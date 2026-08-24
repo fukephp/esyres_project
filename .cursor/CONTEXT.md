@@ -1,6 +1,6 @@
 # Esyres — agent context
 
-This file is the source of truth for everything under `.cursor/`. Read it before applying rules, skills, commands, or hooks. Product scope lives in `docs/mvp/`. Target architecture lives in `docs/architecture/`. There is no application code yet.
+This file is the source of truth for everything under `.cursor/`. Read it before applying rules, skills, commands, or hooks. Product scope lives in `docs/mvp/`. Target architecture lives in `docs/architecture/`. There is no application code yet; `esyres_app/` is the reserved app folder (placeholder until scaffolded). App commands run from `esyres_app/`, not the git root. See `AGENTS.md`.
 
 ## Product (locked)
 
@@ -23,6 +23,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 
 | Path | Role |
 |------|------|
+| `esyres_app/` | Application (Laravel + PWA). Empty placeholder until scaffolded. App commands run here, not at the git root. |
 | `rules/frontend/` | UI/PWA conventions when frontend files are in play |
 | `rules/backend/` | Booking, API, and data conventions when backend files are in play |
 | `hooks/` | Scripts wired in `hooks.json` (session injects this file) |
