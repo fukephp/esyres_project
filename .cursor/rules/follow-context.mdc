@@ -1,0 +1,13 @@
+---
+description: Always follow .cursor/CONTEXT.md across rules, skills, commands, and hooks
+alwaysApply: true
+---
+
+# Follow project context
+
+Read and obey `.cursor/CONTEXT.md` for every task. It applies to all sub-folders under `.cursor/` (`rules/`, `hooks/`, `skills/`, `commands/`).
+
+- Product truth is `docs/mvp/`, not guesses.
+- Architecture truth is `docs/architecture/`. Do not invent a stack.
+- Use `rules/frontend/` when touching UI. Use `rules/backend/` when touching APIs, booking state, or data.
+- Use skills and slash commands listed in CONTEXT.md instead of inventing a parallel workflow.

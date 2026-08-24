@@ -1,0 +1,18 @@
+---
+description: Booking state machine and request-and-propose rules
+globs: backend/**,apps/api/**,**/api/**
+alwaysApply: false
+---
+
+# Booking lifecycle
+
+Stack and occupancy rules: `docs/architecture/`.
+
+Status flow is only: `requested → time_proposed → confirmed | declined`.
+
+- A request holds a **day**, not a clock time. `time_proposed` and `confirmed` occupy the worker slot; `requested` does not.
+- Owner propose sets `time_proposed`, not `confirmed`. Ask-another-day reopens the **same** row (`requested` + new preferred day).
+- Reschedule: the confirmed booking stays protected until the new proposed time is approved.
+- Default reschedule cap is 1 in-progress reschedule per booking (owner-configurable).
+- Cancellation uses owner `cancellation_notice_hours`. Late cancel warns; it does not hard-block.
+- Worker "no preference" is a first-class choice, not an empty worker id hack.

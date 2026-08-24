@@ -1,0 +1,16 @@
+---
+description: Mobile-first PWA UI conventions for Esyres customer and owner surfaces
+globs: frontend/**,apps/web/**,**/*.tsx,**/*.jsx,**/*.css
+alwaysApply: false
+---
+
+# PWA, mobile first
+
+Stack: `docs/architecture/` (one React TypeScript PWA, same origin).
+
+- Customer target is a mobile browser/PWA. Owner dashboard must still work on a phone.
+- Guest browsing has no login wall. Email+password at request submit / My Bookings / owner. Phone OTP required to send a request; email verified before request or owner routes.
+- Bosnian-first copy. Prices in KM. Do not default to English-only or EUR.
+- Keep the QR / Instagram-bio → salon page → request path to one tap where possible.
+- Drag-to-propose on the owner panel always has a tap/form fallback.
+- Verify UI changes in the browser (behavior, not only a screenshot), including related routes that share state.

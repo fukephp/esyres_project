@@ -1,0 +1,42 @@
+# Overview & Goals
+
+## The Problem
+
+Booking a haircut, make-up session, or massage in Sarajevo today means calling the salon or DM-ing on Instagram and waiting for a reply. On the other side, salon owners are juggling a phone, a paper notebook, or a group chat, with no clean way to see who's coming in and when.
+
+## The Solution
+
+A two-sided salon reservation marketplace, mobile-first PWA, connecting customers who want frictionless discovery/booking with salon owners who need structured reservation management — launching in Sarajevo, Bosnia and Herzegovina.
+
+## Core Booking Philosophy
+
+The customer does **not** pick an exact time. They pick a service, optionally a worker (or "no preference"), and a preferred **day**. The salon owner sets the actual time by dragging the request onto an open slot on the Worker Availability Panel and **proposes** it back to the customer, who approves, rejects, or asks for a different day.
+
+Status flow: `requested → time_proposed → confirmed / declined`
+
+This keeps the customer experience light (no scheduling decisions) while concentrating scheduling complexity on the owner side, where it belongs.
+
+## Business Goals
+
+- Solve the two-sided cold-start problem in Sarajevo before expanding to Bosnia and Herzegovina more broadly.
+- Win trust against Booksy (regional incumbent) through Bosnian-first UI, KM pricing, a genuinely free MVP tier, and founder-led onboarding.
+- Preserve the QR-code / Instagram-bio-link → browse → request funnel as the core acquisition mechanic — every product decision is evaluated against whether it protects this path.
+- Build a real, usable product for the first 15–20 founder-onboarded salons before thinking about monetization.
+
+## Product Goals
+
+- Replace phone tag and Instagram DM waiting with a structured request-and-propose flow.
+- Give owners one shared workspace (Worker Availability Panel) to manage all incoming requests and worker schedules without needing per-worker logins.
+- Capture the data needed for trust signals (verification, response speed, reliability) from day one, even where the UI to display it is a later phase.
+
+## Explicit Non-Goals (for now)
+
+- Native mobile app (PWA only at MVP; native is a possible fast-follow).
+- In-app payments (in-salon payment only).
+- Worker self-service logins.
+- Reviews/ratings system.
+- Viber/WhatsApp messaging, referral incentives, badge display UI — all Phase 2.
+
+## Note on Architecture
+
+Stack, data model, and Docker live in `docs/architecture/`. These files remain product scope. If a grilled decision changed product behavior (auth, salon switcher, durations, ask-other-day), this set was updated to match.

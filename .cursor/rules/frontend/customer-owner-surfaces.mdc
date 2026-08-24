@@ -1,0 +1,17 @@
+---
+description: Split customer vs owner UI; customers never see schedules or dashboards
+globs: frontend/**,apps/web/**,**/*.tsx,**/*.jsx
+alwaysApply: false
+---
+
+# Customer vs owner surfaces
+
+Stack and routes: `docs/architecture/` (`/` customer, `/owner` owner, salon switcher).
+
+Customer surface is narrow: Profile, Favorites, Search/Discover, Schedule/Reschedule.
+
+- Customers see a day-level busy badge (🟢/🟡/🔴), never a slot grid.
+- Do not show owner dashboards, stats, or worker grids to customers.
+- Owner complexity lives on the Worker Availability Panel (workers × slots, pending queue).
+- Calm state copy for limbo states (reschedule in progress, late-cancel warning — not a hard block).
+- Capture trust fields now; do not build badge display UI unless the task is Phase 2.
