@@ -30,8 +30,11 @@ Verified (phone + email), Founding Partner, Fast Responder, and similar badges a
 
 States like "Reschedule in progress — thank you for your patience" and late-cancellation warnings (rather than hard blocks) are chosen to keep the customer from feeling penalized or left in limbo while an owner is deciding.
 
+## Decided (visual)
+
+- **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Pastel washes in Design 2 are decorative surfaces only — never status. See `refs/design-2/DESIGN.md`.
+
 ## Not Yet Decided (needs discussion before final design)
 
-- Whether the busy-level badge and Worker Availability Panel visuals should share a consistent color language, or intentionally diverge (customer sees green/yellow/red status; owner sees free/pending/proposed/booked/off cell states) — worth confirming since they represent related but different concepts.
 - Visual treatment for "no preference" worker requests vs. worker-specific ones, on both sides.
 - Whether category chips on Discovery are a fixed set or pulled dynamically from registered salon services.

@@ -11,7 +11,7 @@ Before generating or changing visual UI:
 1. Read root `DESIGN.md` (index — two designs, do not mix).
 2. Open the matching source:
    - **Marketing landing** → `refs/design-1/DESIGN.md`
-   - **Product PWA** (customer / owner / worker) → `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` until `refs/design-2/DESIGN.md` exists
+   - **Product PWA** (customer / owner / worker) → `refs/design-2/DESIGN.md` (also `panel-ref.jpg`), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
 
-- Design 1 is locked (bento + pixel salon). Design 2 is not started yet.
+- Design 1 is locked (bento + pixel salon). Design 2 is locked (cream/pastel/charcoal PWA tokens + role composition).
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

@@ -24,8 +24,9 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | Path | Role |
 |------|------|
 | `esyres_app/` | Application (Laravel + PWA). Empty placeholder until scaffolded. App commands run here, not at the git root. |
-| `DESIGN.md` | Index for **two** designs — points to `refs/design-1/` (marketing). Design 2 TBD. Read before UI; do not mix. |
+| `DESIGN.md` | Index for **two** designs — Design 1 marketing, Design 2 PWA. Read before UI; do not mix. |
 | `refs/design-1/` | Design 1 pack: marketing landing spec + JPG refs |
+| `refs/design-2/` | Design 2 pack: PWA visual system (tokens + composition) + `panel-ref.jpg` |
 | `rules/frontend/` | UI/PWA conventions when frontend files are in play |
 | `rules/backend/` | Booking, API, and data conventions when backend files are in play |
 | `hooks/` | Scripts wired in `hooks.json` (session injects this file) |
@@ -45,7 +46,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 2. Prefer `docs/architecture/` over inventing a stack.
 3. Do not expand MVP into Phase 2 work unless the user asks.
 4. Update this file when a locked product or architecture decision lands.
-5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` until `refs/design-2/` exists. Do not mix Design 1 with the app. Does not override `docs/mvp/` or `rules/frontend/`.
+5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `refs/design-2/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX. Do not mix Design 1 with the app. Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Do not scaffold a marketing site unless asked. The marketing site location is undecided.
 
 ## Docs index
