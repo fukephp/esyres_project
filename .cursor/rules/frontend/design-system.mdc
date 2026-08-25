@@ -1,0 +1,17 @@
+---
+description: Read DESIGN.md index, then the correct design pack — do not mix landing vs app
+globs: frontend/**,apps/web/**,esyres_app/**/*.tsx,esyres_app/**/*.jsx,esyres_app/**/*.css,**/*.tsx,**/*.jsx,**/*.css
+alwaysApply: false
+---
+
+# Design system (DESIGN.md)
+
+Before generating or changing visual UI:
+
+1. Read root `DESIGN.md` (index — two designs, do not mix).
+2. Open the matching source:
+   - **Marketing landing** → `refs/design-1/DESIGN.md`
+   - **Product PWA** (customer / owner / worker) → `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` until `refs/design-2/DESIGN.md` exists
+
+- Design 1 is locked (bento + pixel salon). Design 2 is not started yet.
+- Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.
