@@ -39,7 +39,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | `skills/landing-page/` | Esyres **marketing site** landing only — not the PWA |
 | `skills/pricing-page/` | Esyres **marketing site** pricing only — not salon KM prices |
 | `skills/build-awwwards-quality-sites/` | Esyres **marketing site** polish only — never `/` or `/owner` |
-| `loops/` | Story-loop playbook, answer-key template, and per-story keys |
+| `loops/` | Story-loop playbook, Wayfinder-lite maps, answer-key template, and per-story keys |
 | `commands/` | Slash workflows (`/generate-docs`, `/run-tests`) |
 
 ## How to follow this file
@@ -50,7 +50,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 4. Update this file when a locked product or architecture decision lands.
 5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `refs/design-2/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX. Do not mix Design 1 with the app. Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Do not scaffold a marketing site unless asked. The marketing site location is undecided.
-7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Do not run unattended whole-MVP gauntlets.
+7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
 
 ## Docs index
 
