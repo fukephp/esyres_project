@@ -18,7 +18,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 14. **Laravel Storage, GraphQL multipart** — few salon photos; no Spatie.
 15. **i18next, `bs` only** — no language switcher at MVP.
 16. **Busy-level on the server** — one place for thresholds.
-17. **Behat + Vitest + Playwright** — no Pest, no Storybook.
+17. **Behat + Vitest + Playwright** — Behat-only backend gate (no Pest, no parallel PHPUnit suite). Behat is GraphQL-over-HTTP, not Mink; verify with `vendor/bin/behat`. Playwright remains frontend E2E. No Storybook.
 18. **SMS as an interface** — vendor not contracted in docs.
 19. **Sarajevo dates, UTC datetimes** — day-level booking must not shift at midnight UTC.
 20. **Integer feninga** — no float money.

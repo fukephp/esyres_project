@@ -41,8 +41,7 @@ TBD after scaffold
 Examples to replace TBD once the app exists (adjust to real scripts):
 
 ```text
-# composer test
-# php artisan test
+# vendor/bin/behat
 # npm run typecheck
 # npm run lint
 ```

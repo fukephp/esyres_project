@@ -15,7 +15,7 @@ Follow `.cursor/loops/PLAYBOOK.md`. Product constraints while implementing: `.cu
 ## Preconditions
 
 1. Read `.cursor/CONTEXT.md`.
-2. **Verify gate:** Detect whether `esyres_app/` has a real local verify runner (package scripts, PHPUnit / Pest, CI config, language tooling). If `esyres_app/` is still only a placeholder (e.g. `.gitkeep` only), or no test/typecheck/lint runner exists:
+2. **Verify gate:** Detect whether `esyres_app/` has a real local verify runner (`vendor/bin/behat`, package scripts, CI config, language tooling). Backend gate is Behat, not PHPUnit/Pest. If `esyres_app/` is still only a placeholder (e.g. `.gitkeep` only), or no test/typecheck/lint runner exists:
    - Say that story coding loops are blocked until scaffold + local verify exist.
    - Offer plan-gate prep only (map and/or answer key). Do **not** start or brief a coding Cloud Agent. Do not scaffold the app unless the user asked.
 3. Unit of work is **one MVP story** from `docs/mvp/07-Stories.md` → one PR. Refuse multi-epic / whole-MVP gauntlets.

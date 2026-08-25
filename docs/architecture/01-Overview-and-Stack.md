@@ -14,7 +14,7 @@ Application code is **not** in this repo yet. These files describe the locked ta
 | UI | Tailwind CSS, i18next default `bs`, React Router (`/` customer, `/owner` owner) |
 | PWA | `vite-plugin-pwa` + Workbox, native Web Push (VAPID) |
 | Owner grid | `@dnd-kit` + tap/form fallback |
-| Tests | Behat (backend), Vitest + Playwright (frontend) |
+| Tests | Behat GraphQL HTTP (backend); Vitest + Playwright (frontend) |
 | Local run | Docker Compose (documented, not written) |
 
 Same origin: Nginx serves the SPA at `/`, GraphQL at `/graphql`, Reverb on the same host. No split `app.` / `api.` domains at MVP.
