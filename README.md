@@ -41,3 +41,5 @@ No application code in this repo yet. Product scope: `docs/mvp/`. Target archite
 
 - `docs/mvp/` — product scope, users, features, epics, stories
 - `docs/architecture/` — locked stack (Laravel/Lighthouse, React PWA, MySQL, Docker). No app folders yet.
+
+Until `esyres_app/` has real code, stress-test plans with **grill-me**. After that, use **grill-with-docs** / `/grill-with-docs`.

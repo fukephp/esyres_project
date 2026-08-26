@@ -1,6 +1,6 @@
 # Decisions
 
-Short ADRs so later sessions do not re-litigate the stack. Product patches live in `docs/mvp/` when a decision changed scope.
+Short ADRs so later sessions do not re-litigate the stack. Product patches live in `docs/mvp/` when a decision changed scope. After `esyres_app/` exists, **grill-with-docs** also writes `docs/adr/`; if that ADR changes a locked stack choice, update this file too.
 
 1. **Same origin via Nginx** — SPA + GraphQL + Reverb. Avoids CORS and cookie issues for a solo PWA.
 2. **Sanctum cookies, not Bearer** — httpOnly session; tokens later for native.

@@ -43,7 +43,7 @@ After the story is picked, decide whether fog is **non-trivial**:
 ### Work the map
 
 1. Fill Destination and Notes; list Open decisions and Not yet specified honestly.
-2. Use grill-me style: resolve **one open decision at a time** with a recommended answer. Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` over guessing.
+2. Use grill-me style: resolve **one open decision at a time** with a recommended answer. Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` over guessing. If `esyres_app/` has real code, use **grill-with-docs** so glossary/ADRs land on disk.
 3. Move each locked answer into **Decisions so far**. Graduate fog into Open decisions only when the question is sharp enough to ask.
 4. Do **not** compile an answer key while **Not yet specified** or **Open decisions** still have items.
 5. When both are empty, set Status to `ready-to-compile` and ask the user for explicit OK to compile. Do not auto-compile.
@@ -107,3 +107,4 @@ Remind: Bugbot → human merge. Machine gates already passed; Bugbot is the ligh
 - Answer key template: `.cursor/loops/ANSWER_KEY_TEMPLATE.md`
 - Tests: `.cursor/commands/run-tests.md`
 - Grill-me: `.cursor/skills/grill-me/SKILL.md`
+- Grill-with-docs: `.cursor/skills/grill-with-docs/SKILL.md`

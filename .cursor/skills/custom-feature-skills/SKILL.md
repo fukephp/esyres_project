@@ -17,6 +17,7 @@ description: Add or change an Esyres feature against MVP epics and stories. Use 
 5. Capture trust data if the feature touches requests, visits, or verification. Do not build badge display unless asked.
 6. Prefer the smallest change that ships the story. Follow `docs/architecture/` for stack; do not invent a second API style.
 7. Auth: guest browse is open. Email+password login. Verified email + phone OTP required to send a request. Owner routes: invite-only, verified email.
+8. If the change still needs a grill and `esyres_app/` has real code, use **grill-with-docs**. Until then use **grill-me**.
 
 ## Feature checklist
 

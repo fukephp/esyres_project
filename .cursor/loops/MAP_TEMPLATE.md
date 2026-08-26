@@ -21,7 +21,7 @@
 ## Notes
 
 - Consult: `.cursor/CONTEXT.md`, `docs/mvp/`, `docs/architecture/`
-- Skills: `.cursor/skills/custom-feature-skills/SKILL.md`, grill-me style for open decisions
+- Skills: `.cursor/skills/custom-feature-skills/SKILL.md`; grill-me style for open decisions; grill-with-docs when `esyres_app/` has real code
 - Standing preferences for this effort:
 
 ## Decisions so far
