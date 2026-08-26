@@ -2,7 +2,7 @@
 
 > Copy this file to `.cursor/loops/answer-keys/STORY-xx.md` (use the real story id).
 > Fill every section. Replace TBD after `esyres_app/` has real verify commands.
-> Do not start a Cloud Agent until a human has approved this file.
+> Do not implement (Local or Cloud) until a human has approved this file.
 
 ## Meta
 
@@ -52,7 +52,7 @@ Explicit non-goals for this PR (Phase 2, adjacent stories, refactors not require
 
 - …
 
-## Cloud Agent instructions
+## Implementer instructions
 
 1. Read this answer key and `.cursor/CONTEXT.md`. Follow `.cursor/skills/custom-feature-skills/SKILL.md` for product constraints.
 2. Implement **only** what this key requires. Do not expand MVP or invent stack.

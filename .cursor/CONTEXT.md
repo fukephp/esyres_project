@@ -31,7 +31,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | `rules/backend/` | Booking, API, and data conventions when backend files are in play |
 | `hooks/` | Scripts wired in `hooks.json` (session injects this file) |
 | `skills/custom-feature-skills/` | How to add a feature against epics/stories |
-| `skills/story-loop/` | Story-sized Loop Engineering: answer key → Cloud Agent brief → Bugbot |
+| `skills/story-loop/` | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot |
 | `skills/deploy-staging/` | How to ship to staging |
 | `skills/grill-me/` | Relentless interview of a plan or design until shared understanding |
 | `skills/tailwindcss/` | Tailwind for the PWA (vendored MengTo; Esyres gate) |
@@ -50,7 +50,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 4. Update this file when a locked product or architecture decision lands.
 5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `refs/design-2/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX. Do not mix Design 1 with the app. Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Do not scaffold a marketing site unless asked. The marketing site location is undecided.
-7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
+7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
 
 ## Docs index
 

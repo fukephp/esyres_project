@@ -1,6 +1,8 @@
 # Esyres story-loop playbook
 
-Loop Engineering for Esyres means: clear fog, approve a pass/fail answer key, let a Cloud Agent implement and verify on a branch with a hard iteration cap, run Bugbot on the PR, then you merge.
+Loop Engineering for Esyres means: clear fog, approve a pass/fail answer key, implement and verify on a branch with a hard iteration cap, run Bugbot on the PR, then you merge.
+
+**Runtime is Hybrid.** Default is Local Agent in this chat. Cloud Agent is opt-in only (`story-loop STORY-xx unattended`, or a clear “Cloud Agent for STORY-xx”). There is no `briefs/` folder; the answer key is the contract.
 
 This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt.
 
@@ -35,10 +37,10 @@ Foggy stories use a **light story map** (Destination, Decisions so far, Open dec
 | Stop rule | You approve answer key → machine gates → you review PR |
 | Unit of work | One MVP story → one PR |
 | Ready when | Scaffold + local verify commands exist |
-| Runtime | Cloud Agent (or Automation) on a feature branch |
+| Runtime | Hybrid: Local Agent default (implement in chat); Cloud Agent on `unattended` (short paste, no file) |
 | Answer key | Per-story markdown under `.cursor/loops/answer-keys/` |
 | Hard stop | 5–8 implement→verify cycles, then escalate |
-| Plan gate | Fog check → optional map → compile key → you approve → Cloud Agent |
+| Plan gate | Fog check → optional map → compile key → you approve → implement |
 | Checker | Bugbot on the PR (no second unattended critic loop) |
 
 ## Fog gate
@@ -67,8 +69,8 @@ Then set map Status to `compiled`. Do not invent pass/fail checks for leftover f
 3. Grill **one open decision at a time** (grill-me style); update the map. Graduate fog into open decisions only when the question is sharp.
 4. When fog and opens are clear, get your OK → **compile** `.cursor/loops/answer-keys/STORY-xx.md` from Decisions so far + Out of scope + verify placeholders. (Sharp path: draft the key without a map.)
 5. **You approve** the answer key (Status `approved`; every check concrete).
-6. Use the `story-loop` skill to emit a Cloud Agent brief (branch, key path, cap, verify commands).
-7. Cloud Agent implements against the key; runs verify from `esyres_app/`; retries while under the iteration cap.
+6. Use the `story-loop` skill. Default (`story-loop STORY-xx`): implement in this chat against the key. Opt-in Cloud (`story-loop STORY-xx unattended`): emit a short paste block only — do not write a brief file.
+7. Implementer (Local or Cloud) follows **Implementer instructions** in the key; runs verify from `esyres_app/`; retries while under the iteration cap.
 8. On pass: open a PR. On cap / stuck: open a draft or blocked PR with what failed — do not burn more cycles.
 9. Run Bugbot on the PR.
 10. You review and merge.
@@ -92,6 +94,7 @@ Then set map Status to `compiled`. Do not invent pass/fail checks for leftover f
 - Coding loops before `esyres_app/` has a real verify runner
 - Docs-only “loops” that check markdown checklists with no runnable app
 - A second long unattended critic agent (Bugbot + human review is enough for MVP stories)
+- A `briefs/` folder or a mandatory Cloud Agent brief as a lifecycle step
 - Porting Claude Code `/goal` or viral gauntlet prompts verbatim
 - Full Wayfinder (issue-tracker maps, ticket claiming, research/prototype labels)
 
