@@ -1,8 +1,9 @@
 # Story map: STORY-xx
 
 > Wayfinder-lite planning artifact. Copy to `.cursor/loops/maps/STORY-xx.md`.
-> Clear fog and open decisions here; then compile into an answer key.
+> Clear fog and open decisions here; then compile into a **draft** answer key (no extra “OK to compile”).
 > Do **not** invent pass/fail checks for areas still in fog.
+> If a likely product check has no verifier (test, command, or `human-only: …`), keep it here — not on the key.
 > This is not Matt Pocock’s full Wayfinder (no issue-tracker tickets).
 
 ## Meta
@@ -22,6 +23,7 @@
 
 - Consult: `.cursor/CONTEXT.md`, `docs/mvp/`, `docs/architecture/`
 - Skills: `.cursor/skills/custom-feature-skills/SKILL.md`; grill-me style for open decisions; grill-with-docs when `esyres_app/` has real code
+- If a likely product check has no verifier, leave it in Not yet specified or Open decisions
 - Standing preferences for this effort:
 
 ## Decisions so far

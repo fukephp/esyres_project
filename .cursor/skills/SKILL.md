@@ -12,7 +12,7 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 | Skill | When to use |
 |-------|-------------|
 | [custom-feature-skills](custom-feature-skills/SKILL.md) | Adding or changing a product feature against MVP epics/stories |
-| [story-loop](story-loop/SKILL.md) | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot |
+| [story-loop](story-loop/SKILL.md) | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot (`/story-loop`) |
 | [deploy-staging](deploy-staging/SKILL.md) | Deploying or preparing a staging release |
 | [grill-me](grill-me/SKILL.md) | Stress-testing a plan with no app code; user says "grill me"; writes nothing |
 | [grill-with-docs](grill-with-docs/SKILL.md) | Same interview against `esyres_app/` once it exists; writes glossary + ADRs (`/grill-with-docs`) |

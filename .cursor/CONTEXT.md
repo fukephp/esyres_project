@@ -43,7 +43,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | `skills/pricing-page/` | Esyres **marketing site** pricing only — not salon KM prices |
 | `skills/build-awwwards-quality-sites/` | Esyres **marketing site** polish only — never `/` or `/owner` |
 | `loops/` | Story-loop playbook, Wayfinder-lite maps, answer-key template, and per-story keys |
-| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/grill-with-docs`) |
+| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/story-loop`, `/grill-with-docs`) |
 
 ## How to follow this file
 

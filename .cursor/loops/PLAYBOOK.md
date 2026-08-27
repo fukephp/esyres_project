@@ -33,53 +33,61 @@ Foggy stories use a **light story map** (Destination, Decisions so far, Open dec
 
 | Decision | Choice |
 |----------|--------|
-| Job | Ship features with less babysitting |
+| Job | Ship features with less coding babysitting (plan gates stay) |
 | Stop rule | You approve answer key → machine gates → you review PR |
 | Unit of work | One MVP story → one PR |
 | Ready when | Scaffold + local verify commands exist |
 | Runtime | Hybrid: Local Agent default (implement in chat); Cloud Agent on `unattended` (short paste, no file) |
 | Answer key | Per-story markdown under `.cursor/loops/answer-keys/` |
 | Hard stop | 5–8 implement→verify cycles, then escalate |
-| Plan gate | Fog check → optional map → compile key → you approve → implement |
-| Checker | Bugbot on the PR (no second unattended critic loop) |
+| Plan gate | Fog check → optional map → draft key → you approve → implement |
+| Checker | Bugbot on the PR (nits on same PR; key conflicts escalate; no second critic) |
 
 ## Fog gate
 
 Use a story map when fog is **non-trivial**:
 
 - More than **3** open decisions, **or**
-- Story touches **auth**, **booking status transitions**, or a **new customer/owner surface**
+- Story touches **auth**, **booking status transitions**, or a **new customer/owner surface**, **or**
+- Likely product checks do not yet have **obvious verifiers** (test, command, or `human-only: …`)
 
-Otherwise skip the map: short grill → draft answer key directly.
+Otherwise skip the map: short grill → draft answer key directly. Sharp means all of: ≤3 opens, no domain trigger, and every likely product check already has an obvious verifier. Keep the number 3.
+
+If a likely product check cannot name a verifier, it stays on the map (Not yet specified or Open decisions). It is not a pass/fail line yet.
 
 ## Compile rule
 
-Compile map → answer key only when **all** of these are true:
+Compile map → **draft** answer key when **both** of these are true:
 
 1. **Not yet specified** is empty
 2. **Open decisions** are empty (all moved into Decisions so far)
-3. **You explicitly OK** compiling the key
+
+There is no separate “OK to compile.” The agent drafts the key in the same turn. You only approve the key.
 
 Then set map Status to `compiled`. Do not invent pass/fail checks for leftover fog.
+
+## Pass/fail
+
+Every product check on the key must name a verifier: a test, a command, or `human-only: …`. Cap human-only at **1–2** lines per key. Architecture checks cite `docs/architecture/` constraints this story must not violate.
 
 ## Flow
 
 1. Pick a story from `docs/mvp/07-Stories.md`.
 2. Apply the **fog gate**. If non-trivial: create/update `.cursor/loops/maps/STORY-xx.md` from `MAP_TEMPLATE.md`.
 3. Grill **one open decision at a time** (grill-me style; **grill-with-docs** once `esyres_app/` has real code); update the map. Graduate fog into open decisions only when the question is sharp.
-4. When fog and opens are clear, get your OK → **compile** `.cursor/loops/answer-keys/STORY-xx.md` from Decisions so far + Out of scope + verify placeholders. (Sharp path: draft the key without a map.)
-5. **You approve** the answer key (Status `approved`; every check concrete).
+4. When fog and opens are clear, **compile a draft** `.cursor/loops/answer-keys/STORY-xx.md` from Decisions so far + Out of scope + named verifiers. (Sharp path: draft the key without a map.)
+5. **You approve** the answer key (Status `approved`; every product check names a verifier).
 6. Use the `story-loop` skill. Default (`story-loop STORY-xx`): implement in this chat against the key. Opt-in Cloud (`story-loop STORY-xx unattended`): emit a short paste block only — do not write a brief file.
 7. Implementer (Local or Cloud) follows **Implementer instructions** in the key; runs verify from `esyres_app/`; retries while under the iteration cap.
 8. On pass: open a PR. On cap / stuck: open a draft or blocked PR with what failed — do not burn more cycles.
-9. Run Bugbot on the PR.
+9. Run Bugbot on the PR. Trivial nits: fix on the same PR (do not burn the cap). Findings that contradict the key: stop and ask. Do not silently rewrite the key.
 10. You review and merge.
 
 ## Gates
 
 1. **Plan gate** — fog cleared (map or sharp path); answer key approved by you; agent does not invent the key mid-run.
-2. **Machine gate** — every verify command in the answer key exits 0.
-3. **Checker gate** — Bugbot on the PR (lightweight second opinion).
+2. **Machine gate** — every verify command in the answer key exits 0 (plus at most 1–2 named human-only product checks).
+3. **Checker gate** — Bugbot on the PR (lightweight second opinion). Nits stay on the PR; key conflicts escalate to you.
 4. **Merge gate** — you review and merge.
 
 ## Hard stop
