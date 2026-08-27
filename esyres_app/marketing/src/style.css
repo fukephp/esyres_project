@@ -104,10 +104,10 @@ button {
 }
 
 .nav__mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--color-primary);
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .nav__wordmark {
