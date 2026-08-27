@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Join the Esyres salon waitlist in Sarajevo. Invite-only for owners — register your interest."
+    />
+    <title>Sign up your salon · Esyres</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="nav">
+        <a class="nav__brand" href="/" aria-label="Esyres home">
+          <span class="nav__mark" aria-hidden="true"></span>
+          <span class="nav__wordmark">Esyres</span>
+        </a>
+        <nav class="nav__links" aria-label="Primary">
+          <a href="/#how">How it works</a>
+          <a href="/#why">Why Esyres</a>
+          <a href="/#footer">Contact</a>
+          <a class="btn btn--primary btn--nav" href="/signup.html" aria-current="page">
+            Sign up your salon
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="signup" aria-labelledby="signup-heading">
+          <div class="signup__copy">
+            <h1 id="signup-heading">Sign up your salon</h1>
+            <p class="signup__support">
+              Join the early waitlist for salon owners in Sarajevo. Invite-only —
+              we will reach out when your spot opens. This does not create an
+              owner account.
+            </p>
+          </div>
+
+          <div class="signup__panel">
+            <!-- Formspree: replace PLACEHOLDER_REPLACE_ME with your form id before go-live. See README.md -->
+            <form
+              class="waitlist-form"
+              id="waitlist-form"
+              method="POST"
+              action="https://formspree.io/f/PLACEHOLDER_REPLACE_ME"
+              novalidate
+            >
+              <div class="field">
+                <label for="salon_name">Salon name</label>
+                <input
+                  id="salon_name"
+                  name="salon_name"
+                  type="text"
+                  autocomplete="organization"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="owner_name">Owner name</label>
+                <input
+                  id="owner_name"
+                  name="owner_name"
+                  type="text"
+                  autocomplete="name"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="phone">
+                  Phone <span class="field__optional">(optional)</span>
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                />
+              </div>
+              <button type="submit" class="btn btn--primary waitlist-form__submit">
+                Join the waitlist
+              </button>
+              <p class="waitlist-form__note" id="waitlist-note" role="status" hidden></p>
+            </form>
+            <p class="signup__invite-note">
+              Invite-only for owners. Early signup opens with the product — no
+              public salon registration yet.
+            </p>
+          </div>
+        </section>
+
+        <footer class="footer" id="footer">
+          <div class="footer__inner">
+            <p class="footer__eyebrow">Esyres · Sarajevo</p>
+            <h2 class="footer__heading">Built for salons in Sarajevo</h2>
+            <p class="footer__support">
+              Day-level requests. You propose the time. Guests confirm.
+            </p>
+            <a class="btn btn--primary btn--on-dark" href="/">Back to home</a>
+            <div class="footer__meta">
+              <span>English for now · localization later</span>
+              <span>Instagram soon</span>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
