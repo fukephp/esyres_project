@@ -1,5 +1,5 @@
 ---
-description: Read DESIGN.md index, then the correct design pack — do not mix landing vs app
+description: Read DESIGN.md index, then the correct design pack — same Cal tokens, separate packs by surface
 globs: frontend/**,apps/web/**,esyres_app/**/*.tsx,esyres_app/**/*.jsx,esyres_app/**/*.css,**/*.tsx,**/*.jsx,**/*.css
 alwaysApply: false
 ---
@@ -8,10 +8,10 @@ alwaysApply: false
 
 Before generating or changing visual UI:
 
-1. Read root `DESIGN.md` (index — two designs, do not mix).
+1. Read root `DESIGN.md` (index — two packs, shared Cal system; do not mix marketing IA with product chrome).
 2. Open the matching source:
    - **Marketing landing** → `refs/design-1/DESIGN.md`
-   - **Product PWA** (customer / owner / worker) → `refs/design-2/DESIGN.md` (also `panel-ref.jpg`), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
+   - **Product PWA** (customer / owner / worker) → `refs/design-2/DESIGN.md` (also `panel-ref.jpg` for owner skeleton), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
 
-- Design 1 is locked (Cal-based clean SaaS marketing — white canvas, black CTAs, Cal Sans + Inter). Design 2 is locked (cream/pastel/charcoal PWA tokens + role composition).
+- Design 1 is locked (Cal-based clean SaaS marketing — white canvas, black CTAs, Cal Sans + Inter). Design 2 is locked (same Cal tokens + role composition; owner dark nav; not a dashboard IA clone).
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

@@ -3,19 +3,33 @@ version: alpha
 name: Esyres Product PWA
 description: >-
   Design 2 — Product PWA visual system (customer, owner, later worker).
-  Cream canvas, pastel surface accents, charcoal CTAs. Tokens + composition
-  rules only — not a medical-dashboard layout clone. Do not apply to marketing.
+  Same Cal design system as Design 1 (https://www.designmd.co/d/cal):
+  white canvas, black primary CTAs, Cal Sans + Inter, soft ~8–12px radius.
+  Separate pack by surface/composition (sparse customer / dense owner), not
+  by palette. Do not apply marketing IA to product routes.
 colors:
-  canvas: "#F9F6F0"
-  charcoal: "#1A1A1A"
-  on-charcoal: "#FFFFFF"
-  surface: "#FFFFFF"
-  text: "#1A1A1A"
-  text-muted: "#6B6560"
-  pastel-yellow: "#F2D58E"
-  pastel-pink: "#EDC0DD"
-  pastel-green: "#A4C684"
-  pastel-blue: "#B8D4F0"
+  primary: "#111111"
+  primary-active: "#242424"
+  primary-disabled: "#e5e7eb"
+  ink: "#111111"
+  body: "#374151"
+  muted: "#6b7280"
+  muted-soft: "#898989"
+  hairline: "#e5e7eb"
+  hairline-soft: "#f3f4f6"
+  canvas: "#ffffff"
+  surface-soft: "#f8f9fa"
+  surface-card: "#f5f5f5"
+  surface-strong: "#e5e7eb"
+  surface-dark: "#101010"
+  surface-dark-elevated: "#1a1a1a"
+  on-primary: "#ffffff"
+  on-dark: "#ffffff"
+  on-dark-soft: "#a1a1aa"
+  brand-accent: "#3b82f6"
+  success: "#10b981"
+  warning: "#f59e0b"
+  error: "#ef4444"
   busy-free: "#22C55E"
   busy-moderate: "#EAB308"
   busy-busy: "#EF4444"
@@ -25,83 +39,135 @@ colors:
   cell-booked: "#1A1A1A"
   cell-off: "#D6D3D1"
 typography:
-  greeting:
-    fontFamily: Fraunces
-    fontSize: 1.75rem
-    fontWeight: 700
-    lineHeight: 1.2
-  h1:
-    fontFamily: Fraunces
-    fontSize: 1.5rem
+  display-sm:
+    fontFamily: "Cal Sans, Inter, sans-serif"
+    fontSize: 28px
     fontWeight: 600
-    lineHeight: 1.25
-  h2:
-    fontFamily: Fraunces
-    fontSize: 1.25rem
+    lineHeight: 1.2
+    letterSpacing: -0.5px
+  title-lg:
+    fontFamily: "Inter, sans-serif"
+    fontSize: 22px
     fontWeight: 600
     lineHeight: 1.3
+    letterSpacing: -0.3px
+  title-md:
+    fontFamily: "Inter, sans-serif"
+    fontSize: 18px
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: 0
+  title-sm:
+    fontFamily: "Inter, sans-serif"
+    fontSize: 16px
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: 0
   body-md:
-    fontFamily: Plus Jakarta Sans
-    fontSize: 1rem
+    fontFamily: "Inter, sans-serif"
+    fontSize: 16px
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.5
+    letterSpacing: 0
   body-sm:
-    fontFamily: Plus Jakarta Sans
-    fontSize: 0.875rem
+    fontFamily: "Inter, sans-serif"
+    fontSize: 14px
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.5
+    letterSpacing: 0
+  caption:
+    fontFamily: "Inter, sans-serif"
+    fontSize: 13px
+    fontWeight: 500
+    lineHeight: 1.4
+    letterSpacing: 0
   label:
-    fontFamily: Plus Jakarta Sans
-    fontSize: 0.75rem
+    fontFamily: "Inter, sans-serif"
+    fontSize: 12px
     fontWeight: 600
     lineHeight: 1.3
-    letterSpacing: 0.04em
+    letterSpacing: 0
   button:
-    fontFamily: Plus Jakarta Sans
-    fontSize: 0.9375rem
+    fontFamily: "Inter, sans-serif"
+    fontSize: 14px
     fontWeight: 600
-    lineHeight: 1.2
+    lineHeight: 1
+    letterSpacing: 0
+  nav-link:
+    fontFamily: "Inter, sans-serif"
+    fontSize: 14px
+    fontWeight: 500
+    lineHeight: 1.4
+    letterSpacing: 0
 rounded:
-  sm: 16px
-  md: 24px
-  lg: 32px
-spacing:
   xs: 4px
-  sm: 8px
+  sm: 6px
+  md: 8px
+  lg: 12px
+  xl: 16px
+  pill: 9999px
+  full: 9999px
+spacing:
+  xxs: 4px
+  xs: 8px
+  sm: 12px
   md: 16px
   lg: 24px
   xl: 32px
   xxl: 48px
 components:
   button-primary:
-    backgroundColor: "{colors.charcoal}"
-    textColor: "{colors.on-charcoal}"
-    rounded: "9999px"
-    padding: 14px
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    padding: 12px 20px
+    height: 40px
+  button-primary-active:
+    backgroundColor: "{colors.primary-active}"
+    textColor: "{colors.on-primary}"
+    rounded: "{rounded.md}"
+  button-primary-disabled:
+    backgroundColor: "{colors.primary-disabled}"
+    textColor: "{colors.muted}"
+    rounded: "{rounded.md}"
   button-secondary:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.charcoal}"
-    rounded: "9999px"
-    padding: 14px
-  bento-card:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    typography: "{typography.button}"
     rounded: "{rounded.md}"
-  bento-accent:
-    rounded: "{rounded.md}"
+    padding: 12px 20px
+    height: 40px
   owner-nav:
-    backgroundColor: "{colors.charcoal}"
-    textColor: "{colors.on-charcoal}"
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.on-dark}"
+    typography: "{typography.nav-link}"
+  queue-surface:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+  availability-panel:
+    backgroundColor: "{colors.surface-card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+  customer-top-bar:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    typography: "{typography.nav-link}"
+    height: 56px
 ---
 
 ## Overview
 
 Design 2 is the **product PWA** look — customer funnel, owner tools, and (Phase 2) worker UI. It locks **tokens + composition rules**, not a 1:1 clone of any reference dashboard.
 
+**Provenance:** Same visual system as Design 1, adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Brand/surface/type/radius tokens match Design 1 (self-contained here so this pack reads alone). Packs stay separate by **surface and composition** — marketing IA vs product chrome — not by palette.
+
 Reference in this folder:
 
-- **`panel-ref.jpg`** — **palette, radius, type vibe only** (cream canvas, soft pastel bento, charcoal chrome, serif greeting + sans UI). Do **not** copy the medical IA, KPI charts, patient detail panels, or required mini-calendar rail.
+- **`panel-ref.jpg`** — **owner panel skeleton / density only** (left nav, main queue + availability, optional rail). Ignore cream/pastel/serif/medical IA, KPI charts, patient panels, and required mini-calendar from the image. Visual truth is the tokens in this file.
 
-**Do not apply Design 2 to the Esyres marketing site.** Marketing uses [`refs/design-1/DESIGN.md`](../design-1/DESIGN.md).
+**Do not apply Design 2 to the Esyres marketing site.** Marketing uses [`refs/design-1/DESIGN.md`](../design-1/DESIGN.md). Do not apply marketing long-scroll/hero IA to product routes.
 
 Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste. Copy is Bosnian-first; prices in KM.
 
@@ -111,29 +177,29 @@ When the PWA is scaffolded, map these tokens to Tailwind/CSS variables. Until th
 
 - Calm, trustworthy salon booking UI for Sarajevo.
 - Customer: frictionless QR → browse → request (no dashboards).
-- Owner: dense, actionable queue + Worker Availability Panel in the same visual language.
-- Success: one clear hierarchy per screen; pastel warmth without rainbow status confusion.
+- Owner: dense, actionable queue + Worker Availability Panel in the same Cal visual language.
+- Success: one clear hierarchy per screen; status colors stay functional and separate from brand chrome.
 
 ## FORMAT
 
 - Customer: mobile-first, single column; safe margins ~16–20px.
 - Owner: tablet/desktop primary; phone must still work (collapse nav, stack regions, tap-to-propose fallback).
-- Large corner radius throughout (`rounded.sm`–`lg` ≈ Tailwind `rounded-2xl`–`3xl`).
+- Radius hierarchy matches Cal: buttons/inputs `{rounded.md}` (8px); content panels `{rounded.lg}` (12px). Do not use pill primary CTAs.
 
 ## LAYOUT (composition rules)
 
 ### Customer (sparse)
 
-- No charcoal sidebar, no right schedule rail, no KPI card grids, no charts.
-- Cream canvas; charcoal primary CTAs; soft white/pastel chips and at most one accent block when it aids the funnel (e.g. busy-day hint, confirmation).
+- No dark sidebar, no right schedule rail, no KPI card grids, no charts.
+- White canvas; primary black CTAs; hairline borders; at most one soft surface block when it aids the funnel (e.g. busy-day hint, confirmation).
 - Surfaces: Profile, Bookmarks/Favorites, Search/Discover, Schedule/Reschedule — narrow by product design.
 
 ### Owner (dense)
 
-Desktop/tablet default regions:
+Desktop/tablet default regions (see `panel-ref.jpg` for skeleton density only):
 
-1. **Charcoal left nav** — primary destinations; salon switcher if multi-salon.
-2. **Main** — pending-request queue + Worker Availability Panel on pastel/white bento surfaces; charcoal CTAs.
+1. **Dark left nav** (`{colors.surface-dark}`) — primary destinations; salon switcher if multi-salon.
+2. **Main** — pending-request queue + Worker Availability Panel on white / `{colors.surface-card}` surfaces; primary CTAs.
 3. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
 
 Phone: collapse or bottom nav; stack queue above availability.
@@ -144,29 +210,29 @@ Same tokens and chrome family as owner when built. Not MVP — do not invent wor
 
 ## TYPE SYSTEM
 
-- **Titles / greetings:** Fraunces, weight 600–700.
-- **UI chrome / body / nav / buttons:** Plus Jakarta Sans — body 400, labels/buttons 600.
-- Never use Design 1 Satoshi or pixel-label typography on the PWA.
-- Hierarchy: one greeting or H1 → short support → primary action.
+- **Page titles / greetings:** Cal Sans (`display-sm` / `title-lg` weight 600), negative letter-spacing where specified.
+- **UI chrome / body / nav / buttons / labels:** Inter — body 400, labels/buttons 600.
+- Never put body in Cal Sans; never put dense panel chrome in a decorative serif.
+- Hierarchy: one title or H1 → short support → primary action.
+- Self-host Cal Sans (same as marketing). Load Inter via CDN or self-host. If Cal Sans is unavailable, Inter 600 with ≈ -0.04em tracking is the fallback.
 
 ## COLOR + MATERIAL
 
-### Surfaces (decorative — not status)
+### Brand & surfaces (Cal parity with Design 1)
 
 | Token | Hex | Use |
 |--------|------|-----|
-| canvas | `#F9F6F0` | Page background |
-| surface | `#FFFFFF` | Default cards on cream |
-| pastel-yellow | `#F2D58E` | Accent bento / section fill |
-| pastel-pink | `#EDC0DD` | Accent bento / soft chips |
-| pastel-green | `#A4C684` | Accent bento |
-| pastel-blue | `#B8D4F0` | Accent bento |
-| charcoal | `#1A1A1A` | Owner nav, primary CTA, strong text |
-| text-muted | `#6B6560` | Secondary copy |
+| canvas | `#ffffff` | Page background |
+| surface-soft | `#f8f9fa` | Soft dividers |
+| surface-card | `#f5f5f5` | Panels, availability chrome |
+| surface-dark | `#101010` | Owner left nav (scarce dark signal) |
+| primary | `#111111` | Primary CTAs, strong text |
+| hairline | `#e5e7eb` | 1px borders on light surfaces |
+| ink / body / muted | `#111111` / `#374151` / `#6b7280` | Text hierarchy |
 
-Pastels may be reused freely by layout. They must **not** encode booking or busy meaning.
+Brand accent (`#3b82f6`) is spare use only (rare inline link). Never on primary CTAs.
 
-### Status (separate, higher contrast)
+### Status (Design-2-only — higher contrast; not brand chrome)
 
 **Customer busy badge** (day-level — keep 🟢 / 🟡 / 🔴 semantics):
 
@@ -188,50 +254,53 @@ Pastels may be reused freely by layout. They must **not** encode booking or busy
 
 ## IMAGERY / UI STYLE
 
-- Soft bento cards, thin-line icons, pill buttons (`rounded-full` for primary actions).
+- Soft panels with hairline borders; thin-line icons; primary buttons at `{rounded.md}` (not pills).
 - Calm salon product UI — not agency landing, not medical EMR chrome.
-- Depth from cream vs white/pastel fills and large radius — not glass, glow, or multi-layer shadows.
-- Real salon photography only when product needs it; decorative gradients alone are not the main visual idea on marketing (N/A here). Prefer quiet UI over hero photography on owner tools.
+- Depth from white vs `{colors.surface-card}` fills and 8–12px radius — not glass, glow, or multi-layer shadows.
+- Real salon photography only when product needs it. Prefer quiet UI over hero photography on owner tools.
 
 ## CONSTRAINTS
 
 ```text
-FONT   FRAUNCES + PLUS JAKARTA SANS
-STYLE  CREAM PASTEL BENTO
-MODE   LIGHT
-CTA    CHARCOAL
+FONT   CAL SANS + INTER
+STYLE  CLEAN CAL SAAS (PRODUCT COMPOSITION)
+MODE   LIGHT (+ dark owner nav)
+CTA    PRIMARY #111111
 ```
 
 - Change one variable at a time when iterating variants.
-- Product routes (`/`, salon pages, `/owner`) never inherit Design 1 pixel/magenta marketing look.
+- Product routes (`/`, salon pages, `/owner`) never inherit marketing long-scroll, hero bands, or dark-footer page endings.
 
 ## NEGATIVE PROMPT
 
-- No Design 1 Satoshi / pixel / magenta / cobalt marketing chrome on the PWA.
+- No cream canvas, decorative pastel washes, Fraunces, Plus Jakarta Sans, or oversized 24–32px “bento” radius.
+- No pill primary CTAs.
 - No customer dashboards, KPI strips, visit charts, or medical patient-detail panels.
-- No pastel washes used as busy/availability status.
+- No status encoded with brand accent or decorative pastels — use busy/cell tokens only.
 - No required mini-month calendar as owner chrome.
 - No slot-grid for customers (day + busy badge only).
-- No logos/watermarks from reference sites; no “intelly” branding.
-- No purple-on-white SaaS default; no terracotta-serif cream cliché beyond this locked palette.
+- No logos/watermarks from reference sites.
+- No purple-on-white SaaS default; no terracotta-serif cream cliché.
 - Do not invent colors outside this file — extend tokens here first.
+- Do not apply Design 1 marketing IA (hero, feature grids, dark footer page close) on product screens.
 
 ## Tailwind (later)
 
-When `esyres_app` exists, expose these as CSS variables / Tailwind theme keys (e.g. `--color-canvas`, `--color-pastel-pink`). Do not hardcode one-off hexes in components. This markdown remains the locked source until that theme lands.
+When `esyres_app` PWA theme exists, expose these as CSS variables / Tailwind theme keys (e.g. `--color-canvas`, `--color-primary`, `--color-busy-free`). Do not hardcode one-off hexes in components. This markdown remains the locked source until that theme lands.
 
 ## Do's and Don'ts
 
 **Do**
 
-- Read this file and `panel-ref.jpg` before generating PWA UI.
+- Read this file before generating PWA UI; use `panel-ref.jpg` for owner skeleton density only.
 - Keep customer sparse and owner dense.
 - Keep Bosnian-first copy and KM prices.
 - Prefer `docs/mvp/` for flows; this file for look.
+- Keep busy-badge vs availability-cell tokens separate.
 
 **Don't**
 
 - Do not apply this pack to the marketing site.
-- Do not clone the reference’s three-column medical dashboard IA.
+- Do not clone the reference image’s medical dashboard IA or its cream/pastel look.
 - Do not build worker UI in MVP.
-- Do not mix Design 1 and Design 2 on the same screen.
+- Do not put marketing long-scroll/hero composition on product routes.

@@ -32,7 +32,7 @@ States like "Reschedule in progress — thank you for your patience" and late-ca
 
 ## Decided (visual)
 
-- **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Pastel washes in Design 2 are decorative surfaces only — never status. See `refs/design-2/DESIGN.md`.
+- **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Status tokens are Design-2-only and are never brand chrome. See `refs/design-2/DESIGN.md`.
 
 ## Not Yet Decided (needs discussion before final design)
 
