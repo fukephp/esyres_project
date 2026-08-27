@@ -18,17 +18,17 @@
 
 ## Pass/fail — product
 
-- [ ] `signup.html` exists as a Vite multi-page entry (or equivalent) and is included in `npm run build` output — verify: `esyres_app/marketing/dist/signup.html` (or built asset path) present after `npm run build`
-- [ ] Page IA is minimal: nav + hero (H1 + support) + waitlist form + short invite-only note + dark footer; no how-it-works / feature grid / FAQ on this page — verify: structure in `signup.html`; `npm run build` exits 0
-- [ ] Form fields: salon name, owner name, email (required); phone optional; `method="POST"` with Formspree-style `action` using a clearly marked placeholder (e.g. `REPLACE_ME` / `PLACEHOLDER`) plus HTML comment or README note to replace before go-live — verify: grep/`signup.html` inspection; `npm run build` exits 0
-- [ ] Homepage nav, hero, and footer primary “Sign up your salon” controls are enabled links to `/signup.html` (not disabled buttons) — verify: `index.html` links; `npm run build` exits 0
+- [x] `signup.html` exists as a Vite multi-page entry (or equivalent) and is included in `npm run build` output — verify: `esyres_app/marketing/dist/signup.html` (or built asset path) present after `npm run build`
+- [x] Page IA is minimal: nav + hero (H1 + support) + waitlist form + short invite-only note + dark footer; no how-it-works / feature grid / FAQ on this page — verify: structure in `signup.html`; `npm run build` exits 0
+- [x] Form fields: salon name, owner name, email (required); phone optional; `method="POST"` with Formspree-style `action` using a clearly marked placeholder (e.g. `REPLACE_ME` / `PLACEHOLDER`) plus HTML comment or README note to replace before go-live — verify: grep/`signup.html` inspection; `npm run build` exits 0
+- [x] Homepage nav, hero, and footer primary “Sign up your salon” controls are enabled links to `/signup.html` (not disabled buttons) — verify: `index.html` links; `npm run build` exits 0
 - [ ] Design 1 Cal look (white canvas, black primary, Cal Sans + Inter, dark footer); copy English and honest about invite-only / waitlist (no claim of instant owner account) — verify: human-only: PR screenshots desktop+mobile of `/signup.html` (+ homepage CTA link)
 
 ## Pass/fail — architecture
 
-- [ ] Change only `esyres_app/marketing/` (plus this key / map). Do not touch product PWA, Laravel, or Design 2 — verify: git diff paths
-- [ ] Stay static HTML/CSS/JS; Vite-only; no new npm deps; no Sanctum / GraphQL / owner auth — verify: `package.json`; `npm run build` in `esyres_app/marketing` exits 0
-- [ ] Does not implement public owner registration in the product (MVP invite-only) — verify: no Laravel/PWA owner signup routes in the diff
+- [x] Change only `esyres_app/marketing/` (plus this key / map). Do not touch product PWA, Laravel, or Design 2 — verify: git diff paths
+- [x] Stay static HTML/CSS/JS; Vite-only; no new npm deps; no Sanctum / GraphQL / owner auth — verify: `package.json`; `npm run build` in `esyres_app/marketing` exits 0
+- [x] Does not implement public owner registration in the product (MVP invite-only) — verify: no Laravel/PWA owner signup routes in the diff
 
 ## Verify commands
 
