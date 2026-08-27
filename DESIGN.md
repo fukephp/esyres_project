@@ -25,7 +25,7 @@ Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conf
 
 ## Skills (Design 1 only)
 
-Use `landing-page`, `pricing-page`, `build-awwwards-quality-sites` only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage. Do not scaffold a marketing site unless asked.
+Use `landing-page`, `pricing-page`, `build-awwwards-quality-sites` only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage. Site code: [`esyres_app/marketing/`](esyres_app/marketing/).
 
 ## Status
 
