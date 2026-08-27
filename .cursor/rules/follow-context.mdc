@@ -9,6 +9,6 @@ Read and obey `.cursor/CONTEXT.md` for every task. It applies to all sub-folders
 
 - Product truth is `docs/mvp/`, not guesses.
 - Architecture truth is `docs/architecture/`. Do not invent a stack.
-- Use `rules/frontend/` when touching UI. Use `rules/backend/` when touching APIs, booking state, or data.
+- Use `rules/frontend/` when touching UI. Use `rules/backend/` when touching APIs or data.
 - Use skills and slash commands listed in CONTEXT.md instead of inventing a parallel workflow.
-- Prefer **grill-me** until `esyres_app/` has real code. Prefer **grill-with-docs** once a codebase exists to align against.
+- Prefer **grill-me** before locking plans when there is no app code. Prefer **grill-with-docs** when a codebase exists to align against.

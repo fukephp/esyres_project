@@ -1,20 +1,20 @@
 ---
 name: deploy-staging
-description: Deploy Esyres to the staging environment. Use when the user asks to deploy, ship, or release to staging, or mentions staging URLs, preview deploys, or a staging checklist.
+description: Deploy to the staging environment. Use when the user asks to deploy, ship, or release to staging, or mentions staging URLs, preview deploys, or a staging checklist.
 ---
 
 # Deploy staging
 
-No application deploy pipeline exists in this repo yet. Target stack is documented in `docs/architecture/` (Laravel, React PWA, Docker). Do not invent hosting, secrets, or extra services. Follow what is actually in the repo; ask if a step is missing.
+No application deploy pipeline is assumed in this framework. Follow what is actually in the repo and in `docs/architecture/`. Do not invent hosting, secrets, or extra services. Ask if a step is missing.
 
 ## Instructions
 
-1. Read `.cursor/CONTEXT.md`. Confirm the change belongs on staging (MVP only unless asked).
+1. Read `.cursor/CONTEXT.md`. Confirm the change belongs on staging (current phase only unless asked).
 2. Run `/run-tests` (or the project's real test command once one exists). Do not deploy on a red suite.
 3. Check git status: no leftover debug, no `.env` / credentials in the commit.
 4. Identify the real staging path from the repo (CI workflow, host dashboard, scripts). If none exists, stop and report that — do not improvise production-like infra.
 5. Deploy only to staging. Never production unless the user names production.
-6. Smoke the booking loop after deploy: guest discover → request (day only) → owner propose → customer confirm. Note anything that cannot be verified yet.
+6. Smoke the core user path after deploy (as documented in `docs/mvp/`). Note anything that cannot be verified yet.
 
 ## Staging checklist
 

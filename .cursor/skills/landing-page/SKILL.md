@@ -1,29 +1,18 @@
 ---
 name: landing-page
 description: >-
-  Design a high-converting Esyres-the-company marketing landing page (structure,
-  copy, SEO). Use ONLY when the user explicitly says marketing site, Esyres
-  landing, Esyres pricing page, or marketing homepage. Never use for salon
-  profile, Instagram/QR pages, owner panel, service prices in KM, or the words
-  landing or pricing alone. Do not scaffold a marketing site unless asked.
+  Design a high-converting marketing landing page (structure, copy, SEO).
+  Use when the user asks for a marketing landing or marketing homepage.
+  Do not scaffold a marketing site unless asked. Prefer docs/mvp and DESIGN.md.
 ---
 
 # Landing Page (High‑Conversion) — Web Design Skill
 
-## Esyres gate (read first)
+## Project gate (read first)
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-**May run only** when the user explicitly asks for Esyres-the-company marketing, using one of:
-
-- marketing site
-- Esyres landing
-- Esyres pricing page
-- marketing homepage
-
-**Must not run** for salon profile / Instagram / QR pages, the owner panel (`/owner`), service prices in KM, or the words “landing” or “pricing” alone.
-
-Do not scaffold a marketing site or add a `marketing/` folder unless the user asks. The marketing site location is undecided. Product truth remains `docs/mvp/`. The PWA stack remains `docs/architecture/`.
+Use when the user asks for a marketing landing, marketing site, or marketing homepage. Do not treat in-app product screens as landings unless asked. Do not scaffold a marketing site or add a `marketing/` folder unless the user asks. Product truth remains `docs/mvp/`. Stack truth remains `docs/architecture/`.
 
 A landing page is not a homepage.
 A homepage serves multiple intents.

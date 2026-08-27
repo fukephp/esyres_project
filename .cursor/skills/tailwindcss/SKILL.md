@@ -1,29 +1,20 @@
 ---
 name: tailwindcss
 description: >-
-  Implement UI with Tailwind CSS (layout, typography, responsive, theming) in
-  the Esyres React TypeScript PWA, or on a future Esyres marketing site. Use
-  when writing Tailwind classes, CSS variables, or component layout. Follow
-  Bosnian-first copy and KM prices. Do not add GSAP, Three.js, WebGL, Next.js,
-  MUI, Bootstrap, or a map SDK to the PWA. Do not use for backend or PHP work.
+  Implement UI with Tailwind CSS (layout, typography, responsive, theming).
+  Use when writing Tailwind classes, CSS variables, or component layout.
+  Follow .cursor/CONTEXT.md and docs/architecture. Do not use for backend-only work.
 ---
 
 # Tailwind CSS — Utility-first Styling Skill
 
-## Esyres gate (read first)
+## Project gate (read first)
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-**May run** on the React TypeScript PWA and on a future Esyres marketing site.
-
-**PWA** (`esyres_app/`, `/` and `/owner`):
-
-- Follow `.cursor/rules/frontend/` and `docs/architecture/04-Frontend.md`.
-- Bosnian-first copy. Prices in KM from integer feninga. Tailwind + CSS variables for busy-level colors.
-- Do not add GSAP, Three.js, WebGL, Next.js, MUI, Bootstrap, or a map SDK.
-- Customers see a day-level busy badge, never a slot grid.
-
-Ignore upstream questions that assume Next, Webflow, or English marketing defaults when working on the PWA.
+- Follow `.cursor/CONTEXT.md`, `.cursor/rules/frontend/`, and `docs/architecture/` when present.
+- Prefer project UI constraints over upstream defaults (framework, locale, motion libraries).
+- Do not invent stack choices that contradict locked architecture docs.
 
 ## When to use
 - Rapid UI building with consistent spacing/typography scales

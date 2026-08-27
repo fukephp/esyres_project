@@ -1,29 +1,19 @@
 ---
 name: build-awwwards-quality-sites
 description: >-
-  Art-direct a motion-rich Esyres-the-company marketing site (Awwwards-quality,
-  GSAP, optional Three.js). Use ONLY when the user explicitly says marketing
-  site, Esyres landing, Esyres pricing page, or marketing homepage. Never use on
-  the customer PWA or owner panel. Do not add GSAP, Three.js, or WebGL to
-  esyres_app. Do not scaffold a marketing site unless asked.
+  Art-direct a motion-rich marketing site (Awwwards-quality, GSAP, optional
+  Three.js). Use when the user explicitly asks for marketing polish or an
+  Awwwards-style site. Do not add heavy motion stacks to product app screens
+  unless asked. Do not scaffold a marketing site unless asked.
 ---
 
 # Build Awwwards-Quality Sites
 
-## Esyres gate (read first)
+## Project gate (read first)
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-**May run only** when the user explicitly asks for Esyres-the-company marketing, using one of:
-
-- marketing site
-- Esyres landing
-- Esyres pricing page
-- marketing homepage
-
-**Must not run** for salon profile / Instagram / QR pages, the owner panel (`/owner`), service prices in KM, or the words “landing” or “pricing” alone.
-
-GSAP, smooth-scroll engines, Three.js, and WebGL are allowed **only** on that future marketing surface. Never add them to the PWA (`esyres_app/`, `/`, `/owner`). Do not scaffold a marketing site or add a `marketing/` folder unless the user asks. The marketing site location is undecided.
+Use when the user explicitly asks for marketing polish, marketing site, or Awwwards-style work. Prefer product constraints in `docs/mvp/` and `docs/architecture/` for app screens — do not add GSAP, Three.js, or WebGL to the product app unless the user asks. Do not scaffold a marketing site or add a `marketing/` folder unless asked.
 
 Build a cohesive, memorable site whose visual idea, media, typography, and motion tell the same story. Treat “Awwwards quality” as an acceptance bar, never as an award or recognition claim.
 

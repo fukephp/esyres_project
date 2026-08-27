@@ -1,9 +1,9 @@
 ---
-name: esyres-skills
-description: Index of Esyres project skills under .cursor/skills. Use when choosing which skill to apply, or when the user asks what skills exist.
+name: project-skills
+description: Index of project skills under .cursor/skills. Use when choosing which skill to apply, or when the user asks what skills exist.
 ---
 
-# Esyres skills
+# Project skills
 
 Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 
@@ -11,22 +11,22 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 
 | Skill | When to use |
 |-------|-------------|
-| [custom-feature-skills](custom-feature-skills/SKILL.md) | Adding or changing a product feature against MVP epics/stories |
+| [grill-me](grill-me/SKILL.md) | **Default** when there is no app code; user says "grill me"; writes nothing |
+| [grill-with-docs](grill-with-docs/SKILL.md) | Same interview against a **codebase**; writes glossary + ADRs (`/grill-with-docs`) |
+| [scaffold-project](scaffold-project/SKILL.md) | New sibling project from this framework layout (`/scaffold-project`) |
+| [sync-framework](sync-framework/SKILL.md) | Propagate allowlisted Cursor defaults into one existing sibling (`/sync-framework`) |
 | [story-loop](story-loop/SKILL.md) | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot (`/story-loop`) |
+| [custom-feature-skills](custom-feature-skills/SKILL.md) | Adding or changing a product feature against MVP epics/stories |
 | [deploy-staging](deploy-staging/SKILL.md) | Deploying or preparing a staging release |
-| [grill-me](grill-me/SKILL.md) | Stress-testing a plan with no app code; user says "grill me"; writes nothing |
-| [grill-with-docs](grill-with-docs/SKILL.md) | Same interview against `esyres_app/` once it exists; writes glossary + ADRs (`/grill-with-docs`) |
 
 ## UI (vendored from MengTo/Skills, MIT)
 
-PWA work uses the first two. The last three fire **only** on explicit Esyres-the-company marketing language: “marketing site”, “Esyres landing”, “Esyres pricing page”, “marketing homepage”. They must not run on salon pages, `/owner`, or service prices in KM. Do not scaffold a marketing site unless asked.
-
 | Skill | When to use |
 |-------|-------------|
-| [tailwindcss](tailwindcss/SKILL.md) | Tailwind in the React PWA (or future marketing site). No GSAP/Three.js/WebGL in the app. |
-| [design-first-ui-prompting](design-first-ui-prompting/SKILL.md) | Spec-driven UI prompts. Calm PWA; cinematic style only with marketing triggers. |
-| [landing-page](landing-page/SKILL.md) | Esyres marketing landing only |
-| [pricing-page](pricing-page/SKILL.md) | Esyres marketing pricing only (not salon KM prices; not MVP public pricing unless asked) |
-| [build-awwwards-quality-sites](build-awwwards-quality-sites/SKILL.md) | Esyres marketing polish only. Never on the PWA. |
+| [tailwindcss](tailwindcss/SKILL.md) | Tailwind classes, layout, theming |
+| [design-first-ui-prompting](design-first-ui-prompting/SKILL.md) | Spec-driven UI prompts before generating screens |
+| [landing-page](landing-page/SKILL.md) | Marketing landing pages (when the user asks) |
+| [pricing-page](pricing-page/SKILL.md) | Marketing pricing pages (when the user asks) |
+| [build-awwwards-quality-sites](build-awwwards-quality-sites/SKILL.md) | Marketing polish / motion-rich sites (when the user asks) |
 
-Do not invent a parallel workflow. If the task is a slash command (`/generate-docs`, `/run-tests`, `/grill-with-docs`), use `.cursor/commands/` instead.
+Do not invent a parallel workflow. If the task is a slash command (`/generate-docs`, `/run-tests`, `/scaffold-project`, `/sync-framework`, `/story-loop`, `/grill-with-docs`), use `.cursor/commands/` instead.

@@ -2,23 +2,21 @@
 name: design-first-ui-prompting
 description: >-
   Turn fuzzy UI ideas into a spec-driven prompt (layout, type, color,
-  constraints) before generating screens. Use when designing Esyres PWA UI or
-  when the user asks for design-first prompting. For the PWA: calm, customer vs
-  owner split, no slot grid, Bosnian-first. Cinematic or Awwwards style only
-  when the user explicitly says marketing site, Esyres landing, Esyres pricing
-  page, or marketing homepage. Do not turn salon or owner pages into agency
-  landings.
+  constraints) before generating screens. Use when designing product UI or
+  when the user asks for design-first prompting. Prefer docs/mvp UI goals and
+  DESIGN.md / refs packs. Cinematic or Awwwards style only when the user
+  explicitly asks for marketing or polish work.
 ---
 
 # Design-First UI Prompting Skill
 
-## Esyres gate (read first)
+## Project gate (read first)
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-**PWA:** calm, mobile-first, customer vs owner split. No slot grid. Bosnian-first. Prefer `docs/mvp/04-UI-Design-Goals.md` over ARTICLE.md advice that conflicts (Webflow templates, Unicorn Studio, English headlines, extra motion libraries). Do not add GSAP, Three.js, or WebGL to the PWA.
-
-**Cinematic / Awwwards / conversion-landing style:** only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage.
+- Prefer `docs/mvp/` UI goals, root `DESIGN.md`, and `refs/` packs over ARTICLE.md advice that conflicts.
+- Match product surfaces to product constraints; do not turn app screens into agency landings unless asked.
+- Cinematic / Awwwards / conversion-landing style: only when the user explicitly asks for marketing site, landing, pricing page, or marketing polish.
 
 This skill is for **design-first prompting**: turn fuzzy ideas into a tight spec that produces consistent UI.
 
