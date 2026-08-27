@@ -17,14 +17,14 @@
 
 ## Pass/fail — product
 
-- [ ] Icon-strip section (Makaze / Stolica / Ogledalo / Dan tiles + prev/next + strip JS) is fully removed from the homepage — verify: `index.html` has no `.icon-strip`; `src/main.js` has no strip handlers; `npm run build` in `esyres_app/marketing` exits 0
+- [x] Icon-strip section (Makaze / Stolica / Ogledalo / Dan tiles + prev/next + strip JS) is fully removed from the homepage — verify: `index.html` has no `.icon-strip`; `src/main.js` has no strip handlers; `npm run build` in `esyres_app/marketing` exits 0
 - [ ] Body keeps the lavender gradient; `.page` (nav + main) is one white rounded main container (`--radius-xl`, light outline) with inner padding — verify: human-only: PR screenshots desktop+mobile vs `layout-ref.jpg` + user shots
 - [ ] Zašto Esyres heading is clearly larger than current (`clamp` max ≥ `2.75rem`); feature card titles ≥ `1.35rem`; nested shells (features / uskoro / footer) stay bordered panels inside the white page — verify: human-only: PR screenshots desktop+mobile of `#features` vs user Zašto shot / `layout-ref.jpg` “Our Class” scale
 
 ## Pass/fail — architecture
 
-- [ ] Change only `esyres_app/marketing/` (plus this key). Do not touch product PWA, Laravel, or Design 2 — verify: git diff paths
-- [ ] Stay static HTML/CSS/JS; no new deps — verify: `package.json` still Vite-only; `npm run build` in `esyres_app/marketing` exits 0
+- [x] Change only `esyres_app/marketing/` (plus this key). Do not touch product PWA, Laravel, or Design 2 — verify: git diff paths
+- [x] Stay static HTML/CSS/JS; no new deps — verify: `package.json` still Vite-only; `npm run build` in `esyres_app/marketing` exits 0
 
 ## Verify commands
 
