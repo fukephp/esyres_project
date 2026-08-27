@@ -24,6 +24,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | Path | Role |
 |------|------|
 | `esyres_app/` | Application (Laravel + PWA). Empty placeholder until scaffolded. App commands run here, not at the git root. |
+| `esyres_app/marketing/` | Design 1 static marketing site (Vite + HTML/CSS). Sibling under the Laravel root — not under `public/`, not in the PWA bundle. Commands: `npm run dev` from `esyres_app/marketing/`. |
 | `docs/glossary.md` | Domain glossary (lazy; grill-with-docs). Not `.cursor/CONTEXT.md`. |
 | `docs/adr/` | ADRs (lazy; grill-with-docs). If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`. |
 | `DESIGN.md` | Index for **two** designs — Design 1 marketing, Design 2 PWA. Read before UI; do not mix. |
@@ -52,7 +53,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 3. Do not expand MVP into Phase 2 work unless the user asks.
 4. Update this file when a locked product or architecture decision lands.
 5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `refs/design-2/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX. Do not mix Design 1 with the app. Does not override `docs/mvp/` or `rules/frontend/`.
-6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Do not scaffold a marketing site unless asked. The marketing site location is undecided.
+6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Marketing site lives in `esyres_app/marketing/` (Design 1 only — sibling to Laravel/PWA; never under `public/` or in the product SPA bundle).
 7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Once `esyres_app/` has real code, use **grill-with-docs** (`/grill-with-docs`) so glossary and ADRs land on disk. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
 
 ## Docs index

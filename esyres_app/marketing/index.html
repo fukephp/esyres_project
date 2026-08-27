@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="bs">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Esyres — rezervacije salona u Sarajevu. Ti biraš dan, salon predlaže tačno vrijeme."
+    />
+    <title>Esyres — Rezervacije salona u Sarajevu</title>
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="nav">
+        <nav class="nav__left" aria-label="Glavna navigacija">
+          <a href="#features">Zašto Esyres</a>
+          <a href="#uskoro">Gosti</a>
+        </nav>
+        <a class="nav__brand" href="#" aria-label="Esyres početna">
+          <span class="nav__mark" aria-hidden="true"></span>
+          <span class="nav__wordmark">Esyres</span>
+        </a>
+        <nav class="nav__right" aria-label="Sekundarna navigacija">
+          <a href="#footer">Kontakt</a>
+          <button type="button" class="btn btn--nav" disabled title="Uskoro">
+            Prijavi salon
+          </button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-heading">
+          <div class="hero__copy">
+            <h1 id="hero-heading">
+              Rezervacije salona u Sarajevu — bez lovljenja termina
+            </h1>
+            <p class="hero__support">
+              Ti biraš dan. Salon predlaže tačno vrijeme. Ti potvrdiš.
+            </p>
+            <div class="hero__ctas">
+              <button
+                type="button"
+                class="btn btn--primary"
+                disabled
+                title="Prijava salona stiže sa backendom"
+              >
+                Prijavi salon
+                <span class="btn__arrow" aria-hidden="true">→</span>
+              </button>
+              <a class="btn btn--secondary" href="#uskoro" data-scroll-to="uskoro">
+                Pronađi salon
+              </a>
+            </div>
+          </div>
+          <div class="hero__visual">
+            <img
+              src="/hero-salon.jpg"
+              alt="Isometrijski pixel-art enterijer salona"
+              width="640"
+              height="640"
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
+        </section>
+
+        <section class="icon-strip" aria-label="Motivi salona">
+          <button
+            type="button"
+            class="icon-strip__ctrl"
+            data-strip-prev
+            aria-label="Prethodni"
+          >
+            ←
+          </button>
+          <ul class="icon-strip__track" data-strip-track>
+            <li class="icon-tile">
+              <span class="icon-tile__art" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path
+                    d="M16 12l8 10 8-10M20 28v8h8v-8"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                  <circle cx="24" cy="22" r="3" fill="currentColor" />
+                </svg>
+              </span>
+              <span class="icon-tile__label">Makaze</span>
+            </li>
+            <li class="icon-tile">
+              <span class="icon-tile__art" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect
+                    x="14"
+                    y="18"
+                    width="20"
+                    height="16"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M18 18v-4h12v4M24 34v4"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                </svg>
+              </span>
+              <span class="icon-tile__label">Stolica</span>
+            </li>
+            <li class="icon-tile">
+              <span class="icon-tile__art" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect
+                    x="10"
+                    y="12"
+                    width="28"
+                    height="24"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M16 20h16M16 26h12"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                </svg>
+              </span>
+              <span class="icon-tile__label">Ogledalo</span>
+            </li>
+            <li class="icon-tile">
+              <span class="icon-tile__art" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect
+                    x="12"
+                    y="14"
+                    width="24"
+                    height="24"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M18 10v6M30 10v6M12 22h24"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                  <rect x="20" y="26" width="8" height="8" fill="currentColor" />
+                </svg>
+              </span>
+              <span class="icon-tile__label">Dan</span>
+            </li>
+          </ul>
+          <button
+            type="button"
+            class="icon-strip__ctrl"
+            data-strip-next
+            aria-label="Sljedeći"
+          >
+            →
+          </button>
+        </section>
+
+        <section class="shell features" id="features" aria-labelledby="features-heading">
+          <div class="features__header">
+            <h2 id="features-heading">Zašto Esyres</h2>
+            <p>
+              Struktura umjesto haosa — gosti traže dan, vlasnici predlažu termin.
+            </p>
+          </div>
+          <div class="features__grid">
+            <article class="feature-card">
+              <div class="feature-card__top">
+                <h3>Za goste</h3>
+                <span class="feature-card__arrow" aria-hidden="true">↗</span>
+              </div>
+              <p>
+                Pregledaj salon, izaberi uslugu i dan. Nema mreže sati — samo jasan
+                zahtjev.
+              </p>
+            </article>
+            <article class="feature-card feature-card--emphasis">
+              <div class="feature-card__top">
+                <h3>Za salone</h3>
+                <span class="feature-card__arrow" aria-hidden="true">↗</span>
+              </div>
+              <p>
+                Ti predlažeš tačno vrijeme. Red čekanja i dostupnost na jednom
+                mjestu — kompleksnost ostaje kod tebe.
+              </p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__top">
+                <h3>Jedan ritam</h3>
+                <span class="feature-card__arrow" aria-hidden="true">↗</span>
+              </div>
+              <p>
+                Zahtjev → predlog → potvrda. Jasni statusi, manje poruka naprijed-nazad.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="shell uskoro" id="uskoro" aria-labelledby="uskoro-heading">
+          <p class="label">Gosti</p>
+          <h2 id="uskoro-heading">Uskoro u Sarajevu</h2>
+          <p class="uskoro__body">
+            Pretraga salona stiže sa produktom. Do tada — prati Instagram ili QR
+            link svog salona kad budu online.
+          </p>
+        </section>
+
+        <footer class="shell footer" id="footer">
+          <p class="label">— Esyres —</p>
+          <h2>
+            Prijavi salon i budi među prvima u
+            <span class="footer__pill">Sarajevu</span>
+          </h2>
+          <p class="footer__support">
+            Invite-only za vlasnike. Forma za ranu prijavu stiže uskoro.
+          </p>
+          <button
+            type="button"
+            class="btn btn--primary"
+            disabled
+            title="Prijava salona stiže sa backendom"
+          >
+            Prijavi salon
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </button>
+          <div class="footer__meta">
+            <span>Esyres · Sarajevo</span>
+            <span class="footer__social" aria-label="Društvene mreže">
+              <span aria-hidden="true">◎</span>
+              Instagram uskoro
+            </span>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -93,7 +93,7 @@ components:
 
 ## Overview
 
-Design 1 is the **Esyres-the-company marketing site** — landing first, pricing/polish later. Location undecided.
+Design 1 is the **Esyres-the-company marketing site** — landing first, pricing/polish later. Implementation lives in [`esyres_app/marketing/`](../../esyres_app/marketing/) (Vite + HTML/CSS), as a sibling under the Laravel root — not under `public/`, not in the PWA bundle.
 
 Two references in this folder define the look:
 

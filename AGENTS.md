@@ -5,15 +5,17 @@ This git root is the Cursor/docs workspace. Application code lives in `esyres_ap
 ## Layout
 
 - `esyres_app/` — Laravel + PWA (all app commands run here)
+- `esyres_app/marketing/` — Design 1 static marketing site (Vite + HTML/CSS; sibling under Laravel root, not under `public/`)
 - `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from grill-with-docs
 - `.cursor/` — rules, skills, commands, hooks
 - `AGENTS.md` — this file
 
-Do not put application code in the git root. Do not put docs, rules, or skills inside `esyres_app/`.
+Do not put application code in the git root. Do not put docs, rules, or skills inside `esyres_app/`. Keep marketing out of the PWA `public/` and SPA bundle.
 
 ## Working directory
 
 - Application commands (`composer`, `php artisan`, `npm`, `docker compose`, tests): run from `esyres_app/`.
+- Marketing site (`npm run dev` / `build`): run from `esyres_app/marketing/`.
 - Git, and edits to `docs/` / `.cursor/` / this file: run from the git root.
 
 ## Product and architecture
