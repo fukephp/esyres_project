@@ -1,5 +1,7 @@
 # Answer key: MKT-homepage-type-align
 
+> **OBSOLETE (2026-08-27).** Design 1 no longer uses Satoshi, `layout-ref.jpg`, or the pixel/bento roadmap. Current source of truth: `refs/design-1/DESIGN.md` (Cal-adapted). Do not implement this key.
+
 > Marketing visual polish only. Not an MVP story from `docs/mvp/07-Stories.md`.
 > Do not implement (Local or Cloud) until a human has approved this file.
 
