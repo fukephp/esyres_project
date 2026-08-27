@@ -1,5 +1,3 @@
-const uskoro = document.getElementById("uskoro");
-
 document.querySelectorAll("[data-scroll-to]").forEach((el) => {
   el.addEventListener("click", (event) => {
     const id = el.getAttribute("data-scroll-to");
@@ -11,9 +9,12 @@ document.querySelectorAll("[data-scroll-to]").forEach((el) => {
   });
 });
 
-// Deep-link to #uskoro on load
-if (window.location.hash === "#uskoro" && uskoro) {
-  requestAnimationFrame(() => {
-    uskoro.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+const hash = window.location.hash.slice(1);
+if (hash) {
+  const target = document.getElementById(hash);
+  if (target) {
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 }

@@ -28,7 +28,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | `docs/glossary.md` | Domain glossary (lazy; grill-with-docs). Not `.cursor/CONTEXT.md`. |
 | `docs/adr/` | ADRs (lazy; grill-with-docs). If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`. |
 | `DESIGN.md` | Index for **two** designs — Design 1 marketing, Design 2 PWA. Read before UI; do not mix. |
-| `refs/design-1/` | Design 1 pack: marketing landing spec + JPG refs |
+| `refs/design-1/` | Design 1 pack: marketing landing spec (Cal-adapted; see DESIGN.md) |
 | `refs/design-2/` | Design 2 pack: PWA visual system (tokens + composition) + `panel-ref.jpg` |
 | `rules/frontend/` | UI/PWA conventions when frontend files are in play |
 | `rules/backend/` | Booking, API, and data conventions when backend files are in play |

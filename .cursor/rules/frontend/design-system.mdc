@@ -13,5 +13,5 @@ Before generating or changing visual UI:
    - **Marketing landing** → `refs/design-1/DESIGN.md`
    - **Product PWA** (customer / owner / worker) → `refs/design-2/DESIGN.md` (also `panel-ref.jpg`), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
 
-- Design 1 is locked (bento + pixel salon). Design 2 is locked (cream/pastel/charcoal PWA tokens + role composition).
+- Design 1 is locked (Cal-based clean SaaS marketing — white canvas, black CTAs, Cal Sans + Inter). Design 2 is locked (cream/pastel/charcoal PWA tokens + role composition).
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.
