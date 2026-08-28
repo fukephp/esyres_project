@@ -5,9 +5,9 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 ## Domain mapped to epics
 
 - Epic 1 — public `salonsNearby`, `popularInSarajevo`, salon profile, server-computed `busyLevel`
-- Epic 2 — register/login, email verify, phone OTP, `createBooking` (day only)
-- Epic 3 — owner inbox, availability grid, `proposeTime`, `declineBooking`
-- Epic 4 — customer respond; “ask other day” updates the **same** booking row
+- Epic 2 — register/login, email verify, phone OTP, `createBooking` (preferred date + time)
+- Epic 3 — owner inbox, availability grid, `acceptPreferredTime`, `proposeTime` (counter-propose), `declineBooking`
+- Epic 4 — customer respond to counter-proposal; “ask other day or time” updates the **same** booking row
 - Epic 5 — reschedule (original slot stays occupied until new time approved), cancel
 - Epic 6 — queued notifications
 - Epic 7 — salon/services/workers/hours (invite provisions salon + owner)
@@ -18,11 +18,12 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 
 - MySQL is the source of truth. Redis holds OTP TTL, cache, queues, Reverb — not bookings.
 - GraphQL `ID` is the MySQL bigint.
-- Money is integer **feninga**. Dates: `preferred_date` is a Sarajevo calendar date. Clock times stored UTC. `APP_TIMEZONE=Europe/Sarajevo`.
+- Money is integer **feninga**.
+- Dates: `preferred_date` is a Sarajevo calendar date; `preferred_starts_at` is derived from `preferred_date` + local preferred time, stored UTC. `APP_TIMEZONE=Europe/Sarajevo`.
 - Lists: limit/offset with a capped `perPage`.
 - Photos: Laravel Storage (local `public` disk). Upload via GraphQL multipart. Swap disk to S3-compatible later. No Spatie.
 - Busy-level is computed on the server (`LOW | MEDIUM | HIGH` + percent). Thresholds remain product placeholders.
-- Overlap: `time_proposed` and `confirmed` occupy `[startsAt, startsAt + duration)` on a worker. `requested` does not occupy a clock slot.
+- Overlap: `time_proposed` and `confirmed` occupy `[startsAt, startsAt + duration)` on a worker. `requested` does not occupy a clock slot. `acceptPreferredTime` sets `confirmed` directly when the owner accepts the guest's preferred time.
 - Expire job: placeholder TTLs in config; status becomes `declined` with reason `expired` (no fifth status).
 
 ## Backend testing (Behat)

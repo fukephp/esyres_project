@@ -4,10 +4,10 @@ This file is the source of truth for everything under `.cursor/`. Read it before
 
 ## Product (locked)
 
-Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optional worker, and a **day**. Owner proposes an exact time. Status: `requested → time_proposed → confirmed | declined`.
+Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optional worker, and a preferred **day and time**. Owner accepts preferred time or counter-proposes. Status: `requested → confirmed` (accept) or `requested → time_proposed → confirmed | declined` (counter-propose).
 
-- Customer: guest discovery, day-level busy badge (🟢/🟡/🔴). Email+password login (not a homepage wall). Verified email + phone OTP required to **send a request**. No time grid.
-- Owner: invite-only. Pending queue, Worker Availability Panel (drag-to-propose + tap fallback). Salon switcher if they own more than one salon. Complexity stays on this side.
+- Customer: guest discovery, day-level busy badge (🟢/🟡/🔴), simple date+time picker (no slot grid). Email+password login (not a homepage wall). Verified email + phone OTP required to **send a request**.
+- Owner: invite-only. Pending queue (shows preferred date/time), Worker Availability Panel (one-tap accept + drag-to-counter-propose + tap fallback). Salon switcher if they own more than one salon. Complexity stays on this side.
 - MVP captures trust data (response time, no-show, QR visit, verification). Badge **display** is Phase 2.
 - Not MVP: native apps, in-app payments, worker logins, reviews, messaging, chain multi-location, receptionist roles.
 

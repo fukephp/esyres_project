@@ -10,11 +10,11 @@ A two-sided salon reservation marketplace, mobile-first PWA, connecting customer
 
 ## Core Booking Philosophy
 
-The customer does **not** pick an exact time. They pick a service, optionally a worker (or "no preference"), and a preferred **day**. The salon owner sets the actual time by dragging the request onto an open slot on the Worker Availability Panel and **proposes** it back to the customer, who approves, rejects, or asks for a different day.
+The customer picks a service, optionally a worker (or "no preference"), and a preferred **day and time** via a simple picker — no availability grid. The salon owner **accepts** the preferred time in one tap when it works, or **counter-proposes** a different time by dragging the request onto an open slot on the Worker Availability Panel. The customer confirms only when the salon proposes a different time; they can approve, reject, or ask for a different day or time.
 
-Status flow: `requested → time_proposed → confirmed / declined`
+Status flow: `requested → confirmed` (owner accepts preferred time) or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts)
 
-This keeps the customer experience light (no scheduling decisions) while concentrating scheduling complexity on the owner side, where it belongs.
+This keeps the customer experience light (state a preference, no slot hunting) while concentrating scheduling authority on the owner side, where it belongs.
 
 ## Business Goals
 
@@ -39,4 +39,4 @@ This keeps the customer experience light (no scheduling decisions) while concent
 
 ## Note on Architecture
 
-Stack, data model, and Docker live in `docs/architecture/`. These files remain product scope. If a grilled decision changed product behavior (auth, salon switcher, durations, ask-other-day), this set was updated to match.
+Stack, data model, and Docker live in `docs/architecture/`. These files remain product scope. If a grilled decision changed product behavior (auth, salon switcher, durations, ask-other-day-or-time, preferred time), this set was updated to match.

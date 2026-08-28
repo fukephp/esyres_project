@@ -10,7 +10,7 @@ Stack and routes: `docs/architecture/` (`/` customer, `/owner` owner, salon swit
 
 Customer surface is narrow: Profile, Favorites, Search/Discover, Schedule/Reschedule.
 
-- Customers see a day-level busy badge (🟢/🟡/🔴), never a slot grid.
+- Customers see a day-level busy badge (🟢/🟡/🔴) and a simple date+time picker — never a slot availability grid.
 - Do not show owner dashboards, stats, or worker grids to customers.
 - Owner complexity lives on the Worker Availability Panel (workers × slots, pending queue).
 - Calm state copy for limbo states (reschedule in progress, late-cancel warning — not a hard block).

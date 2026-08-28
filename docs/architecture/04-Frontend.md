@@ -18,8 +18,8 @@ Customer browse has no login wall. Login/register appears at request submit, My 
 - Tailwind + CSS variables for busy-level colors
 - i18next, default locale `bs`, no language switcher
 - `vite-plugin-pwa` + Workbox (shell cache + VAPID push)
-- `@dnd-kit` on the owner panel; tap/form fallback calls the same `proposeTime` mutation
-- Vitest for small helpers; Playwright for guest → request → propose → confirm
+- `@dnd-kit` on the owner panel; tap/form fallback calls the same `acceptPreferredTime` and `proposeTime` mutations
+- Vitest for small helpers; Playwright for guest → request → accept or counter-propose → confirm
 
 ## Explicitly not added
 
@@ -27,9 +27,9 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 
 ## UX constraints (from product rules)
 
-- Customers see a day-level busy badge, never a slot grid.
+- Customers see a day-level busy badge and a simple date+time picker (no slot grid).
 - Copy is Bosnian-first. Prices formatted as BAM via `Intl` (`bs-BA`) from integer feninga.
-- Drag-to-propose always has a tap fallback.
+- Accept-preferred-time and drag-to-counter-propose always have tap/form fallbacks.
 - GraphQL errors are machine codes; the SPA maps them to Bosnian strings.
 
 ## Discovery

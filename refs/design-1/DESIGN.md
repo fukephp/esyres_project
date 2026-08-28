@@ -184,7 +184,7 @@ Design 1 is the **Esyres-the-company marketing site** — landing first, pricing
 
 **Provenance:** Visual system adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Tokens, type roles, radius, whitespace, in-card product UI, and dark footer follow that system. Product framing and page IA are Esyres-specific.
 
-The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black primary CTAs (`{colors.primary}`), **Cal Sans** display + **Inter** body, `{colors.surface-card}` (#f5f5f5) cards holding **static HTML/CSS product UI mocks** of the Esyres request flow (guest picks day → owner proposes time → guest confirms). Brand voltage comes from Cal Sans headlines and monochrome product chrome in-card — not illustration, not accent color.
+The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black primary CTAs (`{colors.primary}`), **Cal Sans** display + **Inter** body, `{colors.surface-card}` (#f5f5f5) cards holding **static HTML/CSS product UI mocks** of the Esyres request flow (guest picks day+time → owner accepts or adjusts → guest confirms when counter-proposed). Brand voltage comes from Cal Sans headlines and monochrome product chrome in-card — not illustration, not accent color.
 
 Copy for this marketing site is **English** until localization lands. Do not invent Bosnian strings in Design 1 files for this phase.
 
@@ -194,7 +194,7 @@ Copy for this marketing site is **English** until localization lands. Do not inv
 
 1. **Top nav** — logo/wordmark left; links + primary CTA right.
 2. **Hero** — H1 + support + CTAs left; request-flow mock in `{component.hero-app-mockup-card}` right.
-3. **How it works** — three steps (day → propose → confirm) with monochrome product-UI-in-card.
+3. **How it works** — three steps (day+time → accept/adjust → confirm when adjusted) with monochrome product-UI-in-card.
 4. **Why Esyres** — short 2–3 feature cards on `{colors.surface-card}`.
 5. **Dark footer** — contact + secondary CTA on `{colors.surface-dark}`.
 
@@ -272,7 +272,7 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 **Do**
 
 - Read this file (and the Cal provenance URL) before generating marketing UI.
-- Keep English marketing copy until localization; Esyres offer: day-level request, owner proposes time, guest confirms.
+- Keep English marketing copy until localization; Esyres offer: guest picks preferred day and time, owner accepts or adjusts, guest confirms when counter-proposed.
 - Embed product UI mocks in cards; keep mocks monochrome Cal chrome.
 - End pages with the dark footer.
 - Use gated skills (`landing-page`, `pricing-page`, `build-awwwards-quality-sites`) only on explicit marketing triggers.

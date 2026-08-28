@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Esyres — salon reservations in Sarajevo. You pick the day. The salon proposes an exact time. You confirm."
+      content="Esyres — salon reservations in Sarajevo. You pick day and preferred time. The salon accepts or adjusts. You confirm when needed."
     />
     <title>Esyres — Salon reservations in Sarajevo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,7 +46,8 @@
           <div class="hero__copy">
             <h1 id="hero-heading">Salon reservations without chasing times</h1>
             <p class="hero__support">
-              You pick the day. The salon proposes an exact time. You confirm.
+              You pick day and preferred time. The salon accepts or adjusts.
+              You confirm when they propose a different slot.
             </p>
             <div class="hero__ctas">
               <a class="btn btn--primary" href="/signup.html">
@@ -59,7 +60,7 @@
           </div>
 
           <div class="hero__mock" aria-hidden="false">
-            <div class="mock mock--hero" role="img" aria-label="Request flow preview: pick a day, receive a time, confirm">
+            <div class="mock mock--hero" role="img" aria-label="Request flow preview: pick day and time, salon accepts or adjusts, confirm when needed">
               <div class="mock__chrome">
                 <span class="mock__dot"></span>
                 <span class="mock__dot"></span>
@@ -69,20 +70,20 @@
               <div class="mock__body">
                 <p class="mock__label">Service</p>
                 <div class="mock__row mock__row--selected">Haircut · 45 min</div>
-                <p class="mock__label">Day</p>
-                <div class="mock__days">
-                  <span>Mon</span>
-                  <span class="is-active">Tue 12</span>
-                  <span>Wed</span>
-                  <span>Thu</span>
+                <p class="mock__label">Day &amp; time</p>
+                <div class="mock__pick-row">
+                  <span class="mock__chip">Mon</span>
+                  <span class="mock__chip is-active">Tue 12</span>
+                  <span class="mock__chip">Wed</span>
+                  <span class="mock__chip">Thu</span>
+                  <span class="mock__chip mock__chip--time">14:30</span>
                 </div>
-                <p class="mock__hint">No time grid — the salon proposes the slot.</p>
+                <p class="mock__hint">Preferred time — no slot grid to hunt.</p>
                 <div class="mock__status">
                   <span class="mock__pill">Requested</span>
                   <span class="mock__arrow">→</span>
-                  <span class="mock__pill mock__pill--soft">Time proposed</span>
-                  <span class="mock__arrow">→</span>
                   <span class="mock__pill mock__pill--ink">Confirmed</span>
+                  <span class="mock__pill mock__pill--soft mock__pill--or">or adjust</span>
                 </div>
               </div>
             </div>
@@ -98,35 +99,42 @@
             <article class="mock-card">
               <div class="mock mock--step">
                 <p class="mock__step">1 · Guest</p>
-                <p class="mock__label">Pick a day</p>
-                <div class="mock__days mock__days--compact">
-                  <span>11</span>
-                  <span class="is-active">12</span>
-                  <span>13</span>
+                <p class="mock__label">Pick day + time</p>
+                <div class="mock__demo">
+                  <div class="mock__pick-row mock__pick-row--compact">
+                    <span class="mock__chip">11</span>
+                    <span class="mock__chip is-active">12</span>
+                    <span class="mock__chip">13</span>
+                    <span class="mock__chip mock__chip--time">14:30</span>
+                  </div>
                 </div>
-                <p class="mock__caption">Day-level request. No hunting for slots.</p>
+                <p class="mock__caption">State when you'd like to come. No slot hunting.</p>
               </div>
             </article>
             <article class="mock-card">
               <div class="mock mock--step">
                 <p class="mock__step">2 · Salon</p>
-                <p class="mock__label">Propose a time</p>
-                <div class="mock__propose">
-                  <span>Tue 12</span>
-                  <strong>14:30</strong>
+                <p class="mock__label">Accept or adjust</p>
+                <div class="mock__demo">
+                  <div class="mock__propose">
+                    <span>Tue 12 · 14:30</span>
+                    <strong>Accept</strong>
+                  </div>
                 </div>
-                <p class="mock__caption">Owner picks an exact time from availability.</p>
+                <p class="mock__caption">Salon confirms your time or proposes another slot.</p>
               </div>
             </article>
             <article class="mock-card">
               <div class="mock mock--step">
                 <p class="mock__step">3 · Guest</p>
                 <p class="mock__label">Confirm</p>
-                <div class="mock__confirm">
-                  <span class="mock__pill mock__pill--ink">Confirmed</span>
-                  <span>Tue 12 · 14:30</span>
+                <div class="mock__demo">
+                  <div class="mock__confirm">
+                    <span class="mock__pill mock__pill--soft">Time proposed</span>
+                    <span>Tue 12 · 15:00</span>
+                  </div>
                 </div>
-                <p class="mock__caption">One tap to lock it in. Done.</p>
+                <p class="mock__caption">One tap when the salon proposes a different time.</p>
               </div>
             </article>
           </div>
@@ -141,22 +149,22 @@
             <article class="feature-card">
               <h3>For guests</h3>
               <p>
-                Browse a salon, choose services and a day. Send a clear request —
-                no hour grid to fight.
+                Browse a salon, choose services, day, and preferred time. Send
+                a clear request — no availability grid to fight.
               </p>
             </article>
             <article class="feature-card">
               <h3>For salons</h3>
               <p>
-                You propose the exact time. Pending queue and availability stay
-                in one place — complexity stays with you.
+                Accept a guest's preferred time in one tap, or adjust from your
+                availability panel — complexity stays with you.
               </p>
             </article>
             <article class="feature-card">
               <h3>One rhythm</h3>
               <p>
-                Requested → time proposed → confirmed or declined. Fewer
-                back-and-forth messages.
+                Requested → confirmed when it fits, or requested → time proposed
+                → confirmed when it doesn't. Fewer back-and-forth messages.
               </p>
             </article>
           </div>

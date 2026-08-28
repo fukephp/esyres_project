@@ -25,7 +25,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 21. **Bigint IDs** — no UUID PK at this size.
 22. **Owner salon switcher** — many `Salon` rows, each a separate customer profile. Not chain multi-location (shared workers). Receptionist roles still Phase 2.
 23. **VAPID web push** — no OneSignal.
-24. **Ask other day = same booking row** — no duplicate busy-level.
+24. **Ask other day or time = same booking row** — no duplicate busy-level.
 25. **QR guest cookie ~7 days** — last salon wins; reconcile at verify.
 26. **Full local compose list** — nginx, php, mysql, redis, worker, reverb, vite, mailpit.
 27. **Expire → declined** — no fifth status; TTL numbers placeholder.

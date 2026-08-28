@@ -12,5 +12,5 @@ Stack: `docs/architecture/` (one React TypeScript PWA, same origin).
 - Guest browsing has no login wall. Email+password at request submit / My Bookings / owner. Phone OTP required to send a request; email verified before request or owner routes.
 - Bosnian-first copy. Prices in KM. Do not default to English-only or EUR.
 - Keep the QR / Instagram-bio → salon page → request path to one tap where possible.
-- Drag-to-propose on the owner panel always has a tap/form fallback.
+- Accept-preferred-time and drag-to-counter-propose on the owner panel always have tap/form fallbacks.
 - Verify UI changes in the browser (behavior, not only a screenshot), including related routes that share state.

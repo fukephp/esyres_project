@@ -1,6 +1,6 @@
 # Esyres
 
-Two-sided salon reservation product. Customers request a service for a preferred day; salon owners assign an exact time. Mobile-first PWA.
+Two-sided salon reservation product. Customers request a service with a preferred day and time; salon owners accept or counter-propose. Mobile-first PWA.
 
 No application code in this repo yet. Product scope: `docs/mvp/`. Target architecture: `docs/architecture/`. Update this file when features land.
 
@@ -8,17 +8,17 @@ No application code in this repo yet. Product scope: `docs/mvp/`. Target archite
 
 **Booking model**
 
-- Customer picks service(s), optional worker, and a day — not a clock time.
-- Owner proposes a slot from a worker × time-slot panel (drag or form). A proposal holds that slot until confirm/decline/expire.
-- Status: `requested` → `time_proposed` → `confirmed` | `declined`.
-- Ask for a different day reopens the **same** booking.
+- Customer picks service(s), optional worker, and a preferred day and time (simple picker, no availability grid).
+- Owner accepts preferred time in one tap, or counter-proposes from the worker × time-slot panel (drag or form). A counter-proposal holds that slot until confirm/decline/expire.
+- Status: `requested` → `confirmed` (accept) or `requested` → `time_proposed` → `confirmed` | `declined` (counter-propose).
+- Ask for a different day or time reopens the **same** booking.
 
 **Customer**
 
 - Unauthenticated discovery (geo-sorted list with “Popular in Sarajevo” fallback); search/filter. No map SDK.
 - Salon profile: hours, services/prices/durations, day-level busy signal (no time grid).
 - Email+password account. Verified email + phone OTP required to send a request. Phone optional at register.
-- Approve / reject / ask for another day; bookings list; cancel/reschedule.
+- Approve / reject / ask for another day or time; bookings list; cancel/reschedule.
 - Favorites; QR scan (~7 day guest cookie) bookmarks a visited salon after verify.
 - Web push + SMS for status; email reminders.
 

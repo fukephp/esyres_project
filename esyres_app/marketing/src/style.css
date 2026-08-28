@@ -407,6 +407,51 @@ button {
   min-width: 44px;
 }
 
+.mock__pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--space-md);
+}
+
+.mock__pick-row--compact {
+  margin-bottom: 0;
+}
+
+.mock__pick-row .mock__chip:not(.mock__chip--time) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mock__pick-row--compact .mock__chip:not(.mock__chip--time) {
+  flex: 0 0 auto;
+  min-width: 44px;
+}
+
+.mock__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 6px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.mock__chip.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.mock__chip--time {
+  flex: 0 0 auto;
+  min-width: 56px;
+  font-variant-numeric: tabular-nums;
+}
+
 .mock__hint {
   margin: 0 0 var(--space-lg);
   font-size: 13px;
@@ -476,6 +521,10 @@ button {
   letter-spacing: -0.5px;
 }
 
+.mock__pill--or {
+  font-size: 12px;
+}
+
 .mock__confirm {
   display: flex;
   flex-direction: column;
@@ -524,6 +573,31 @@ button {
   height: 100%;
   border-radius: var(--radius-lg);
   background: var(--color-canvas);
+}
+
+.how .mock--step {
+  display: flex;
+  flex-direction: column;
+}
+
+.how .mock__demo {
+  flex: 1;
+  min-height: 5.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.how .mock__demo .mock__pick-row,
+.how .mock__demo .mock__propose {
+  margin-bottom: 0;
+}
+
+.how .mock__demo .mock__propose {
+  height: 100%;
+  align-items: center;
+}
+
+.how .mock__caption {
+  margin-top: auto;
 }
 
 .feature-card {

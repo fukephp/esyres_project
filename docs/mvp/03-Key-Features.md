@@ -8,10 +8,10 @@
 - **Salon Profile** — photos, address, working hours, service list with prices/durations, and a busy-level badge (🟢/🟡/🔴 — see below). Optional link-out to maps; no in-app map SDK.
 - **Busy-Level Indicator** — coarse signal of how booked a day is, shown instead of a detailed time grid. Deliberately hides per-slot scheduling detail from customers.
 - **Service Selection** — multi-select, durations/prices stack automatically.
-- **Worker & Day Selection** — pick a specific worker or "no preference"; pick a preferred day only, never an exact time.
+- **Worker & Date/Time Selection** — pick a specific worker or "no preference"; pick a preferred day and time via a simple picker (no availability grid).
 - **Registration / login** — email + password. Guest browse has no login wall. Email verification is required before a request can be sent (and before owner routes). Phone is optional at register (encouraged); **phone OTP is required to send a request**. Verified phone also enables OTP as an alternate login. `phone_verified_at` is captured now; reward-badge **display** is Phase 2.
-- **Send Request** — creates a `requested` booking; no clock slot is held yet, just counted toward that day's busy-level.
-- **Time Proposed screen** — Approve / Reject / Ask for a different day. Ask-other-day **reopens the same booking** (`requested` + new preferred day); it does not spawn a second request.
+- **Send Request** — creates a `requested` booking with preferred date and time; no clock slot is held yet, just counted toward that day's busy-level.
+- **Time Proposed screen** — Approve / Reject / Ask for a different day or time (shown only when owner counter-proposes). Ask-other-day-or-time **reopens the same booking** (`requested` + new preferred date/time); it does not spawn a second request.
 - **My Bookings** — list of requests by status (Pending / Time Proposed / Confirmed / Declined); cancel/reschedule confirmed bookings.
 - **Reschedule** — original confirmed booking stays untouched and protected until a new proposed time is approved.
 - **Cancel** — owner-configurable notice window; late cancellations get a warning, not a hard block.
@@ -20,9 +20,9 @@
 
 ## Owner-Facing (MVP)
 
-- **Reservation Inbox / Pending Requests Queue** — sorted by upcoming/requested day, soonest first; near-expiry visual urgency cues; reschedule requests visually tagged.
-- **Worker Availability Panel** — table of workers × **15-minute** slots per day. Pending requests sit in a queue at the top of each day; the owner **drags** a request onto an open slot to propose a time (sets `time_proposed`, not `confirmed`). A proposal **holds that slot** until confirm, decline, or expire. `requested` does not occupy a clock slot.
-- **Request Detail (fallback to drag)** — tap a pending item to accept/decline/propose a time via a form; needed for touch devices where drag is unreliable.
+- **Reservation Inbox / Pending Requests Queue** — sorted by upcoming/requested day, soonest first; shows each guest's preferred date and time; near-expiry visual urgency cues; reschedule requests visually tagged.
+- **Worker Availability Panel** — table of workers × **15-minute** slots per day. Pending requests sit in a queue at the top of each day; the owner **accepts** a preferred time in one tap or **drags** a request onto an open slot to counter-propose (sets `time_proposed`, not `confirmed`). A counter-proposal **holds that slot** until confirm, decline, or expire. `requested` does not occupy a clock slot.
+- **Request Detail (fallback to drag)** — tap a pending item to accept preferred time, decline, or counter-propose via a form; needed for touch devices where drag is unreliable.
 - **Decline** — optional reason field shown to the customer.
 - **Working Hours & Availability Settings** — open days/hours, breaks, holidays, and owner-configurable `cancellation_notice_hours` and reschedule cap (default = 1 in-progress reschedule per booking).
 - **Service & Pricing Management** — add/edit services, durations, prices; default service duration 30 min, owner-adjustable.

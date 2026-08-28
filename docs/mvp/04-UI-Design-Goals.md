@@ -12,11 +12,11 @@ The owner side, by contrast, is where the real scheduling tool lives — the Wor
 
 ## 3. Coarse Signals, Not Detailed Schedules (Customer Side)
 
-Customers see a 🟢/🟡/🔴 busy-level badge per day, not a slot-by-slot grid. This keeps the request flow light and avoids putting scheduling decisions on the customer, consistent with the request-and-propose booking model.
+Customers see a 🟢/🟡/🔴 busy-level badge per day and pick a preferred day and time via a simple picker — not a slot-by-slot availability grid. This keeps the request flow light while letting guests state when they'd like to come; the salon still accepts or counter-proposes.
 
 ## 4. Mobile-First, Responsive Second
 
-Primary target is a mobile browser/PWA experience for customers. The owner dashboard is responsive but should still work acceptably from a phone (e.g. drag-to-propose has a tap-based fallback for exactly this reason).
+Primary target is a mobile browser/PWA experience for customers. The owner dashboard is responsive but should still work acceptably from a phone (e.g. accept-preferred-time and drag-to-counter-propose have tap-based fallbacks for exactly this reason).
 
 ## 5. Localization as a Trust Signal
 

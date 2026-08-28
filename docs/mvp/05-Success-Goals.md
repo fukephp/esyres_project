@@ -11,13 +11,13 @@
 
 ## Owner-Side Health Signals
 
-- **Response speed**: how quickly an owner proposes a time after a request comes in (feeds the future "Fast Responder" badge and is already known to correlate with IG DM conversion).
+- **Response speed**: how quickly an owner accepts or counter-proposes after a request comes in (feeds the future "Fast Responder" badge and is already known to correlate with IG DM conversion).
 - **QR scan → verified-visit conversion rate**: a concrete, owner-visible read on whether their counter sticker is actually driving reconnects.
 - **Cancellation / no-show rate** and **decline rate** over time, once there's enough volume to be meaningful.
 
 ## Customer-Side Health Signals
 
-- Request → confirmed-booking conversion (i.e., how often a proposed time is actually accepted, not rejected or ignored).
+- Request → confirmed-booking conversion (i.e., how often a request ends confirmed — via accept or counter-propose acceptance — not rejected or ignored).
 - Repeat-salon rate (feeds the "Regular" badge logic and Favorites usage).
 - Verification completion rate (phone + email) — this is a new friction point (see `08-Improvements-and-Open-Questions.md`) and should be watched closely once live, since it sits right before the request is sent.
 

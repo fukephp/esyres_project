@@ -6,13 +6,13 @@
 Guest-accessible discovery flow: location-based "near you" with "Popular in Sarajevo" fallback, search/filter, salon profile page with services, prices, and busy-level badge.
 
 ## Epic 2 — Booking Request Flow (Customer)
-Service selection (multi-service), worker selection (specific or "no preference"), day-only picker, email+password account, verified email + phone OTP at request submit, pending state.
+Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account, verified email + phone OTP at request submit, pending state.
 
 ## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
-The core owner scheduling surface: per-day worker × time grid, Pending Requests queue, drag-to-propose interaction (+ tap fallback), Request Detail screen, decline flow.
+The core owner scheduling surface: per-day worker × time grid, Pending Requests queue (shows preferred date/time), one-tap accept preferred time, drag-to-counter-propose (+ tap fallback), Request Detail screen, decline flow.
 
 ## Epic 4 — Booking Lifecycle & Customer Response
-Time-Proposed screen (Approve / Reject / Ask for a different day on the **same** booking row), status transitions through `requested → time_proposed → confirmed/declined`, My Bookings list.
+Time-Proposed screen (Approve / Reject / Ask for a different day or time on the **same** booking row — only when owner counter-proposes), status transitions through `requested → confirmed` (accept) or `requested → time_proposed → confirmed/declined` (counter-propose), My Bookings list.
 
 ## Epic 5 — Reschedule & Cancellation
 Reschedule flow for confirmed bookings (original stays protected until new time approved), cancellation with owner-configurable notice window, reschedule cap enforcement.

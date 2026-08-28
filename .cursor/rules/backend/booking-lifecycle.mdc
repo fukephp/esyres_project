@@ -8,10 +8,10 @@ alwaysApply: false
 
 Stack and occupancy rules: `docs/architecture/`.
 
-Status flow is only: `requested → time_proposed → confirmed | declined`.
+Status flow: `requested → confirmed` (owner accepts preferred time) or `requested → time_proposed → confirmed | declined` (owner counter-proposes).
 
-- A request holds a **day**, not a clock time. `time_proposed` and `confirmed` occupy the worker slot; `requested` does not.
-- Owner propose sets `time_proposed`, not `confirmed`. Ask-another-day reopens the **same** row (`requested` + new preferred day).
+- A request holds preferred date and time but does not occupy a clock slot until `confirmed` or `time_proposed`. `time_proposed` and `confirmed` occupy the worker slot; `requested` does not.
+- Owner `acceptPreferredTime` sets `confirmed` directly. Owner `proposeTime` (counter-propose) sets `time_proposed`, not `confirmed`. Ask-another-day-or-time reopens the **same** row (`requested` + new preferred date/time).
 - Reschedule: the confirmed booking stays protected until the new proposed time is approved.
 - Default reschedule cap is 1 in-progress reschedule per booking (owner-configurable).
 - Cancellation uses owner `cancellation_notice_hours`. Late cancel warns; it does not hard-block.

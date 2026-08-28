@@ -10,13 +10,13 @@ Login is email+password so browsing stays open. Phone is optional at register an
 
 ### Two-step approval may slow down perceived responsiveness (worth discussing)
 
-The old model was `requested → confirmed/declined` (one owner action). The new model is `requested → time_proposed → confirmed/declined` (owner proposes, then customer must also act). This is a deliberate, reasonable choice given the "salon sets the time" philosophy — but it does mean a customer's request isn't actually locked in until **two** parties have acted, and the "Fast Responder" trust signal now measures only the *owner's* half of that latency, not the whole loop. I don't think this needs to change, but it's worth being explicit that "time to owner proposal" and "time to fully confirmed" are two different metrics worth tracking separately.
+The old model was `requested → confirmed/declined` (one owner action). The current model adds a **fast path** (`requested → confirmed` when owner accepts preferred time) and a **counter-propose path** (`requested → time_proposed → confirmed/declined`). When the owner counter-proposes, the customer must also act — so a request isn't locked in until both parties have acted on that path. The "Fast Responder" trust signal should measure owner response to incoming requests (accept or counter-propose); "time to fully confirmed" is a separate metric when the counter-propose loop is involved.
 
 ### Pricing axis is still genuinely undefined
 Per-worker booking used to be the natural Pro-tier gate; it no longer is, since it's core MVP. `MarketingBrainstorm.md` floats Viber/WhatsApp outreach as a candidate paid feature (since it has real per-message cost), which is a reasonable direction, but nothing is locked. This is a business decision, not something I should presume — flagging for your input rather than proposing a number.
 
-### Consider whether "Ask for a different day" needs its own light-weight loop now, given it's already core UX
-**Decided:** same booking row returns to `requested` with a new preferred day. Reschedule of a confirmed booking stays Epic 5 (original slot protected).
+### Consider whether "Ask for a different day or time" needs its own light-weight loop now, given it's already core UX
+**Decided:** same booking row returns to `requested` with a new preferred day and/or time. Reschedule of a confirmed booking stays Epic 5 (original slot protected).
 
 ## Part 2 — Consolidated Open Questions (from existing docs)
 
