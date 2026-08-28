@@ -2,14 +2,14 @@
 name: what-next
 description: >-
   Read-only orientation: scan MVP stories, loop artifacts, and the codebase
-  to report status and top-3 ranked next-work suggestions. Use when the user
-  asks what to work on next, what's done, or says /what-next. Does not write
-  files or implement code.
+  to report status and top-3 next picks with one Recommended (best for
+  current progress). Use when the user asks what to work on next, what's
+  done, or says /what-next. Does not write files or implement code.
 ---
 
 # What next
 
-Orient before execute. This skill reports **what is done, in-flight, blocked, and not started**, then suggests up to **three** next picks. It does **not** implement, draft answer keys, or write status files.
+Orient before execute. This skill reports **what is done, in-flight, blocked, and not started**, then suggests up to **three** next picks. **#1 is always Recommended** — the best next move for current progress. It does **not** implement, draft answer keys, or write status files.
 
 For execution after a pick, use **story-loop**. For fog on a specific story, use **grill-me** (no app code) or **grill-with-docs** (codebase exists).
 
@@ -60,46 +60,77 @@ When evidence is ambiguous, say so briefly — do not mark done without support.
 
 ### 4. Blockers-first gate
 
-Before ranking stories, check for project blockers. When any apply, they **consume top suggestion slots** (up to 3):
+Before ranking stories, check for project blockers. When any apply, they **consume suggestion slots** (up to 3), in this chain order:
 
-- Stories source unset or empty
-- App root unset or placeholder
-- No local verify runner (tests, typecheck, lint) — same bar as [story-loop preconditions](.cursor/skills/story-loop/SKILL.md)
-- Architecture docs still stubs when stories need stack decisions
+1. Stories source unset or empty
+2. Architecture docs still stubs when stories need stack decisions
+3. App root unset or placeholder
+4. No local verify runner (tests, typecheck, lint) — same bar as [story-loop preconditions](.cursor/skills/story-loop/SKILL.md)
 
 Describe each blocker in one line. Do not imply a coding loop is ready when verify is missing; note **plan-gate only** where relevant.
 
-### 5. Rank stories (when blockers are clear)
+### 5. Rank unlock candidates (when blockers are clear)
 
-Rank **not-started** and **blocked-by-dependency** stories by dependency unlock value:
+Rank **not-started** and **blocked-by-dependency** stories by dependency unlock value. This list feeds slots 2–3 and the fallback Recommended pick — it is **not** the Recommended rule.
 
 1. Explicit deps in story text (`depends on`, `blocked by`, ordered epic lists)
 2. Inferred foundation flows (auth shell, core entity, shared layout/API conventions)
 3. Stories that unblock the most downstream stories
 4. Tie-break: lower story id / earlier epic order
 
-**In-flight** stories appear in the status summary and optional in-flight note. They do **not** auto-outrank unlock candidates — mention WIP without forcing "finish first."
+### 6. Pick Recommended and build the 3
 
-### 6. Output (compact)
+**Recommended is always slot 1.** It uses a **progress** rule, not unlock rank. Do not add a 4th item. Do not recommend work that cannot proceed.
 
-Use this shape. Max **3** numbered suggestions.
+Pick the first that applies:
+
+1. **Unblocked in-flight** — can continue now (plan-gate if no verify runner; coding only if verify exists). Skip in-flight with unmet story deps, or that needs coding while app root / verify is missing.
+2. Else the **earliest project blocker** from the chain in step 4 (skip entries that do not apply).
+3. Else the **#1 unlock** story from step 5.
+
+Several unblocked in-flight: **closest to done**, then recency, then lower id:
+
+1. Approved answer key (coding-ready or verify in progress)
+2. Draft answer key / open map
+3. `story/*` branch with no key
+4. Tie: most recently touched (git), then lower story id
+
+Build the numbered 3 as:
+
+1. The recommended pick (labeled)
+2. Next-best unlock candidate or remaining blocker, excluding #1
+3. Same, next after that
+
+No duplicates. If fewer than 3 exist, list fewer. When in-flight wins, it **enters** the numbered 3 — it is not only a footer.
+
+Short reason in parens is exactly one of: `finish in-flight` · `clear blocker` · `highest unlock`.
+
+### 7. Output (compact)
+
+Use this shape. Max **3** numbered suggestions. Label **only** #1.
 
 ```text
 Status: X done · Y in-flight · Z not started · W blocked
 
-1. STORY-03 — <title> — unlocks auth for 4 downstream stories
-2. STORY-01 — <title> — core entity CRUD; no deps
-3. STORY-07 — <title> — thin vertical slice after STORY-03
+1. STORY-02 — <title> — Recommended (finish in-flight) — draft key ready to approve
+2. STORY-03 — <title> — unlocks auth for 4 downstream stories
+3. STORY-01 — <title> — core entity CRUD; no deps
+```
 
-In-flight: STORY-02 (draft answer key)
+Blocker with no story id:
+
+```text
+1. Stories source unset — Recommended (clear blocker) — fill CONTEXT / docs/mvp
 ```
 
 Rules:
 
-- One line per suggestion: id, title, why ranked here.
-- Optional one-line in-flight note after the list.
-- If blockers fill all slots, list blockers instead of stories.
-- If top pick has high fog or no verify runner, note **plan-gate only**.
+- One line per suggestion: id (or blocker name), title, why.
+- Slot 1: `— Recommended (<short reason>) —` then the why.
+- Slots 2–3: unlabeled alternatives.
+- Optional one-line in-flight note **only** for other WIP not already in the 3. Omit if the only in-flight is #1.
+- If blockers fill all slots, list blockers instead of stories; #1 is still Recommended (earliest in the chain).
+- If #1 has high fog or no verify runner, note **plan-gate only**.
 - **No** trailing handoff command.
 
 ## Related
