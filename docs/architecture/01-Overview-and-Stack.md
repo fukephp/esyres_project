@@ -35,4 +35,4 @@ Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet/Google Maps SDK,
 
 ## Related product overrides
 
-Auth, owner invite, salon switcher, per-service duration, preferred time, and “ask for a different day or time” were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md).
+Auth, owner invite, salon switcher, per-service duration, preferred time, “ask for a different day or time”, and the scripted salon booking assistant were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md). Assistant v1 does not add a stack component (no LLM, no WhatsApp).

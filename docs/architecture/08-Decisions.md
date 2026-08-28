@@ -36,3 +36,4 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 32. **Per-service duration, 15-min grid** — Phase 2 “salon-wide duration only” is revoked.
 33. **Proposal holds the slot** — `requested` does not.
 34. **Workers inherit salon hours** — per-worker vacation still Phase 2.
+35. **Assistant v1 is scripted UI + existing GraphQL** — deterministic salon-profile chat (service → worker → day/busy → 1–3 preferred times → confirm → OTP) calling the same `createBooking` as the picker. No LLM vendor, no GoHighLevel, no Meta/WhatsApp/Viber in v1. Those are explicit later decisions. `requested` still does not hold a slot.

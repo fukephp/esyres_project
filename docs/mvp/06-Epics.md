@@ -29,12 +29,16 @@ QR Reconnect Loop (scan → ~7 day guest cookie → reconcile at verification �
 ## Epic 9 — Basic Stats & Owner Insights
 Bookings per week, busiest hours/days, cancellation rate, day-level busy %, QR scan and conversion stats — feeds both the owner's Basic Stats screen and the customer-facing busy-level indicator.
 
+## Epic 10 — Salon Booking Assistant (scripted intake)
+In-PWA scripted chat on the salon profile as an alternate to the picker. Same `createBooking` / `requested` contract, same OTP gates, coarse time suggestions only. Owner: chat tab + badge for in-flight conversations, optional take-over (guest waits only after Take over; after hours / DND the assistant always finishes), transcript on Request Detail. Not in the first demo — ships after Epics 2–4 exist. Not WhatsApp, not an LLM, not worker-facing.
+
 ---
 
 ## Explicitly Deferred Epics (Phase 2 — not scoped for now)
 
 - Trust Badge Display UI
-- Viber/WhatsApp Marketing & Re-engagement Messaging
+- Viber/WhatsApp Marketing & Re-engagement Messaging (and Instagram DM as an assistant channel — same booking contract later)
+- LLM / free-form NLU for the assistant (v1 stays scripted)
 - Native App
 - Referral Incentive Mechanic
 - Reviews/Ratings
@@ -43,4 +47,4 @@ Bookings per week, busiest hours/days, cancellation rate, day-level busy %, QR s
 
 ## PM Note
 
-I'd suggest building in roughly this order for a first working demo: **Epic 7 → Epic 1 → Epic 2 → Epic 3 → Epic 4 → Epic 5 → Epic 6 → Epic 8/9.** Reasoning: an owner needs a salon set up (7) before there's anything to discover (1); the request/propose/respond loop (2–4) is the core value loop and should be proven end-to-end before layering reschedule (5), notifications (6), or trust/stats (8–9) on top. Flagging this as a suggestion, not a locked decision — happy to reorder if you see it differently.
+I'd suggest building in roughly this order for a first working demo: **Epic 7 → Epic 1 → Epic 2 → Epic 3 → Epic 4.** Reasoning: an owner needs a salon set up (7) before there's anything to discover (1); the request/propose/respond loop (2–4) is the core value loop and should be proven end-to-end before anything else. **Epic 10 (assistant) comes next**, once that loop is real — it writes into the same inbox and must not ship as a fake. Then **Epic 5 → Epic 6 → Epic 8/9**. Flagging the later ordering as a suggestion, not a locked decision — happy to reorder 5/6/8/9 if you see it differently. Epic 10 after 2–4 is locked.

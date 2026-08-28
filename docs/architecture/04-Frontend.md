@@ -4,8 +4,8 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 
 ## Routing
 
-- `/` — customer: discover, salon, request, bookings, favorites
-- `/owner` — owner: inbox, worker panel, settings, stats; **salon switcher** when the user owns more than one salon
+- `/` — customer: discover, salon, request (picker or scripted salon-profile chat), bookings, favorites
+- `/owner` — owner: inbox, worker panel (home), in-flight chat tab, settings, stats; **salon switcher** when the user owns more than one salon
 
 Owner chunks (including `@dnd-kit`) are lazy-loaded so the customer first paint does not ship the grid.
 
@@ -27,7 +27,7 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 
 ## UX constraints (from product rules)
 
-- Customers see a day-level busy badge and a simple date+time picker (no slot grid).
+- Customers see a day-level busy badge and a simple date+time picker (no slot grid). Scripted salon-profile chat (Epic 10) is an alternate path to the same `createBooking`; it may suggest 1–3 preferred times from busy-level, never live slots. No LLM in v1.
 - Copy is Bosnian-first. Prices formatted as BAM via `Intl` (`bs-BA`) from integer feninga.
 - Accept-preferred-time and drag-to-counter-propose always have tap/form fallbacks.
 - GraphQL errors are machine codes; the SPA maps them to Bosnian strings.

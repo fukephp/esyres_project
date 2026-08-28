@@ -4,15 +4,17 @@
 
 Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password) and phone OTP appear at request submit / My Bookings, not on the homepage.
 
+On the salon profile, the **primary** button stays the picker (`Pošalji zahtjev`). Scripted chat is a visible alternate (`Nisi sigurna? Pitaj salon.`), not a second product. Owners may market the assistant; guests who already know still get a few taps.
+
 ## 2. Complexity Belongs on the Owner Side
 
-The customer's entire surface is deliberately narrow: **Profile, Bookmarks/Favorites, Search/Discover, and Schedule/Reschedule.** No dashboards, panels, or stats are ever shown to a customer.
+The customer's entire surface is deliberately narrow: **Profile, Bookmarks/Favorites, Search/Discover, and Schedule/Reschedule.** Scripted chat lives on the salon profile; it is not a customer inbox or dashboard. No dashboards, panels, or stats are ever shown to a customer.
 
-The owner side, by contrast, is where the real scheduling tool lives — the Worker Availability Panel is a dense, actionable table (drag-and-drop, per-worker rows, pending-request queue) because the owner is the power user managing many customers and workers at once. If they own more than one salon, a switcher changes context; each salon stays a separate customer profile.
+The owner side, by contrast, is where the real scheduling tool lives — the Worker Availability Panel is a dense, actionable table (drag-and-drop, per-worker rows, pending-request queue) because the owner is the power user managing many customers and workers at once. Home after login is this panel + pending queue. In-flight chat is a **tab with a badge**, not screen 1. If they own more than one salon, a switcher changes context; each salon stays a separate customer profile.
 
 ## 3. Coarse Signals, Not Detailed Schedules (Customer Side)
 
-Customers see a 🟢/🟡/🔴 busy-level badge per day and pick a preferred day and time via a simple picker — not a slot-by-slot availability grid. This keeps the request flow light while letting guests state when they'd like to come; the salon still accepts or counter-proposes.
+Customers see a 🟢/🟡/🔴 busy-level badge per day and pick a preferred day and time via a simple picker — not a slot-by-slot availability grid. The assistant uses the same coarse signal: it may suggest 1–3 preferred times from hours, busy-level, and worker preference. It must not name live free slots or hold a clock cell. This keeps both request paths light while letting guests state when they'd like to come; the salon still accepts or counter-proposes.
 
 ## 4. Mobile-First, Responsive Second
 
@@ -29,6 +31,10 @@ Verified (phone + email), Founding Partner, Fast Responder, and similar badges a
 ## 7. Calm, Reassuring State Language
 
 States like "Reschedule in progress — thank you for your patience" and late-cancellation warnings (rather than hard blocks) are chosen to keep the customer from feeling penalized or left in limbo while an owner is deciding.
+
+## 8. Salon Voice in Chat (not a named bot)
+
+Guest chat speaks as the salon (Bosnian). No platform character (no “Cora”). Esyres is plumbing. Copy and steps are owned by us (scripted flow); the conversation-shape guideline is acknowledge → short questions → close to a request — not WhatsApp auto-book.
 
 ## Decided (visual)
 

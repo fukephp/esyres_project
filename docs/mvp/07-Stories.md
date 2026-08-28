@@ -62,8 +62,19 @@
 - As an owner, I want to see bookings per week, busiest hours, and cancellation rate, so that I can understand how my salon is actually running.
 - As an owner, I want to see how many people scanned my QR code and how many converted into verified visits, so that I know if the sticker is working.
 
+## Epic 10 — Salon Booking Assistant (scripted intake)
+
+- As a customer, I want an alternate chat on the salon profile when I am not sure which service or time to pick, so that I can still send the same kind of request without hunting a slot grid.
+- As a customer, I want the chat to suggest 1–3 preferred times from hours and how busy the day looks, so that I can choose a time without seeing the owner's real calendar.
+- As a customer, I want the chat to speak as this salon in Bosnian and only use that salon's live services, prices, hours, address, workers, and busy-level, so that it does not invent policies or feel like a third brand.
+- As a customer, I want send gates to stay the same as the picker (login, verified email, phone OTP), so that the salon still gets a reachable guest. If I am already verified, I want one confirm at the end.
+- As an owner, I want assistant-originated requests in the same pending queue, tagged and with a collapsed transcript on Request Detail, so that I can accept or counter-propose without a second workflow.
+- As an owner, I want a chat tab with a badge for conversations that have not become a request yet, so that in-flight chats are visible without replacing the panel as home.
+- As an owner, I want optional Take over so I can handle one conversation myself, and I want the assistant to keep going (and still be able to send a request) unless I have tapped Take over. After hours or DND, take-over is off.
+- As an owner, I want the assistant to say it does not know when the answer is not in live salon data, and optionally ping me, without making the guest wait on me.
+
 ---
 
 ## Note
 
-These stories reflect **locked MVP scope only**. Stories for Phase 2 items (badge display, Viber/WhatsApp, native app, etc.) are intentionally not written yet — writing them now would imply a commitment that hasn't been made.
+These stories reflect **locked MVP scope only**. Stories for Phase 2 items (badge display, Viber/WhatsApp / Instagram DM channels, LLM NLU, native app, etc.) are intentionally not written yet — writing them now would imply a commitment that hasn't been made.
