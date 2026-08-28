@@ -2,7 +2,7 @@
 
 Two-sided salon reservation product. Customers request a service with a preferred day and time; salon owners accept or counter-propose. Mobile-first PWA.
 
-No application code in this repo yet. Product scope: `docs/mvp/`. Target architecture: `docs/architecture/`. Update this file when features land.
+Application code lives in `esyres_app/` (Laravel + PWA). Product scope: `docs/mvp/`. Target architecture: `docs/architecture/`. Update this file when features land.
 
 ## Capability (MVP)
 

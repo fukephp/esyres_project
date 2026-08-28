@@ -31,14 +31,14 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 Behat is the only backend verify gate for MVP. Do not add Pest or a parallel PHPUnit suite.
 
 - **Driver:** GraphQL-over-HTTP against `/graphql` (booking lifecycle + schema). No Mink/browser Behat — Playwright owns UI flows.
-- **Verify command:** `vendor/bin/behat` from `esyres_app/` once Laravel is scaffolded. Do not document `php artisan test` or `composer test` as the backend gate.
+- **Verify command:** `docker compose run --rm php vendor/bin/behat` from `esyres_app/`. Do not document `php artisan test` or `composer test` as the backend gate.
 - **Auth:** Sanctum cookie/session steps (CSRF like the SPA). No Bearer tokens and no test-only auth bypass.
 - **Database:** Dedicated test DB. Fresh migrate + per-scenario fixtures (Gherkin setup), not a shared seeded DB.
 - **Side effects:** Behat env uses the sync queue plus fake/log SMS, mail, and push. Do not require a live worker in the default gate.
 - **OTP:** Fake `SmsGateway` stores the last code; Behat reads it and calls the same verify mutation as the app. Fixtures may set `phone_verified_at` when OTP is not under test. No magic OTP in app code.
 - **Gherkin:** English feature files and step defs.
 
-Install Behat when the app is scaffolded — not before.
+Behat is installed. GraphQL feature files land with Lighthouse — not before.
 
 ## Queues
 

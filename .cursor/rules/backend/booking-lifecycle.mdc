@@ -1,6 +1,6 @@
 ---
 description: Booking state machine and request-and-propose rules
-globs: backend/**,apps/api/**,**/api/**
+globs: esyres_app/app/**,esyres_app/routes/**,esyres_app/config/**,esyres_app/database/**,esyres_app/features/**
 alwaysApply: false
 ---
 

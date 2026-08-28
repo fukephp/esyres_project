@@ -1,6 +1,6 @@
 ---
 description: Mobile-first PWA UI conventions for Esyres customer and owner surfaces
-globs: frontend/**,apps/web/**,**/*.tsx,**/*.jsx,**/*.css
+globs: esyres_app/frontend/**
 alwaysApply: false
 ---
 
