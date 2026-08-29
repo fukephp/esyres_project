@@ -1,0 +1,54 @@
+enum Weekday {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}
+
+type DayHours {
+    weekday: Weekday!
+    closed: Boolean!
+    opensAt: String
+    closesAt: String
+    breakStartsAt: String
+    breakEndsAt: String
+}
+
+input DayHoursInput {
+    weekday: Weekday!
+    closed: Boolean!
+    opensAt: String
+    closesAt: String
+    breakStartsAt: String
+    breakEndsAt: String
+}
+
+input UpdateSalonHoursInput {
+    hours: [DayHoursInput!]!
+    cancellationNoticeHours: Int!
+}
+
+type User {
+    id: ID!
+    email: String!
+    emailVerified: Boolean! @method(name: "hasVerifiedEmail")
+}
+
+type Salon {
+    id: ID!
+    name: String!
+    cancellationNoticeHours: Int! @rename(attribute: "cancellation_notice_hours")
+    hours: [DayHours!]! @method(name: "dayHours")
+}
+
+type Query {
+    salon(id: ID!): Salon
+}
+
+type Mutation {
+    login(email: String!, password: String!): User!
+    updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
+}

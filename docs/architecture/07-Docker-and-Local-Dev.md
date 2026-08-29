@@ -1,14 +1,14 @@
 # Docker and local dev
 
-Slim Compose lives at `esyres_app/docker-compose.yml`: **php** (8.3, Composer, Artisan, Behat) and **node** (22, `frontend/` + `marketing/` npm). Run `docker compose` from `esyres_app/`. Not Laravel Sail.
+Slim Compose lives at `esyres_app/docker-compose.yml`: **php** (8.3, Composer, Artisan, Behat), **node** (22, `frontend/` + `marketing/` npm), and **mysql** (app DB + dedicated Behat test DB). Run `docker compose` from `esyres_app/`. Not Laravel Sail.
 
-The target one-origin stack (not in this compose yet):
+The rest of the one-origin stack is still not in this compose:
 
 ## Services (target)
 
 - **nginx** — SPA, `/graphql`, Reverb proxy
 - **php-fpm** — Laravel
-- **mysql**
+- **mysql** — in slim compose now; this line stays on the target list for the full stack
 - **redis**
 - **queue worker** — same image as php-fpm
 - **reverb**
