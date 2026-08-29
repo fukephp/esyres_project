@@ -3,6 +3,7 @@
 use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Worker;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -24,6 +25,8 @@ class FeatureContext implements Context
     private ?Salon $salon = null;
 
     private ?Service $service = null;
+
+    private ?Worker $worker = null;
 
     private ?User $otherUser = null;
 
@@ -50,6 +53,7 @@ class FeatureContext implements Context
         $this->user = null;
         $this->salon = null;
         $this->service = null;
+        $this->worker = null;
         $this->otherUser = null;
 
         $this->app = require dirname(__DIR__, 2).'/bootstrap/app.php';
@@ -113,6 +117,18 @@ class FeatureContext implements Context
             'category' => $input['category'],
             'duration_minutes' => $input['durationMinutes'],
             'price_feninga' => $input['priceFeninga'],
+        ]);
+    }
+
+    /**
+     * @Given the salon has a worker:
+     */
+    public function theSalonHasAWorker(PyStringNode $payload): void
+    {
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->worker = Worker::factory()->create([
+            'salon_id' => $this->salon->id,
+            'name' => $input['name'],
         ]);
     }
 
@@ -190,6 +206,48 @@ class FeatureContext implements Context
     {
         $this->graphql($this->updateServiceMutation(), [
             'id' => (string) $this->service->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I query salon workers
+     */
+    public function iQuerySalonWorkers(): void
+    {
+        $this->graphql($this->salonWorkersQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I create a salon worker:
+     */
+    public function iCreateASalonWorker(PyStringNode $payload): void
+    {
+        $this->graphql($this->createWorkerMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I create a salon worker as a guest:
+     */
+    public function iCreateASalonWorkerAsAGuest(PyStringNode $payload): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->createWorkerMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I update the salon worker:
+     */
+    public function iUpdateTheSalonWorker(PyStringNode $payload): void
+    {
+        $this->graphql($this->updateWorkerMutation(), [
+            'id' => (string) $this->worker->id,
             'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
         ]);
     }
@@ -296,6 +354,31 @@ class FeatureContext implements Context
                 'category' => $service['category'],
                 'durationMinutes' => $service['durationMinutes'],
                 'priceFeninga' => $service['priceFeninga'],
+            ];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then salon workers are empty
+     */
+    public function salonWorkersAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['salon']['workers']);
+    }
+
+    /**
+     * @Then salon workers match:
+     */
+    public function salonWorkersMatch(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['salon']['workers'] as $worker) {
+            $actual[] = [
+                'name' => $worker['name'],
             ];
         }
         $this->assertSame($expected, $actual);
@@ -456,6 +539,45 @@ mutation UpdateService($id: ID!, $input: UpdateSalonServiceInput!) {
     category
     durationMinutes
     priceFeninga
+  }
+}
+GQL;
+    }
+
+    private function salonWorkersQuery(): string
+    {
+        return <<<'GQL'
+query Salon($id: ID!) {
+  salon(id: $id) {
+    id
+    workers {
+      id
+      name
+    }
+  }
+}
+GQL;
+    }
+
+    private function createWorkerMutation(): string
+    {
+        return <<<'GQL'
+mutation CreateWorker($salonId: ID!, $input: CreateSalonWorkerInput!) {
+  createSalonWorker(salonId: $salonId, input: $input) {
+    id
+    name
+  }
+}
+GQL;
+    }
+
+    private function updateWorkerMutation(): string
+    {
+        return <<<'GQL'
+mutation UpdateWorker($id: ID!, $input: UpdateSalonWorkerInput!) {
+  updateSalonWorker(id: $id, input: $input) {
+    id
+    name
   }
 }
 GQL;

@@ -6,6 +6,7 @@ use App\Exceptions\ClientError;
 use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Worker;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class OwnerAccess
@@ -41,5 +42,15 @@ final class OwnerAccess
         }
 
         return $service;
+    }
+
+    public static function worker(User $user, string $id): Worker
+    {
+        $worker = Worker::query()->find($id);
+        if ($worker === null || $worker->salon->owner_id !== $user->id) {
+            throw new ClientError('FORBIDDEN');
+        }
+
+        return $worker;
     }
 };
