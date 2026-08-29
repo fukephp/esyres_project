@@ -1,6 +1,6 @@
 ---
 description: Read DESIGN.md index, then the correct design pack — same Cal tokens, separate packs by surface
-globs: frontend/**,apps/web/**,esyres_app/**/*.tsx,esyres_app/**/*.jsx,esyres_app/**/*.css,**/*.tsx,**/*.jsx,**/*.css
+globs: esyres_app/frontend/**
 alwaysApply: false
 ---
 

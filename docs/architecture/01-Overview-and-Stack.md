@@ -1,6 +1,6 @@
 # Overview and stack
 
-Application code is **not** in this repo yet. These files describe the locked target architecture. Product scope stays in `docs/mvp/`.
+Application code is in `esyres_app/` (Laravel 13 + React TypeScript PWA placeholder). Product scope stays in `docs/mvp/`.
 
 ## Locked stack
 
@@ -15,21 +15,22 @@ Application code is **not** in this repo yet. These files describe the locked ta
 | PWA | `vite-plugin-pwa` + Workbox, native Web Push (VAPID) |
 | Owner grid | `@dnd-kit` + tap/form fallback |
 | Tests | Behat GraphQL HTTP (backend); Vitest + Playwright (frontend) |
-| Local run | Docker Compose (documented, not written) |
+| Local run | Docker Compose in `esyres_app/` (slim: `php` + `node`; full list later) |
 
 Same origin: Nginx serves the SPA at `/`, GraphQL at `/graphql`, Reverb on the same host. No split `app.` / `api.` domains at MVP.
 
-## Planned repo layout
+## Repo layout
 
-One git repo (not created as app folders yet):
+One git repo. Application code is not at the git root.
 
-- `backend/` — Laravel
-- `frontend/` — Vite React PWA
-- `docker-compose.yml` — root, later
+- `esyres_app/` — Laravel (`artisan`, `composer.json`, `app/`)
+- `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`)
+- `esyres_app/marketing/` — Design 1 static marketing site (sibling under the Laravel root)
+- `esyres_app/docker-compose.yml` — slim `php` + `node` (full service list later)
 - `docs/mvp/` — product
 - `docs/architecture/` — this set
 
-## Out of scope for this architecture (still no code)
+## Out of scope for this architecture
 
 Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet/Google Maps SDK, Spatie Media Library, Pest, Scout/Meilisearch, Octane, Elasticsearch, OneSignal, worker logins, in-app payments, REST as a second public API.
 

@@ -1,8 +1,10 @@
 # Docker and local dev
 
-No compose file in the repo yet. When it is added, one origin through Nginx.
+Slim Compose lives at `esyres_app/docker-compose.yml`: **php** (8.3, Composer, Artisan, Behat) and **node** (22, `frontend/` + `marketing/` npm). Run `docker compose` from `esyres_app/`. Not Laravel Sail.
 
-## Services
+The target one-origin stack (not in this compose yet):
+
+## Services (target)
 
 - **nginx** — SPA, `/graphql`, Reverb proxy
 - **php-fpm** — Laravel
@@ -13,7 +15,7 @@ No compose file in the repo yet. When it is added, one origin through Nginx.
 - **vite** — frontend dev
 - **mailpit** — catch mail
 
-Not in the first compose: Horizon container, SMS container, Laravel Sail as the named approach.
+Not in compose: Horizon container, SMS container, Laravel Sail as the named approach.
 
 ## Local vs staging notes
 

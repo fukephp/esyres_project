@@ -1,6 +1,6 @@
 ---
 description: Split customer vs owner UI; customers never see schedules or dashboards
-globs: frontend/**,apps/web/**,**/*.tsx,**/*.jsx
+globs: esyres_app/frontend/**
 alwaysApply: false
 ---
 

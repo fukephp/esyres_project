@@ -1,6 +1,6 @@
 # Esyres — agent context
 
-This file is the source of truth for everything under `.cursor/`. Read it before applying rules, skills, commands, or hooks. Product scope lives in `docs/mvp/`. Target architecture lives in `docs/architecture/`. There is no application code yet; `esyres_app/` is the reserved app folder (placeholder until scaffolded). App commands run from `esyres_app/`, not the git root. See `AGENTS.md`.
+This file is the source of truth for everything under `.cursor/`. Read it before applying rules, skills, commands, or hooks. Product scope lives in `docs/mvp/`. Target architecture lives in `docs/architecture/`. Application code lives in `esyres_app/` (Laravel 13 + React TypeScript PWA placeholder). App commands and Docker Compose run from `esyres_app/`, not the git root. See `AGENTS.md`.
 
 ## Product (locked)
 
@@ -15,15 +15,18 @@ Bosnian-first UI. Prices in KM (integer feninga in the data model). Preserve QR 
 
 ## Architecture (locked)
 
-See `docs/architecture/`. Short version: Laravel + Lighthouse GraphQL + MySQL + Redis + Reverb, one React TypeScript PWA, Sanctum cookies, same origin via Nginx, Docker Compose (not written yet).
+See `docs/architecture/`. Short version: Laravel + Lighthouse GraphQL + MySQL + Redis + Reverb, one React TypeScript PWA, Sanctum cookies, same origin via Nginx. Slim Docker Compose (`php` + `node`) lives in `esyres_app/`; the full service list is not written yet.
 
-Do not invent a different stack. Do not scaffold app code unless the user asks.
+Do not invent a different stack. Do not expand the scaffold into product features unless the user asks.
+
+**Local verify** (from `esyres_app/`): `docker compose run --rm php php artisan --version`; `docker compose run --rm php vendor/bin/behat`; frontend `typecheck` / `test` / `build`; marketing `build`. See `esyres_app/README.md`. Backend gate is Behat, not `php artisan test`.
 
 ## Folder map
 
 | Path | Role |
 |------|------|
-| `esyres_app/` | Application (Laravel + PWA). Empty placeholder until scaffolded. App commands run here, not at the git root. |
+| `esyres_app/` | Application (Laravel + PWA). Commands (`composer`, `php artisan`, `npm`, `docker compose`, Behat) run here. |
+| `esyres_app/frontend/` | Product PWA (Vite + React + TypeScript). Placeholder until product stories. |
 | `esyres_app/marketing/` | Design 1 static marketing site (Vite + HTML/CSS). Sibling under the Laravel root — not under `public/`, not in the PWA bundle. Commands: `npm run dev` from `esyres_app/marketing/`. |
 | `docs/glossary.md` | Domain glossary (lazy; grill-with-docs). Not `.cursor/CONTEXT.md`. |
 | `docs/adr/` | ADRs (lazy; grill-with-docs). If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`. |
@@ -36,7 +39,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 | `skills/custom-feature-skills/` | How to add a feature against epics/stories |
 | `skills/story-loop/` | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot |
 | `skills/deploy-staging/` | How to ship to staging |
-| `skills/grill-me/` | Relentless interview of a plan or design; writes nothing — default until `esyres_app/` has real code |
+| `skills/grill-me/` | Relentless interview of a plan or design; writes nothing |
 | `skills/grill-with-docs/` | Same interview against the codebase; writes `docs/glossary.md` + `docs/adr/` as terms/decisions lock |
 | `skills/tailwindcss/` | Tailwind for the PWA (vendored MengTo; Esyres gate) |
 | `skills/design-first-ui-prompting/` | Spec-driven UI prompts for the PWA (vendored MengTo; Esyres gate) |
@@ -54,7 +57,7 @@ Do not invent a different stack. Do not scaffold app code unless the user asks.
 4. Update this file when a locked product or architecture decision lands.
 5. Before UI work, read root `DESIGN.md`. Marketing → `refs/design-1/DESIGN.md`. PWA → `refs/design-2/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX. Same Cal tokens; do not mix marketing IA with product chrome. Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page`, `pricing-page`, and `build-awwwards-quality-sites` run only when the user explicitly says marketing site, Esyres landing, Esyres pricing page, or marketing homepage (Design 1). Marketing site lives in `esyres_app/marketing/` (Design 1 only — sibling to Laravel/PWA; never under `public/` or in the product SPA bundle).
-7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops are allowed only when `esyres_app/` has real local verify commands. Until then use grill-me + turn-by-turn (including scaffolding). Once `esyres_app/` has real code, use **grill-with-docs** (`/grill-with-docs`) so glossary and ADRs land on disk. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
+7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops run verify from `esyres_app/` (see `esyres_app/README.md`). Use **grill-with-docs** (`/grill-with-docs`) so glossary and ADRs land on disk. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map.
 
 ## Docs index
 

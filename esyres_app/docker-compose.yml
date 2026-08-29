@@ -1,0 +1,15 @@
+# Slim local verify stack (php + node). Full list (nginx, mysql, redis,
+# worker, reverb, vite, mailpit) comes later — docs/architecture/07-Docker-and-Local-Dev.md
+services:
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - .:/app
+    working_dir: /app
+
+  node:
+    image: node:22-bookworm
+    volumes:
+      - .:/app
+    working_dir: /app

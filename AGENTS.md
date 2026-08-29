@@ -5,6 +5,7 @@ This git root is the Cursor/docs workspace. Application code lives in `esyres_ap
 ## Layout
 
 - `esyres_app/` — Laravel + PWA (all app commands run here)
+- `esyres_app/frontend/` — product PWA (Vite + React + TypeScript)
 - `esyres_app/marketing/` — Design 1 static marketing site (Vite + HTML/CSS; sibling under Laravel root, not under `public/`)
 - `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from grill-with-docs
 - `.cursor/` — rules, skills, commands, hooks
@@ -14,7 +15,8 @@ Do not put application code in the git root. Do not put docs, rules, or skills i
 
 ## Working directory
 
-- Application commands (`composer`, `php artisan`, `npm`, `docker compose`, tests): run from `esyres_app/`.
+- Application commands (`composer`, `php artisan`, `npm`, `docker compose`, Behat): run from `esyres_app/`.
+- Product PWA (`npm run dev` / `build` / `test`): run from `esyres_app/frontend/` (or `docker compose run --workdir /app/frontend node …`).
 - Marketing site (`npm run dev` / `build`): run from `esyres_app/marketing/`.
 - Git, and edits to `docs/` / `.cursor/` / this file: run from the git root.
 
@@ -24,5 +26,5 @@ Read `.cursor/CONTEXT.md`. Prefer `docs/mvp/` and `docs/architecture/` over inve
 
 ## Plans and designs
 
-- **grill-me** — until `esyres_app/` has real code, or a throwaway interview; writes nothing
-- **grill-with-docs** (`/grill-with-docs`) — once application code exists; writes `docs/glossary.md` and `docs/adr/`. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
+- **grill-me** — throwaway interview of a plan; writes nothing
+- **grill-with-docs** (`/grill-with-docs`) — against the codebase; writes `docs/glossary.md` and `docs/adr/`. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
