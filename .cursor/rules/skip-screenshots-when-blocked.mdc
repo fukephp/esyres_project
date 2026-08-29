@@ -1,0 +1,12 @@
+---
+description: Skip UI screenshots when capture or attach is not possible; do not block the PR
+alwaysApply: true
+---
+
+# Skip screenshots when capture fails
+
+If screenshots cannot be taken (no working browser, port conflict, flaky local serve, attach failure), **skip them**.
+
+- Do not open a draft/blocked PR solely because shots are missing.
+- Note that shots were skipped; ship when machine gates pass.
+- Still take and attach desktop + mobile shots when capture actually works.

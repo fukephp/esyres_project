@@ -1,17 +1,19 @@
 ---
 name: what-next
 description: >-
-  Read-only orientation: scan MVP stories, loop artifacts, and the codebase
-  to report status and top-3 next picks with one Recommended (best for
-  current progress). Use when the user asks what to work on next, what's
-  done, or says /what-next. Does not write files or implement code.
+  Read-only orientation: classified story inventory plus top-3 next picks
+  with one Recommended. Applies story-loop fog gate as tags; does not
+  interview. Use when the user asks what to work on next, what's done,
+  or says /what-next. Does not write files or implement code.
 ---
 
 # What next
 
-Orient before execute. This skill reports **what is done, in-flight, blocked, and not started**, then suggests up to **three** next picks. **#1 is always Recommended** — the best next move for current progress. It does **not** implement, draft answer keys, or write status files.
+Orient before execute. This skill reports a **classified inventory of every story**, then suggests up to **three** next picks. **#1 is always Recommended** — the best next move for current progress. It does **not** implement, draft answer keys, write status files, or start a grill interview.
 
-For execution after a pick, use **story-loop**. For fog on a specific story, use **grill-me** (no app code) or **grill-with-docs** (codebase exists).
+Apply the [story-loop fog gate](../story-loop/SKILL.md) as **tags and action type** (plan-gate vs code). Do **not** skip a foggy bottleneck. Do **not** name grill-me / grill-with-docs on pick lines.
+
+For execution after a pick, use **story-loop**. For fog on a specific story, the user starts **grill-me** (no app code) or **grill-with-docs** (codebase exists) separately.
 
 ## Phrases
 
@@ -25,7 +27,7 @@ For execution after a pick, use **story-loop**. For fog on a specific story, use
 - **Read-only** — never write `docs/tasks/`, story status fields, `progress.md`, maps, or answer keys.
 - Do not implement code unless the user asks separately.
 - Do not invent stories or product behavior beyond `docs/mvp/` and `docs/stories/`.
-- Do not auto-suggest `/story-loop` or other handoff commands — list only.
+- Do not start grill-me or grill-with-docs. Do not auto-suggest `/story-loop` or other handoff commands — list only.
 - If stories or architecture docs are still stubs, say so; list doc/scaffold blockers instead of fake story ranks.
 
 ## Workflow
@@ -34,13 +36,13 @@ For execution after a pick, use **story-loop**. For fog on a specific story, use
 
 1. Read `.cursor/CONTEXT.md` for **stories source**, **app root**, and **domain triggers**.
 2. Load stories from the stories source in CONTEXT. If unset, fall back to `docs/mvp/` and `docs/stories/`.
-3. If no real stories exist (index stubs only), stop ranking and report blockers (fill docs, break down epics into stories).
+3. If no real stories exist (index stubs only), stop ranking and report blockers (fill docs, break down epics into stories). Skip the inventory of fake stories.
 
 ### 2. Scan signals (read-only)
 
 | Signal | Where | Use |
 |--------|-------|-----|
-| Loop artifacts | `.cursor/loops/answer-keys/`, `.cursor/loops/maps/` | In-flight, plan-gate state |
+| Loop artifacts | `.cursor/loops/answer-keys/`, `.cursor/loops/maps/` | In-flight, plan-gate state, fog |
 | Git | `story/*` branches, recent merged PR titles mentioning `STORY-xx` | In-flight, done |
 | App codebase | App root from CONTEXT (when set) | Implementation vs story AC |
 | Verify runner | `package.json`, `composer.json`, `Makefile`, CI scripts in app root | Blocker detection |
@@ -58,7 +60,23 @@ Explore the codebase when classification depends on what is actually shipped —
 
 When evidence is ambiguous, say so briefly — do not mark done without support.
 
-### 4. Blockers-first gate
+**Blocked** in the inventory means **story-level** deps (or coding blocked on app root / verify for that story). **Project blockers** (step 5) are not stories — they consume slots in the numbered 3 only. Do not invent an inventory group for them.
+
+### 4. Fog tag
+
+Same definition as story-loop’s fog gate. Tag is `fog`. It does **not** change which story is Recommended. It does **not** replace `finish in-flight` / `clear blocker` / `highest unlock`.
+
+**Map exists** (`.cursor/loops/maps/STORY-xx.md`): tag `fog` if any of:
+
+- More than **3** open decisions, **or**
+- Story touches any item in the project’s **domain trigger list** (CONTEXT; empty until filled), **or**
+- Likely product checks do not yet have obvious verifiers (test, command, or `human-only: …`)
+
+**No map:** tag `fog` only if a **domain trigger** hits, or AC/checks have **no obvious verifier**. Do **not** invent a count of open decisions.
+
+Append ` fog` after the title on inventory lines and on numbered-3 lines that fail the gate. Project-blocker lines never get `fog`.
+
+### 5. Blockers-first gate
 
 Before ranking stories, check for project blockers. When any apply, they **consume suggestion slots** (up to 3), in this chain order:
 
@@ -69,7 +87,7 @@ Before ranking stories, check for project blockers. When any apply, they **consu
 
 Describe each blocker in one line. Do not imply a coding loop is ready when verify is missing; note **plan-gate only** where relevant.
 
-### 5. Rank unlock candidates (when blockers are clear)
+### 6. Rank unlock candidates (when blockers are clear)
 
 Rank **not-started** and **blocked-by-dependency** stories by dependency unlock value. This list feeds slots 2–3 and the fallback Recommended pick — it is **not** the Recommended rule.
 
@@ -78,15 +96,15 @@ Rank **not-started** and **blocked-by-dependency** stories by dependency unlock 
 3. Stories that unblock the most downstream stories
 4. Tie-break: lower story id / earlier epic order
 
-### 6. Pick Recommended and build the 3
+### 7. Pick Recommended and build the 3
 
-**Recommended is always slot 1.** It uses a **progress** rule, not unlock rank. Do not add a 4th item. Do not recommend work that cannot proceed.
+**Recommended is always slot 1.** It uses a **progress** rule, not unlock rank. Do not add a 4th item. Do not recommend work that cannot proceed. Do **not** skip a foggy bottleneck — fog changes action type (plan-gate vs code), not which story is #1.
 
 Pick the first that applies:
 
 1. **Unblocked in-flight** — can continue now (plan-gate if no verify runner; coding only if verify exists). Skip in-flight with unmet story deps, or that needs coding while app root / verify is missing.
-2. Else the **earliest project blocker** from the chain in step 4 (skip entries that do not apply).
-3. Else the **#1 unlock** story from step 5.
+2. Else the **earliest project blocker** from the chain in step 5 (skip entries that do not apply).
+3. Else the **#1 unlock** story from step 6.
 
 Several unblocked in-flight: **closest to done**, then recency, then lower id:
 
@@ -101,45 +119,62 @@ Build the numbered 3 as:
 2. Next-best unlock candidate or remaining blocker, excluding #1
 3. Same, next after that
 
-No duplicates. If fewer than 3 exist, list fewer. When in-flight wins, it **enters** the numbered 3 — it is not only a footer.
+No duplicates **inside the 3**. Stories may appear in both the inventory and the 3. If fewer than 3 exist, list fewer. When in-flight wins, it **enters** the numbered 3 — it is not only a footer.
 
 Short reason in parens is exactly one of: `finish in-flight` · `clear blocker` · `highest unlock`.
 
-### 7. Output (compact)
+### 8. Output (compact)
 
-Use this shape. Max **3** numbered suggestions. Label **only** #1.
+Status line, then inventory, then max **3** numbered suggestions. Label **only** #1.
+
+**Inventory** — stories only, grouped in this order: in-flight, blocked, not started, done.
+
+- **Omit** empty groups.
+- In-flight / blocked / not started: one line per story, `STORY-xx — <title>` plus ` fog` when tagged.
+- Done: ids only, comma-separated, one line after `Done:`.
+- Sort inside a group with the same rules as the picks: in-flight by closest-to-done; blocked by explicit deps then id; not-started by unlock rank (step 6); done by id.
 
 ```text
 Status: X done · Y in-flight · Z not started · W blocked
 
-1. STORY-02 — <title> — Recommended (finish in-flight) — draft key ready to approve
+In-flight:
+STORY-02 — <title> fog
+
+Not started:
+STORY-03 — <title>
+STORY-01 — <title>
+
+Done: STORY-04, STORY-06
+
+1. STORY-02 — <title> fog — Recommended (finish in-flight) — draft key ready to approve
 2. STORY-03 — <title> — unlocks auth for 4 downstream stories
 3. STORY-01 — <title> — core entity CRUD; no deps
 ```
 
-Blocker with no story id:
+Blocker with no story id (no inventory of fake stories):
 
 ```text
+Status: 0 done · 0 in-flight · 0 not started · 0 blocked
+
 1. Stories source unset — Recommended (clear blocker) — fill CONTEXT / docs/mvp
 ```
 
 Rules:
 
-- One line per suggestion: id (or blocker name), title, why.
+- One line per suggestion: id (or blocker name), title, optional ` fog`, why.
 - Slot 1: `— Recommended (<short reason>) —` then the why.
 - Slots 2–3: unlabeled alternatives.
-- Optional one-line in-flight note **only** for other WIP not already in the 3. Omit if the only in-flight is #1.
 - If blockers fill all slots, list blockers instead of stories; #1 is still Recommended (earliest in the chain).
-- If #1 has high fog or no verify runner, note **plan-gate only**.
-- **No** trailing handoff command.
+- If #1 needs coding but no verify runner, note **plan-gate only**.
+- **No** trailing handoff command. **No** skill names on pick or inventory lines.
 
 ## Related
 
 | Skill | Role |
 |-------|------|
-| [story-loop](../story-loop/SKILL.md) | Execute one approved story → PR |
+| [story-loop](../story-loop/SKILL.md) | Execute one approved story → PR; fog-gate definition reused here as tags |
 | [custom-feature-skills](../custom-feature-skills/SKILL.md) | Implementation constraints during coding |
-| [grill-me](../grill-me/SKILL.md) | Clarify fog (no app code; writes nothing) |
-| [grill-with-docs](../grill-with-docs/SKILL.md) | Clarify fog against codebase; writes glossary + ADRs |
+| [grill-me](../grill-me/SKILL.md) | Clarify fog (no app code; writes nothing) — user starts separately |
+| [grill-with-docs](../grill-with-docs/SKILL.md) | Clarify fog against codebase; writes glossary + ADRs — user starts separately |
 
 Playbook: `.cursor/loops/PLAYBOOK.md`
