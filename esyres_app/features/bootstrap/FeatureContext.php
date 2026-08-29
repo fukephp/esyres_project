@@ -4,6 +4,7 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\SalonHours\WeeklyHours;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -133,6 +134,15 @@ class FeatureContext implements Context
     }
 
     /**
+     * @Given the salon has hours:
+     */
+    public function theSalonHasHours(PyStringNode $payload): void
+    {
+        $this->salon->hours = WeeklyHours::fromInput(json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR));
+        $this->salon->save();
+    }
+
+    /**
      * @When I fetch the CSRF cookie
      */
     public function iFetchTheCsrfCookie(): void
@@ -166,6 +176,53 @@ class FeatureContext implements Context
     public function iQuerySalonHours(): void
     {
         $this->graphql($this->salonQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query the public salon as a guest
+     */
+    public function iQueryThePublicSalonAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->publicSalonQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon :id as a guest
+     */
+    public function iQuerySalonAsAGuest(string $id): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->publicSalonQuery(), ['id' => $id]);
+    }
+
+    /**
+     * @When I query salon owner fields as a guest
+     */
+    public function iQuerySalonOwnerFieldsAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonOwnerFieldsQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon owner fields
+     */
+    public function iQuerySalonOwnerFields(): void
+    {
+        $this->graphql($this->salonOwnerFieldsQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon busy level :date as a guest
+     */
+    public function iQuerySalonBusyLevelAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->busyLevelQuery(), [
+            'id' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
     }
 
     /**
@@ -281,6 +338,45 @@ class FeatureContext implements Context
                 'cancellationNoticeHours' => (int) $hours,
             ],
         ]);
+    }
+
+    /**
+     * @Then the public salon name is :name
+     */
+    public function thePublicSalonNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['salon']['name']);
+    }
+
+    /**
+     * @Then the salon is null
+     */
+    public function theSalonIsNull(): void
+    {
+        if (isset($this->graphql['errors'])) {
+            $codes = [];
+            foreach ($this->graphql['errors'] as $error) {
+                $codes[] = $error['extensions']['code'] ?? $error['message'];
+            }
+            if (in_array('UNAUTHENTICATED', $codes, true) || in_array('FORBIDDEN', $codes, true)) {
+                throw new RuntimeException('Expected salon null without UNAUTHENTICATED/FORBIDDEN, got '.json_encode($this->graphql));
+            }
+        }
+        if (! array_key_exists('data', $this->graphql)
+            || ! array_key_exists('salon', $this->graphql['data'])
+            || $this->graphql['data']['salon'] !== null) {
+            throw new RuntimeException('Expected salon null, got '.json_encode($this->graphql));
+        }
+    }
+
+    /**
+     * @Then busy level is :level
+     */
+    public function busyLevelIs(string $level): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($level, $this->graphql['data']['salon']['busyLevel']);
     }
 
     /**
@@ -471,6 +567,61 @@ query Salon($id: ID!) {
       breakStartsAt
       breakEndsAt
     }
+  }
+}
+GQL;
+    }
+
+    private function publicSalonQuery(): string
+    {
+        return <<<'GQL'
+query PublicSalon($id: ID!) {
+  salon(id: $id) {
+    id
+    name
+    hours {
+      weekday
+      closed
+      opensAt
+      closesAt
+      breakStartsAt
+      breakEndsAt
+    }
+    services {
+      id
+      name
+      category
+      durationMinutes
+      priceFeninga
+    }
+  }
+}
+GQL;
+    }
+
+    private function salonOwnerFieldsQuery(): string
+    {
+        return <<<'GQL'
+query SalonOwnerFields($id: ID!) {
+  salon(id: $id) {
+    id
+    cancellationNoticeHours
+    workers {
+      id
+      name
+    }
+  }
+}
+GQL;
+    }
+
+    private function busyLevelQuery(): string
+    {
+        return <<<'GQL'
+query SalonBusy($id: ID!, $date: String!) {
+  salon(id: $id) {
+    id
+    busyLevel(date: $date)
   }
 }
 GQL;

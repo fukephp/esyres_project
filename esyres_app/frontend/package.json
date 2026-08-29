@@ -15,8 +15,13 @@
     "node": "22"
   },
   "dependencies": {
+    "@apollo/client": "^3.14.1",
+    "graphql": "^16.14.2",
+    "i18next": "^26.4.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-i18next": "^17.0.12",
+    "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

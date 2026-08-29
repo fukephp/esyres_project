@@ -12,6 +12,10 @@ _Avoid_: merchant, vendor, admin, staff login
 A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
 _Avoid_: location, branch, store, storefront
 
+**Salon profile**:
+The guest-facing page for one salon: name, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
+_Avoid_: storefront, landing, listing detail, shop page
+
 **Worker**:
 A named person at a salon who can be requested for a booking. Not a user and not a login. A new salon has none until the owner adds them. Workers inherit the salon’s working hours.
 _Avoid_: staff account, employee user, stylist account
@@ -35,3 +39,9 @@ _Avoid_: pause, buffer, gap, split shift
 **Cancellation notice window**:
 How far in advance of a confirmed booking a cancel is on time. Late cancel is a warning, not a block. Set per salon.
 _Avoid_: cancellation policy (as a hard block), deposit rule
+
+## Signals
+
+**Busy-level**:
+A coarse per-day occupancy for one salon: free, moderate, or busy. Shown to guests instead of a slot grid. Not a Phase 2 trust badge (Fast Responder, Regular, and similar).
+_Avoid_: availability, occupancy grid, traffic light, capacity, trust badge

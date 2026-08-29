@@ -37,6 +37,12 @@ enum ServiceCategory {
     MASSAGE
 }
 
+enum BusyLevel {
+    LOW
+    MEDIUM
+    HIGH
+}
+
 type Service {
     id: ID!
     name: String!
@@ -81,10 +87,11 @@ type User {
 type Salon {
     id: ID!
     name: String!
-    cancellationNoticeHours: Int! @rename(attribute: "cancellation_notice_hours")
+    cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
-    workers: [Worker!]! @method(name: "workerList")
+    workers: [Worker!]! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@workers")
+    busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
 }
 
 type Query {
