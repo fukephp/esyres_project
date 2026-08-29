@@ -13,7 +13,7 @@ A customer-facing shop with its own profile, hours, services, and workers. One o
 _Avoid_: location, branch, store, storefront
 
 **Worker**:
-A named person at a salon who can be requested for a booking. Not a user and not a login.
+A named person at a salon who can be requested for a booking. Not a user and not a login. A new salon has none until the owner adds them. Workers inherit the salon’s working hours.
 _Avoid_: staff account, employee user, stylist account
 
 ## Catalog

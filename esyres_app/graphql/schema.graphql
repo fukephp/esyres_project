@@ -45,6 +45,11 @@ type Service {
     priceFeninga: Int! @rename(attribute: "price_feninga")
 }
 
+type Worker {
+    id: ID!
+    name: String!
+}
+
 input CreateSalonServiceInput {
     name: String!
     category: ServiceCategory!
@@ -59,6 +64,14 @@ input UpdateSalonServiceInput {
     priceFeninga: Int!
 }
 
+input CreateSalonWorkerInput {
+    name: String!
+}
+
+input UpdateSalonWorkerInput {
+    name: String!
+}
+
 type User {
     id: ID!
     email: String!
@@ -71,6 +84,7 @@ type Salon {
     cancellationNoticeHours: Int! @rename(attribute: "cancellation_notice_hours")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
+    workers: [Worker!]! @method(name: "workerList")
 }
 
 type Query {
@@ -82,4 +96,6 @@ type Mutation {
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
+    createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
+    updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
 }

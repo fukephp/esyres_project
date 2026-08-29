@@ -56,11 +56,27 @@ class Salon extends Model
     }
 
     /**
+     * @return HasMany<Worker, $this>
+     */
+    public function workers(): HasMany
+    {
+        return $this->hasMany(Worker::class)->orderBy('id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Collection<int, Service>
      */
     public function serviceList()
     {
         return $this->services()->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Worker>
+     */
+    public function workerList()
+    {
+        return $this->workers()->get();
     }
 
     /**
