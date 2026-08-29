@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Salon;
+use App\Models\Service;
 use App\Models\User;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
@@ -21,6 +22,8 @@ class FeatureContext implements Context
     private ?User $user = null;
 
     private ?Salon $salon = null;
+
+    private ?Service $service = null;
 
     private ?User $otherUser = null;
 
@@ -46,6 +49,7 @@ class FeatureContext implements Context
         $this->graphql = [];
         $this->user = null;
         $this->salon = null;
+        $this->service = null;
         $this->otherUser = null;
 
         $this->app = require dirname(__DIR__, 2).'/bootstrap/app.php';
@@ -98,6 +102,21 @@ class FeatureContext implements Context
     }
 
     /**
+     * @Given the salon has a service:
+     */
+    public function theSalonHasAService(PyStringNode $payload): void
+    {
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->service = Service::factory()->create([
+            'salon_id' => $this->salon->id,
+            'name' => $input['name'],
+            'category' => $input['category'],
+            'duration_minutes' => $input['durationMinutes'],
+            'price_feninga' => $input['priceFeninga'],
+        ]);
+    }
+
+    /**
      * @When I fetch the CSRF cookie
      */
     public function iFetchTheCsrfCookie(): void
@@ -131,6 +150,48 @@ class FeatureContext implements Context
     public function iQuerySalonHours(): void
     {
         $this->graphql($this->salonQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon services
+     */
+    public function iQuerySalonServices(): void
+    {
+        $this->graphql($this->salonServicesQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I create a salon service:
+     */
+    public function iCreateASalonService(PyStringNode $payload): void
+    {
+        $this->graphql($this->createServiceMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I create a salon service as a guest:
+     */
+    public function iCreateASalonServiceAsAGuest(PyStringNode $payload): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->createServiceMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I update the salon service:
+     */
+    public function iUpdateTheSalonService(PyStringNode $payload): void
+    {
+        $this->graphql($this->updateServiceMutation(), [
+            'id' => (string) $this->service->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
     }
 
     /**
@@ -210,6 +271,34 @@ class FeatureContext implements Context
     {
         $this->assertNoGraphqlErrors();
         $this->assertSame((int) $hours, $this->graphql['data']['salon']['cancellationNoticeHours']);
+    }
+
+    /**
+     * @Then salon services are empty
+     */
+    public function salonServicesAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['salon']['services']);
+    }
+
+    /**
+     * @Then salon services match:
+     */
+    public function salonServicesMatch(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['salon']['services'] as $service) {
+            $actual[] = [
+                'name' => $service['name'],
+                'category' => $service['category'],
+                'durationMinutes' => $service['durationMinutes'],
+                'priceFeninga' => $service['priceFeninga'],
+            ];
+        }
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -319,6 +408,54 @@ mutation Update($salonId: ID!, $input: UpdateSalonHoursInput!) {
       breakStartsAt
       breakEndsAt
     }
+  }
+}
+GQL;
+    }
+
+    private function salonServicesQuery(): string
+    {
+        return <<<'GQL'
+query Salon($id: ID!) {
+  salon(id: $id) {
+    id
+    services {
+      id
+      name
+      category
+      durationMinutes
+      priceFeninga
+    }
+  }
+}
+GQL;
+    }
+
+    private function createServiceMutation(): string
+    {
+        return <<<'GQL'
+mutation Create($salonId: ID!, $input: CreateSalonServiceInput!) {
+  createSalonService(salonId: $salonId, input: $input) {
+    id
+    name
+    category
+    durationMinutes
+    priceFeninga
+  }
+}
+GQL;
+    }
+
+    private function updateServiceMutation(): string
+    {
+        return <<<'GQL'
+mutation UpdateService($id: ID!, $input: UpdateSalonServiceInput!) {
+  updateSalonService(id: $id, input: $input) {
+    id
+    name
+    category
+    durationMinutes
+    priceFeninga
   }
 }
 GQL;

@@ -31,6 +31,34 @@ input UpdateSalonHoursInput {
     cancellationNoticeHours: Int!
 }
 
+enum ServiceCategory {
+    HAIR
+    MAKE_UP
+    MASSAGE
+}
+
+type Service {
+    id: ID!
+    name: String!
+    category: ServiceCategory!
+    durationMinutes: Int! @rename(attribute: "duration_minutes")
+    priceFeninga: Int! @rename(attribute: "price_feninga")
+}
+
+input CreateSalonServiceInput {
+    name: String!
+    category: ServiceCategory!
+    durationMinutes: Int
+    priceFeninga: Int!
+}
+
+input UpdateSalonServiceInput {
+    name: String!
+    category: ServiceCategory!
+    durationMinutes: Int!
+    priceFeninga: Int!
+}
+
 type User {
     id: ID!
     email: String!
@@ -42,6 +70,7 @@ type Salon {
     name: String!
     cancellationNoticeHours: Int! @rename(attribute: "cancellation_notice_hours")
     hours: [DayHours!]! @method(name: "dayHours")
+    services: [Service!]! @method(name: "serviceList")
 }
 
 type Query {
@@ -51,4 +80,6 @@ type Query {
 type Mutation {
     login(email: String!, password: String!): User!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
+    createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
+    updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
 }
