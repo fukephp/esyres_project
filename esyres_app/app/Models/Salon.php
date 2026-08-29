@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['owner_id', 'name', 'cancellation_notice_hours', 'hours'])]
 class Salon extends Model
@@ -44,6 +45,22 @@ class Salon extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /**
+     * @return HasMany<Service, $this>
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class)->orderBy('id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Service>
+     */
+    public function serviceList()
+    {
+        return $this->services()->get();
     }
 
     /**

@@ -9,12 +9,18 @@ A user who owns at least one salon. The same person can also be a customer. Owne
 _Avoid_: merchant, vendor, admin, staff login
 
 **Salon**:
-A customer-facing shop with its own profile, hours, and workers. One owner may own several salons; each is a separate shop, not a chain location.
+A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
 _Avoid_: location, branch, store, storefront
 
 **Worker**:
 A named person at a salon who can be requested for a booking. Not a user and not a login.
 _Avoid_: staff account, employee user, stylist account
+
+## Catalog
+
+**Service**:
+A named offering at one salon: a category (hair, make-up, or massage), a duration, and a KM price. A salon may list services in more than one category. A new salon has none until the owner adds them.
+_Avoid_: product, menu item, treatment package, listing
 
 ## Time rules
 
