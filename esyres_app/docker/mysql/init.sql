@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS esyres_test;
+GRANT ALL PRIVILEGES ON esyres_test.* TO 'esyres'@'%';
+FLUSH PRIVILEGES;

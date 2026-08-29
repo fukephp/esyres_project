@@ -1,5 +1,6 @@
-# Slim local verify stack (php + node). Full list (nginx, mysql, redis,
-# worker, reverb, vite, mailpit) comes later — docs/architecture/07-Docker-and-Local-Dev.md
+# Slim local verify stack (php + node + mysql). Remaining services
+# (nginx, redis, worker, reverb, vite, mailpit) come later —
+# docs/architecture/07-Docker-and-Local-Dev.md
 services:
   php:
     build:
@@ -7,9 +8,35 @@ services:
     volumes:
       - .:/app
     working_dir: /app
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: esyres
+      DB_USERNAME: esyres
+      DB_PASSWORD: secret
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   node:
     image: node:22-bookworm
     volumes:
       - .:/app
     working_dir: /app
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: esyres
+      MYSQL_USER: esyres
+      MYSQL_PASSWORD: secret
+    volumes:
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
