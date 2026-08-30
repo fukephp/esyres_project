@@ -1,7 +1,14 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
+import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
-import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData } from '../graphql/salon'
+import {
+  CREATE_BOOKING_MUTATION,
+  LOGIN_MUTATION,
+  type CreateBookingInput,
+} from '../graphql/booking'
+import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
+import { graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoToday } from '../lib/format'
 
@@ -22,6 +29,37 @@ function hoursLine(day: DayHours, t: (key: string, opts?: Record<string, string>
   return line
 }
 
+function gateMessage(
+  code: string | null,
+  t: (key: string) => string,
+): string {
+  if (code === 'EMAIL_UNVERIFIED') {
+    return t('salon.gate.EMAIL_UNVERIFIED')
+  }
+  if (code === 'PHONE_UNVERIFIED') {
+    return t('salon.gate.PHONE_UNVERIFIED')
+  }
+  if (code === 'INVALID_SERVICES') {
+    return t('salon.gate.INVALID_SERVICES')
+  }
+  if (code === 'INVALID_WORKER') {
+    return t('salon.gate.INVALID_WORKER')
+  }
+  if (code === 'SALON_CLOSED') {
+    return t('salon.gate.SALON_CLOSED')
+  }
+  if (code === 'PAST_TIME') {
+    return t('salon.gate.PAST_TIME')
+  }
+  if (code === 'INVALID_DATE' || code === 'INVALID_TIME') {
+    return t('salon.gate.INVALID_DATE')
+  }
+  if (code === 'INVALID_CREDENTIALS') {
+    return t('salon.gate.INVALID_CREDENTIALS')
+  }
+  return t('salon.gate.fallback')
+}
+
 export function SalonProfile() {
   const { id } = useParams()
   const { t } = useTranslation()
@@ -30,6 +68,18 @@ export function SalonProfile() {
     variables: { id, date },
     skip: !id,
   })
+  const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
+  const [login] = useMutation(LOGIN_MUTATION)
+  const [picking, setPicking] = useState(false)
+  const [selected, setSelected] = useState<string[]>([])
+  const [preferredDate, setPreferredDate] = useState('')
+  const [preferredTime, setPreferredTime] = useState('')
+  const [needLogin, setNeedLogin] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   if (loading) {
     return (
@@ -49,6 +99,60 @@ export function SalonProfile() {
   }
 
   const token = busyToken(salon.busyLevel)
+  const chosen = salon.services.filter((s) => selected.includes(s.id))
+  const stack = stackSelection(chosen)
+  const canSend = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
+
+  function toggle(service: SalonService) {
+    setSelected((ids) =>
+      ids.includes(service.id) ? ids.filter((id) => id !== service.id) : [...ids, service.id],
+    )
+  }
+
+  async function send(input: CreateBookingInput) {
+    try {
+      await createBooking({ variables: { input } })
+      setSent(true)
+      setNeedLogin(false)
+      setError(null)
+    } catch (err) {
+      const code = graphqlErrorCode(err)
+      if (code === 'UNAUTHENTICATED') {
+        setNeedLogin(true)
+        setError(null)
+        return
+      }
+      setError(gateMessage(code, t))
+    }
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!id || !canSend || busy) {
+      return
+    }
+    setBusy(true)
+    setError(null)
+    const input: CreateBookingInput = {
+      salonId: id,
+      serviceIds: selected,
+      preferredDate,
+      preferredTime,
+    }
+    try {
+      if (needLogin) {
+        try {
+          await login({ variables: { email, password } })
+        } catch (err) {
+          setError(gateMessage(graphqlErrorCode(err), t))
+          return
+        }
+      }
+      await send(input)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <main className="mx-auto max-w-md px-5 py-8">
@@ -81,19 +185,118 @@ export function SalonProfile() {
         ) : (
           <ul className="mt-3 divide-y divide-hairline">
             {salon.services.map((service) => (
-              <li key={service.id} className="flex items-baseline justify-between gap-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-ink">{service.name}</p>
-                  <p className="text-xs text-muted">
-                    {t(`category.${service.category}`)} · {t('salon.duration', { n: service.durationMinutes })}
-                  </p>
-                </div>
-                <p className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</p>
+              <li key={service.id} className="py-3">
+                {picking ? (
+                  <label className="flex cursor-pointer items-baseline justify-between gap-4">
+                    <span className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1"
+                        checked={selected.includes(service.id)}
+                        onChange={() => toggle(service)}
+                      />
+                      <span>
+                        <span className="block text-sm font-medium text-ink">{service.name}</span>
+                        <span className="text-xs text-muted">
+                          {t(`category.${service.category}`)} · {t('salon.duration', { n: service.durationMinutes })}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</span>
+                  </label>
+                ) : (
+                  <div className="flex items-baseline justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-ink">{service.name}</p>
+                      <p className="text-xs text-muted">
+                        {t(`category.${service.category}`)} · {t('salon.duration', { n: service.durationMinutes })}
+                      </p>
+                    </div>
+                    <p className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</p>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {salon.services.length > 0 && !picking && !sent && (
+        <button
+          type="button"
+          className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
+          onClick={() => setPicking(true)}
+        >
+          {t('salon.send')}
+        </button>
+      )}
+
+      {picking && !sent && (
+        <form className="mt-8 space-y-4" onSubmit={onSubmit}>
+          {chosen.length > 0 && (
+            <p className="text-sm text-ink">
+              {t('salon.total')}: {t('salon.duration', { n: stack.durationMinutes })} · {formatFeninga(stack.priceFeninga)}
+            </p>
+          )}
+          <label className="block text-sm text-body">
+            {t('salon.date')}
+            <input
+              type="date"
+              required
+              min={date}
+              value={preferredDate}
+              onChange={(e) => setPreferredDate(e.target.value)}
+              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            />
+          </label>
+          <label className="block text-sm text-body">
+            {t('salon.time')}
+            <input
+              type="time"
+              required
+              step={900}
+              value={preferredTime}
+              onChange={(e) => setPreferredTime(e.target.value)}
+              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            />
+          </label>
+          {needLogin && (
+            <>
+              <p className="text-sm font-semibold text-ink">{t('salon.login')}</p>
+              <label className="block text-sm text-body">
+                {t('salon.email')}
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                />
+              </label>
+              <label className="block text-sm text-body">
+                {t('salon.password')}
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                />
+              </label>
+            </>
+          )}
+          {error && <p className="text-sm text-busy-busy">{error}</p>}
+          <button
+            type="submit"
+            disabled={!canSend || busy}
+            className="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+          >
+            {t('salon.submit')}
+          </button>
+        </form>
+      )}
+
+      {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
     </main>
   )
 }

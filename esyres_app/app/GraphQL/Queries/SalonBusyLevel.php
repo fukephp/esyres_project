@@ -3,6 +3,7 @@
 namespace App\GraphQL\Queries;
 
 use App\BusyLevel\BusyLevel;
+use App\BusyLevel\Occupancy;
 use App\Exceptions\ClientError;
 use App\Models\Salon;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -27,7 +28,6 @@ final class SalonBusyLevel
 
     private function occupancyPercent(Salon $salon, string $date): int
     {
-        // ponytail: 0 until Booking exists; count requested+proposed+confirmed for $salon+$date then.
-        return 0;
+        return Occupancy::percent($salon, $date);
     }
 }

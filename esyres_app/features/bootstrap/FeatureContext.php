@@ -29,6 +29,9 @@ class FeatureContext implements Context
 
     private ?Worker $worker = null;
 
+    /** @var list<Service> */
+    private array $services = [];
+
     private ?User $otherUser = null;
 
     /** @BeforeScenario */
@@ -45,6 +48,7 @@ class FeatureContext implements Context
         $this->putEnv('CACHE_STORE', 'array');
         $this->putEnv('SESSION_DRIVER', 'database');
         $this->putEnv('QUEUE_CONNECTION', 'sync');
+        $this->putEnv('APP_TIMEZONE', 'Europe/Sarajevo');
         $this->putEnv('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', 'false');
         $this->putEnv('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'false');
 
@@ -55,6 +59,7 @@ class FeatureContext implements Context
         $this->salon = null;
         $this->service = null;
         $this->worker = null;
+        $this->services = [];
         $this->otherUser = null;
 
         $this->app = require dirname(__DIR__, 2).'/bootstrap/app.php';
@@ -119,6 +124,7 @@ class FeatureContext implements Context
             'duration_minutes' => $input['durationMinutes'],
             'price_feninga' => $input['priceFeninga'],
         ]);
+        $this->services[] = $this->service;
     }
 
     /**
@@ -168,6 +174,185 @@ class FeatureContext implements Context
             'email' => $email,
             'password' => $password,
         ]);
+    }
+
+    /**
+     * @Given a verified customer :email with password :password
+     */
+    public function aVerifiedCustomer(string $email, string $password): void
+    {
+        $this->user = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'phone' => '+38761'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * @Given an unverified customer :email with password :password
+     */
+    public function anUnverifiedCustomer(string $email, string $password): void
+    {
+        $this->user = User::factory()->unverified()->create([
+            'email' => $email,
+            'password' => $password,
+            'phone' => '+38761'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * @Given a customer :email with password :password whose phone is not verified
+     */
+    public function aCustomerWhosePhoneIsNotVerified(string $email, string $password): void
+    {
+        $this->user = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'phone' => '+38761'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * @When I create a booking as a guest on :date at :time with the salon services
+     */
+    public function iCreateABookingAsAGuestWithSalonServices(string $date, string $time): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with the salon services
+     */
+    public function iCreateABookingWithSalonServices(string $date, string $time): void
+    {
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with no services
+     */
+    public function iCreateABookingWithNoServices(string $date, string $time): void
+    {
+        $this->postCreateBooking($date, $time, [], null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with duplicate services
+     */
+    public function iCreateABookingWithDuplicateServices(string $date, string $time): void
+    {
+        $id = (string) $this->services[0]->id;
+        $this->postCreateBooking($date, $time, [$id, $id], null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with a foreign service
+     */
+    public function iCreateABookingWithAForeignService(string $date, string $time): void
+    {
+        $foreign = Service::factory()->create();
+        $this->postCreateBooking($date, $time, [(string) $foreign->id], null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with a foreign worker
+     */
+    public function iCreateABookingWithAForeignWorker(string $date, string $time): void
+    {
+        $foreign = Worker::factory()->create();
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), (string) $foreign->id);
+    }
+
+    /**
+     * @Then the booking status is :status
+     */
+    public function theBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['createBooking']['status']);
+    }
+
+    /**
+     * @Then the booking has :count snapshots
+     */
+    public function theBookingHasSnapshots(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame((int) $count, count($this->graphql['data']['createBooking']['services']));
+    }
+
+    /**
+     * @Then booking duration minutes is :minutes
+     */
+    public function bookingDurationMinutesIs(string $minutes): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame((int) $minutes, $this->graphql['data']['createBooking']['durationMinutes']);
+    }
+
+    /**
+     * @Then booking snapshots match:
+     */
+    public function bookingSnapshotsMatch(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['createBooking']['services'] as $row) {
+            $actual[] = [
+                'name' => $row['name'],
+                'durationMinutes' => $row['durationMinutes'],
+                'priceFeninga' => $row['priceFeninga'],
+            ];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then booking has no worker
+     */
+    public function bookingHasNoWorker(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $id = $this->graphql['data']['createBooking']['id'];
+        $booking = \App\Models\Booking::query()->find($id);
+        if ($booking === null || $booking->worker_id !== null) {
+            throw new RuntimeException('Expected no worker, got '.json_encode($booking));
+        }
+    }
+
+    /**
+     * @param  list<string>  $serviceIds
+     */
+    private function postCreateBooking(string $date, string $time, array $serviceIds, ?string $workerId): void
+    {
+        $input = [
+            'salonId' => (string) $this->salon->id,
+            'serviceIds' => $serviceIds,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ];
+        if ($workerId !== null) {
+            $input['workerId'] = $workerId;
+        }
+        $this->graphql($this->createBookingMutation(), ['input' => $input]);
+    }
+
+    /** @return list<string> */
+    private function salonServiceIds(): array
+    {
+        $ids = [];
+        foreach ($this->services as $service) {
+            $ids[] = (string) $service->id;
+        }
+
+        return $ids;
     }
 
     /**
@@ -693,6 +878,26 @@ mutation Login($email: String!, $password: String!) {
     id
     email
     emailVerified
+  }
+}
+GQL;
+    }
+
+    private function createBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation CreateBooking($input: CreateBookingInput!) {
+  createBooking(input: $input) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    services {
+      name
+      durationMinutes
+      priceFeninga
+    }
   }
 }
 GQL;

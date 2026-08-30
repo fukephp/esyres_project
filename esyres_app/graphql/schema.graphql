@@ -78,6 +78,33 @@ input UpdateSalonWorkerInput {
     name: String!
 }
 
+enum BookingStatus {
+    REQUESTED
+}
+
+type BookingService {
+    name: String!
+    durationMinutes: Int! @rename(attribute: "duration_minutes")
+    priceFeninga: Int! @rename(attribute: "price_feninga")
+}
+
+type Booking {
+    id: ID!
+    status: BookingStatus! @method(name: "graphqlStatus")
+    preferredDate: String! @method(name: "preferredDateString")
+    preferredStartsAt: String! @method(name: "preferredStartsAtIso")
+    durationMinutes: Int! @rename(attribute: "duration_minutes")
+    services: [BookingService!]! @method(name: "snapshotList")
+}
+
+input CreateBookingInput {
+    salonId: ID!
+    serviceIds: [ID!]!
+    workerId: ID
+    preferredDate: String!
+    preferredTime: String!
+}
+
 type User {
     id: ID!
     email: String!
@@ -107,4 +134,5 @@ type Mutation {
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
+    createBooking(input: CreateBookingInput!): Booking!
 }
