@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'name', 'cancellation_notice_hours', 'hours'])]
+#[Fillable(['owner_id', 'name', 'cancellation_notice_hours', 'hours', 'lat', 'lng'])]
 class Salon extends Model
 {
     /** @use HasFactory<SalonFactory> */
@@ -36,6 +36,8 @@ class Salon extends Model
         return [
             'hours' => 'array',
             'cancellation_notice_hours' => 'integer',
+            'lat' => 'float',
+            'lng' => 'float',
         ];
     }
 

@@ -171,6 +171,106 @@ class FeatureContext implements Context
     }
 
     /**
+     * @Given the salon is at lat :lat lng :lng
+     */
+    public function theSalonIsAt(string $lat, string $lng): void
+    {
+        $this->salon->lat = (float) $lat;
+        $this->salon->lng = (float) $lng;
+        $this->salon->save();
+    }
+
+    /**
+     * @Given that owner also owns salon :name
+     */
+    public function thatOwnerAlsoOwnsSalon(string $name): void
+    {
+        $this->salon = Salon::factory()->create([
+            'owner_id' => $this->user->id,
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * @Given that owner also owns salon :name at lat :lat lng :lng
+     */
+    public function thatOwnerAlsoOwnsSalonAt(string $name, string $lat, string $lng): void
+    {
+        $this->salon = Salon::factory()->create([
+            'owner_id' => $this->user->id,
+            'name' => $name,
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+        ]);
+    }
+
+    /**
+     * @When I query salonsNearby lat :lat lng :lng as a guest
+     */
+    public function iQuerySalonsNearbyAsAGuest(string $lat, string $lng): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonsNearbyQuery(), [
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+        ]);
+    }
+
+    /**
+     * @When I query salonsNearby lat :lat lng :lng limit :limit offset :offset as a guest
+     */
+    public function iQuerySalonsNearbyPagedAsAGuest(string $lat, string $lng, string $limit, string $offset): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonsNearbyQuery(), [
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @When I query popularInSarajevo as a guest
+     */
+    public function iQueryPopularInSarajevoAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->popularInSarajevoQuery(), []);
+    }
+
+    /**
+     * @When I query popularInSarajevo limit :limit offset :offset as a guest
+     */
+    public function iQueryPopularInSarajevoPagedAsAGuest(string $limit, string $offset): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->popularInSarajevoQuery(), [
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @Then the listed salon names are:
+     */
+    public function theListedSalonNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $data = $this->graphql['data'];
+        $list = $data['salonsNearby'] ?? $data['popularInSarajevo'] ?? null;
+        if (! is_array($list)) {
+            throw new RuntimeException('Expected a salon list, got '.json_encode($this->graphql));
+        }
+        $actual = [];
+        foreach ($list as $salon) {
+            $actual[] = $salon['name'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * @When I query salon hours
      */
     public function iQuerySalonHours(): void
@@ -536,6 +636,30 @@ class FeatureContext implements Context
         if ($expected !== $actual) {
             throw new RuntimeException('Expected '.json_encode($expected).' got '.json_encode($actual));
         }
+    }
+
+    private function salonsNearbyQuery(): string
+    {
+        return <<<'GQL'
+query Nearby($lat: Float!, $lng: Float!, $limit: Int, $offset: Int) {
+  salonsNearby(lat: $lat, lng: $lng, limit: $limit, offset: $offset) {
+    id
+    name
+  }
+}
+GQL;
+    }
+
+    private function popularInSarajevoQuery(): string
+    {
+        return <<<'GQL'
+query Popular($limit: Int, $offset: Int) {
+  popularInSarajevo(limit: $limit, offset: $offset) {
+    id
+    name
+  }
+}
+GQL;
     }
 
     private function loginMutation(): string
