@@ -56,3 +56,149 @@ Feature: Guest salon discovery
   Scenario: Popular page cap is rejected
     When I query popularInSarajevo limit "51" offset "0" as a guest
     Then the GraphQL error code is "INVALID_PAGE"
+
+  Scenario: Category keeps salons with a matching service
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Hair Shop"
+    And the salon is at lat "43.8563" lng "18.4131"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And that owner also owns salon "Makeup Shop" at lat "43.8600" lng "18.4200"
+    And the salon has a service:
+      """
+      {"name": "Šminka", "category": "MAKE_UP", "durationMinutes": 45, "priceFeninga": 4000}
+      """
+    And that owner also owns salon "Empty" at lat "43.8500" lng "18.4000"
+    When I query popularInSarajevo with:
+      """
+      {"category": "HAIR"}
+      """
+    Then the listed salon names are:
+      """
+      ["Hair Shop"]
+      """
+    When I query salonsNearby lat "43.8563" lng "18.4131" with:
+      """
+      {"category": "HAIR"}
+      """
+    Then the listed salon names are:
+      """
+      ["Hair Shop"]
+      """
+
+  Scenario: Nearby category still omits salons without coordinates and stays nearest first
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Near Hair"
+    And the salon is at lat "43.8563" lng "18.4131"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And that owner also owns salon "Far Hair" at lat "44.7722" lng "17.1910"
+    And the salon has a service:
+      """
+      {"name": "Boja", "category": "HAIR", "durationMinutes": 60, "priceFeninga": 5000}
+      """
+    And that owner also owns salon "Hidden Hair"
+    And the salon has a service:
+      """
+      {"name": "Fen", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2000}
+      """
+    When I query salonsNearby lat "43.8563" lng "18.4131" with:
+      """
+      {"category": "HAIR"}
+      """
+    Then the listed salon names are:
+      """
+      ["Near Hair", "Far Hair"]
+      """
+
+  Scenario: Name matches salon name not service name
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Ana Hair"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And that owner also owns salon "Studio"
+    And the salon has a service:
+      """
+      {"name": "Ana Cut", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    When I query popularInSarajevo with:
+      """
+      {"name": "ana"}
+      """
+    Then the listed salon names are:
+      """
+      ["Ana Hair"]
+      """
+
+  Scenario: Category and name apply together
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Ana Hair"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And that owner also owns salon "Ana Makeup"
+    And the salon has a service:
+      """
+      {"name": "Šminka", "category": "MAKE_UP", "durationMinutes": 45, "priceFeninga": 4000}
+      """
+    And that owner also owns salon "Bob Hair"
+    And the salon has a service:
+      """
+      {"name": "Fen", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2000}
+      """
+    When I query popularInSarajevo with:
+      """
+      {"category": "HAIR", "name": "Ana"}
+      """
+    Then the listed salon names are:
+      """
+      ["Ana Hair"]
+      """
+
+  Scenario: Empty name is ignored
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Near"
+    And that owner also owns salon "Far"
+    When I query popularInSarajevo with:
+      """
+      {"name": "   "}
+      """
+    Then the listed salon names are:
+      """
+      ["Near", "Far"]
+      """
+
+  Scenario: Category filter is paged after matching
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Hair One"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And that owner also owns salon "Makeup Shop"
+    And the salon has a service:
+      """
+      {"name": "Šminka", "category": "MAKE_UP", "durationMinutes": 45, "priceFeninga": 4000}
+      """
+    And that owner also owns salon "Hair Two"
+    And the salon has a service:
+      """
+      {"name": "Boja", "category": "HAIR", "durationMinutes": 60, "priceFeninga": 5000}
+      """
+    When I query popularInSarajevo with:
+      """
+      {"category": "HAIR", "limit": 1, "offset": 0}
+      """
+    Then the listed salon names are:
+      """
+      ["Hair One"]
+      """
+    When I query popularInSarajevo with:
+      """
+      {"category": "HAIR", "limit": 1, "offset": 1}
+      """
+    Then the listed salon names are:
+      """
+      ["Hair Two"]
+      """

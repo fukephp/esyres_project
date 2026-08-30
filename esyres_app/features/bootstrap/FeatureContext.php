@@ -252,6 +252,29 @@ class FeatureContext implements Context
     }
 
     /**
+     * @When I query salonsNearby lat :lat lng :lng with:
+     */
+    public function iQuerySalonsNearbyWith(string $lat, string $lng, PyStringNode $payload): void
+    {
+        $extra = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonsNearbyQuery(), array_merge([
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+        ], $extra));
+    }
+
+    /**
+     * @When I query popularInSarajevo with:
+     */
+    public function iQueryPopularInSarajevoWith(PyStringNode $payload): void
+    {
+        $extra = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->popularInSarajevoQuery(), $extra);
+    }
+
+    /**
      * @Then the listed salon names are:
      */
     public function theListedSalonNamesAre(PyStringNode $payload): void
@@ -641,8 +664,8 @@ class FeatureContext implements Context
     private function salonsNearbyQuery(): string
     {
         return <<<'GQL'
-query Nearby($lat: Float!, $lng: Float!, $limit: Int, $offset: Int) {
-  salonsNearby(lat: $lat, lng: $lng, limit: $limit, offset: $offset) {
+query Nearby($lat: Float!, $lng: Float!, $limit: Int, $offset: Int, $category: ServiceCategory, $name: String) {
+  salonsNearby(lat: $lat, lng: $lng, limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
   }
@@ -653,8 +676,8 @@ GQL;
     private function popularInSarajevoQuery(): string
     {
         return <<<'GQL'
-query Popular($limit: Int, $offset: Int) {
-  popularInSarajevo(limit: $limit, offset: $offset) {
+query Popular($limit: Int, $offset: Int, $category: ServiceCategory, $name: String) {
+  popularInSarajevo(limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
   }

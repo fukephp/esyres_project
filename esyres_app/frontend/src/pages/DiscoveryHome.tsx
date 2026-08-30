@@ -5,10 +5,18 @@ import { Link } from 'react-router-dom'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
   SALONS_NEARBY_QUERY,
+  type DiscoveryVars,
   type PopularInSarajevoData,
   type SalonsNearbyData,
 } from '../graphql/discovery'
-import { discoverySource, type DiscoverySource } from '../lib/discovery'
+import {
+  DISCOVERY_CATEGORIES,
+  discoveryEmptyKey,
+  discoveryHasFilter,
+  discoverySource,
+  type DiscoverySource,
+  type ServiceCategory,
+} from '../lib/discovery'
 
 type Geo =
   | { status: 'pending' }
@@ -34,17 +42,44 @@ function useGeo(): Geo {
   return geo
 }
 
+function useDebounced(value: string, ms: number): string {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), ms)
+    return () => window.clearTimeout(id)
+  }, [value, ms])
+  return debounced
+}
+
+function filterVars(category: ServiceCategory | null, name: string): DiscoveryVars {
+  const vars: DiscoveryVars = {}
+  if (category) {
+    vars.category = category
+  }
+  const term = name.trim()
+  if (term !== '') {
+    vars.name = term
+  }
+  return vars
+}
+
 export function DiscoveryHome() {
   const { t } = useTranslation()
   const geo = useGeo()
+  const [category, setCategory] = useState<ServiceCategory | null>(null)
+  const [nameDraft, setNameDraft] = useState('')
+  const name = useDebounced(nameDraft, 300)
   const source: DiscoverySource | null =
     geo.status === 'pending' ? null : discoverySource(geo.status)
+  const vars = filterVars(category, name)
+  const filtered = discoveryHasFilter(category, name)
 
   const nearby = useQuery<SalonsNearbyData>(SALONS_NEARBY_QUERY, {
-    variables: geo.status === 'granted' ? { lat: geo.lat, lng: geo.lng } : undefined,
+    variables: geo.status === 'granted' ? { lat: geo.lat, lng: geo.lng, ...vars } : undefined,
     skip: source !== 'nearby',
   })
   const popular = useQuery<PopularInSarajevoData>(POPULAR_IN_SARAJEVO_QUERY, {
+    variables: vars,
     skip: source !== 'popular',
   })
 
@@ -59,12 +94,38 @@ export function DiscoveryHome() {
           {source === 'nearby' ? t('discovery.nearby') : t('discovery.popular')}
         </h1>
       ) : null}
+      <div className="mt-4 flex gap-2">
+        {DISCOVERY_CATEGORIES.map((chip) => {
+          const on = category === chip
+          return (
+            <button
+              key={chip}
+              type="button"
+              aria-pressed={on}
+              onClick={() => setCategory(on ? null : chip)}
+              className={
+                on
+                  ? 'rounded-full bg-ink px-3 py-1 text-sm text-canvas'
+                  : 'rounded-full border border-hairline px-3 py-1 text-sm text-body'
+              }
+            >
+              {t(`category.${chip}`)}
+            </button>
+          )
+        })}
+      </div>
+      <input
+        type="search"
+        value={nameDraft}
+        onChange={(e) => setNameDraft(e.target.value)}
+        placeholder={t('discovery.searchPlaceholder')}
+        aria-label={t('discovery.searchPlaceholder')}
+        className="mt-4 w-full rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink placeholder:text-muted"
+      />
       {loading || !source ? (
         <p className="mt-6 text-sm text-body">{t('salon.loading')}</p>
       ) : !salons || salons.length === 0 ? (
-        <p className="mt-6 text-sm text-muted">
-          {source === 'nearby' ? t('discovery.emptyNearby') : t('discovery.emptyPopular')}
-        </p>
+        <p className="mt-6 text-sm text-muted">{t(discoveryEmptyKey(source, filtered))}</p>
       ) : (
         <ul className="mt-6 divide-y divide-hairline">
           {salons.map((salon) => (

@@ -28,6 +28,8 @@ void i18n.use(initReactI18next).init({
           popular: 'Popularno u Sarajevu',
           emptyNearby: 'Nema salona u blizini.',
           emptyPopular: 'Nema salona.',
+          emptyFiltered: 'Nema rezultata.',
+          searchPlaceholder: 'Ime salona',
         },
         category: {
           HAIR: 'Kosa',

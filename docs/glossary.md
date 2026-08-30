@@ -23,8 +23,12 @@ _Avoid_: staff account, employee user, stylist account
 ## Discovery
 
 **Discovery home**:
-The guest `/` list of salons. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Not the salon profile and not search.
+The guest `/` list of salons. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile and not a separate search page.
 _Avoid_: homepage wall, feed, marketplace index, landing
+
+**Discovery filter**:
+An optional overlay on discovery home: one service category and/or a salon-name match. Same nearby-or-popular list, not a separate search page.
+_Avoid_: search index, search page, marketplace search, typeahead
 
 **Nearby**:
 The discovery list sorted by distance from the guest’s current location. Only salons that have coordinates. Not a map.
