@@ -122,6 +122,7 @@ type Salon {
 }
 
 type Query {
+    me: User
     salon(id: ID!): Salon
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
@@ -129,6 +130,8 @@ type Query {
 
 type Mutation {
     login(email: String!, password: String!): User!
+    register(email: String!, password: String!, phone: String): User!
+    logout: Boolean!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service

@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { BookingsLink } from '../components/BookingsLink'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
   SALONS_NEARBY_QUERY,
@@ -89,6 +90,7 @@ export function DiscoveryHome() {
 
   return (
     <main className="mx-auto max-w-md px-5 py-8">
+      <BookingsLink />
       {source ? (
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
           {source === 'nearby' ? t('discovery.nearby') : t('discovery.popular')}

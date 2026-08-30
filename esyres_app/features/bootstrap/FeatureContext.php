@@ -4,12 +4,16 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Notifications\VerifyEmail;
 use App\SalonHours\WeeklyHours;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Schema;
 
 class FeatureContext implements Context
 {
@@ -33,6 +37,11 @@ class FeatureContext implements Context
     private array $services = [];
 
     private ?User $otherUser = null;
+
+    private static bool $schemaReady = false;
+
+    /** @var \Illuminate\Foundation\Application|null */
+    private static $sharedApp = null;
 
     /** @BeforeScenario */
     public function bootApplication(): void
@@ -62,10 +71,38 @@ class FeatureContext implements Context
         $this->services = [];
         $this->otherUser = null;
 
-        $this->app = require dirname(__DIR__, 2).'/bootstrap/app.php';
-        $this->app->make(ConsoleKernel::class)->bootstrap();
-        Artisan::call('migrate:fresh');
+        if (self::$sharedApp === null) {
+            self::$sharedApp = require dirname(__DIR__, 2).'/bootstrap/app.php';
+            self::$sharedApp->make(ConsoleKernel::class)->bootstrap();
+            Artisan::call('migrate:fresh');
+            self::$schemaReady = true;
+        }
+        $this->app = self::$sharedApp;
+        $this->truncateData();
+        $this->resetAuth();
         $this->withCredentials();
+        Notification::fake();
+    }
+
+    private function resetAuth(): void
+    {
+        if ($this->app->bound('session')) {
+            $this->app['session']->flush();
+        }
+        $this->app['auth']->guard('web')->forgetUser();
+        $this->app['auth']->forgetGuards();
+    }
+
+    private function truncateData(): void
+    {
+        Schema::disableForeignKeyConstraints();
+        foreach (Schema::getTableListing() as $table) {
+            if ($table === 'migrations') {
+                continue;
+            }
+            DB::table($table)->truncate();
+        }
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -174,6 +211,142 @@ class FeatureContext implements Context
             'email' => $email,
             'password' => $password,
         ]);
+    }
+
+    /**
+     * @When I register as :email with password :password
+     */
+    public function iRegisterAs(string $email, string $password): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->registerMutation(), [
+            'email' => $email,
+            'password' => $password,
+        ]);
+    }
+
+    /**
+     * @When I register as :email with password :password and phone :phone
+     */
+    public function iRegisterAsWithPhone(string $email, string $password, string $phone): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->registerMutation(), [
+            'email' => $email,
+            'password' => $password,
+            'phone' => $phone,
+        ]);
+    }
+
+    /**
+     * @When I log out
+     */
+    public function iLogOut(): void
+    {
+        $this->graphql($this->logoutMutation());
+    }
+
+    /**
+     * @When I query me as a guest
+     */
+    public function iQueryMeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->meQuery());
+    }
+
+    /**
+     * @When I query me
+     */
+    public function iQueryMe(): void
+    {
+        $this->graphql($this->meQuery());
+    }
+
+    /**
+     * @Then register succeeds for :email
+     */
+    public function registerSucceedsFor(string $email): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($email, $this->graphql['data']['register']['email']);
+        $this->assertSame(false, $this->graphql['data']['register']['emailVerified']);
+        $this->user = User::query()->where('email', $email)->first();
+    }
+
+    /**
+     * @Then me is null
+     */
+    public function meIsNull(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['me']);
+    }
+
+    /**
+     * @Then me email is :email
+     */
+    public function meEmailIs(string $email): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($email, $this->graphql['data']['me']['email']);
+    }
+
+    /**
+     * @Then me email is not verified
+     */
+    public function meEmailIsNotVerified(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(false, $this->graphql['data']['me']['emailVerified']);
+    }
+
+    /**
+     * @Then the customer has no phone
+     */
+    public function theCustomerHasNoPhone(): void
+    {
+        $this->assertSame(null, $this->customer()->phone);
+    }
+
+    /**
+     * @Then the customer phone is :phone
+     */
+    public function theCustomerPhoneIs(string $phone): void
+    {
+        $this->assertSame($phone, $this->customer()->phone);
+    }
+
+    /**
+     * @Then the customer phone is not verified
+     */
+    public function theCustomerPhoneIsNotVerified(): void
+    {
+        $this->assertSame(null, $this->customer()->phone_verified_at);
+    }
+
+    /**
+     * @Then the customer name is :name
+     */
+    public function theCustomerNameIs(string $name): void
+    {
+        $this->assertSame($name, $this->customer()->name);
+    }
+
+    /**
+     * @Then a verify-email notification was sent
+     */
+    public function aVerifyEmailNotificationWasSent(): void
+    {
+        Notification::assertSentTo($this->customer(), VerifyEmail::class);
+    }
+
+    /**
+     * @Then the customer email is not verified in the database
+     */
+    public function theCustomerEmailIsNotVerifiedInTheDatabase(): void
+    {
+        $this->assertSame(null, $this->customer()->fresh()->email_verified_at);
     }
 
     /**
@@ -881,6 +1054,50 @@ mutation Login($email: String!, $password: String!) {
   }
 }
 GQL;
+    }
+
+    private function registerMutation(): string
+    {
+        return <<<'GQL'
+mutation Register($email: String!, $password: String!, $phone: String) {
+  register(email: $email, password: $password, phone: $phone) {
+    id
+    email
+    emailVerified
+  }
+}
+GQL;
+    }
+
+    private function logoutMutation(): string
+    {
+        return <<<'GQL'
+mutation {
+  logout
+}
+GQL;
+    }
+
+    private function meQuery(): string
+    {
+        return <<<'GQL'
+query Me {
+  me {
+    id
+    email
+    emailVerified
+  }
+}
+GQL;
+    }
+
+    private function customer(): User
+    {
+        if ($this->user === null) {
+            throw new RuntimeException('Expected a customer in the scenario');
+        }
+
+        return $this->user->fresh() ?? $this->user;
     }
 
     private function createBookingMutation(): string

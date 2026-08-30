@@ -4,6 +4,10 @@ Domain language for the Sarajevo salon reservation product. What things **are**,
 
 ## People and shops
 
+**Customer**:
+A person with email+password who can browse as a guest and send requests once verified. The same person can also be an owner. Not a separate account type and not a worker login.
+_Avoid_: account (as a type), member, client user, shopper
+
 **Owner**:
 A user who owns at least one salon. The same person can also be a customer. Owners are invite-only; there is no public salon registration.
 _Avoid_: merchant, vendor, admin, staff login
@@ -43,6 +47,10 @@ The discovery list when location is denied or unavailable, so `/` is never blank
 _Avoid_: trending, featured, curated homepage, popular ranking
 
 ## Bookings
+
+**My Bookings**:
+The customer place that lists their requests by status. Not discovery, not the salon profile, and not the owner queue.
+_Avoid_: schedule, inbox (customer), booking history, dashboard
 
 **Request**:
 A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
