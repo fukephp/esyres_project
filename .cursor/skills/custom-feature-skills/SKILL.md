@@ -21,7 +21,7 @@ description: Add or change a product feature against MVP epics and stories. Use 
 - [ ] Story/epic cited from `docs/mvp/` or `docs/stories/`
 - [ ] Surfaces and auth rules from docs respected
 - [ ] Architecture conventions followed
-- [ ] UI verified in the browser when the change is user-visible; attach desktop + mobile screenshots in the PR description (not committed to the repo)
+- [ ] UI verified in the browser when the change is user-visible. Do not attach screenshots to the PR.
 
 ## Examples
 

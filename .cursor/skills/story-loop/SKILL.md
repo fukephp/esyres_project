@@ -84,7 +84,7 @@ Implement in this chat against the answer key:
 - Run every verify command from the app root named in CONTEXT
 - Implement→verify loop; **iteration cap 5–8** (use the key’s cap if set); stop early if the same failure repeats twice with no progress
 - Open a PR on success or a draft/blocked PR on escalate; do not expand scope
-- **UI stories** (any user-visible change): embed desktop + mobile screenshots in the PR description per `.cursor/loops/PLAYBOOK.md` **PR visual evidence**. If shots cannot be attached, open a draft/blocked PR instead of ready. Non-UI PRs skip screenshots.
+- Do **not** capture or attach screenshots
 - After PR: remind the user to run **Bugbot**, then human review and merge
 
 ### Cloud (opt-in only)
@@ -97,7 +97,7 @@ Answer key: .cursor/loops/answer-keys/STORY-xx.md
 Follow Implementer instructions in that key.
 Run every verify command from the app root named in CONTEXT. Iteration cap from key.
 Open PR on pass; draft/blocked on escalate. Do not expand scope.
-UI stories: embed desktop + mobile screenshots in the PR description (playbook PR visual evidence); draft if cannot attach.
+Do not capture or attach screenshots.
 ```
 
 Do not invent a second unattended critic loop.
