@@ -5,6 +5,7 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 ## Routing
 
 - `/` — customer: discover, salon, request (picker or scripted salon-profile chat), bookings, favorites
+- `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route.
 - `/owner` — owner: inbox, worker panel (home), in-flight chat tab, settings, stats; **salon switcher** when the user owns more than one salon
 
 Owner chunks (including `@dnd-kit`) are lazy-loaded so the customer first paint does not ship the grid.
@@ -31,6 +32,7 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 - Copy is Bosnian-first. Prices formatted as BAM via `Intl` (`bs-BA`) from integer feninga.
 - Accept-preferred-time and drag-to-counter-propose always have tap/form fallbacks.
 - GraphQL errors are machine codes; the SPA maps them to Bosnian strings.
+- On `EMAIL_UNVERIFIED`, the picker stays on `/salon/:id` with check-email copy, resend, and a retry of `createBooking`. `/bookings` shows resend when `me.emailVerified` is false. No dedicated verify-email route.
 
 ## Discovery
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { BookingsLink } from '../components/BookingsLink'
+import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
 import { graphqlErrorCode, stackSelection } from '../lib/booking'
@@ -72,6 +73,7 @@ export function SalonProfile() {
   const [preferredDate, setPreferredDate] = useState('')
   const [preferredTime, setPreferredTime] = useState('')
   const [needLogin, setNeedLogin] = useState(false)
+  const [needEmail, setNeedEmail] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -111,14 +113,23 @@ export function SalonProfile() {
       await createBooking({ variables: { input } })
       setSent(true)
       setNeedLogin(false)
+      setNeedEmail(false)
       setError(null)
     } catch (err) {
       const code = graphqlErrorCode(err)
       if (code === 'UNAUTHENTICATED') {
         setNeedLogin(true)
+        setNeedEmail(false)
         setError(null)
         return
       }
+      if (code === 'EMAIL_UNVERIFIED') {
+        setNeedEmail(true)
+        setNeedLogin(false)
+        setError(null)
+        return
+      }
+      setNeedEmail(false)
       setError(gateMessage(code, t))
     }
   }
@@ -270,7 +281,7 @@ export function SalonProfile() {
               />
             </label>
             {error && <p className="text-sm text-busy-busy">{error}</p>}
-            {!needLogin && (
+            {!needLogin && !needEmail && (
               <button
                 type="submit"
                 disabled={!canSend || busy}
@@ -280,6 +291,11 @@ export function SalonProfile() {
               </button>
             )}
           </form>
+          {needEmail && (
+            <div className="mt-8">
+              <EmailVerifyPanel onRetry={() => afterAuth()} />
+            </div>
+          )}
           {needLogin && (
             <div className="mt-8">
               <AuthShell onAuthenticated={() => afterAuth()} />

@@ -6,6 +6,7 @@ use App\Models\Worker;
 use App\Notifications\VerifyEmail;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 
 trait GuestSteps
 {
@@ -143,6 +144,151 @@ trait GuestSteps
     public function theCustomerEmailIsNotVerifiedInTheDatabase(): void
     {
         $this->assertSame(null, $this->customer()->fresh()->email_verified_at);
+    }
+
+    /**
+     * @Then me has a verified email
+     */
+    public function meHasAVerifiedEmail(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['me']['emailVerified']);
+    }
+
+    /**
+     * @Then the customer email is verified in the database
+     */
+    public function theCustomerEmailIsVerifiedInTheDatabase(): void
+    {
+        if ($this->customer()->fresh()->email_verified_at === null) {
+            throw new RuntimeException('Expected email_verified_at to be set');
+        }
+    }
+
+    /**
+     * @Then I remember the verify-email URL
+     */
+    public function iRememberTheVerifyEmailUrl(): void
+    {
+        $user = $this->customer();
+        $this->verifyUser = $user;
+        $this->verifyUrl = $this->verifyEmailActionUrl($user);
+    }
+
+    /**
+     * @When I visit the remembered verify-email URL
+     */
+    public function iVisitTheRememberedVerifyEmailUrl(): void
+    {
+        if ($this->verifyUrl === null) {
+            throw new RuntimeException('No remembered verify-email URL');
+        }
+        $this->getVerifyUrl($this->verifyUrl);
+    }
+
+    /**
+     * @When I visit a tampered verify-email URL
+     */
+    public function iVisitATamperedVerifyEmailUrl(): void
+    {
+        if ($this->verifyUrl === null) {
+            $this->iRememberTheVerifyEmailUrl();
+        }
+        $this->getVerifyUrl($this->verifyUrl.'&tamper=1');
+    }
+
+    /**
+     * @When I visit an expired verify-email URL
+     */
+    public function iVisitAnExpiredVerifyEmailUrl(): void
+    {
+        $user = $this->customer();
+        $url = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->subMinute(),
+            ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())],
+        );
+        $this->getVerifyUrl($url);
+    }
+
+    /**
+     * @Then I am redirected to bookings verified
+     */
+    public function iAmRedirectedToBookingsVerified(): void
+    {
+        $this->assertSame('http://localhost/bookings?verified=1', $this->lastLocation);
+    }
+
+    /**
+     * @Then I am redirected to bookings verify invalid
+     */
+    public function iAmRedirectedToBookingsVerifyInvalid(): void
+    {
+        $this->assertSame('http://localhost/bookings?verify=invalid', $this->lastLocation);
+    }
+
+    /**
+     * @Then I am redirected to bookings verify mismatch
+     */
+    public function iAmRedirectedToBookingsVerifyMismatch(): void
+    {
+        $this->assertSame('http://localhost/bookings?verify=mismatch', $this->lastLocation);
+    }
+
+    /**
+     * @Then the remembered customer email is not verified
+     */
+    public function theRememberedCustomerEmailIsNotVerified(): void
+    {
+        if ($this->verifyUser === null) {
+            throw new RuntimeException('No remembered verify customer');
+        }
+        $this->assertSame(null, $this->verifyUser->fresh()->email_verified_at);
+    }
+
+    /**
+     * @When the customer's phone is marked verified
+     */
+    public function theCustomersPhoneIsMarkedVerified(): void
+    {
+        $user = $this->customer();
+        $user->phone = $user->phone ?? '+38761111000';
+        $user->phone_verified_at = now();
+        $user->save();
+    }
+
+    /**
+     * @When I resend the verification email
+     */
+    public function iResendTheVerificationEmail(): void
+    {
+        $this->graphql($this->resendVerificationEmailMutation());
+    }
+
+    /**
+     * @When I resend the verification email as a guest
+     */
+    public function iResendTheVerificationEmailAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->resendVerificationEmailMutation());
+    }
+
+    /**
+     * @Then resend succeeds
+     */
+    public function resendSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['resendVerificationEmail']);
+    }
+
+    /**
+     * @Then a verify-email notification was sent twice
+     */
+    public function aVerifyEmailNotificationWasSentTwice(): void
+    {
+        Notification::assertSentToTimes($this->customer(), VerifyEmail::class, 2);
     }
 
     /**
@@ -478,6 +624,40 @@ trait GuestSteps
         }
 
         return $this->user->fresh() ?? $this->user;
+    }
+
+    private function verifyEmailActionUrl(User $user): string
+    {
+        $notification = Notification::sent($user, VerifyEmail::class)->last();
+        if ($notification === null) {
+            throw new RuntimeException('No VerifyEmail notification for '.$user->email);
+        }
+
+        return $notification->toMail($user)->actionUrl;
+    }
+
+    private function getVerifyUrl(string $url): void
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        $query = parse_url($url, PHP_URL_QUERY);
+        if (! is_string($path)) {
+            throw new RuntimeException('Invalid verify URL: '.$url);
+        }
+        $uri = $path.(is_string($query) && $query !== '' ? '?'.$query : '');
+        $this->forgetRequestUser();
+        $response = $this->get($uri);
+        $this->lastLocation = $response->headers->get('Location');
+        $this->rememberCookies($response);
+        $this->forgetRequestUser();
+    }
+
+    private function resendVerificationEmailMutation(): string
+    {
+        return <<<'GQL'
+mutation {
+  resendVerificationEmail
+}
+GQL;
     }
 
     /**

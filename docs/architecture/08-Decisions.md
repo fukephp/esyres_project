@@ -9,7 +9,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 5. **Phone OTP required to send a request, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login.
 6. **Email verified before request or owner panel** — reminders and fake-owner protection.
 7. **Invite-only owners** — first 15–20 salons are provisioned, not self-serve.
-8. **Lighthouse code-first, one endpoint** — PHP is the contract; codegen introspects local schema.
+8. **Lighthouse code-first, one endpoint** — PHP is the contract; codegen introspects local schema. Exception: email verification completes via Laravel signed GET (`verification.verify`), not a GraphQL mutation. See `docs/adr/0003-email-verify-signed-get.md`.
 9. **Redis from day one** — OTP, queues, cache, Reverb.
 10. **One PWA, lazy owner routes** — one QR host, one cookie, one service worker.
 11. **Apollo + codegen** — subscriptions and typed operations.

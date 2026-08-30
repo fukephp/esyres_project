@@ -6,7 +6,7 @@ One `users` table. A person can be customer and owner. Owner access = owns at le
 
 **Login:** email + password (Sanctum cookie). Guest browse is cookieless aside from the QR hold cookie.
 
-**Email:** verification mail on register. Password login allowed while unverified. Booking mutations and `/owner` require `email_verified_at`.
+**Email:** verification mail on register. Customer completes verify by clicking the signed link (`verification.verify` GET), not a GraphQL mutation. The GET does not require a session and does not log the user in; a session for a different user is rejected (`/bookings?verify=mismatch`). Bad or expired signature 302s to `/bookings?verify=invalid` (do not distinguish expired vs forged). Success 302s to `/bookings?verified=1`. Never render Laravel 403 Blade for this flow. Sessioned `resendVerificationEmail` re-sends the same mail (cache throttle; `EMAIL_ALREADY_VERIFIED` if already verified). Password login allowed while unverified. Booking mutations and `/owner` require `email_verified_at`. See `docs/adr/0003-email-verify-signed-get.md` and `docs/adr/0004-email-verify-get-no-session.md`.
 
 **Phone:** optional at register; encouraged. **Required (OTP-verified) to `createBooking`.** Verified phone also enables OTP as an alternate login. `phone_verified_at` is captured at MVP; reward-badge **UI** stays Phase 2.
 
