@@ -20,6 +20,10 @@ _Avoid_: storefront, landing, listing detail, shop page
 A named person at a salon who can be requested for a booking. Not a user and not a login. A new salon has none until the owner adds them. Workers inherit the salon’s working hours.
 _Avoid_: staff account, employee user, stylist account
 
+**No preference**:
+The guest did not pick a specific worker on a request. Valid on its own, not a missing worker and not a fake “any” worker row.
+_Avoid_: unassigned, any stylist, empty worker, default worker
+
 ## Discovery
 
 **Discovery home**:
@@ -37,6 +41,20 @@ _Avoid_: near me map, radius search, geo grid
 **Popular in Sarajevo**:
 The discovery list when location is denied or unavailable, so `/` is never blank. Not a ranking of bookings or trust badges.
 _Avoid_: trending, featured, curated homepage, popular ranking
+
+## Bookings
+
+**Request**:
+A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
+_Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
+
+**Preferred time**:
+The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.
+_Avoid_: slot, availability, booking time (as confirmed), hold
+
+**Service snapshot**:
+The name, duration, and KM price copied onto a request at send time. Later catalog edits do not change that request.
+_Avoid_: live service row, price lookup
 
 ## Catalog
 
