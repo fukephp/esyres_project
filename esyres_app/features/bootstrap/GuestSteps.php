@@ -4,7 +4,10 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\Notifications\VerifyEmail;
+use App\Sms\FakeSmsGateway;
+use App\Sms\SmsGateway;
 use Behat\Gherkin\Node\PyStringNode;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
@@ -20,6 +23,7 @@ trait GuestSteps
             'email' => $email,
             'password' => $password,
         ]);
+        $this->rememberRegisteredUser();
     }
 
     /**
@@ -33,6 +37,7 @@ trait GuestSteps
             'password' => $password,
             'phone' => $phone,
         ]);
+        $this->rememberRegisteredUser();
     }
 
     /**
@@ -289,6 +294,103 @@ trait GuestSteps
     public function aVerifyEmailNotificationWasSentTwice(): void
     {
         Notification::assertSentToTimes($this->customer(), VerifyEmail::class, 2);
+    }
+
+    /**
+     * @When I request a phone OTP for :phone
+     */
+    public function iRequestAPhoneOtpFor(string $phone): void
+    {
+        $this->graphql($this->requestPhoneOtpMutation(), ['phone' => $phone]);
+    }
+
+    /**
+     * @When I request a phone OTP for :phone as a guest
+     */
+    public function iRequestAPhoneOtpForAsAGuest(string $phone): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->requestPhoneOtpMutation(), ['phone' => $phone]);
+    }
+
+    /**
+     * @When I verify the last phone OTP
+     */
+    public function iVerifyTheLastPhoneOtp(): void
+    {
+        $this->graphql($this->verifyPhoneOtpMutation(), ['code' => $this->lastOtp()]);
+    }
+
+    /**
+     * @When I verify the phone OTP with :code
+     */
+    public function iVerifyThePhoneOtpWith(string $code): void
+    {
+        $this->graphql($this->verifyPhoneOtpMutation(), ['code' => $code]);
+    }
+
+    /**
+     * @When I verify the phone OTP with :code as a guest
+     */
+    public function iVerifyThePhoneOtpWithAsAGuest(string $code): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->verifyPhoneOtpMutation(), ['code' => $code]);
+    }
+
+    /**
+     * @When I verify the phone OTP with a wrong code :n more times
+     */
+    public function iVerifyThePhoneOtpWithAWrongCodeMoreTimes(string $n): void
+    {
+        for ($i = 0; $i < (int) $n; $i++) {
+            $this->graphql($this->verifyPhoneOtpMutation(), ['code' => '000000']);
+        }
+    }
+
+    /**
+     * @When time advances :seconds seconds
+     */
+    public function timeAdvances(string $seconds): void
+    {
+        Carbon::setTestNow(now()->addSeconds((int) $seconds));
+    }
+
+    /**
+     * @Then request phone otp succeeds
+     */
+    public function requestPhoneOtpSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['requestPhoneOtp']);
+    }
+
+    /**
+     * @Then verify phone otp succeeds
+     */
+    public function verifyPhoneOtpSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['verifyPhoneOtp']);
+    }
+
+    /**
+     * @Then the last OTP is 6 digits
+     */
+    public function theLastOtpIs6Digits(): void
+    {
+        if (preg_match('/^\d{6}$/', $this->lastOtp()) !== 1) {
+            throw new RuntimeException('Expected 6-digit OTP, got '.$this->lastOtp());
+        }
+    }
+
+    /**
+     * @Then me phone is verified
+     */
+    public function mePhoneIsVerified(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['me']['phoneVerified']);
     }
 
     /**
@@ -651,6 +753,42 @@ trait GuestSteps
         $this->forgetRequestUser();
     }
 
+    private function lastOtp(): string
+    {
+        $sms = $this->app->make(SmsGateway::class);
+        if (! $sms instanceof FakeSmsGateway || $sms->lastCode === null) {
+            throw new RuntimeException('No captured OTP');
+        }
+
+        return $sms->lastCode;
+    }
+
+    private function rememberRegisteredUser(): void
+    {
+        $email = $this->graphql['data']['register']['email'] ?? null;
+        if (is_string($email)) {
+            $this->user = User::query()->where('email', $email)->first();
+        }
+    }
+
+    private function requestPhoneOtpMutation(): string
+    {
+        return <<<'GQL'
+mutation RequestPhoneOtp($phone: String!) {
+  requestPhoneOtp(phone: $phone)
+}
+GQL;
+    }
+
+    private function verifyPhoneOtpMutation(): string
+    {
+        return <<<'GQL'
+mutation VerifyPhoneOtp($code: String!) {
+  verifyPhoneOtp(code: $code)
+}
+GQL;
+    }
+
     private function resendVerificationEmailMutation(): string
     {
         return <<<'GQL'
@@ -742,6 +880,8 @@ query Me {
     id
     email
     emailVerified
+    phone
+    phoneVerified
   }
 }
 GQL;

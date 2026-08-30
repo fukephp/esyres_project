@@ -6,11 +6,11 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 2. **Sanctum cookies, not Bearer** — httpOnly session; tokens later for native.
 3. **One users table + roles** — same human can book and own salons. Workers are not users.
 4. **Email+password login** — phone is not the username. Guest browse stays open.
-5. **Phone OTP required to send a request, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login.
+5. **Phone OTP required to send a request, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login. Phone stored as E.164, any country (see `docs/adr/0006-phone-e164-any-country.md`).
 6. **Email verified before request or owner panel** — reminders and fake-owner protection.
 7. **Invite-only owners** — first 15–20 salons are provisioned, not self-serve.
 8. **Lighthouse code-first, one endpoint** — PHP is the contract; codegen introspects local schema. Exception: email verification completes via Laravel signed GET (`verification.verify`), not a GraphQL mutation. See `docs/adr/0003-email-verify-signed-get.md`.
-9. **Redis from day one** — OTP, queues, cache, Reverb.
+9. **Redis from day one** — OTP, queues, cache, Reverb. Slim Compose still has no redis service (ADR 0001 / #36). OTP codes and throttle use Laravel Cache until Redis is the cache driver; see `docs/adr/0005-otp-in-laravel-cache.md`.
 10. **One PWA, lazy owner routes** — one QR host, one cookie, one service worker.
 11. **Apollo + codegen** — subscriptions and typed operations.
 12. **Tailwind, not Bootstrap** — two surfaces (funnel vs dense grid) without a generic kit.
@@ -29,7 +29,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 25. **QR guest cookie ~7 days** — last salon wins; reconcile at verify.
 26. **Full local compose list** — nginx, php, mysql, redis, worker, reverb, vite, mailpit.
 27. **Expire → declined** — no fifth status; TTL numbers placeholder.
-28. **OTP throttle in Redis** — no CAPTCHA.
+28. **OTP throttle in cache** — no CAPTCHA. Same Laravel Cache store as codes (Redis when that service lands). See ADR 0005.
 29. **@dnd-kit** — same mutation as tap fallback.
 30. **Limit/offset pagination** — cap `perPage`.
 31. **Introspection local-only**.

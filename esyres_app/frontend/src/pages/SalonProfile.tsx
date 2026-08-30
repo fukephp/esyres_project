@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { BookingsLink } from '../components/BookingsLink'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
+import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
 import { graphqlErrorCode, stackSelection } from '../lib/booking'
@@ -74,6 +75,7 @@ export function SalonProfile() {
   const [preferredTime, setPreferredTime] = useState('')
   const [needLogin, setNeedLogin] = useState(false)
   const [needEmail, setNeedEmail] = useState(false)
+  const [needPhone, setNeedPhone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -114,22 +116,33 @@ export function SalonProfile() {
       setSent(true)
       setNeedLogin(false)
       setNeedEmail(false)
+      setNeedPhone(false)
       setError(null)
     } catch (err) {
       const code = graphqlErrorCode(err)
       if (code === 'UNAUTHENTICATED') {
         setNeedLogin(true)
         setNeedEmail(false)
+        setNeedPhone(false)
         setError(null)
         return
       }
       if (code === 'EMAIL_UNVERIFIED') {
         setNeedEmail(true)
         setNeedLogin(false)
+        setNeedPhone(false)
+        setError(null)
+        return
+      }
+      if (code === 'PHONE_UNVERIFIED') {
+        setNeedPhone(true)
+        setNeedLogin(false)
+        setNeedEmail(false)
         setError(null)
         return
       }
       setNeedEmail(false)
+      setNeedPhone(false)
       setError(gateMessage(code, t))
     }
   }
@@ -281,7 +294,7 @@ export function SalonProfile() {
               />
             </label>
             {error && <p className="text-sm text-busy-busy">{error}</p>}
-            {!needLogin && !needEmail && (
+            {!needLogin && !needEmail && !needPhone && (
               <button
                 type="submit"
                 disabled={!canSend || busy}
@@ -294,6 +307,11 @@ export function SalonProfile() {
           {needEmail && (
             <div className="mt-8">
               <EmailVerifyPanel onRetry={() => afterAuth()} />
+            </div>
+          )}
+          {needPhone && (
+            <div className="mt-8">
+              <PhoneOtpPanel onRetry={() => afterAuth()} />
             </div>
           )}
           {needLogin && (

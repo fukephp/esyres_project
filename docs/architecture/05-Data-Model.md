@@ -13,7 +13,7 @@ Sketch only — no migrations. Status machine: `requested → confirmed` (owner 
 
 ## Entities
 
-- **User** — email+password; `email_verified_at`; optional `phone` + `phone_verified_at`; roles: can be customer and owner. Phone unique when present.
+- **User** — email+password; `email_verified_at`; optional `phone` (E.164, any country, unique when present) + `phone_verified_at`; roles: can be customer and owner. See `docs/adr/0006-phone-e164-any-country.md`.
 - **Salon** — `owner_id`, profile, address, `lat`/`lng`, hours, breaks, holidays, `cancellation_notice_hours`, reschedule cap, photos on disk. One user may own many salons (separate profiles, not a chain-location product).
 - **Worker** — belongs to a salon; assigned to services; active/inactive. Inherits salon hours. Not a user.
 - **Service** — belongs to salon; `duration_minutes` (default 30), price feninga, category (hair / make-up / massage).

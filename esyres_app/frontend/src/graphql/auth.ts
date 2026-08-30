@@ -6,6 +6,8 @@ export const ME_QUERY = gql`
       id
       email
       emailVerified
+      phone
+      phoneVerified
     }
   }
 `
@@ -16,6 +18,8 @@ export const LOGIN_MUTATION = gql`
       id
       email
       emailVerified
+      phone
+      phoneVerified
     }
   }
 `
@@ -26,6 +30,8 @@ export const REGISTER_MUTATION = gql`
       id
       email
       emailVerified
+      phone
+      phoneVerified
     }
   }
 `
@@ -42,6 +48,24 @@ export const RESEND_VERIFICATION_EMAIL = gql`
   }
 `
 
+export const REQUEST_PHONE_OTP = gql`
+  mutation RequestPhoneOtp($phone: String!) {
+    requestPhoneOtp(phone: $phone)
+  }
+`
+
+export const VERIFY_PHONE_OTP = gql`
+  mutation VerifyPhoneOtp($code: String!) {
+    verifyPhoneOtp(code: $code)
+  }
+`
+
 export type MeData = {
-  me: { id: string; email: string; emailVerified: boolean } | null
+  me: {
+    id: string
+    email: string
+    emailVerified: boolean
+    phone: string | null
+    phoneVerified: boolean
+  } | null
 }

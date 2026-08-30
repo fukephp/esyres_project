@@ -4,8 +4,11 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Sms\FakeSmsGateway;
+use App\Sms\SmsGateway;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +80,11 @@ trait BehatRuntime
         $this->app = BehatKernel::$app;
         $this->truncateData();
         Cache::flush();
+        Carbon::setTestNow();
+        $sms = $this->app->make(SmsGateway::class);
+        if ($sms instanceof FakeSmsGateway) {
+            $sms->reset();
+        }
         $this->resetAuth();
         $this->withCredentials();
         Notification::fake();

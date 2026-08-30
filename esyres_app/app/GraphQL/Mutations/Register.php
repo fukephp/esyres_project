@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Exceptions\ClientError;
 use App\Models\User;
+use App\Phone\E164;
 use Illuminate\Support\Facades\Auth;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -25,7 +26,10 @@ final class Register
             throw new ClientError('EMAIL_TAKEN');
         }
 
-        $phone = $this->phone($args['phone'] ?? null);
+        $phone = E164::optional($args['phone'] ?? null);
+        if ($phone !== null && User::query()->where('phone', $phone)->exists()) {
+            throw new ClientError('PHONE_TAKEN');
+        }
 
         $user = new User;
         $user->name = explode('@', $email)[0];
@@ -39,21 +43,5 @@ final class Register
         $user->sendEmailVerificationNotification();
 
         return $user;
-    }
-
-    private function phone(mixed $phone): ?string
-    {
-        if (! is_string($phone)) {
-            return null;
-        }
-        $phone = trim($phone);
-        if ($phone === '') {
-            return null;
-        }
-        if (User::query()->where('phone', $phone)->exists()) {
-            throw new ClientError('PHONE_TAKEN');
-        }
-
-        return $phone;
     }
 }

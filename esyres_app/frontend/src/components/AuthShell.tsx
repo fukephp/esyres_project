@@ -17,6 +17,9 @@ function authMessage(code: string | null, t: (key: string) => string): string {
   if (code === 'INVALID_EMAIL') {
     return t('auth.gate.INVALID_EMAIL')
   }
+  if (code === 'INVALID_PHONE') {
+    return t('auth.gate.INVALID_PHONE')
+  }
   if (code === 'INVALID_CREDENTIALS') {
     return t('auth.gate.INVALID_CREDENTIALS')
   }
