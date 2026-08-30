@@ -14,6 +14,8 @@ From this directory:
 docker compose up -d mysql
 docker compose run --rm php php artisan --version
 docker compose run --rm php vendor/bin/behat
+docker compose run --rm php vendor/bin/behat --suite owner
+docker compose run --rm php vendor/bin/behat --suite guest
 docker compose run --rm --workdir /app/frontend node npm run typecheck
 docker compose run --rm --workdir /app/frontend node npm run test
 docker compose run --rm --workdir /app/frontend node npm run build

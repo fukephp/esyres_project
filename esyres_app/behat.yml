@@ -2,8 +2,13 @@ default:
   autoload:
     '': '%paths.base%/features/bootstrap'
   suites:
-    default:
+    owner:
       paths:
-        - '%paths.base%/features'
+        - '%paths.base%/features/owner'
       contexts:
-        - FeatureContext
+        - OwnerContext
+    guest:
+      paths:
+        - '%paths.base%/features/guest'
+      contexts:
+        - GuestContext
