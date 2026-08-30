@@ -7,6 +7,7 @@ use App\Models\Worker;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -35,6 +36,12 @@ trait BehatRuntime
 
     protected ?User $otherUser = null;
 
+    protected ?string $verifyUrl = null;
+
+    protected ?User $verifyUser = null;
+
+    protected ?string $lastLocation = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -47,6 +54,9 @@ trait BehatRuntime
         $this->worker = null;
         $this->services = [];
         $this->otherUser = null;
+        $this->verifyUrl = null;
+        $this->verifyUser = null;
+        $this->lastLocation = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();
@@ -66,6 +76,7 @@ trait BehatRuntime
         }
         $this->app = BehatKernel::$app;
         $this->truncateData();
+        Cache::flush();
         $this->resetAuth();
         $this->withCredentials();
         Notification::fake();
@@ -75,6 +86,7 @@ trait BehatRuntime
     {
         $this->putEnv('APP_ENV', 'testing');
         $this->putEnv('APP_URL', 'http://localhost');
+        $this->putEnv('FRONTEND_URL', 'http://localhost');
         $this->putEnv('BCRYPT_ROUNDS', '4');
         $this->putEnv('DB_CONNECTION', 'mysql');
         $this->putEnv('DB_HOST', 'mysql');
@@ -95,8 +107,13 @@ trait BehatRuntime
         if ($this->app->bound('session')) {
             $this->app['session']->flush();
         }
-        $this->app['auth']->guard('web')->forgetUser();
+        $this->forgetRequestUser();
         $this->app['auth']->forgetGuards();
+    }
+
+    protected function forgetRequestUser(): void
+    {
+        $this->app['auth']->guard('web')->forgetUser();
     }
 
     private function truncateData(): void
@@ -113,6 +130,7 @@ trait BehatRuntime
      */
     protected function graphql(string $query, array $variables = []): void
     {
+        $this->forgetRequestUser();
         $response = $this->postJson('/graphql', [
             'query' => $query,
             'variables' => $variables,

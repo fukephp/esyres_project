@@ -36,6 +36,12 @@ export const LOGOUT_MUTATION = gql`
   }
 `
 
+export const RESEND_VERIFICATION_EMAIL = gql`
+  mutation ResendVerificationEmail {
+    resendVerificationEmail
+  }
+`
+
 export type MeData = {
   me: { id: string; email: string; emailVerified: boolean } | null
 }
