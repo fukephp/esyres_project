@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { DiscoveryHome } from './pages/DiscoveryHome'
+import { MyBookings } from './pages/MyBookings'
 import { SalonProfile } from './pages/SalonProfile'
 
 export default function App() {
@@ -8,6 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<DiscoveryHome />} />
         <Route path="/salon/:id" element={<SalonProfile />} />
+        <Route path="/bookings" element={<MyBookings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
