@@ -22,6 +22,8 @@ class SalonFactory extends Factory
             'name' => fake()->company(),
             'cancellation_notice_hours' => 24,
             'hours' => WeeklyHours::closedWeek(),
+            'lat' => null,
+            'lng' => null,
         ];
     }
 }

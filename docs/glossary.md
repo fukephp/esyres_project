@@ -20,6 +20,20 @@ _Avoid_: storefront, landing, listing detail, shop page
 A named person at a salon who can be requested for a booking. Not a user and not a login. A new salon has none until the owner adds them. Workers inherit the salon’s working hours.
 _Avoid_: staff account, employee user, stylist account
 
+## Discovery
+
+**Discovery home**:
+The guest `/` list of salons. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Not the salon profile and not search.
+_Avoid_: homepage wall, feed, marketplace index, landing
+
+**Nearby**:
+The discovery list sorted by distance from the guest’s current location. Only salons that have coordinates. Not a map.
+_Avoid_: near me map, radius search, geo grid
+
+**Popular in Sarajevo**:
+The discovery list when location is denied or unavailable, so `/` is never blank. Not a ranking of bookings or trust badges.
+_Avoid_: trending, featured, curated homepage, popular ranking
+
 ## Catalog
 
 **Service**:

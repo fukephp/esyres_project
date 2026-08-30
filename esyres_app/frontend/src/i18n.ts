@@ -23,6 +23,12 @@ void i18n.use(initReactI18next).init({
             HIGH: 'Zauzeto',
           },
         },
+        discovery: {
+          nearby: 'Saloni u blizini',
+          popular: 'Popularno u Sarajevu',
+          emptyNearby: 'Nema salona u blizini.',
+          emptyPopular: 'Nema salona.',
+        },
         category: {
           HAIR: 'Kosa',
           MAKE_UP: 'Šminka',
