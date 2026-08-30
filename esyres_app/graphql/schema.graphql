@@ -109,6 +109,8 @@ type User {
     id: ID!
     email: String!
     emailVerified: Boolean! @method(name: "hasVerifiedEmail")
+    phone: String
+    phoneVerified: Boolean! @method(name: "hasVerifiedPhone")
 }
 
 type Salon {
@@ -133,6 +135,8 @@ type Mutation {
     register(email: String!, password: String!, phone: String): User!
     logout: Boolean!
     resendVerificationEmail: Boolean!
+    requestPhoneOtp(phone: String!): Boolean!
+    verifyPhoneOtp(code: String!): Boolean!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service

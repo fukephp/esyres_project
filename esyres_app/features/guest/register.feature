@@ -24,6 +24,10 @@ Feature: Customer email and password account
     And the customer phone is "+38761111111"
     And the customer phone is not verified
 
+  Scenario: Invalid phone on register is rejected
+    When I register as "ana@example.com" with password "secret-pass" and phone "not-a-phone"
+    Then the GraphQL error code is "INVALID_PHONE"
+
   Scenario: Duplicate email is rejected
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I register as "ana@example.com" with password "secret-pass"

@@ -84,6 +84,12 @@ _Avoid_: pause, buffer, gap, split shift
 How far in advance of a confirmed booking a cancel is on time. Late cancel is a warning, not a block. Set per salon.
 _Avoid_: cancellation policy (as a hard block), deposit rule
 
+## Verification
+
+**Verified phone**:
+A customer phone that has passed OTP. Required to send a request. Optional at register. Not the login username.
+_Avoid_: phone login, SMS login, 2FA, phone username
+
 ## Signals
 
 **Busy-level**:

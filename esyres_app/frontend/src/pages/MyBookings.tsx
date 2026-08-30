@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
+import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 
 function VerifyBanner() {
@@ -53,7 +54,13 @@ export function MyBookings() {
         {t('bookings.title')}
       </h1>
       <VerifyBanner />
-      {data.me.emailVerified ? null : (
+      {data.me.emailVerified ? (
+        data.me.phoneVerified ? null : (
+          <div className="mt-8">
+            <PhoneOtpPanel />
+          </div>
+        )
+      ) : (
         <div className="mt-8">
           <EmailVerifyPanel />
         </div>

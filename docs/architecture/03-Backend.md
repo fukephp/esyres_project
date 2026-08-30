@@ -16,7 +16,7 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 
 ## Conventions
 
-- MySQL is the source of truth. Redis holds OTP TTL, cache, queues, Reverb — not bookings.
+- MySQL is the source of truth. Laravel Cache holds OTP TTL (Redis when that service is in compose). Redis remains the target for cache, queues, Reverb — not bookings. See `docs/adr/0005-otp-in-laravel-cache.md`.
 - GraphQL `ID` is the MySQL bigint.
 - Money is integer **feninga**.
 - Dates: `preferred_date` is a Sarajevo calendar date; `preferred_starts_at` is derived from `preferred_date` + local preferred time, stored UTC. `APP_TIMEZONE=Europe/Sarajevo`.

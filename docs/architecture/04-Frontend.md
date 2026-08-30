@@ -33,6 +33,7 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 - Accept-preferred-time and drag-to-counter-propose always have tap/form fallbacks.
 - GraphQL errors are machine codes; the SPA maps them to Bosnian strings.
 - On `EMAIL_UNVERIFIED`, the picker stays on `/salon/:id` with check-email copy, resend, and a retry of `createBooking`. `/bookings` shows resend when `me.emailVerified` is false. No dedicated verify-email route.
+- On `PHONE_UNVERIFIED`, the picker stays on `/salon/:id` with phone + OTP + retry of `createBooking`. `/bookings` shows the same OTP panel when `me.emailVerified` is true and `me.phoneVerified` is false. `me` exposes `phone` (nullable) and `phoneVerified`. No dedicated verify-phone route.
 
 ## Discovery
 
