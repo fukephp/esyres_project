@@ -49,8 +49,12 @@ _Avoid_: trending, featured, curated homepage, popular ranking
 ## Bookings
 
 **My Bookings**:
-The customer place that lists their requests by status. Not discovery, not the salon profile, and not the owner queue.
+The customer place that lists their requests by status. Not discovery, not the salon profile, and not the pending queue.
 _Avoid_: schedule, inbox (customer), booking history, dashboard
+
+**Pending queue**:
+The owner’s list of requested bookings for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
+_Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request**:
 A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.

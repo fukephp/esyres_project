@@ -79,6 +79,11 @@ class Booking extends Model
         return $this->preferred_starts_at->utc()->toIso8601String();
     }
 
+    public function customerName(): string
+    {
+        return $this->customer->name;
+    }
+
     public static function roundUp15(int $minutes): int
     {
         return intdiv($minutes + 14, 15) * 15;

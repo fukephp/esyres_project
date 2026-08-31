@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Booking;
 use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
@@ -39,6 +40,10 @@ trait BehatRuntime
 
     protected ?User $otherUser = null;
 
+    protected ?Salon $otherSalon = null;
+
+    protected ?Booking $booking = null;
+
     protected ?string $verifyUrl = null;
 
     protected ?User $verifyUser = null;
@@ -57,6 +62,8 @@ trait BehatRuntime
         $this->worker = null;
         $this->services = [];
         $this->otherUser = null;
+        $this->otherSalon = null;
+        $this->booking = null;
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;

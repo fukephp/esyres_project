@@ -48,4 +48,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Salon::class, 'owner_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Salon>
+     */
+    public function salonList()
+    {
+        return $this->salons()->orderBy('id')->get();
+    }
 }

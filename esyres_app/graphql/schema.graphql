@@ -94,6 +94,8 @@ type Booking {
     preferredDate: String! @method(name: "preferredDateString")
     preferredStartsAt: String! @method(name: "preferredStartsAtIso")
     durationMinutes: Int! @rename(attribute: "duration_minutes")
+    customerName: String! @method(name: "customerName")
+    worker: Worker
     services: [BookingService!]! @method(name: "snapshotList")
 }
 
@@ -111,6 +113,7 @@ type User {
     emailVerified: Boolean! @method(name: "hasVerifiedEmail")
     phone: String
     phoneVerified: Boolean! @method(name: "hasVerifiedPhone")
+    salons: [Salon!]! @method(name: "salonList")
 }
 
 type Salon {
@@ -128,6 +131,7 @@ type Query {
     salon(id: ID!): Salon
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
+    pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
 }
 
 type Mutation {

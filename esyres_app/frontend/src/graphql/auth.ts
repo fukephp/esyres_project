@@ -8,6 +8,10 @@ export const ME_QUERY = gql`
       emailVerified
       phone
       phoneVerified
+      salons {
+        id
+        name
+      }
     }
   }
 `
@@ -67,5 +71,6 @@ export type MeData = {
     emailVerified: boolean
     phone: string | null
     phoneVerified: boolean
+    salons: { id: string; name: string }[]
   } | null
 }

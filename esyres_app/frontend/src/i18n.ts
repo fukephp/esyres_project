@@ -78,6 +78,13 @@ void i18n.use(initReactI18next).init({
           empty: 'Nema zahtjeva.',
           logout: 'Odjavi se',
         },
+        owner: {
+          title: 'Zahtjevi',
+          date: 'Datum',
+          empty: 'Nema zahtjeva za ovaj dan.',
+          notOwner: 'Nisi vlasnik salona.',
+          soon: 'Uskoro',
+        },
         verify: {
           checkEmail: 'Provjeri email i klikni link za potvrdu.',
           resend: 'Pošalji ponovo',
