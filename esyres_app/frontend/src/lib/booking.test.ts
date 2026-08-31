@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { graphqlErrorCode, stackSelection } from './booking'
+import { graphqlErrorCode, stackSelection, bookingWorkerId } from './booking'
 
 test('stacks duration and feninga', () => {
   expect(
@@ -19,4 +19,9 @@ test('reads GraphQL error code', () => {
     'UNAUTHENTICATED',
   )
   expect(graphqlErrorCode(new Error('nope'))).toBeNull()
+})
+
+test('omits workerId for no preference', () => {
+  expect(bookingWorkerId('')).toBeUndefined()
+  expect(bookingWorkerId('12')).toBe('12')
 })

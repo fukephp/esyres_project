@@ -14,3 +14,10 @@ export function graphqlErrorCode(error: unknown): string | null {
   const errors = (error as { graphQLErrors: { extensions?: { code?: string } }[] }).graphQLErrors
   return errors[0]?.extensions?.code ?? null
 }
+
+export function bookingWorkerId(selected: string): string | undefined {
+  if (selected === '') {
+    return undefined
+  }
+  return selected
+}

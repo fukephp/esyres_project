@@ -119,7 +119,7 @@ type Salon {
     cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
-    workers: [Worker!]! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@workers")
+    workers: [Worker!]! @method(name: "workerList")
     busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
 }
 

@@ -28,7 +28,7 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 
 ## UX constraints (from product rules)
 
-- Customers see a day-level busy badge and a simple date+time picker (no slot grid). Scripted salon-profile chat (Epic 10) is an alternate path to the same `createBooking`; it may suggest 1–3 preferred times from busy-level, never live slots. No LLM in v1.
+- Customers see a day-level busy badge and a simple date+time picker (no slot grid). The picker includes optional worker radios (no preference default). Scripted salon-profile chat (Epic 10) is an alternate path to the same `createBooking`; it may suggest 1–3 preferred times from busy-level, never live slots. No LLM in v1.
 - Copy is Bosnian-first. Prices formatted as BAM via `Intl` (`bs-BA`) from integer feninga.
 - Accept-preferred-time and drag-to-counter-propose always have tap/form fallbacks.
 - GraphQL errors are machine codes; the SPA maps them to Bosnian strings.

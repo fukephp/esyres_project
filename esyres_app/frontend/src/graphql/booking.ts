@@ -20,6 +20,7 @@ export const CREATE_BOOKING_MUTATION = gql`
 export type CreateBookingInput = {
   salonId: string
   serviceIds: string[]
+  workerId?: string
   preferredDate: string
   preferredTime: string
 }

@@ -80,7 +80,7 @@ trait BehatRuntime
         $this->app = BehatKernel::$app;
         $this->truncateData();
         Cache::flush();
-        Carbon::setTestNow();
+        Carbon::setTestNow(Carbon::parse('2026-08-29 09:00:00', 'Europe/Sarajevo'));
         $sms = $this->app->make(SmsGateway::class);
         if ($sms instanceof FakeSmsGateway) {
             $sms->reset();
