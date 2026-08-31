@@ -77,6 +77,12 @@ void i18n.use(initReactI18next).init({
           title: 'Moji zahtjevi',
           empty: 'Nema zahtjeva.',
           logout: 'Odjavi se',
+          status: {
+            REQUESTED: 'Na čekanju',
+            TIME_PROPOSED: 'Predloženo vrijeme',
+            CONFIRMED: 'Potvrđeno',
+            DECLINED: 'Odbijeno',
+          },
         },
         owner: {
           title: 'Zahtjevi',

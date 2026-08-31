@@ -46,6 +46,8 @@ trait BehatRuntime
 
     protected ?Booking $booking = null;
 
+    protected ?Booking $firstCustomerBooking = null;
+
     protected ?string $verifyUrl = null;
 
     protected ?User $verifyUser = null;
@@ -67,6 +69,7 @@ trait BehatRuntime
         $this->otherSalon = null;
         $this->otherWorker = null;
         $this->booking = null;
+        $this->firstCustomerBooking = null;
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;
