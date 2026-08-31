@@ -39,17 +39,26 @@ Feature: Guest salon profile
       """
       [{"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}]
       """
+    And salon workers are empty
 
-  Scenario: Missing salon is null
-    When I query salon "999999" as a guest
-    Then the salon is null
-
-  Scenario: Guest cannot read owner fields
+  Scenario: Guest can read salon workers
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Kosa Studio"
     And the salon has a worker:
       """
       {"name": "Ana"}
       """
+    When I query the public salon as a guest
+    Then salon workers match:
+      """
+      [{"name": "Ana"}]
+      """
+
+  Scenario: Missing salon is null
+    When I query salon "999999" as a guest
+    Then the salon is null
+
+  Scenario: Guest cannot read cancellation notice hours
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Kosa Studio"
     When I query salon owner fields as a guest
     Then the GraphQL error code is "UNAUTHENTICATED"
 

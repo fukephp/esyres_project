@@ -22,6 +22,8 @@ void i18n.use(initReactI18next).init({
           date: 'Datum',
           time: 'Vrijeme',
           total: 'Ukupno',
+          worker: 'Radnik',
+          noPreference: 'Nema preference',
           success: 'Zahtjev je poslan. Salon će odgovoriti.',
           login: 'Prijava',
           email: 'Email',

@@ -8,7 +8,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
-import { graphqlErrorCode, stackSelection } from '../lib/booking'
+import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoToday } from '../lib/format'
 
@@ -73,6 +73,7 @@ export function SalonProfile() {
   const [selected, setSelected] = useState<string[]>([])
   const [preferredDate, setPreferredDate] = useState('')
   const [preferredTime, setPreferredTime] = useState('')
+  const [workerChoice, setWorkerChoice] = useState('')
   const [needLogin, setNeedLogin] = useState(false)
   const [needEmail, setNeedEmail] = useState(false)
   const [needPhone, setNeedPhone] = useState(false)
@@ -147,19 +148,34 @@ export function SalonProfile() {
     }
   }
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (!id || !canSend || busy) {
-      return
+  function bookingInput(): CreateBookingInput | null {
+    if (!id) {
+      return null
     }
-    setBusy(true)
-    setError(null)
     const input: CreateBookingInput = {
       salonId: id,
       serviceIds: selected,
       preferredDate,
       preferredTime,
     }
+    const workerId = bookingWorkerId(workerChoice)
+    if (workerId !== undefined) {
+      input.workerId = workerId
+    }
+    return input
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!id || !canSend || busy) {
+      return
+    }
+    const input = bookingInput()
+    if (!input) {
+      return
+    }
+    setBusy(true)
+    setError(null)
     try {
       await send(input)
     } finally {
@@ -168,18 +184,14 @@ export function SalonProfile() {
   }
 
   async function afterAuth() {
-    if (!id) {
+    const input = bookingInput()
+    if (!input) {
       return
     }
     setBusy(true)
     setError(null)
     try {
-      await send({
-        salonId: id,
-        serviceIds: selected,
-        preferredDate,
-        preferredTime,
-      })
+      await send(input)
     } finally {
       setBusy(false)
     }
@@ -270,6 +282,39 @@ export function SalonProfile() {
               <p className="text-sm text-ink">
                 {t('salon.total')}: {t('salon.duration', { n: stack.durationMinutes })} · {formatFeninga(stack.priceFeninga)}
               </p>
+            )}
+            {salon.workers.length > 0 && (
+              <fieldset>
+                <legend className="text-sm text-body">{t('salon.worker')}</legend>
+                <ul className="mt-2 space-y-2">
+                  <li>
+                    <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+                      <input
+                        type="radio"
+                        name="worker"
+                        value=""
+                        checked={workerChoice === ''}
+                        onChange={() => setWorkerChoice('')}
+                      />
+                      {t('salon.noPreference')}
+                    </label>
+                  </li>
+                  {salon.workers.map((worker) => (
+                    <li key={worker.id}>
+                      <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+                        <input
+                          type="radio"
+                          name="worker"
+                          value={worker.id}
+                          checked={workerChoice === worker.id}
+                          onChange={() => setWorkerChoice(worker.id)}
+                        />
+                        {worker.name}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </fieldset>
             )}
             <label className="block text-sm text-body">
               {t('salon.date')}

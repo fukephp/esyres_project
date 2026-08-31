@@ -42,6 +42,17 @@ Feature: Customer multi-service booking request
       ]
       """
 
+  Scenario: Verified customer sends a request with a salon worker
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And the salon has a worker:
+      """
+      {"name": "Ana"}
+      """
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon worker
+    Then the booking status is "REQUESTED"
+    And booking has the salon worker
+
   Scenario: Guest cannot create a booking
     When I create a booking as a guest on "2026-08-31" at "10:00" with the salon services
     Then the GraphQL error code is "UNAUTHENTICATED"

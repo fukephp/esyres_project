@@ -21,6 +21,10 @@ export const PUBLIC_SALON_QUERY = gql`
         durationMinutes
         priceFeninga
       }
+      workers {
+        id
+        name
+      }
       busyLevel(date: $date)
     }
   }
@@ -43,11 +47,17 @@ export type SalonService = {
   priceFeninga: number
 }
 
+export type SalonWorker = {
+  id: string
+  name: string
+}
+
 export type PublicSalon = {
   id: string
   name: string
   hours: DayHours[]
   services: SalonService[]
+  workers: SalonWorker[]
   busyLevel: BusyLevel
 }
 

@@ -487,6 +487,17 @@ trait GuestSteps
     }
 
     /**
+     * @When I create a booking on :date at :time with the salon worker
+     */
+    public function iCreateABookingWithTheSalonWorker(string $date, string $time): void
+    {
+        if ($this->worker === null) {
+            throw new RuntimeException('Salon worker fixture is missing');
+        }
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), (string) $this->worker->id);
+    }
+
+    /**
      * @Then the booking status is :status
      */
     public function theBookingStatusIs(string $status): void
@@ -541,6 +552,22 @@ trait GuestSteps
         $booking = \App\Models\Booking::query()->find($id);
         if ($booking === null || $booking->worker_id !== null) {
             throw new RuntimeException('Expected no worker, got '.json_encode($booking));
+        }
+    }
+
+    /**
+     * @Then booking has the salon worker
+     */
+    public function bookingHasTheSalonWorker(): void
+    {
+        $this->assertNoGraphqlErrors();
+        if ($this->worker === null) {
+            throw new RuntimeException('Salon worker fixture is missing');
+        }
+        $id = $this->graphql['data']['createBooking']['id'];
+        $booking = \App\Models\Booking::query()->find($id);
+        if ($booking === null || $booking->worker_id !== $this->worker->id) {
+            throw new RuntimeException('Expected salon worker, got '.json_encode($booking));
         }
     }
 
@@ -928,6 +955,10 @@ query PublicSalon($id: ID!) {
       category
       durationMinutes
       priceFeninga
+    }
+    workers {
+      id
+      name
     }
   }
 }
