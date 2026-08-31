@@ -87,6 +87,10 @@ void i18n.use(initReactI18next).init({
           closedDay: 'Zatvoreno ovaj dan.',
           soon: 'Uskoro',
           accept: 'Prihvati',
+          decline: 'Odbi',
+          declineConfirm: 'Potvrdi',
+          declineCancel: 'Odustani',
+          declineReason: 'Razlog (opcionalno)',
           acceptError: {
             SLOT_TAKEN: 'Taj termin je zauzet.',
             NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
@@ -99,6 +103,11 @@ void i18n.use(initReactI18next).init({
             PAST_TIME: 'To vrijeme je već prošlo.',
             INVALID_WORKER: 'Odaberi radnika ovog salona.',
             fallback: 'Zahtjev nije predložen.',
+          },
+          declineError: {
+            NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
+            REASON_TOO_LONG: 'Razlog je predug.',
+            fallback: 'Zahtjev nije odbijen.',
           },
         },
         verify: {

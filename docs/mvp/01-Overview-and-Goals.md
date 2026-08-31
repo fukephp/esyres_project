@@ -14,7 +14,7 @@ The customer picks a service, optionally a worker (or "no preference"), and a pr
 
 The salon owner **accepts** the preferred time in one tap when it works, or **counter-proposes** a different time by dragging the request onto an open slot on the Worker Availability Panel. The customer confirms only when the salon proposes a different time; they can approve, reject, or ask for a different day or time.
 
-Status flow: `requested → confirmed` (owner accepts preferred time) or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts)
+Status flow: `requested → confirmed` (owner accepts preferred time), `requested → declined` (owner decline), or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts)
 
 This keeps the customer experience light (state a preference, no slot hunting) while concentrating scheduling authority on the owner side, where it belongs. The assistant’s job is 24/7 intake into that inbox, not auto-confirm.
 

@@ -9,6 +9,7 @@ import { WorkerPanel } from '../components/WorkerPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
+  DECLINE_BOOKING_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
   OWNER_SALON_QUERY,
   PENDING_BOOKINGS_QUERY,
@@ -24,6 +25,7 @@ import { sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
   canAcceptPreferredTime,
+  declineErrorKey,
   formatSarajevoTime,
   hoursForDate,
   isPreferredSoon,
@@ -31,6 +33,7 @@ import {
   ownerDateFromSearch,
   panelCells,
   proposeErrorKey,
+  trimDeclineReason,
 } from '../lib/owner'
 
 export function OwnerHome() {
@@ -54,7 +57,10 @@ export function OwnerHome() {
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
+  const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [declineId, setDeclineId] = useState<string | null>(null)
+  const [reasonDraft, setReasonDraft] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -118,6 +124,34 @@ export function OwnerHome() {
       setErrors((current) => ({
         ...current,
         [bookingId]: t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(error))}`),
+      }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function onDecline(row: PendingBooking) {
+    if (salon === null) {
+      return
+    }
+    setBusyId(row.id)
+    setErrors((current) => {
+      const next = { ...current }
+      delete next[row.id]
+      return next
+    })
+    const reason = trimDeclineReason(reasonDraft)
+    try {
+      await decline({
+        variables: { bookingId: row.id, reason },
+        refetchQueries: refetchBoard(),
+      })
+      setDeclineId(null)
+      setReasonDraft('')
+    } catch (error) {
+      setErrors((current) => ({
+        ...current,
+        [row.id]: t(`owner.declineError.${declineErrorKey(graphqlErrorCode(error))}`),
       }))
     } finally {
       setBusyId(null)
@@ -214,7 +248,24 @@ export function OwnerHome() {
                   row={row}
                   busy={busyId === row.id}
                   error={errors[row.id]}
+                  declineOpen={declineId === row.id}
+                  reasonDraft={reasonDraft}
                   onAccept={() => void onAccept(row)}
+                  onDeclineOpen={() => {
+                    setDeclineId(row.id)
+                    setReasonDraft('')
+                    setErrors((current) => {
+                      const next = { ...current }
+                      delete next[row.id]
+                      return next
+                    })
+                  }}
+                  onDeclineCancel={() => {
+                    setDeclineId(null)
+                    setReasonDraft('')
+                  }}
+                  onDeclineConfirm={() => void onDecline(row)}
+                  onReasonChange={setReasonDraft}
                 />
               ))}
             </ul>
@@ -236,17 +287,29 @@ function QueueRow({
   row,
   busy,
   error,
+  declineOpen,
+  reasonDraft,
   onAccept,
+  onDeclineOpen,
+  onDeclineCancel,
+  onDeclineConfirm,
+  onReasonChange,
 }: {
   row: PendingBooking
   busy: boolean
   error?: string
+  declineOpen: boolean
+  reasonDraft: string
   onAccept: () => void
+  onDeclineOpen: () => void
+  onDeclineCancel: () => void
+  onDeclineConfirm: () => void
+  onReasonChange: (value: string) => void
 }) {
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: row.id,
-    disabled: busy,
+    disabled: busy || declineOpen,
   })
   const style = transform === null ? undefined : { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
 
@@ -274,15 +337,63 @@ function QueueRow({
         {' · '}
         {row.worker ? row.worker.name : t('salon.noPreference')}
       </p>
-      {canAcceptPreferredTime(row.worker) ? (
-        <button
-          type="button"
-          disabled={busy}
-          onClick={onAccept}
-          className="mt-3 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
-        >
-          {t('owner.accept')}
-        </button>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {canAcceptPreferredTime(row.worker) ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onAccept}
+            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+          >
+            {t('owner.accept')}
+          </button>
+        ) : null}
+        {declineOpen ? null : (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onDeclineOpen}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('owner.decline')}
+          </button>
+        )}
+      </div>
+      {declineOpen ? (
+        <div className="mt-3 space-y-2">
+          <label className="block text-sm text-body">
+            {t('owner.declineReason')}
+            <textarea
+              value={reasonDraft}
+              maxLength={255}
+              disabled={busy}
+              onChange={(e) => onReasonChange(e.target.value)}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+              rows={2}
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onDeclineConfirm}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            >
+              {t('owner.declineConfirm')}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onDeclineCancel}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            >
+              {t('owner.declineCancel')}
+            </button>
+          </div>
+        </div>
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
     </li>

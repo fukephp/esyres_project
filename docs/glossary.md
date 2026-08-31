@@ -80,6 +80,14 @@ _Avoid_: reservation, appointment (as the request), hold
 A booking the owner has counter-proposed. It holds the offered range on that worker. Not a request and not confirmed until the customer acts.
 _Avoid_: pending (as requested), confirmed, hold (as a request)
 
+**Decline**:
+The owner’s refusal of a request. Optional reason for the customer. Does not require a counter-proposal first. Not the customer’s reject of a time-proposed booking, not expire, and not a cancel of a confirmed booking.
+_Avoid_: reject (owner), cancel (as requested), expire, refuse slot
+
+**Declined booking**:
+A booking the owner declined, or that later expired into the same status. It does not occupy a clock slot. Not a cancelled confirmed booking.
+_Avoid_: cancelled (as requested), expired (as a fifth status), rejected appointment
+
 **Preferred time**:
 The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.
 _Avoid_: slot, availability, booking time (as confirmed), hold
@@ -125,5 +133,5 @@ A coarse per-day occupancy for one salon: free, moderate, or busy. Shown to gues
 _Avoid_: availability, occupancy grid, traffic light, capacity, trust badge
 
 **Owner response time**:
-When the owner first accepts a preferred time or counter-proposes. Captured at MVP. Badge display is Phase 2. Not how long it took to reach confirmed after a counter-proposal.
+When the owner first accepts a preferred time, counter-proposes, or declines a request. Captured at MVP. Badge display is Phase 2. Not how long it took to reach confirmed after a counter-proposal.
 _Avoid_: time to confirmed, Fast Responder (the badge), accepted_at

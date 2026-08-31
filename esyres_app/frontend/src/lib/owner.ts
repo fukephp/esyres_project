@@ -69,6 +69,23 @@ export function proposeErrorKey(
   return 'fallback'
 }
 
+export function trimDeclineReason(value: string): string | null {
+  const trimmed = value.trim()
+  if (trimmed === '') {
+    return null
+  }
+
+  return trimmed
+}
+
+export function declineErrorKey(code: string | null): 'NOT_REQUESTED' | 'REASON_TOO_LONG' | 'fallback' {
+  if (code === 'NOT_REQUESTED' || code === 'REASON_TOO_LONG') {
+    return code
+  }
+
+  return 'fallback'
+}
+
 export function isFifteenMinute(time: string): boolean {
   return /^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/.test(time)
 }

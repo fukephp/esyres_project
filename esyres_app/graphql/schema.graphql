@@ -82,6 +82,7 @@ enum BookingStatus {
     REQUESTED
     CONFIRMED
     TIME_PROPOSED
+    DECLINED
 }
 
 type BookingService {
@@ -100,6 +101,7 @@ type Booking {
     worker: Worker
     proposedStartsAt: String @method(name: "proposedStartsAtIso")
     proposedWorker: Worker @method(name: "proposedWorkerOrNull")
+    declineReason: String @rename(attribute: "decline_reason")
     services: [BookingService!]! @method(name: "snapshotList")
 }
 
@@ -154,4 +156,5 @@ type Mutation {
     createBooking(input: CreateBookingInput!): Booking!
     acceptPreferredTime(bookingId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
+    declineBooking(bookingId: ID!, reason: String): Booking!
 }
