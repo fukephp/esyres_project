@@ -38,6 +38,16 @@ export const PROPOSE_TIME_MUTATION = gql`
   }
 `
 
+export const DECLINE_BOOKING_MUTATION = gql`
+  mutation DeclineBooking($bookingId: ID!, $reason: String) {
+    declineBooking(bookingId: $bookingId, reason: $reason) {
+      id
+      status
+      declineReason
+    }
+  }
+`
+
 export const OWNER_SALON_QUERY = gql`
   query OwnerSalon($id: ID!) {
     salon(id: $id) {

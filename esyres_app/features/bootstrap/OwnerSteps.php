@@ -7,6 +7,84 @@ use Behat\Gherkin\Node\PyStringNode;
 trait OwnerSteps
 {
     /**
+     * @When I decline the booking
+     */
+    public function iDeclineTheBooking(): void
+    {
+        $this->graphql($this->declineBookingMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I decline the booking with reason :reason
+     */
+    public function iDeclineTheBookingWithReason(string $reason): void
+    {
+        $this->graphql($this->declineBookingMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * @When I decline the booking with a reason of :count characters
+     */
+    public function iDeclineTheBookingWithReasonLength(string $count): void
+    {
+        $this->graphql($this->declineBookingMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'reason' => str_repeat('a', (int) $count),
+        ]);
+    }
+
+    /**
+     * @When I decline the booking as a guest
+     */
+    public function iDeclineTheBookingAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iDeclineTheBooking();
+    }
+
+    /**
+     * @When I decline booking id :id
+     */
+    public function iDeclineBookingId(string $id): void
+    {
+        $this->graphql($this->declineBookingMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then the declined booking status is :status
+     */
+    public function theDeclinedBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['declineBooking']['status']);
+    }
+
+    /**
+     * @Then the declined booking has no reason
+     */
+    public function theDeclinedBookingHasNoReason(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['declineBooking']['declineReason']);
+    }
+
+    /**
+     * @Then the declined booking reason is :reason
+     */
+    public function theDeclinedBookingReasonIs(string $reason): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($reason, $this->graphql['data']['declineBooking']['declineReason']);
+    }
+
+    /**
      * @When I accept the preferred time
      */
     public function iAcceptThePreferredTime(): void
@@ -471,6 +549,19 @@ GQL, ['id' => (string) $this->salon->id]);
         foreach ($this->graphql['data']['salon']['hours'] as $day) {
             $this->assertTrue($day['closed'], $day['weekday'].' should be closed');
         }
+    }
+
+    private function declineBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation Decline($bookingId: ID!, $reason: String) {
+  declineBooking(bookingId: $bookingId, reason: $reason) {
+    id
+    status
+    declineReason
+  }
+}
+GQL;
     }
 
     private function acceptPreferredTimeMutation(): string

@@ -4,7 +4,7 @@ This file is the source of truth for everything under `.cursor/`. Read it before
 
 ## Product (locked)
 
-Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optional worker, and a preferred **day and time**. Two guest paths, one contract: picker (primary CTA) or scripted salon-profile chat (Epic 10, after the picker/panel loop). Both create `requested`. Owner accepts preferred time or counter-proposes. Status: `requested → confirmed` (accept) or `requested → time_proposed → confirmed | declined` (counter-propose).
+Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optional worker, and a preferred **day and time**. Two guest paths, one contract: picker (primary CTA) or scripted salon-profile chat (Epic 10, after the picker/panel loop). Both create `requested`. Owner accepts preferred time or counter-proposes. Status: `requested → confirmed` (accept), `requested → declined` (owner decline), or `requested → time_proposed → confirmed | declined` (counter-propose).
 
 - Customer: guest discovery, day-level busy badge (🟢/🟡/🔴), simple date+time picker (no slot grid). Chat is the messy-intent alternate on the salon profile (salon-branded Bosnian, live salon data only, coarse 1–3 time suggestions, same email+phone OTP to send). Email+password login (not a homepage wall). Verified email + phone OTP required to **send a request**.
 - Owner: invite-only. Pending queue (shows preferred date/time), Worker Availability Panel (one-tap accept + drag-to-counter-propose + tap fallback) is home. In-flight chat tab + badge; optional Take over (guest waits only after that tap; after hours / DND assistant always finishes). Salon switcher if they own more than one salon. Complexity stays on this side.

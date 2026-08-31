@@ -11,6 +11,8 @@ import {
   ownerDateFromSearch,
   panelCells,
   proposeErrorKey,
+  declineErrorKey,
+  trimDeclineReason,
   sarajevoWeekday,
 } from './owner'
 
@@ -46,6 +48,19 @@ test('propose error keys', () => {
   expect(proposeErrorKey('INVALID_WORKER')).toBe('INVALID_WORKER')
   expect(proposeErrorKey('SLOT_TAKEN')).toBe('SLOT_TAKEN')
   expect(proposeErrorKey('nope')).toBe('fallback')
+})
+
+test('trim decline reason', () => {
+  expect(trimDeclineReason('')).toBeNull()
+  expect(trimDeclineReason('   ')).toBeNull()
+  expect(trimDeclineReason('  Zatvoreno  ')).toBe('Zatvoreno')
+})
+
+test('decline error keys', () => {
+  expect(declineErrorKey('NOT_REQUESTED')).toBe('NOT_REQUESTED')
+  expect(declineErrorKey('REASON_TOO_LONG')).toBe('REASON_TOO_LONG')
+  expect(declineErrorKey('SLOT_TAKEN')).toBe('fallback')
+  expect(declineErrorKey(null)).toBe('fallback')
 })
 
 test('15-minute step', () => {
