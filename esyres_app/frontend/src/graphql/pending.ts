@@ -20,6 +20,15 @@ export const PENDING_BOOKINGS_QUERY = gql`
   }
 `
 
+export const ACCEPT_PREFERRED_TIME_MUTATION = gql`
+  mutation AcceptPreferredTime($bookingId: ID!) {
+    acceptPreferredTime(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
 export type PendingBooking = {
   id: string
   customerName: string

@@ -1,9 +1,80 @@
 <?php
 
+use App\Models\Booking;
 use Behat\Gherkin\Node\PyStringNode;
 
 trait OwnerSteps
 {
+    /**
+     * @When I accept the preferred time
+     */
+    public function iAcceptThePreferredTime(): void
+    {
+        $this->graphql($this->acceptPreferredTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I accept the preferred time for :name
+     */
+    public function iAcceptThePreferredTimeFor(string $name): void
+    {
+        $this->booking = Booking::query()
+            ->where('salon_id', $this->salon->id)
+            ->whereHas('customer', static fn ($query) => $query->where('name', $name))
+            ->firstOrFail();
+        $this->iAcceptThePreferredTime();
+    }
+
+    /**
+     * @When I accept the preferred time as a guest
+     */
+    public function iAcceptThePreferredTimeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iAcceptThePreferredTime();
+    }
+
+    /**
+     * @When I accept preferred time for booking id :id
+     */
+    public function iAcceptPreferredTimeForBookingId(string $id): void
+    {
+        $this->graphql($this->acceptPreferredTimeMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then the accepted booking status is :status
+     */
+    public function theAcceptedBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['acceptPreferredTime']['status']);
+    }
+
+    /**
+     * @Then that booking has owner_responded_at set
+     */
+    public function thatBookingHasOwnerRespondedAtSet(): void
+    {
+        $this->booking->refresh();
+        if ($this->booking->owner_responded_at === null) {
+            throw new RuntimeException('Expected owner_responded_at');
+        }
+    }
+
+    /**
+     * @Then that booking has no owner_responded_at
+     */
+    public function thatBookingHasNoOwnerRespondedAt(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame(null, $this->booking->owner_responded_at);
+    }
+
     /**
      * @When I query pending bookings for date :date
      */
@@ -238,6 +309,18 @@ trait OwnerSteps
         foreach ($this->graphql['data']['salon']['hours'] as $day) {
             $this->assertTrue($day['closed'], $day['weekday'].' should be closed');
         }
+    }
+
+    private function acceptPreferredTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation Accept($bookingId: ID!) {
+  acceptPreferredTime(bookingId: $bookingId) {
+    id
+    status
+  }
+}
+GQL;
     }
 
     private function pendingBookingsQuery(): string

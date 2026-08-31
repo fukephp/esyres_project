@@ -97,6 +97,24 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that booking is confirmed
+     */
+    public function thatBookingIsConfirmed(): void
+    {
+        $this->booking->status = Booking::CONFIRMED;
+        $this->booking->save();
+    }
+
+    /**
+     * @Given that booking is time proposed
+     */
+    public function thatBookingIsTimeProposed(): void
+    {
+        $this->booking->status = Booking::TIME_PROPOSED;
+        $this->booking->save();
+    }
+
+    /**
      * @param  Salon  $salon
      */
     private function insertRequestedBooking(Salon $salon, string $date, string $time, string $name, ?Worker $worker): void

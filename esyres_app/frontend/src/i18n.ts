@@ -84,6 +84,12 @@ void i18n.use(initReactI18next).init({
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',
           soon: 'Uskoro',
+          accept: 'Prihvati',
+          acceptError: {
+            SLOT_TAKEN: 'Taj termin je zauzet.',
+            NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
+            fallback: 'Zahtjev nije prihvaćen.',
+          },
         },
         verify: {
           checkEmail: 'Provjeri email i klikni link za potvrdu.',
