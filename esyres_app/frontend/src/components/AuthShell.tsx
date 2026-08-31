@@ -26,7 +26,13 @@ function authMessage(code: string | null, t: (key: string) => string): string {
   return t('auth.gate.fallback')
 }
 
-export function AuthShell({ onAuthenticated }: { onAuthenticated: () => void | Promise<unknown> }) {
+export function AuthShell({
+  onAuthenticated,
+  allowRegister = true,
+}: {
+  onAuthenticated: () => void | Promise<unknown>
+  allowRegister?: boolean
+}) {
   const { t } = useTranslation()
   const [login] = useMutation(LOGIN_MUTATION, { refetchQueries: ['Me'] })
   const [register] = useMutation(REGISTER_MUTATION, { refetchQueries: ['Me'] })
@@ -62,22 +68,24 @@ export function AuthShell({ onAuthenticated }: { onAuthenticated: () => void | P
 
   return (
     <form className="space-y-4" onSubmit={onSubmit}>
-      <div className="flex gap-4 text-sm">
-        <button
-          type="button"
-          className={mode === 'login' ? 'font-semibold text-ink' : 'text-body'}
-          onClick={() => setMode('login')}
-        >
-          {t('auth.login')}
-        </button>
-        <button
-          type="button"
-          className={mode === 'register' ? 'font-semibold text-ink' : 'text-body'}
-          onClick={() => setMode('register')}
-        >
-          {t('auth.register')}
-        </button>
-      </div>
+      {allowRegister ? (
+        <div className="flex gap-4 text-sm">
+          <button
+            type="button"
+            className={mode === 'login' ? 'font-semibold text-ink' : 'text-body'}
+            onClick={() => setMode('login')}
+          >
+            {t('auth.login')}
+          </button>
+          <button
+            type="button"
+            className={mode === 'register' ? 'font-semibold text-ink' : 'text-body'}
+            onClick={() => setMode('register')}
+          >
+            {t('auth.register')}
+          </button>
+        </div>
+      ) : null}
       <label className="block text-sm text-body">
         {t('auth.email')}
         <input

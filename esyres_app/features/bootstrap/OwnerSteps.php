@@ -5,6 +5,108 @@ use Behat\Gherkin\Node\PyStringNode;
 trait OwnerSteps
 {
     /**
+     * @When I query pending bookings for date :date
+     */
+    public function iQueryPendingBookingsForDate(string $date): void
+    {
+        $this->graphql($this->pendingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query pending bookings for date :date limit :limit offset :offset
+     */
+    public function iQueryPendingBookingsPaged(string $date, string $limit, string $offset): void
+    {
+        $this->graphql($this->pendingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @When I query pending bookings as a guest for date :date
+     */
+    public function iQueryPendingBookingsAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->pendingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query my salons
+     */
+    public function iQueryMySalons(): void
+    {
+        $this->graphql($this->meSalonsQuery());
+    }
+
+    /**
+     * @Then pending bookings are empty
+     */
+    public function pendingBookingsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['pendingBookings']);
+    }
+
+    /**
+     * @Then pending booking names are:
+     */
+    public function pendingBookingNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['pendingBookings'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then the first pending booking matches:
+     */
+    public function theFirstPendingBookingMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data']['pendingBookings'][0];
+        $actual = [
+            'customerName' => $row['customerName'],
+            'preferredDate' => $row['preferredDate'],
+            'durationMinutes' => $row['durationMinutes'],
+            'worker' => $row['worker'] === null ? null : $row['worker']['name'],
+            'services' => array_map(static fn (array $s): array => [
+                'name' => $s['name'],
+                'durationMinutes' => $s['durationMinutes'],
+            ], $row['services']),
+        ];
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then my salons match:
+     */
+    public function mySalonsMatch(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['me']['salons'] as $salon) {
+            $actual[] = ['name' => $salon['name']];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * @When I query salon hours
      */
     public function iQuerySalonHours(): void
@@ -136,6 +238,36 @@ trait OwnerSteps
         foreach ($this->graphql['data']['salon']['hours'] as $day) {
             $this->assertTrue($day['closed'], $day['weekday'].' should be closed');
         }
+    }
+
+    private function pendingBookingsQuery(): string
+    {
+        return <<<'GQL'
+query Pending($salonId: ID!, $date: String!, $limit: Int = 20, $offset: Int = 0) {
+  pendingBookings(salonId: $salonId, date: $date, limit: $limit, offset: $offset) {
+    id
+    status
+    customerName
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function meSalonsQuery(): string
+    {
+        return <<<'GQL'
+query MeSalons {
+  me {
+    id
+    salons { id name }
+  }
+}
+GQL;
     }
 
     private function salonHoursQuery(): string

@@ -7,6 +7,10 @@
   --color-muted: #6b7280;
   --color-hairline: #e5e7eb;
   --color-surface-card: #f5f5f5;
+  --color-surface-dark: #101010;
+  --color-on-dark: #ffffff;
+  --color-warning: #f59e0b;
+  --color-cell-pending: #fcd34d;
   --color-busy-free: #22c55e;
   --color-busy-moderate: #eab308;
   --color-busy-busy: #ef4444;

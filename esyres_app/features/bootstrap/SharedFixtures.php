@@ -1,11 +1,14 @@
 <?php
 
+use App\Models\Booking;
+use App\Models\BookingService;
 use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\SalonHours\WeeklyHours;
 use Behat\Gherkin\Node\PyStringNode;
+use Illuminate\Support\Carbon;
 
 trait SharedFixtures
 {
@@ -50,6 +53,77 @@ trait SharedFixtures
             'password' => $password,
             'email_verified_at' => now(),
         ]);
+    }
+
+    /**
+     * @Given another verified owner :email with password :password owns salon :name
+     */
+    public function anotherVerifiedOwnerOwnsSalon(string $email, string $password, string $name): void
+    {
+        $this->otherUser = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+        ]);
+        $this->otherSalon = Salon::factory()->create([
+            'owner_id' => $this->otherUser->id,
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * @Given the salon has a requested booking on :date at :time for :name
+     */
+    public function theSalonHasARequestedBooking(string $date, string $time, string $name): void
+    {
+        $this->insertRequestedBooking($this->salon, $date, $time, $name, null);
+    }
+
+    /**
+     * @Given the other salon has a requested booking on :date at :time for :name
+     */
+    public function theOtherSalonHasARequestedBooking(string $date, string $time, string $name): void
+    {
+        $this->insertRequestedBooking($this->otherSalon, $date, $time, $name, null);
+    }
+
+    /**
+     * @Given that booking is for the salon worker
+     */
+    public function thatBookingIsForTheSalonWorker(): void
+    {
+        $this->booking->worker_id = $this->worker->id;
+        $this->booking->save();
+    }
+
+    /**
+     * @param  Salon  $salon
+     */
+    private function insertRequestedBooking(Salon $salon, string $date, string $time, string $name, ?Worker $worker): void
+    {
+        $customer = User::factory()->create([
+            'name' => $name,
+            'email_verified_at' => now(),
+            'phone_verified_at' => now(),
+        ]);
+        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $booking = new Booking;
+        $booking->salon_id = $salon->id;
+        $booking->customer_id = $customer->id;
+        $booking->worker_id = $worker?->id;
+        $booking->preferred_date = $date;
+        $booking->preferred_starts_at = $starts;
+        $booking->status = Booking::REQUESTED;
+        $booking->duration_minutes = 30;
+        $booking->save();
+        $row = new BookingService;
+        $row->booking_id = $booking->id;
+        $row->name = 'Šišanje';
+        $row->duration_minutes = 30;
+        $row->price_feninga = 2500;
+        $row->save();
+        $this->booking = $booking;
+        Carbon::setTestNow(now()->addMinute());
     }
 
     /**
