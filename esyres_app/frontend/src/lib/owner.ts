@@ -40,3 +40,15 @@ export function formatSarajevoTime(iso: string): string {
     hourCycle: 'h23',
   }).format(new Date(iso))
 }
+
+export function canAcceptPreferredTime(worker: { id: string } | null): boolean {
+  return worker !== null
+}
+
+export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'fallback' {
+  if (code === 'SLOT_TAKEN' || code === 'NOT_REQUESTED') {
+    return code
+  }
+
+  return 'fallback'
+}

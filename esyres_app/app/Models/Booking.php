@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
+
+    public const CONFIRMED = 'confirmed';
+
+    public const TIME_PROPOSED = 'time_proposed';
 
     /**
      * @return array<string, string>
@@ -21,6 +25,7 @@ class Booking extends Model
             'preferred_date' => 'date',
             'preferred_starts_at' => 'datetime',
             'duration_minutes' => 'integer',
+            'owner_responded_at' => 'datetime',
         ];
     }
 

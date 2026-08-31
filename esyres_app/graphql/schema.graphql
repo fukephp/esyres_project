@@ -80,6 +80,7 @@ input UpdateSalonWorkerInput {
 
 enum BookingStatus {
     REQUESTED
+    CONFIRMED
 }
 
 type BookingService {
@@ -147,4 +148,5 @@ type Mutation {
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
+    acceptPreferredTime(bookingId: ID!): Booking!
 }
