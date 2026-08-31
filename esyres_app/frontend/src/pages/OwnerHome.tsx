@@ -1,12 +1,25 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
-import { PENDING_BOOKINGS_QUERY, type PendingBookingsData } from '../graphql/pending'
+import {
+  ACCEPT_PREFERRED_TIME_MUTATION,
+  PENDING_BOOKINGS_QUERY,
+  type PendingBooking,
+  type PendingBookingsData,
+} from '../graphql/pending'
+import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
-import { formatSarajevoTime, isPreferredSoon, ownerDateFromSearch } from '../lib/owner'
+import {
+  acceptErrorKey,
+  canAcceptPreferredTime,
+  formatSarajevoTime,
+  isPreferredSoon,
+  ownerDateFromSearch,
+} from '../lib/owner'
 
 export function OwnerHome() {
   const { t } = useTranslation()
@@ -18,6 +31,9 @@ export function OwnerHome() {
     variables: { salonId: salon?.id ?? '', date },
     skip: salon === null || data?.me?.emailVerified !== true,
   })
+  const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   function onDate(value: string) {
     const next = ownerDateFromSearch(value)
@@ -26,6 +42,31 @@ export function OwnerHome() {
       return
     }
     setParams({ date: next })
+  }
+
+  async function onAccept(row: PendingBooking) {
+    if (salon === null) {
+      return
+    }
+    setBusyId(row.id)
+    setErrors((current) => {
+      const next = { ...current }
+      delete next[row.id]
+      return next
+    })
+    try {
+      await accept({
+        variables: { bookingId: row.id },
+        refetchQueries: [{ query: PENDING_BOOKINGS_QUERY, variables: { salonId: salon.id, date } }],
+      })
+    } catch (error) {
+      setErrors((current) => ({
+        ...current,
+        [row.id]: t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(error))}`),
+      }))
+    } finally {
+      setBusyId(null)
+    }
   }
 
   if (loading) {
@@ -114,6 +155,17 @@ export function OwnerHome() {
                   {' · '}
                   {row.worker ? row.worker.name : t('salon.noPreference')}
                 </p>
+                {canAcceptPreferredTime(row.worker) ? (
+                  <button
+                    type="button"
+                    disabled={busyId === row.id}
+                    onClick={() => void onAccept(row)}
+                    className="mt-3 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+                  >
+                    {t('owner.accept')}
+                  </button>
+                ) : null}
+                {errors[row.id] ? <p className="mt-2 text-sm text-busy-busy">{errors[row.id]}</p> : null}
               </li>
             ))}
           </ul>

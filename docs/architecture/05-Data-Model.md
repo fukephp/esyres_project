@@ -17,7 +17,7 @@ Sketch only — no migrations. Status machine: `requested → confirmed` (owner 
 - **Salon** — `owner_id`, profile, address, `lat`/`lng`, hours, breaks, holidays, `cancellation_notice_hours`, reschedule cap, photos on disk. One user may own many salons (separate profiles, not a chain-location product).
 - **Worker** — belongs to a salon; assigned to services; active/inactive. Inherits salon hours. Not a user.
 - **Service** — belongs to salon; `duration_minutes` (default 30), price feninga, category (hair / make-up / massage).
-- **Booking** — `salon_id`, `customer_id`, optional `worker_id` (null = no preference until accept/propose), `preferred_date`, `preferred_starts_at`, status, `proposed_starts_at`, `proposed_worker_id`, duration derived from services (sum, rounded up to 15 minutes), decline/expire reason.
+- **Booking** — `salon_id`, `customer_id`, optional `worker_id` (null = no preference until accept/propose), `preferred_date`, `preferred_starts_at`, status, `proposed_starts_at`, `proposed_worker_id`, duration derived from services (sum, rounded up to 15 minutes), decline/expire reason. `owner_responded_at` is set once on the first successful accept or counter-propose (see `docs/adr/0007-owner-responded-at-on-first-action.md`).
 - **BookingService** — services on a booking; durations/prices snapshot at request time.
 - **QrScan** — scan events; guest hold is a cookie until reconcile.
 - **PushSubscription** — VAPID endpoint + keys per user.

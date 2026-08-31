@@ -25,7 +25,7 @@ A named person at a salon who can be requested for a booking. Not a user and not
 _Avoid_: staff account, employee user, stylist account
 
 **No preference**:
-The guest did not pick a specific worker on a request. Valid on its own, not a missing worker and not a fake “any” worker row.
+The guest did not pick a specific worker on a request. Valid on a request; a confirmed booking always has a worker. Not a missing worker and not a fake “any” worker row.
 _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
@@ -60,6 +60,14 @@ _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
 _Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
 
+**Accept preferred time**:
+The owner’s one tap that turns a request into a confirmed booking at the guest’s preferred time. Not a counter-proposal.
+_Avoid_: approve, book, auto-confirm, one-click book
+
+**Confirmed booking**:
+A booking locked to a worker and a clock range, either because the owner accepted the preferred time or because both sides agreed after a counter-proposal. Not a request.
+_Avoid_: reservation, appointment (as the request), hold
+
 **Preferred time**:
 The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.
 _Avoid_: slot, availability, booking time (as confirmed), hold
@@ -75,6 +83,10 @@ A named offering at one salon: a category (hair, make-up, or massage), a duratio
 _Avoid_: product, menu item, treatment package, listing
 
 ## Time rules
+
+**Occupied range**:
+The half-open clock interval a confirmed or time-proposed booking holds on one worker. A request does not hold one.
+_Avoid_: reserved slot (as a request), hold (as requested), availability cell
 
 **Working hours**:
 The salon’s weekly template: each weekday is closed or open for one local interval. A newly provisioned salon is closed every day until the owner writes hours. Workers inherit this. Not a live slot calendar and not a holiday calendar.
@@ -99,3 +111,7 @@ _Avoid_: phone login, SMS login, 2FA, phone username
 **Busy-level**:
 A coarse per-day occupancy for one salon: free, moderate, or busy. Shown to guests instead of a slot grid. Not a Phase 2 trust badge (Fast Responder, Regular, and similar).
 _Avoid_: availability, occupancy grid, traffic light, capacity, trust badge
+
+**Owner response time**:
+When the owner first accepts a preferred time or counter-proposes. Captured at MVP. Badge display is Phase 2. Not how long it took to reach confirmed after a counter-proposal.
+_Avoid_: time to confirmed, Fast Responder (the badge), accepted_at
