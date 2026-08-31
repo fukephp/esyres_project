@@ -111,7 +111,41 @@ trait SharedFixtures
     public function thatBookingIsTimeProposed(): void
     {
         $this->booking->status = Booking::TIME_PROPOSED;
+        $this->booking->proposed_starts_at = $this->booking->preferred_starts_at;
+        $this->booking->proposed_worker_id = $this->booking->worker_id;
         $this->booking->save();
+    }
+
+    /**
+     * @Given the salon is open :weekday from :opens to :closes
+     */
+    public function theSalonIsOpenFromTo(string $weekday, string $opens, string $closes): void
+    {
+        $week = WeeklyHours::closedWeek();
+        $week[strtolower($weekday)] = [
+            'closed' => false,
+            'opens_at' => $opens,
+            'closes_at' => $closes,
+        ];
+        $this->salon->hours = $week;
+        $this->salon->save();
+    }
+
+    /**
+     * @Given the salon is open :weekday from :opens to :closes with break :breakStart to :breakEnd
+     */
+    public function theSalonIsOpenWithBreak(string $weekday, string $opens, string $closes, string $breakStart, string $breakEnd): void
+    {
+        $week = WeeklyHours::closedWeek();
+        $week[strtolower($weekday)] = [
+            'closed' => false,
+            'opens_at' => $opens,
+            'closes_at' => $closes,
+            'break_starts_at' => $breakStart,
+            'break_ends_at' => $breakEnd,
+        ];
+        $this->salon->hours = $week;
+        $this->salon->save();
     }
 
     /**
@@ -168,6 +202,18 @@ trait SharedFixtures
         $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
         $this->worker = Worker::factory()->create([
             'salon_id' => $this->salon->id,
+            'name' => $input['name'],
+        ]);
+    }
+
+    /**
+     * @Given the other salon has a worker:
+     */
+    public function theOtherSalonHasAWorker(PyStringNode $payload): void
+    {
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->otherWorker = Worker::factory()->create([
+            'salon_id' => $this->otherSalon->id,
             'name' => $input['name'],
         ]);
     }

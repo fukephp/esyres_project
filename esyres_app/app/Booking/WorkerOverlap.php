@@ -3,6 +3,8 @@
 namespace App\Booking;
 
 use App\Models\Booking;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 
 final class WorkerOverlap
 {
@@ -11,24 +13,43 @@ final class WorkerOverlap
      */
     public const OCCUPYING = [Booking::CONFIRMED, Booking::TIME_PROPOSED];
 
-    public static function taken(Booking $booking): bool
+    public static function taken(int $workerId, CarbonInterface $start, int $duration, int $excludeId): bool
     {
-        $start = $booking->preferred_starts_at;
-        $end = $start->copy()->addMinutes((int) $booking->duration_minutes);
+        $from = CarbonImmutable::instance($start);
+        $to = $from->addMinutes($duration);
 
         $others = Booking::query()
-            ->where('worker_id', $booking->worker_id)
-            ->where('id', '!=', $booking->id)
+            ->where('id', '!=', $excludeId)
             ->whereIn('status', self::OCCUPYING)
+            ->where(function ($query) use ($workerId): void {
+                $query->where(function ($query) use ($workerId): void {
+                    $query->where('status', Booking::CONFIRMED)->where('worker_id', $workerId);
+                })->orWhere(function ($query) use ($workerId): void {
+                    $query->where('status', Booking::TIME_PROPOSED)->where('proposed_worker_id', $workerId);
+                });
+            })
             ->get();
 
         foreach ($others as $other) {
-            $otherEnd = $other->preferred_starts_at->copy()->addMinutes((int) $other->duration_minutes);
-            if ($start->lt($otherEnd) && $other->preferred_starts_at->lt($end)) {
+            [$otherStart, $otherEnd] = self::range($other);
+            if ($from->lt($otherEnd) && $otherStart->lt($to)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
+     */
+    public static function range(Booking $booking): array
+    {
+        $raw = $booking->status === Booking::TIME_PROPOSED
+            ? $booking->proposed_starts_at
+            : $booking->preferred_starts_at;
+        $start = CarbonImmutable::parse($raw);
+
+        return [$start, $start->addMinutes((int) $booking->duration_minutes)];
     }
 }

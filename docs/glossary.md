@@ -25,7 +25,7 @@ A named person at a salon who can be requested for a booking. Not a user and not
 _Avoid_: staff account, employee user, stylist account
 
 **No preference**:
-The guest did not pick a specific worker on a request. Valid on a request; a confirmed booking always has a worker. Not a missing worker and not a fake “any” worker row.
+The guest did not pick a specific worker on a request. Valid on a request; a confirmed booking always has a worker. A counter-proposal names a worker even when the request was no preference. Not a missing worker and not a fake “any” worker row.
 _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
@@ -56,6 +56,14 @@ _Avoid_: schedule, inbox (customer), booking history, dashboard
 The owner’s list of requested bookings for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
+**Worker Availability Panel**:
+The owner’s per-day table of workers × 15-minute cells, with that day’s pending queue above it. Home after owner login. Not the pending queue alone, not Request Detail, and not the customer busy-level badge.
+_Avoid_: calendar, schedule grid (customer), inbox, dashboard, slot picker (guest)
+
+**Counter-proposal**:
+The owner’s offered worker and clock range on a booking, instead of accepting the preferred time. It holds that range. Not a confirmed booking until the customer acts, and not the guest’s preferred time.
+_Avoid_: accept, reschedule (Epic 5), hold (as a request), slot offer
+
 **Request**:
 A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
 _Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
@@ -67,6 +75,10 @@ _Avoid_: approve, book, auto-confirm, one-click book
 **Confirmed booking**:
 A booking locked to a worker and a clock range, either because the owner accepted the preferred time or because both sides agreed after a counter-proposal. Not a request.
 _Avoid_: reservation, appointment (as the request), hold
+
+**Time-proposed booking**:
+A booking the owner has counter-proposed. It holds the offered range on that worker. Not a request and not confirmed until the customer acts.
+_Avoid_: pending (as requested), confirmed, hold (as a request)
 
 **Preferred time**:
 The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.

@@ -29,6 +29,55 @@ export const ACCEPT_PREFERRED_TIME_MUTATION = gql`
   }
 `
 
+export const PROPOSE_TIME_MUTATION = gql`
+  mutation ProposeTime($bookingId: ID!, $workerId: ID!, $proposedTime: String!) {
+    proposeTime(bookingId: $bookingId, workerId: $workerId, proposedTime: $proposedTime) {
+      id
+      status
+    }
+  }
+`
+
+export const OWNER_SALON_QUERY = gql`
+  query OwnerSalon($id: ID!) {
+    salon(id: $id) {
+      id
+      workers {
+        id
+        name
+      }
+      hours {
+        weekday
+        closed
+        opensAt
+        closesAt
+        breakStartsAt
+        breakEndsAt
+      }
+    }
+  }
+`
+
+export const OCCUPYING_BOOKINGS_QUERY = gql`
+  query OccupyingBookings($salonId: ID!, $date: String!) {
+    occupyingBookings(salonId: $salonId, date: $date) {
+      id
+      status
+      preferredStartsAt
+      proposedStartsAt
+      durationMinutes
+      worker {
+        id
+        name
+      }
+      proposedWorker {
+        id
+        name
+      }
+    }
+  }
+`
+
 export type PendingBooking = {
   id: string
   customerName: string
@@ -41,4 +90,33 @@ export type PendingBooking = {
 
 export type PendingBookingsData = {
   pendingBookings: PendingBooking[]
+}
+
+export type OccupyingBooking = {
+  id: string
+  status: 'CONFIRMED' | 'TIME_PROPOSED'
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string; name: string } | null
+  proposedWorker: { id: string; name: string } | null
+}
+
+export type OccupyingBookingsData = {
+  occupyingBookings: OccupyingBooking[]
+}
+
+export type OwnerSalonData = {
+  salon: {
+    id: string
+    workers: { id: string; name: string }[]
+    hours: {
+      weekday: string
+      closed: boolean
+      opensAt: string | null
+      closesAt: string | null
+      breakStartsAt: string | null
+      breakEndsAt: string | null
+    }[]
+  } | null
 }

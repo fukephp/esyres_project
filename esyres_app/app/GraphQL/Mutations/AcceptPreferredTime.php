@@ -28,7 +28,8 @@ final class AcceptPreferredTime
                 ->where(function ($query) use ($booking): void {
                     $query->whereKey($booking->id);
                     if ($booking->worker_id !== null) {
-                        $query->orWhere('worker_id', $booking->worker_id);
+                        $query->orWhere('worker_id', $booking->worker_id)
+                            ->orWhere('proposed_worker_id', $booking->worker_id);
                     }
                 })
                 ->orderBy('id')
@@ -45,7 +46,12 @@ final class AcceptPreferredTime
             if ($booking->worker_id === null) {
                 throw new ClientError('WORKER_REQUIRED');
             }
-            if (WorkerOverlap::taken($booking)) {
+            if (WorkerOverlap::taken(
+                (int) $booking->worker_id,
+                $booking->preferred_starts_at,
+                (int) $booking->duration_minutes,
+                $booking->id,
+            )) {
                 throw new ClientError('SLOT_TAKEN');
             }
 
