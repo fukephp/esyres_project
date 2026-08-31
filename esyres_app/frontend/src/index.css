@@ -11,6 +11,10 @@
   --color-on-dark: #ffffff;
   --color-warning: #f59e0b;
   --color-cell-pending: #fcd34d;
+  --color-cell-free: #86efac;
+  --color-cell-off: #d6d3d1;
+  --color-cell-booked: #1a1a1a;
+  --color-cell-proposed: #93c5fd;
   --color-busy-free: #22c55e;
   --color-busy-moderate: #eab308;
   --color-busy-busy: #ef4444;

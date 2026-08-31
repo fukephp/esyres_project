@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Booking;
+use App\Models\Worker;
 use Behat\Gherkin\Node\PyStringNode;
 
 trait OwnerSteps
@@ -117,6 +118,167 @@ trait OwnerSteps
     public function iQueryMySalons(): void
     {
         $this->graphql($this->meSalonsQuery());
+    }
+
+    /**
+     * @When I propose time :time on the salon worker
+     */
+    public function iProposeTimeOnTheSalonWorker(string $time): void
+    {
+        $this->graphql($this->proposeTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $this->worker->id,
+            'proposedTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I propose time :time on worker :name
+     */
+    public function iProposeTimeOnWorker(string $time, string $name): void
+    {
+        $this->worker = Worker::query()
+            ->where('salon_id', $this->salon->id)
+            ->where('name', $name)
+            ->firstOrFail();
+        $this->iProposeTimeOnTheSalonWorker($time);
+    }
+
+    /**
+     * @When I propose time :time on worker :workerName for :customerName
+     */
+    public function iProposeTimeOnWorkerFor(string $time, string $workerName, string $customerName): void
+    {
+        $this->booking = Booking::query()
+            ->where('salon_id', $this->salon->id)
+            ->whereHas('customer', static fn ($query) => $query->where('name', $customerName))
+            ->firstOrFail();
+        $this->iProposeTimeOnWorker($time, $workerName);
+    }
+
+    /**
+     * @When I propose time :time on the other salon worker
+     */
+    public function iProposeTimeOnTheOtherSalonWorker(string $time): void
+    {
+        $this->graphql($this->proposeTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $this->otherWorker->id,
+            'proposedTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I propose time :time on the salon worker for :name
+     */
+    public function iProposeTimeOnTheSalonWorkerFor(string $time, string $name): void
+    {
+        $this->booking = Booking::query()
+            ->where('salon_id', $this->salon->id)
+            ->whereHas('customer', static fn ($query) => $query->where('name', $name))
+            ->firstOrFail();
+        $this->iProposeTimeOnTheSalonWorker($time);
+    }
+
+    /**
+     * @When I propose time :time on the salon worker as a guest
+     */
+    public function iProposeTimeAsAGuest(string $time): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iProposeTimeOnTheSalonWorker($time);
+    }
+
+    /**
+     * @When I propose time :time for booking id :id
+     */
+    public function iProposeTimeForBookingId(string $time, string $id): void
+    {
+        $this->graphql($this->proposeTimeMutation(), [
+            'bookingId' => $id,
+            'workerId' => (string) $this->worker->id,
+            'proposedTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I query occupying bookings for date :date
+     */
+    public function iQueryOccupyingBookingsForDate(string $date): void
+    {
+        $this->graphql($this->occupyingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query occupying bookings as a guest for date :date
+     */
+    public function iQueryOccupyingBookingsAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->occupyingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then the proposed booking matches:
+     */
+    public function theProposedBookingMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data']['proposeTime'];
+        $this->assertSame($expected['status'], $row['status']);
+        $this->assertSame($expected['preferredDate'], $row['preferredDate']);
+        $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
+        $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
+        $this->assertNotNull($row['proposedStartsAt']);
+    }
+
+    /**
+     * @Then occupying bookings are empty
+     */
+    public function occupyingBookingsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['occupyingBookings']);
+    }
+
+    /**
+     * @Then occupying booking names are:
+     */
+    public function occupyingBookingNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['occupyingBookings'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then public salon has no occupying field
+     */
+    public function publicSalonHasNoOccupyingField(): void
+    {
+        $this->graphql(<<<'GQL'
+query Salon($id: ID!) {
+  salon(id: $id) {
+    id
+    occupyingBookings
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+        $payload = json_encode($this->graphql);
+        if (! isset($this->graphql['errors']) || ! str_contains($payload, 'occupyingBookings')) {
+            throw new RuntimeException("Expected occupying field rejected, got {$payload}");
+        }
     }
 
     /**
@@ -318,6 +480,40 @@ mutation Accept($bookingId: ID!) {
   acceptPreferredTime(bookingId: $bookingId) {
     id
     status
+  }
+}
+GQL;
+    }
+
+    private function proposeTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation Propose($bookingId: ID!, $workerId: ID!, $proposedTime: String!) {
+  proposeTime(bookingId: $bookingId, workerId: $workerId, proposedTime: $proposedTime) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    proposedStartsAt
+    worker { id name }
+    proposedWorker { id name }
+  }
+}
+GQL;
+    }
+
+    private function occupyingBookingsQuery(): string
+    {
+        return <<<'GQL'
+query Occupying($salonId: ID!, $date: String!) {
+  occupyingBookings(salonId: $salonId, date: $date) {
+    id
+    status
+    customerName
+    preferredStartsAt
+    proposedStartsAt
+    worker { id name }
+    proposedWorker { id name }
   }
 }
 GQL;

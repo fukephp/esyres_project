@@ -42,6 +42,8 @@ trait BehatRuntime
 
     protected ?Salon $otherSalon = null;
 
+    protected ?Worker $otherWorker = null;
+
     protected ?Booking $booking = null;
 
     protected ?string $verifyUrl = null;
@@ -63,6 +65,7 @@ trait BehatRuntime
         $this->services = [];
         $this->otherUser = null;
         $this->otherSalon = null;
+        $this->otherWorker = null;
         $this->booking = null;
         $this->verifyUrl = null;
         $this->verifyUser = null;
@@ -186,6 +189,13 @@ trait BehatRuntime
     {
         if ($expected !== $actual) {
             throw new RuntimeException('Expected '.json_encode($expected).' got '.json_encode($actual));
+        }
+    }
+
+    protected function assertNotNull(mixed $value): void
+    {
+        if ($value === null) {
+            throw new RuntimeException('Expected not null');
         }
     }
 

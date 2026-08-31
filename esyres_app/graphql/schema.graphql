@@ -81,6 +81,7 @@ input UpdateSalonWorkerInput {
 enum BookingStatus {
     REQUESTED
     CONFIRMED
+    TIME_PROPOSED
 }
 
 type BookingService {
@@ -97,6 +98,8 @@ type Booking {
     durationMinutes: Int! @rename(attribute: "duration_minutes")
     customerName: String! @method(name: "customerName")
     worker: Worker
+    proposedStartsAt: String @method(name: "proposedStartsAtIso")
+    proposedWorker: Worker @method(name: "proposedWorkerOrNull")
     services: [BookingService!]! @method(name: "snapshotList")
 }
 
@@ -133,6 +136,7 @@ type Query {
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
+    occupyingBookings(salonId: ID!, date: String!): [Booking!]!
 }
 
 type Mutation {
@@ -149,4 +153,5 @@ type Mutation {
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
     acceptPreferredTime(bookingId: ID!): Booking!
+    proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
 }

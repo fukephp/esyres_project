@@ -83,12 +83,22 @@ void i18n.use(initReactI18next).init({
           date: 'Datum',
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',
+          noWorkers: 'Nema radnika.',
+          closedDay: 'Zatvoreno ovaj dan.',
           soon: 'Uskoro',
           accept: 'Prihvati',
           acceptError: {
             SLOT_TAKEN: 'Taj termin je zauzet.',
             NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
             fallback: 'Zahtjev nije prihvaćen.',
+          },
+          proposeError: {
+            SLOT_TAKEN: 'Taj termin je zauzet.',
+            NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
+            OUTSIDE_HOURS: 'Van radnog vremena.',
+            PAST_TIME: 'To vrijeme je već prošlo.',
+            INVALID_WORKER: 'Odaberi radnika ovog salona.',
+            fallback: 'Zahtjev nije predložen.',
           },
         },
         verify: {

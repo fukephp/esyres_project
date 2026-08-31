@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
@@ -26,6 +26,7 @@ class Booking extends Model
             'preferred_starts_at' => 'datetime',
             'duration_minutes' => 'integer',
             'owner_responded_at' => 'datetime',
+            'proposed_starts_at' => 'datetime',
         ];
     }
 
@@ -51,6 +52,14 @@ class Booking extends Model
     public function worker(): BelongsTo
     {
         return $this->belongsTo(Worker::class);
+    }
+
+    /**
+     * @return BelongsTo<Worker, $this>
+     */
+    public function proposedWorker(): BelongsTo
+    {
+        return $this->belongsTo(Worker::class, 'proposed_worker_id');
     }
 
     /**
@@ -82,6 +91,24 @@ class Booking extends Model
     public function preferredStartsAtIso(): string
     {
         return $this->preferred_starts_at->utc()->toIso8601String();
+    }
+
+    public function proposedStartsAtIso(): ?string
+    {
+        if ($this->status !== self::TIME_PROPOSED || $this->proposed_starts_at === null) {
+            return null;
+        }
+
+        return $this->proposed_starts_at->utc()->toIso8601String();
+    }
+
+    public function proposedWorkerOrNull(): ?Worker
+    {
+        if ($this->status !== self::TIME_PROPOSED) {
+            return null;
+        }
+
+        return $this->proposedWorker;
     }
 
     public function customerName(): string
