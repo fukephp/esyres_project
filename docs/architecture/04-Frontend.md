@@ -35,6 +35,7 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 - On `EMAIL_UNVERIFIED`, the picker stays on `/salon/:id` with check-email copy, resend, and a retry of `createBooking`. `/bookings` shows resend when `me.emailVerified` is false. No dedicated verify-email route.
 - On `PHONE_UNVERIFIED`, the picker stays on `/salon/:id` with phone + OTP + retry of `createBooking`. `/bookings` shows the same OTP panel when `me.emailVerified` is true and `me.phoneVerified` is false. `me` exposes `phone` (nullable) and `phoneVerified`. No dedicated verify-phone route.
 - `/owner` is a lazy pending queue + Worker Availability Panel for one salon-day (login only; Prihvati on named-worker rows via `acceptPreferredTime`; drag onto a free cell calls `proposeTime`; Odbi on every pending row via two-step `declineBooking`; no Request Detail). No `/owner` link on customer pages.
+- `/bookings` lists the session customer’s bookings (flat status labels; no respond/cancel this slice). Logged-out AuthShell, verify banners, and email/phone panels stay on this route.
 
 ## Discovery
 

@@ -178,6 +178,32 @@ trait SharedFixtures
         Carbon::setTestNow(now()->addMinute());
     }
 
+    protected function insertCustomerBooking(User $customer, Salon $salon, string $date, string $time): Booking
+    {
+        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $booking = new Booking;
+        $booking->salon_id = $salon->id;
+        $booking->customer_id = $customer->id;
+        $booking->preferred_date = $date;
+        $booking->preferred_starts_at = $starts;
+        $booking->status = Booking::REQUESTED;
+        $booking->duration_minutes = 30;
+        $booking->save();
+        $row = new BookingService;
+        $row->booking_id = $booking->id;
+        $row->name = 'Šišanje';
+        $row->duration_minutes = 30;
+        $row->price_feninga = 2500;
+        $row->save();
+        $this->booking = $booking;
+        if ($this->firstCustomerBooking === null) {
+            $this->firstCustomerBooking = $booking;
+        }
+        Carbon::setTestNow(now()->addMinute());
+
+        return $booking;
+    }
+
     /**
      * @Given the salon has a service:
      */

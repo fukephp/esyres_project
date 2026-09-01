@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { graphqlErrorCode, stackSelection, bookingWorkerId } from './booking'
+import { bookingClock, bookingStatusKey, bookingWorkerId, graphqlErrorCode, stackSelection } from './booking'
 
 test('stacks duration and feninga', () => {
   expect(
@@ -24,4 +24,56 @@ test('reads GraphQL error code', () => {
 test('omits workerId for no preference', () => {
   expect(bookingWorkerId('')).toBeUndefined()
   expect(bookingWorkerId('12')).toBe('12')
+})
+
+const worker = { id: '1', name: 'Lejla' }
+
+test('TIME_PROPOSED clock uses proposed start and worker', () => {
+  expect(
+    bookingClock({
+      status: 'TIME_PROPOSED',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+      worker: null,
+      proposedStartsAt: '2026-08-30T12:00:00.000Z',
+      proposedWorker: worker,
+    }),
+  ).toEqual({ startsAt: '2026-08-30T12:00:00.000Z', worker })
+})
+
+test('other statuses use preferred start and worker', () => {
+  expect(
+    bookingClock({
+      status: 'REQUESTED',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+      worker,
+      proposedStartsAt: '2026-08-30T12:00:00.000Z',
+      proposedWorker: worker,
+    }),
+  ).toEqual({ startsAt: '2026-08-29T09:00:00.000Z', worker })
+  expect(
+    bookingClock({
+      status: 'CONFIRMED',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+      worker,
+      proposedStartsAt: null,
+      proposedWorker: null,
+    }),
+  ).toEqual({ startsAt: '2026-08-29T09:00:00.000Z', worker })
+  expect(
+    bookingClock({
+      status: 'DECLINED',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+      worker: null,
+      proposedStartsAt: null,
+      proposedWorker: null,
+    }),
+  ).toEqual({ startsAt: '2026-08-29T09:00:00.000Z', worker: null })
+})
+
+test('status maps to i18n keys', () => {
+  expect(bookingStatusKey('REQUESTED')).toBe('REQUESTED')
+  expect(bookingStatusKey('TIME_PROPOSED')).toBe('TIME_PROPOSED')
+  expect(bookingStatusKey('CONFIRMED')).toBe('CONFIRMED')
+  expect(bookingStatusKey('DECLINED')).toBe('DECLINED')
+  expect(bookingStatusKey('nope')).toBe('REQUESTED')
 })

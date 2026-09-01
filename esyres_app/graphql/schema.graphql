@@ -102,6 +102,7 @@ type Booking {
     proposedStartsAt: String @method(name: "proposedStartsAtIso")
     proposedWorker: Worker @method(name: "proposedWorkerOrNull")
     declineReason: String @rename(attribute: "decline_reason")
+    salon: Salon!
     services: [BookingService!]! @method(name: "snapshotList")
 }
 
@@ -139,6 +140,7 @@ type Query {
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
     occupyingBookings(salonId: ID!, date: String!): [Booking!]!
+    myBookings(limit: Int = 20, offset: Int = 0): [Booking!]!
 }
 
 type Mutation {

@@ -1,4 +1,6 @@
-import { sarajevoToday } from './format'
+import { formatSarajevoTime, sarajevoToday } from './format'
+
+export { formatSarajevoTime }
 
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 
@@ -30,15 +32,6 @@ export function isPreferredSoon(iso: string, now = new Date()): boolean {
   }
 
   return start <= now.getTime() + TWO_HOURS_MS
-}
-
-export function formatSarajevoTime(iso: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Sarajevo',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(iso))
 }
 
 export function canAcceptPreferredTime(worker: { id: string } | null): boolean {

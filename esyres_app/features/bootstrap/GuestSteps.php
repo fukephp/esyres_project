@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -872,6 +873,178 @@ query Popular($limit: Int, $offset: Int, $category: ServiceCategory, $name: Stri
   popularInSarajevo(limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
+  }
+}
+GQL;
+    }
+
+    /**
+     * @Given the customer has a requested booking on :date at :time
+     */
+    public function theCustomerHasARequestedBooking(string $date, string $time): void
+    {
+        $this->insertCustomerBooking($this->user, $this->salon, $date, $time);
+    }
+
+    /**
+     * @Given that other user has a requested booking on :date at :time
+     */
+    public function thatOtherUserHasARequestedBooking(string $date, string $time): void
+    {
+        $this->insertCustomerBooking($this->otherUser, $this->salon, $date, $time);
+    }
+
+    /**
+     * @Given that booking is declined
+     */
+    public function thatBookingIsDeclined(): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @Given that booking is declined with reason :reason
+     */
+    public function thatBookingIsDeclinedWithReason(string $reason): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->decline_reason = $reason;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @Given the customer's first booking is declined
+     */
+    public function theCustomersFirstBookingIsDeclined(): void
+    {
+        $this->firstCustomerBooking->status = Booking::DECLINED;
+        $this->firstCustomerBooking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @Given that booking is time proposed at :date at :time
+     */
+    public function thatBookingIsTimeProposedAt(string $date, string $time): void
+    {
+        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $this->booking->status = Booking::TIME_PROPOSED;
+        $this->booking->proposed_starts_at = $starts;
+        $this->booking->proposed_worker_id = $this->worker->id;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @When I query my bookings
+     */
+    public function iQueryMyBookings(): void
+    {
+        $this->graphql($this->myBookingsQuery());
+    }
+
+    /**
+     * @When I query my bookings limit :limit offset :offset
+     */
+    public function iQueryMyBookingsPaged(string $limit, string $offset): void
+    {
+        $this->graphql($this->myBookingsQuery(), [
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @When I query my bookings as a guest
+     */
+    public function iQueryMyBookingsAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->myBookingsQuery());
+    }
+
+    /**
+     * @Then my bookings are empty
+     */
+    public function myBookingsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['myBookings']);
+    }
+
+    /**
+     * @Then my booking statuses are:
+     */
+    public function myBookingStatusesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['myBookings'] as $row) {
+            $actual[] = $row['status'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then my booking preferred dates are:
+     */
+    public function myBookingPreferredDatesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['myBookings'] as $row) {
+            $actual[] = $row['preferredDate'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then the first my booking matches:
+     */
+    public function theFirstMyBookingMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data']['myBookings'][0];
+        $this->assertSame($expected['status'], $row['status']);
+        $this->assertSame($expected['salon'], $row['salon']['name']);
+        $this->assertSame($this->salon->id, (int) $row['salon']['id']);
+        $this->assertSame($expected['preferredDate'], $row['preferredDate']);
+        $this->assertSame($expected['durationMinutes'], $row['durationMinutes']);
+        $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
+        $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
+        $this->assertSame($expected['declineReason'], $row['declineReason']);
+        $this->assertSame($expected['services'], $row['services']);
+        if (array_key_exists('proposedStartsAt', $expected)) {
+            if ($expected['proposedStartsAt'] === null) {
+                $this->assertSame(null, $row['proposedStartsAt']);
+            } else {
+                $this->assertNotNull($row['proposedStartsAt']);
+            }
+        }
+    }
+
+    private function myBookingsQuery(): string
+    {
+        return <<<'GQL'
+query MyBookings($limit: Int = 20, $offset: Int = 0) {
+  myBookings(limit: $limit, offset: $offset) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    salon { id name }
+    services { name durationMinutes }
   }
 }
 GQL;
