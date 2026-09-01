@@ -159,4 +159,7 @@ type Mutation {
     acceptPreferredTime(bookingId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
     declineBooking(bookingId: ID!, reason: String): Booking!
+    confirmProposedTime(bookingId: ID!): Booking!
+    rejectProposedTime(bookingId: ID!): Booking!
+    askOtherTime(bookingId: ID!, preferredDate: String!, preferredTime: String!): Booking!
 }

@@ -54,6 +54,8 @@ trait BehatRuntime
 
     protected ?string $lastLocation = null;
 
+    protected ?string $ownerRespondedAt = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -73,6 +75,7 @@ trait BehatRuntime
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;
+        $this->ownerRespondedAt = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();

@@ -879,6 +879,20 @@ GQL;
     }
 
     /**
+     * @Given another verified customer :email with password :password
+     */
+    public function anotherVerifiedCustomer(string $email, string $password): void
+    {
+        $this->otherUser = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'phone' => '+38762'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => now(),
+        ]);
+    }
+
+    /**
      * @Given the customer has a requested booking on :date at :time
      */
     public function theCustomerHasARequestedBooking(string $date, string $time): void
@@ -934,8 +948,197 @@ GQL;
         $this->booking->status = Booking::TIME_PROPOSED;
         $this->booking->proposed_starts_at = $starts;
         $this->booking->proposed_worker_id = $this->worker->id;
+        $this->booking->owner_responded_at = now();
         $this->booking->save();
+        $this->ownerRespondedAt = $this->booking->fresh()->owner_responded_at->utc()->toIso8601String();
         Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @When I confirm the proposed time
+     */
+    public function iConfirmTheProposedTime(): void
+    {
+        $this->graphql($this->confirmProposedTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I confirm the proposed time as a guest
+     */
+    public function iConfirmTheProposedTimeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iConfirmTheProposedTime();
+    }
+
+    /**
+     * @When I confirm proposed time for booking id :id
+     */
+    public function iConfirmProposedTimeForBookingId(string $id): void
+    {
+        $this->graphql($this->confirmProposedTimeMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @When I reject the proposed time
+     */
+    public function iRejectTheProposedTime(): void
+    {
+        $this->graphql($this->rejectProposedTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I ask other time :date at :time
+     */
+    public function iAskOtherTime(string $date, string $time): void
+    {
+        $this->graphql($this->askOtherTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I query occupying bookings for date :date
+     */
+    public function iQueryOccupyingBookingsForDate(string $date): void
+    {
+        $this->graphql($this->occupyingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query pending bookings for date :date
+     */
+    public function iQueryPendingBookingsForDate(string $date): void
+    {
+        $this->graphql($this->pendingBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then confirm proposed time matches:
+     */
+    public function confirmProposedTimeMatches(PyStringNode $payload): void
+    {
+        $this->assertRespondBooking('confirmProposedTime', $payload);
+    }
+
+    /**
+     * @Then reject proposed time matches:
+     */
+    public function rejectProposedTimeMatches(PyStringNode $payload): void
+    {
+        $this->assertRespondBooking('rejectProposedTime', $payload);
+    }
+
+    /**
+     * @Then ask other time matches:
+     */
+    public function askOtherTimeMatches(PyStringNode $payload): void
+    {
+        $this->assertRespondBooking('askOtherTime', $payload);
+    }
+
+    /**
+     * @Then that booking still has the same owner_responded_at
+     */
+    public function thatBookingStillHasTheSameOwnerRespondedAt(): void
+    {
+        $this->booking->refresh();
+        $after = $this->booking->owner_responded_at?->utc()->toIso8601String();
+        $this->assertSame($this->ownerRespondedAt, $after);
+    }
+
+    /**
+     * @Then occupying bookings include this booking as :status
+     */
+    public function occupyingBookingsIncludeThisBookingAs(string $status): void
+    {
+        $this->assertBookingListed('occupyingBookings', $status, true);
+    }
+
+    /**
+     * @Then occupying bookings do not include this booking
+     */
+    public function occupyingBookingsDoNotIncludeThisBooking(): void
+    {
+        $this->assertBookingListed('occupyingBookings', null, false);
+    }
+
+    /**
+     * @Then pending bookings include this booking as :status
+     */
+    public function pendingBookingsIncludeThisBookingAs(string $status): void
+    {
+        $this->assertBookingListed('pendingBookings', $status, true);
+    }
+
+    /**
+     * @Then pending bookings do not include this booking
+     */
+    public function pendingBookingsDoNotIncludeThisBooking(): void
+    {
+        $this->assertBookingListed('pendingBookings', null, false);
+    }
+
+    /**
+     * @param  'occupyingBookings'|'pendingBookings'  $field
+     */
+    private function assertBookingListed(string $field, ?string $status, bool $present): void
+    {
+        $this->assertNoGraphqlErrors();
+        $id = (string) $this->booking->id;
+        foreach ($this->graphql['data'][$field] as $row) {
+            if ((string) $row['id'] === $id) {
+                if (! $present) {
+                    throw new RuntimeException("Did not expect booking {$id} in {$field}");
+                }
+                $this->assertSame($status, $row['status']);
+
+                return;
+            }
+        }
+        if ($present) {
+            throw new RuntimeException("Expected booking {$id} in {$field}");
+        }
+    }
+
+    private function assertRespondBooking(string $field, PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data'][$field];
+        $this->assertSame((string) $this->booking->id, (string) $row['id']);
+        $this->assertSame($expected['status'], $row['status']);
+        $this->assertSame($expected['preferredDate'], $row['preferredDate']);
+        $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
+        $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
+        $this->assertSame($expected['declineReason'], $row['declineReason']);
+        if (array_key_exists('proposedStartsAt', $expected)) {
+            if ($expected['proposedStartsAt'] === null) {
+                $this->assertSame(null, $row['proposedStartsAt']);
+            } else {
+                $this->assertNotNull($row['proposedStartsAt']);
+            }
+        }
+        if (array_key_exists('durationMinutes', $expected)) {
+            $this->assertSame($expected['durationMinutes'], $row['durationMinutes']);
+        }
+        if (array_key_exists('services', $expected)) {
+            $this->assertSame($expected['services'], $row['services']);
+        }
     }
 
     /**
@@ -1027,6 +1230,90 @@ GQL;
                 $this->assertNotNull($row['proposedStartsAt']);
             }
         }
+    }
+
+    private function confirmProposedTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation ConfirmProposed($bookingId: ID!) {
+  confirmProposedTime(bookingId: $bookingId) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function rejectProposedTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation RejectProposed($bookingId: ID!) {
+  rejectProposedTime(bookingId: $bookingId) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function askOtherTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation AskOther($bookingId: ID!, $preferredDate: String!, $preferredTime: String!) {
+  askOtherTime(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function occupyingBookingsQuery(): string
+    {
+        return <<<'GQL'
+query Occupying($salonId: ID!, $date: String!) {
+  occupyingBookings(salonId: $salonId, date: $date) {
+    id
+    status
+  }
+}
+GQL;
+    }
+
+    private function pendingBookingsQuery(): string
+    {
+        return <<<'GQL'
+query Pending($salonId: ID!, $date: String!) {
+  pendingBookings(salonId: $salonId, date: $date) {
+    id
+    status
+  }
+}
+GQL;
     }
 
     private function myBookingsQuery(): string

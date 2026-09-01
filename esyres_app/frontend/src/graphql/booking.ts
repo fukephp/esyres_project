@@ -72,3 +72,30 @@ export type MyBooking = {
 export type MyBookingsData = {
   myBookings: MyBooking[]
 }
+
+export const CONFIRM_PROPOSED_TIME_MUTATION = gql`
+  mutation ConfirmProposedTime($bookingId: ID!) {
+    confirmProposedTime(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
+export const REJECT_PROPOSED_TIME_MUTATION = gql`
+  mutation RejectProposedTime($bookingId: ID!) {
+    rejectProposedTime(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
+export const ASK_OTHER_TIME_MUTATION = gql`
+  mutation AskOtherTime($bookingId: ID!, $preferredDate: String!, $preferredTime: String!) {
+    askOtherTime(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
+      id
+      status
+    }
+  }
+`

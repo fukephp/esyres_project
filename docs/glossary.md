@@ -49,8 +49,12 @@ _Avoid_: trending, featured, curated homepage, popular ranking
 ## Bookings
 
 **My Bookings**:
-The customer place that lists their requests by status. Not discovery, not the salon profile, and not the pending queue.
+The customer place that lists their requests by status. Time Proposed screen actions live on those rows. Not discovery, not the salon profile, and not the pending queue.
 _Avoid_: schedule, inbox (customer), booking history, dashboard
+
+**Time Proposed screen**:
+The Approve / Reject / Ask other time actions on a time-proposed booking, shown on that row in My Bookings. Not a separate URL, not Request Detail, and not cancel of a confirmed booking.
+_Avoid_: booking detail, proposal page, respond inbox
 
 **Pending queue**:
 The owner’s list of requested bookings for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
@@ -72,6 +76,14 @@ _Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
 The owner’s one tap that turns a request into a confirmed booking at the guest’s preferred time. Not a counter-proposal.
 _Avoid_: approve, book, auto-confirm, one-click book
 
+**Confirm proposed time**:
+The customer’s yes to a time-proposed booking. The booking becomes confirmed at the offered worker and time. Not accept preferred time.
+_Avoid_: accept (customer), approve slot, auto-confirm
+
+**Reject proposed time**:
+The customer’s no to a time-proposed booking. The booking becomes declined with no customer reason. Not owner Decline and not cancel of a confirmed booking.
+_Avoid_: decline (customer), cancel (as time-proposed)
+
 **Confirmed booking**:
 A booking locked to a worker and a clock range, either because the owner accepted the preferred time or because both sides agreed after a counter-proposal. Not a request.
 _Avoid_: reservation, appointment (as the request), hold
@@ -80,12 +92,16 @@ _Avoid_: reservation, appointment (as the request), hold
 A booking the owner has counter-proposed. It holds the offered range on that worker. Not a request and not confirmed until the customer acts.
 _Avoid_: pending (as requested), confirmed, hold (as a request)
 
+**Ask other time**:
+The customer’s new preferred day and time on a time-proposed booking. It reopens that same request. Not a second request and not reschedule of a confirmed booking.
+_Avoid_: new booking, duplicate request, reschedule (Epic 5)
+
 **Decline**:
 The owner’s refusal of a request. Optional reason for the customer. Does not require a counter-proposal first. Not the customer’s reject of a time-proposed booking, not expire, and not a cancel of a confirmed booking.
 _Avoid_: reject (owner), cancel (as requested), expire, refuse slot
 
 **Declined booking**:
-A booking the owner declined, or that later expired into the same status. It does not occupy a clock slot. Not a cancelled confirmed booking.
+A booking the owner declined, the customer rejected after a counter-proposal, or that later expired into the same status. It does not occupy a clock slot. Not a cancelled confirmed booking.
 _Avoid_: cancelled (as requested), expired (as a fifth status), rejected appointment
 
 **Preferred time**:
