@@ -23,12 +23,12 @@ Do **not** emit a Cloud Agent brief unless the user opted into Cloud. Do not wri
 
 1. Read `.cursor/CONTEXT.md`.
 2. Resolve from CONTEXT (when locked):
-   - **Stories source** — path to the project’s stories doc or folder (e.g. under `docs/mvp/` or `docs/stories/`). If unset, ask which source to use; do not invent stories.
+   - **Stories source** — `docs/stories/` (`STORY-xx.md`). If that folder has no real story files (index stub only), stop and say a product grill must persist stories first. Do not invent stories. Do not write `docs/stories/`. Do not read mvp as the inventory.
    - **App root** — folder where application commands and verify runners live. If unset or still a placeholder with no real runner, coding loops are blocked.
 3. **Verify gate:** Detect whether the app root has a real local verify runner (tests, typecheck, lint, CI scripts the agent can fail). If there is no app root, only a placeholder, or no runner:
    - Say that story coding loops are blocked until scaffold + local verify exist.
    - Offer plan-gate prep only (map and/or answer key). Do **not** start coding or emit a Cloud paste. Do not scaffold the app unless the user asked.
-4. Unit of work is **one story** from the stories source → one PR. Refuse multi-epic / whole-MVP gauntlets.
+4. Unit of work is **one story** from `docs/stories/` → one PR. Refuse multi-epic / whole-MVP gauntlets.
 
 ## Plan gate (Wayfinder-lite)
 
@@ -47,7 +47,7 @@ After the story is picked, decide whether fog is **non-trivial**:
 ### Work the map
 
 1. Fill Destination and Notes; list Open decisions and Not yet specified honestly.
-2. Use grill-me style: resolve **one open decision at a time** with a recommended answer. Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` / `docs/stories/` over guessing. If app code exists, use **grill-with-docs** so glossary/ADRs land on disk.
+2. Use grill-me style: resolve **one open decision at a time** with a recommended answer. Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` / `docs/stories/` over guessing. If app code exists, use **grill-with-docs** (glossary/ADRs as they lock; product/stories at end of topic). Do not create new `STORY-xx` files during the loop.
 3. Move each locked answer into **Decisions so far**. Graduate fog into Open decisions only when the question is sharp enough to ask.
 4. Do **not** compile an answer key while **Not yet specified** or **Open decisions** still have items. If a likely product check has no verifier, leave it there.
 5. When both are empty, compile the **draft** key in the same turn (set map Status to `compiled`). Ask for **key** approval, not compile OK.
@@ -84,7 +84,7 @@ Implement in this chat against the answer key:
 - Run every verify command from the app root named in CONTEXT
 - Implement→verify loop; **iteration cap 5–8** (use the key’s cap if set); stop early if the same failure repeats twice with no progress
 - Open a PR on success or a draft/blocked PR on escalate; do not expand scope
-- Do **not** capture or attach screenshots
+- **UI stories** (any user-visible change): embed desktop + mobile screenshots in the PR description per `.cursor/loops/PLAYBOOK.md` **PR visual evidence**. If shots cannot be attached, open a draft/blocked PR instead of ready. Non-UI PRs skip screenshots.
 - After PR: remind the user to run **Bugbot**, then human review and merge
 
 ### Cloud (opt-in only)
@@ -97,7 +97,7 @@ Answer key: .cursor/loops/answer-keys/STORY-xx.md
 Follow Implementer instructions in that key.
 Run every verify command from the app root named in CONTEXT. Iteration cap from key.
 Open PR on pass; draft/blocked on escalate. Do not expand scope.
-Do not capture or attach screenshots.
+UI stories: embed desktop + mobile screenshots in the PR description (playbook PR visual evidence); draft if cannot attach.
 ```
 
 Do not invent a second unattended critic loop.

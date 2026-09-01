@@ -50,13 +50,13 @@ Keep: skills (including grill-me, grill-with-docs, story-loop, scaffold-project,
    - Root files present (`AGENTS.md`, `DESIGN.md`, `README.md`, `.gitignore`, `.cursor/CONTEXT.md`)
    - `.git` exists and is new
    - `.cursor/plans` was not copied (or is absent/empty)
-8. Reply with the new path and: open that folder as the Cursor workspace, then run **grill-me** before filling product/architecture.
+8. Reply with the new path and: open that folder as the Cursor workspace, then run **grill-me** (a finished product grill persists `docs/mvp/` and `docs/stories/STORY-xx.md`).
 9. Do **not** start grill-me automatically while still in `esy_framework`.
 10. Do not scaffold application code unless the user asks in a later step. To update an **existing** sibling later, use **sync-framework** / `/sync-framework <name>` — not this skill.
 
 ## Out of scope (v1)
 
 - App/stack generators (Laravel, React, Docker, etc.)
-- Auto-filling `docs/mvp/` or `docs/architecture/`
+- Auto-filling `docs/mvp/`, `docs/stories/`, or `docs/architecture/`
 - Propagating into existing projects (use **sync-framework** instead)
 - A committed `scripts/scaffold-project.ps1`

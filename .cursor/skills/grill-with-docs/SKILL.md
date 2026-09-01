@@ -2,9 +2,9 @@
 name: grill-with-docs
 description: >-
   Relentless interview of a plan or design against a codebase, writing glossary
-  terms and ADRs as they lock. Use when the user says "grill-with-docs",
-  "grill with docs", or /grill-with-docs. Prefer this over grill-me when
-  application code exists. Writes files; grill-me does not.
+  terms and ADRs as they lock; product/stories persist at end of topic. Use
+  when the user says "grill-with-docs", "grill with docs", or /grill-with-docs.
+  Prefer this over grill-me when application code exists.
 disable-model-invocation: true
 ---
 
@@ -19,7 +19,7 @@ Adapted from [mattpocock/skills grill-with-docs](https://github.com/mattpocock/s
 | | grill-me (productivity) | grill-with-docs (engineering) |
 |---|---|---|
 | When | No app code, or a throwaway interview | App code exists, or the user invoked this skill |
-| Writes | Nothing | Glossary + ADRs as terms/decisions lock |
+| Writes | End-of-topic batch (mvp, stories, architecture, CONTEXT) | Glossary + ADRs as they lock; same product/stories end-batch |
 | Check | Ask, or explore if easy | Must read the codebase and surface contradictions |
 
 If there is no application code yet, use **grill-me** unless the user explicitly asked for this skill (early shared language is allowed).
@@ -28,7 +28,7 @@ If there is no application code yet, use **grill-me** unless the user explicitly
 
 Same discipline as **grill-me**: walk the design tree, resolve dependencies one by one. Ask **one question at a time**. For each question, give your recommended answer. Wait for the user’s answer before the next question.
 
-Finding facts is your job. Explore the codebase, `docs/mvp/`, `docs/architecture/`, `docs/glossary.md`, and `docs/adr/` instead of asking. Do not implement the plan until the user confirms shared understanding.
+Finding facts is your job. Explore the codebase, `docs/mvp/`, `docs/architecture/`, `docs/stories/`, `docs/glossary.md`, and `docs/adr/` instead of asking. Do not implement the plan until the user confirms shared understanding.
 
 ## During the session
 
@@ -55,8 +55,21 @@ If any gate fails, skip the ADR. Format: [ADR-FORMAT.md](ADR-FORMAT.md).
 
 - Create `docs/adr/` lazily: `NNNN-slug.md` (scan for the highest number, increment).
 - If `docs/architecture/` already has a Decisions file and this ADR changes a locked stack choice, update that file too so architecture truth does not fork.
-- Patch `docs/mvp/` or `docs/architecture/` when the decision changes product scope or stack.
+
+Do **not** create `STORY-xx` files while interviewing. Product/stories wait for end-of-topic persist.
+
+## Persist (end of topic)
+
+Same routing as **grill-me**. When that grill topic reaches shared understanding, one batch, then stop. Do not auto-implement.
+
+| Topic | Write |
+|-------|--------|
+| Product breakdown (scope locked **and** split into one-PR stories) | `docs/mvp/` + `docs/stories/STORY-xx.md` + refresh `docs/stories/index.md` |
+| Stack | `docs/architecture/` (if not already updated with an ADR) |
+| Process / framework | `.cursor/CONTEXT.md` and skills as decided — **no** `STORY-xx` |
+
+Only a product grill **creates** new `STORY-xx`. Format: `docs/stories/index.md`. One file = one PR.
 
 ## Done
 
-Frontier empty: every branch visited, nothing silently assumed. Confirm shared understanding. Then stop — do not auto-implement, auto-compile an answer key, or invent a spec.
+Frontier empty: every branch visited, nothing silently assumed. Confirm shared understanding. Persist the end-of-topic batch. Then stop — do not auto-implement, auto-compile an answer key, or invent a spec.

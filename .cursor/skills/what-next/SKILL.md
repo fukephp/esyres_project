@@ -24,7 +24,7 @@ For execution after a pick, use **story-loop**. For fog on a specific story, the
 
 ## Hard rules
 
-- **Read-only** — never write `docs/tasks/`, story status fields, `progress.md`, maps, or answer keys.
+- **Read-only** — never write `docs/stories/`, story status fields, `progress.md`, maps, or answer keys.
 - Do not implement code unless the user asks separately.
 - Do not invent stories or product behavior beyond `docs/mvp/` and `docs/stories/`.
 - Do not start grill-me or grill-with-docs. Do not auto-suggest `/story-loop` or other handoff commands — list only.
@@ -34,9 +34,9 @@ For execution after a pick, use **story-loop**. For fog on a specific story, the
 
 ### 1. Read project context
 
-1. Read `.cursor/CONTEXT.md` for **stories source**, **app root**, and **domain triggers**.
-2. Load stories from the stories source in CONTEXT. If unset, fall back to `docs/mvp/` and `docs/stories/`.
-3. If no real stories exist (index stubs only), stop ranking and report blockers (fill docs, break down epics into stories). Skip the inventory of fake stories.
+1. Read `.cursor/CONTEXT.md` for **stories source** (`docs/stories/`), **app root**, and **domain triggers**.
+2. Load stories from `docs/stories/` (`STORY-xx.md`). Do not fall back to `docs/mvp/` as the inventory.
+3. If no real stories exist (index stub only, no `STORY-xx.md`), stop ranking and report blockers (grill MVP, persist stories). Skip the inventory of fake stories.
 
 ### 2. Scan signals (read-only)
 
@@ -80,7 +80,7 @@ Append ` fog` after the title on inventory lines and on numbered-3 lines that fa
 
 Before ranking stories, check for project blockers. When any apply, they **consume suggestion slots** (up to 3), in this chain order:
 
-1. Stories source unset or empty
+1. No `STORY-xx.md` in `docs/stories/` (index stub only)
 2. Architecture docs still stubs when stories need stack decisions
 3. App root unset or placeholder
 4. No local verify runner (tests, typecheck, lint) — same bar as [story-loop preconditions](.cursor/skills/story-loop/SKILL.md)
@@ -156,7 +156,7 @@ Blocker with no story id (no inventory of fake stories):
 ```text
 Status: 0 done · 0 in-flight · 0 not started · 0 blocked
 
-1. Stories source unset — Recommended (clear blocker) — fill CONTEXT / docs/mvp
+1. No stories in docs/stories/ — Recommended (clear blocker) — grill MVP, persist STORY-xx
 ```
 
 Rules:
@@ -174,7 +174,7 @@ Rules:
 |-------|------|
 | [story-loop](../story-loop/SKILL.md) | Execute one approved story → PR; fog-gate definition reused here as tags |
 | [custom-feature-skills](../custom-feature-skills/SKILL.md) | Implementation constraints during coding |
-| [grill-me](../grill-me/SKILL.md) | Clarify fog (no app code; writes nothing) — user starts separately |
-| [grill-with-docs](../grill-with-docs/SKILL.md) | Clarify fog against codebase; writes glossary + ADRs — user starts separately |
+| [grill-me](../grill-me/SKILL.md) | Clarify fog (no app code; persist at end of topic) — user starts separately |
+| [grill-with-docs](../grill-with-docs/SKILL.md) | Clarify fog against codebase; glossary/ADRs as they lock; product/stories end-batch — user starts separately |
 
 Playbook: `.cursor/loops/PLAYBOOK.md`

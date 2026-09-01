@@ -51,7 +51,7 @@ Copy these paths from source → target (create parents as needed; **overwrite**
 Do **not** copy, overwrite, or delete:
 
 - `.cursor/CONTEXT.md`
-- `docs/mvp/`, `docs/architecture/`, `docs/glossary.md`, `docs/adr/`, other product docs
+- `docs/mvp/`, `docs/architecture/`, `docs/stories/`, `docs/glossary.md`, `docs/adr/`, other product docs
 - `.cursor/loops/maps/*` story maps (except the README above)
 - `.cursor/loops/answer-keys/*` story keys (except the README above)
 - `refs/`, application code, `.git/`

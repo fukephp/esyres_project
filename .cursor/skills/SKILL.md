@@ -11,8 +11,8 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 
 | Skill | When to use |
 |-------|-------------|
-| [grill-me](grill-me/SKILL.md) | **Default** when there is no app code; user says "grill me"; writes nothing |
-| [grill-with-docs](grill-with-docs/SKILL.md) | Same interview against a **codebase**; writes glossary + ADRs (`/grill-with-docs`) |
+| [grill-me](grill-me/SKILL.md) | **Default** when there is no app code; user says "grill me"; persist at end of topic |
+| [grill-with-docs](grill-with-docs/SKILL.md) | Same interview against a **codebase**; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`) |
 | [scaffold-project](scaffold-project/SKILL.md) | New sibling project from this framework layout (`/scaffold-project`) |
 | [sync-framework](sync-framework/SKILL.md) | Propagate allowlisted Cursor defaults into one existing sibling (`/sync-framework`) |
 | [story-loop](story-loop/SKILL.md) | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot (`/story-loop`) |

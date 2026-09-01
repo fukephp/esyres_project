@@ -11,7 +11,7 @@
 | Field | Value |
 |-------|--------|
 | Story ID | STORY-xx |
-| Source | Stories path from CONTEXT (cite section / title) |
+| Source | `docs/stories/STORY-xx.md` |
 | Status | draft \| ready-to-compile \| compiled |
 | Answer key path | `.cursor/loops/answer-keys/STORY-xx.md` (after compile) |
 
@@ -21,7 +21,7 @@
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/`, `docs/architecture/`, `docs/stories/` when present
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/`, `docs/architecture/`, `docs/stories/STORY-xx.md`
 - Skills: `.cursor/skills/custom-feature-skills/SKILL.md`; grill-me style for open decisions; grill-with-docs when app code exists
 - If a likely product check has no verifier, leave it in Not yet specified or Open decisions
 - Standing preferences for this effort:

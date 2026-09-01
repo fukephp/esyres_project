@@ -1,4 +1,4 @@
-Grill a plan or design against the codebase and write glossary terms / ADRs as they lock.
+Grill a plan or design against the codebase. Write glossary terms / ADRs as they lock. Persist product/stories at end of topic (same routing as grill-me).
 
 Follow `.cursor/skills/grill-with-docs/SKILL.md` exactly. That skill is the source of truth.
 
