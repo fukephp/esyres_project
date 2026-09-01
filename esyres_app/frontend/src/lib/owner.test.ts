@@ -9,8 +9,10 @@ import {
   isPreferredSoon,
   occupyingBlock,
   ownerDateFromSearch,
+  ownerQueuePath,
   panelCells,
   proposeErrorKey,
+  proposeStartTimes,
   declineErrorKey,
   trimDeclineReason,
   sarajevoWeekday,
@@ -98,6 +100,24 @@ test('start cell droppable only when free', () => {
   expect(canDropOnStart(cellKind('09:00', true, [], '1'))).toBe(false)
   expect(canDropOnStart(cellKind('09:00', false, blocks, '2'))).toBe(true)
   expect(cellKind('09:00', false, [{ ...blocks[0], status: 'TIME_PROPOSED' }], '1')).toBe('proposed')
+})
+
+test('propose start times are droppable starts for that worker', () => {
+  const cells = [
+    { time: '09:00', off: false },
+    { time: '09:15', off: false },
+    { time: '09:30', off: true },
+    { time: '09:45', off: false },
+  ]
+  const blocks = [{ workerId: '1', start: '09:00', durationMinutes: 30, status: 'CONFIRMED' as const }]
+  expect(proposeStartTimes(cells, blocks, '1')).toEqual(['09:45'])
+  expect(proposeStartTimes(cells, blocks, '2')).toEqual(['09:00', '09:15', '09:45'])
+  expect(proposeStartTimes([], blocks, '1')).toEqual([])
+})
+
+test('owner queue path omits today', () => {
+  expect(ownerQueuePath('2026-08-29', '2026-08-29')).toBe('/owner')
+  expect(ownerQueuePath('2026-08-30', '2026-08-29')).toBe('/owner?date=2026-08-30')
 })
 
 test('occupying block uses proposed fields for time proposed', () => {

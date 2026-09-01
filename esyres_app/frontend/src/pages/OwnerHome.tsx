@@ -2,7 +2,7 @@ import { DndContext, PointerSensor, useDraggable, useSensor, useSensors, type Dr
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { WorkerPanel } from '../components/WorkerPanel'
@@ -348,6 +348,13 @@ function QueueRow({
             {t('owner.accept')}
           </button>
         ) : null}
+        <Link
+          to={`/owner/requests/${row.id}`}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink"
+        >
+          {t('owner.propose')}
+        </Link>
         {declineOpen ? null : (
           <button
             type="button"

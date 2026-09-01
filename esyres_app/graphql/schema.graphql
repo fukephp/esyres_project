@@ -140,6 +140,7 @@ type Query {
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
     occupyingBookings(salonId: ID!, date: String!): [Booking!]!
+    ownerBooking(id: ID!): Booking!
     myBookings(limit: Int = 20, offset: Int = 0): [Booking!]!
 }
 

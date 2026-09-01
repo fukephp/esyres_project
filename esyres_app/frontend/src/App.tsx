@@ -6,6 +6,9 @@ import { MyBookings } from './pages/MyBookings'
 import { SalonProfile } from './pages/SalonProfile'
 
 const OwnerHome = lazy(() => import('./pages/OwnerHome').then((m) => ({ default: m.OwnerHome })))
+const OwnerRequestDetail = lazy(() =>
+  import('./pages/OwnerRequestDetail').then((m) => ({ default: m.OwnerRequestDetail })),
+)
 
 export default function App() {
   return (
@@ -19,6 +22,14 @@ export default function App() {
           element={
             <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
               <OwnerHome />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/owner/requests/:id"
+          element={
+            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
+              <OwnerRequestDetail />
             </Suspense>
           }
         />
