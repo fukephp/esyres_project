@@ -16,7 +16,7 @@ Do not put application code in the git root. Do not put docs, rules, or skills i
 ## Working directory
 
 - Application commands (`composer`, `php artisan`, `npm`, `docker compose`, Behat): run from `esyres_app/`.
-- Product PWA (`npm run dev` / `build` / `test`): run from `esyres_app/frontend/` (or `docker compose run --workdir /app/frontend node …`).
+- Product PWA (`npm run dev` / `build` / `test`): run from `esyres_app/frontend/` (or `docker compose exec -T vite …` after `up -d`).
 - Marketing site (`npm run dev` / `build`): run from `esyres_app/marketing/`.
 - Git, and edits to `docs/` / `.cursor/` / this file: run from the git root.
 

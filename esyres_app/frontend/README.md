@@ -1,9 +1,9 @@
 # Esyres PWA (placeholder)
 
-Vite + React + TypeScript + Tailwind. Not product UI. Commands from `esyres_app/`:
+Vite + React + TypeScript + Tailwind. Not product UI. Commands from `esyres_app/` after `docker compose up -d`:
 
 ```text
-docker compose run --rm --workdir /app/frontend node npm run typecheck
-docker compose run --rm --workdir /app/frontend node npm run test
-docker compose run --rm --workdir /app/frontend node npm run build
+docker compose exec -T vite npm run typecheck
+docker compose exec -T vite npm run test
+docker compose exec -T vite npm run build
 ```

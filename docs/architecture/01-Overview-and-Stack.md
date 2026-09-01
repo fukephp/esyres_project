@@ -15,7 +15,7 @@ Application code is in `esyres_app/` (Laravel 13 + React TypeScript PWA placehol
 | PWA | `vite-plugin-pwa` + Workbox, native Web Push (VAPID) |
 | Owner grid | `@dnd-kit` + tap/form fallback |
 | Tests | Behat GraphQL HTTP (backend); Vitest + Playwright (frontend) |
-| Local run | Docker Compose in `esyres_app/` (slim: `php` + `node` + `mysql`; full list later) |
+| Local run | Docker Compose in `esyres_app/` (slim: `php` + `vite` + `mysql`; full list later) |
 
 Same origin: Nginx serves the SPA at `/`, GraphQL at `/graphql`, Reverb on the same host. No split `app.` / `api.` domains at MVP.
 
@@ -26,7 +26,7 @@ One git repo. Application code is not at the git root.
 - `esyres_app/` — Laravel (`artisan`, `composer.json`, `app/`)
 - `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`)
 - `esyres_app/marketing/` — Design 1 static marketing site (sibling under the Laravel root)
-- `esyres_app/docker-compose.yml` — slim `php` + `node` + `mysql` (full service list later)
+- `esyres_app/docker-compose.yml` — slim `php` + `vite` + `mysql` (full service list later)
 - `docs/mvp/` — product
 - `docs/architecture/` — this set
 

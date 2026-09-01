@@ -1,5 +1,5 @@
-# Slim local verify stack (php + node + mysql). Remaining services
-# (nginx, redis, worker, reverb, vite, mailpit) come later —
+# Slim local stack (php + vite + mysql). Remaining services
+# (nginx, redis, worker, reverb, mailpit) come later —
 # docs/architecture/07-Docker-and-Local-Dev.md
 services:
   php:
@@ -8,6 +8,9 @@ services:
     volumes:
       - .:/app
     working_dir: /app
+    command: php artisan serve --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
     environment:
       DB_CONNECTION: mysql
       DB_HOST: mysql
@@ -20,11 +23,22 @@ services:
       mysql:
         condition: service_healthy
 
-  node:
+  vite:
     image: node:22-bookworm
     volumes:
       - .:/app
-    working_dir: /app
+    working_dir: /app/frontend
+    command:
+      - sh
+      - -c
+      - "test -d node_modules || npm install; exec npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
+    ports:
+      - "5173:5173"
+    environment:
+      API_PROXY: http://php:8000
+    depends_on:
+      php:
+        condition: service_started
 
   mysql:
     image: mysql:8.4

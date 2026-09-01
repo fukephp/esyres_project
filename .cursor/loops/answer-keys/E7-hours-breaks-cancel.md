@@ -36,16 +36,16 @@ Cite `docs/architecture/03-Backend.md`, `05-Data-Model.md`, `06-Auth-Notificatio
 
 ## Verify commands
 
-Run from `esyres_app/` (app root in CONTEXT). MySQL must be up. Every command must exit 0.
+Run from `esyres_app/` (app root in CONTEXT). Stack must be up (`docker compose up -d`). Every command must exit 0.
 
 ```text
-docker compose up -d mysql
-docker compose run --rm php php artisan --version
-docker compose run --rm php vendor/bin/behat
-docker compose run --rm --workdir /app/frontend node npm run typecheck
-docker compose run --rm --workdir /app/frontend node npm run test
-docker compose run --rm --workdir /app/frontend node npm run build
-docker compose run --rm --workdir /app/marketing node npm run build
+docker compose up -d
+docker compose exec -T php php artisan --version
+docker compose exec -T php vendor/bin/behat
+docker compose exec -T vite npm run typecheck
+docker compose exec -T vite npm run test
+docker compose exec -T vite npm run build
+docker compose exec -T --workdir /app/marketing vite npm run build
 ```
 
 ## Out of scope

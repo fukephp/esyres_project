@@ -32,7 +32,7 @@ Behat is the only backend verify gate for MVP. Do not add Pest or a parallel PHP
 
 - **Driver:** GraphQL-over-HTTP against `/graphql` (booking lifecycle + schema). No Mink/browser Behat — Playwright owns UI flows.
 - **Suites:** `owner` (`features/owner/`) and `guest` (`features/guest/`). One context class per suite; shared Laravel boot, fixtures, and HTTP live in traits. Inner loop: `vendor/bin/behat --suite owner` (or `guest`).
-- **Verify command:** `docker compose run --rm php vendor/bin/behat` from `esyres_app/` (runs both suites). Do not document `php artisan test` or `composer test` as the backend gate.
+- **Verify command:** `docker compose exec -T php vendor/bin/behat` from `esyres_app/` after `docker compose up -d` (runs both suites). Do not document `php artisan test` or `composer test` as the backend gate.
 - **Auth:** Sanctum cookie/session steps (CSRF like the SPA). No Bearer tokens and no test-only auth bypass. Behat uses `APP_ENV=testing`, bcrypt 4, and the array session driver (in-process cookies, same CSRF flow).
 - **Database:** Dedicated MySQL test DB on Compose (`mysql` service). Migrate once per process, then per-scenario truncate + Gherkin fixtures — not a shared seeded DB and not sqlite for Behat.
 - **Side effects:** Behat env uses the sync queue plus fake/log SMS, mail, and push. Do not require a live worker in the default gate.

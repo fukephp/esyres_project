@@ -103,6 +103,14 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 9. Run Bugbot on the PR. Trivial nits: fix on the same PR (do not burn the cap). Findings that contradict the key: stop and ask. Do not silently rewrite the key.
 10. You review and merge.
 
+## Local Docker
+
+Slim Compose at `esyres_app/` is one long-lived project: `php` + `vite` + `mysql`. Coding loops:
+
+1. `docker compose up -d` from `esyres_app/` (idempotent). Do not `down` as part of verify.
+2. Run every verify command with `docker compose exec -T …` as in CONTEXT / the answer key. Never `docker compose run` for verify or for Vite / `artisan serve`.
+3. If host ports 5173 or 8000 are already bound, reuse that stack. Do not publish 5174/8001 or spawn `*-run-*` one-offs.
+
 ## Gates
 
 1. **Plan gate** — fog cleared (map or sharp path); answer key approved by you; agent does not invent the key mid-run.
