@@ -113,17 +113,18 @@ return [
 
     'query_cache' => [
         /*
-         * Setting to true enables query caching.
+         * Off in local: Laravel's database cache cannot round-trip GraphQL AST
+         * objects (`__PHP_Incomplete_Class` from QueryCache::fromStoreOrParse).
+         * Same default as schema_cache. Enable in staging/production (prefer Redis).
          */
-        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', env('APP_ENV') !== 'local'),
 
         /*
-         * Configures which mechanism to use for the query cache.
-         * - store: use an external shared cache through a Laravel cache store like Redis or Memcached
-         * - opcache: store parsed queries in PHP files on the local filesystem to leverage OPcache
-         * - hybrid: leverage OPcache, but use a shared cache store when local files are not found
+         * store: Laravel cache store (Redis/Memcached). Do not use with the
+         * database cache — DocumentNode unserializes as __PHP_Incomplete_Class.
+         * opcache: PHP files on disk. hybrid: opcache, then store on miss.
          */
-        'mode' => env('LIGHTHOUSE_QUERY_CACHE_MODE', 'store'),
+        'mode' => env('LIGHTHOUSE_QUERY_CACHE_MODE', 'opcache'),
 
         /*
          * Specifies the path where the PHP files are stored when using opcache or hybrid mode.
