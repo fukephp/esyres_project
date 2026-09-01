@@ -60,6 +60,10 @@ _Avoid_: booking detail, proposal page, respond inbox
 The owner’s list of requested bookings for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
+**Request Detail**:
+The owner’s screen for one pending request: accept preferred time, decline, or counter-propose with a form. Not the pending queue, not the Worker Availability Panel, and not the customer Time Proposed screen.
+_Avoid_: booking detail, request modal, tap fallback (as a screen name)
+
 **Worker Availability Panel**:
 The owner’s per-day table of workers × 15-minute cells, with that day’s pending queue above it. Home after owner login. Not the pending queue alone, not Request Detail, and not the customer busy-level badge.
 _Avoid_: calendar, schedule grid (customer), inbox, dashboard, slot picker (guest)

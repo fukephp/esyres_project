@@ -173,6 +173,18 @@ export function canDropOnStart(kind: CellKind): boolean {
   return kind === 'free'
 }
 
+export function proposeStartTimes(cells: PanelCell[], blocks: OccupyingBlock[], workerId: string): string[] {
+  return cells.filter((cell) => canDropOnStart(cellKind(cell.time, cell.off, blocks, workerId))).map((cell) => cell.time)
+}
+
+export function ownerQueuePath(date: string, today = sarajevoToday()): string {
+  if (date === today) {
+    return '/owner'
+  }
+
+  return `/owner?date=${date}`
+}
+
 export function occupyingBlock(row: {
   status: string
   preferredStartsAt: string

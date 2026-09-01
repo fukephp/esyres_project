@@ -191,6 +191,56 @@ trait OwnerSteps
     }
 
     /**
+     * @When I query the owner booking
+     */
+    public function iQueryTheOwnerBooking(): void
+    {
+        $this->graphql($this->ownerBookingQuery(), [
+            'id' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I query owner booking id :id
+     */
+    public function iQueryOwnerBookingId(string $id): void
+    {
+        $this->graphql($this->ownerBookingQuery(), [
+            'id' => $id,
+        ]);
+    }
+
+    /**
+     * @When I query the owner booking as a guest
+     */
+    public function iQueryTheOwnerBookingAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iQueryTheOwnerBooking();
+    }
+
+    /**
+     * @Then the owner booking matches:
+     */
+    public function theOwnerBookingMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data']['ownerBooking'];
+        $this->assertSame($expected, [
+            'status' => $row['status'],
+            'customerName' => $row['customerName'],
+            'preferredDate' => $row['preferredDate'],
+            'durationMinutes' => $row['durationMinutes'],
+            'worker' => $row['worker'] === null ? null : $row['worker']['name'],
+            'services' => array_map(static fn (array $s): array => [
+                'name' => $s['name'],
+                'durationMinutes' => $s['durationMinutes'],
+            ], $row['services']),
+        ]);
+    }
+
+    /**
      * @When I query my salons
      */
     public function iQueryMySalons(): void
@@ -605,6 +655,24 @@ query Occupying($salonId: ID!, $date: String!) {
     proposedStartsAt
     worker { id name }
     proposedWorker { id name }
+  }
+}
+GQL;
+    }
+
+    private function ownerBookingQuery(): string
+    {
+        return <<<'GQL'
+query OwnerBooking($id: ID!) {
+  ownerBooking(id: $id) {
+    id
+    status
+    customerName
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    services { name durationMinutes }
   }
 }
 GQL;

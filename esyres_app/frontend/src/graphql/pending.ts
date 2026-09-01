@@ -1,5 +1,29 @@
 import { gql } from '@apollo/client'
 
+export const OWNER_BOOKING_QUERY = gql`
+  query OwnerBooking($id: ID!) {
+    ownerBooking(id: $id) {
+      id
+      status
+      customerName
+      preferredDate
+      preferredStartsAt
+      durationMinutes
+      worker {
+        id
+        name
+      }
+      services {
+        name
+        durationMinutes
+      }
+      salon {
+        id
+      }
+    }
+  }
+`
+
 export const PENDING_BOOKINGS_QUERY = gql`
   query PendingBookings($salonId: ID!, $date: String!) {
     pendingBookings(salonId: $salonId, date: $date) {
@@ -87,6 +111,22 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
     }
   }
 `
+
+export type OwnerBooking = {
+  id: string
+  status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'
+  customerName: string
+  preferredDate: string
+  preferredStartsAt: string
+  durationMinutes: number
+  worker: { id: string; name: string } | null
+  services: { name: string; durationMinutes: number }[]
+  salon: { id: string }
+}
+
+export type OwnerBookingData = {
+  ownerBooking: OwnerBooking
+}
 
 export type PendingBooking = {
   id: string
