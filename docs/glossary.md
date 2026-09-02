@@ -46,6 +46,20 @@ _Avoid_: near me map, radius search, geo grid
 The discovery list when location is denied or unavailable, so `/` is never blank. Not a ranking of bookings or trust badges.
 _Avoid_: trending, featured, curated homepage, popular ranking
 
+## Request paths
+
+**Picker**:
+The primary request path on a salon profile. The guest chooses services, optional worker, and a preferred day and time, then sends. Not the assistant.
+_Avoid_: form, booking widget, slot picker, calendar
+
+**Salon Booking Assistant**:
+The scripted alternate on a salon profile for messy intent. Speaks as that salon. Completing it is the same request as the picker. Not a customer inbox, not WhatsApp, and not a named platform bot.
+_Avoid_: Cora, chatbot, WhatsApp bot, AI assistant, customer inbox, live chat
+
+**Scripted intake**:
+The assistant’s guided steps on that profile. The guest answers with taps, not free-form understanding. Not NLU and not a slot grid.
+_Avoid_: wizard (as a separate product), NLU flow, conversation inbox
+
 ## Bookings
 
 **My Bookings**:

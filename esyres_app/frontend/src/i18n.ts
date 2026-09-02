@@ -46,6 +46,14 @@ void i18n.use(initReactI18next).init({
             HIGH: 'Zauzeto',
           },
         },
+        assistant: {
+          ask: 'Nisi sigurna? Pitaj salon.',
+          services: 'Koje usluge želiš?',
+          worker: 'Imaš li preferenciju za radnika?',
+          date: 'Koji dan ti odgovara?',
+          time: 'U koje vrijeme?',
+          send: 'Ako ti ovo odgovara, pošalji zahtjev.',
+        },
         discovery: {
           nearby: 'Saloni u blizini',
           popular: 'Popularno u Sarajevu',
