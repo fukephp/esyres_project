@@ -2,6 +2,8 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-37`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+
 ## Epic 1 — Salon Discovery & Profile Browsing
 
 - As a customer, I want to see salons near my current location without logging in, so that I can start browsing immediately from a QR code or IG link.

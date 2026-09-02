@@ -28,6 +28,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `esyres_app/` | Application (Laravel + PWA). Commands (`composer`, `php artisan`, `npm`, `docker compose`, Behat) run here. |
 | `esyres_app/frontend/` | Product PWA (Vite + React + TypeScript). Placeholder until product stories. |
 | `esyres_app/marketing/` | Design 1 static marketing site (Vite + HTML/CSS). Sibling under the Laravel root — not under `public/`, not in the PWA bundle. Commands: `npm run dev` from `esyres_app/marketing/`. |
+| `docs/stories/` | One-PR story inventory (`STORY-xx.md` + `index.md`). what-next and story-loop read this, not `docs/mvp/07-Stories.md`. |
 | `docs/glossary.md` | Domain glossary (lazy; grill-with-docs). Not `.cursor/CONTEXT.md`. |
 | `docs/adr/` | ADRs (lazy; grill-with-docs). If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`. |
 | `DESIGN.md` | Index for **two** packs — Design 1 marketing, Design 2 PWA. Shared Cal tokens; separate by surface. Read before UI. |
@@ -71,6 +72,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 - `docs/mvp/06-Epics.md`
 - `docs/mvp/07-Stories.md`
 - `docs/mvp/08-Improvements-and-Open-Questions.md`
+- `docs/stories/index.md` (`STORY-xx.md` inventory)
 
 **Architecture**
 
