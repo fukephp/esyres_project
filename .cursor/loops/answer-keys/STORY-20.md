@@ -23,7 +23,6 @@
 - [ ] Verified owner of `salonId` can subscribe: GraphQL HTTP 200, subscription channel in `extensions`, no error — verify: Behat
 - [ ] After `confirmProposedTime` / `rejectProposedTime` / `askOtherTime`, pending + occupying on re-query still match STORY-19 (confirm occupies, not pending; reject gone and not occupying; ask-other-time same id pending on the new date, not occupying) — verify: Behat (existing `time_proposed.feature` stays green)
 - [ ] `/owner` uses `useSubscription` for `bookingCustomerResponded`; `pendingBookings` / `occupyingBookings` have no `pollInterval`; `/`, `/salon/:id`, `/bookings`, `/owner/requests/:id` do not subscribe — verify: `esyres_app/frontend` OwnerHome + routes
-- [ ] `/owner` happy path looks right on desktop and mobile (queue + panel; no toast) — verify: human-only: PR screenshots desktop+mobile
 
 ## Pass/fail — architecture
 
@@ -74,6 +73,6 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 7. **Docs (same PR):** slim Compose is now php + vite + mysql + **reverb**. Patch `docs/adr/0012-long-lived-slim-compose.md`, `docs/architecture/07-Docker-and-Local-Dev.md`, `docs/architecture/08-Decisions.md` #36 (remaining: nginx, redis, worker, mailpit), `.cursor/CONTEXT.md`, `esyres_app/README.md`. Add `docs/adr/0014-reverb-in-slim-compose.md`. One line on `docs/architecture/04-Frontend.md`: `/owner` subscribes to `bookingCustomerResponded` and refetches queue+occupying; no poll. Do not add VAPID.
 8. Do not add Pest, Playwright, codegen, Redis, toast UI, or new-request/reschedule subscriptions.
 9. Loop: implement → run every verify command from `esyres_app/` → fix. Cap 8. Same failure twice → escalate.
-10. On success: PR linking this key; list commands run. **UI story** — embed desktop + mobile screenshots of `/owner` (queue + panel, no toast) in the PR description (not committed). If capture/attach fails, open a **draft/blocked** PR.
+10. On success: PR linking this key; list commands run. UI story — same ready rule as non-UI (machine gates). Do not embed screenshots. Do not draft because shots are missing.
 11. On escalate: draft/blocked PR with failing checks and the human decision needed.
 12. After PR: Bugbot; nits on same PR. If Bugbot contradicts this key, stop and ask.

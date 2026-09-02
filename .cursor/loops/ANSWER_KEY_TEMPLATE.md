@@ -24,7 +24,7 @@ Format: `- [ ] <behavior> — verify: <test | command | human-only: …>`
 
 Cap **human-only** at 1–2 lines per key. If a check cannot name a verifier, it is still fog — do not put it here.
 
-For user-visible UI stories, reserve one human-only line for visual acceptance, e.g. `human-only: PR screenshots desktop+mobile` (see playbook **PR visual evidence**).
+Do not reserve a human-only line for PR screenshots. UI ready is machine gates; visual review is merge (playbook **UI ready rule**).
 
 - [ ] … — verify:
 - [ ] … — verify:
@@ -64,7 +64,7 @@ Explicit non-goals for this PR (later phase, adjacent stories, refactors not req
 2. Implement **only** what this key requires. Do not expand scope or invent stack.
 3. Loop: implement → run every verify command → fix failures. Count each full implement→verify as one cycle.
 4. Stop when all named-verifier product checks, architecture checks, and verify commands pass, **or** when the iteration cap is hit, **or** when the same failure repeats twice with no progress. Human-only checks (at most 1–2) are for the human at PR review unless the key says otherwise.
-5. On success: open a PR whose body links this answer key and lists what was verified. If this story changes any user-visible surface, embed **desktop + mobile** screenshots of the primary happy path in the PR description (extra states only if this key owns them; before/after only for redesigns of an existing screen). Do not commit shot files into the repo. If capture or attach fails, open a **draft/blocked** PR noting that UI screenshots are missing — do not mark ready.
+5. On success: open a PR whose body links this answer key and lists what was verified. UI stories use the same ready rule as non-UI (machine gates). Do not embed screenshots in the PR. Do not open a draft/blocked PR because shots are missing. Do not type credentials into the IDE browser or ask the human to attach shots.
 6. On escalate: open a draft/blocked PR with failing checks, last command output summary, and the decision needed from a human. Do not keep spending cycles.
 7. Do not mark the PR ready for merge solely because you believe the work is done — machine gates must pass.
 8. After PR: trivial Bugbot nits on the same PR (do not burn the cap). If Bugbot contradicts this key, stop and ask.

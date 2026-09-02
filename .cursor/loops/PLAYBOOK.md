@@ -50,18 +50,22 @@ Foggy stories use a **light story map** (Destination, Decisions so far, Open dec
 | Hard stop | 5–8 implement→verify cycles, then escalate |
 | Plan gate | Fog check → optional map → draft key → you approve → implement |
 | Checker | Bugbot on the PR (nits on same PR; key conflicts escalate; no second critic) |
-| PR visual evidence | UI stories: agent embeds desktop + mobile shots in the PR description (see below) |
+| UI ready | Same as non-UI: machine gates. Visual review is you at merge (see **UI ready rule**) |
 
-## PR visual evidence
+## UI ready rule
 
-For stories that change **any user-visible surface** (page/route, layout, on-screen copy, styling, component look):
+Ready PR = every verify command in the answer key exits 0. UI stories are not a special case.
 
-- The **implementer** attaches screenshots in the **PR description** (GitHub image embeds). Do not commit shot files into the repo.
-- **Minimum:** desktop + mobile of the primary happy path. Extra states only if the story owns them (empty, error, logged-out). Before/after only when redesigning an existing screen.
-- Non-UI PRs (API/data/infra with no UI touch) skip screenshots.
-- Missing shots → open a **draft/blocked** PR (same escalate pattern). Screenshots are human review evidence, not a machine verify command. A staging/preview URL in the PR body is optional.
+Visual acceptance is the **merge gate**: you look at the running app. Do **not**:
 
-UI visual acceptance on the answer key uses one of the capped `human-only` product checks (e.g. `human-only: PR screenshots desktop+mobile`).
+- embed screenshots in the PR as a loop step
+- draft/block because shots are missing
+- type credentials into the IDE browser
+- ask the human to log in, attach shots, then mark ready
+
+The agent may browser-check public/unauthed surfaces when useful. That never gates ready.
+
+Do not reserve a human-only line for PR screenshots. Cap 1–2 human-only stays for genuine non-machine checks.
 
 ## Fog gate
 
@@ -99,7 +103,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 5. **You approve** the answer key (Status `approved`; every product check names a verifier).
 6. Use the `story-loop` skill. Default (`story-loop STORY-xx`): implement in this chat against the key. Opt-in Cloud (`story-loop STORY-xx unattended`): emit a short paste block only — do not write a brief file.
 7. Implementer (Local or Cloud) follows **Implementer instructions** in the key; runs verify from the app root; retries while under the iteration cap.
-8. On pass: open a PR (UI stories: embed desktop + mobile screenshots in the PR description per **PR visual evidence**; draft/blocked if shots cannot be attached). On cap / stuck: open a draft or blocked PR with what failed — do not burn more cycles.
+8. On pass: open a ready PR (UI stories use the same rule; see **UI ready rule**). On cap / stuck: open a draft or blocked PR with what failed — do not burn more cycles.
 9. Run Bugbot on the PR. Trivial nits: fix on the same PR (do not burn the cap). Findings that contradict the key: stop and ask. Do not silently rewrite the key.
 10. You review and merge.
 
@@ -108,7 +112,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 1. **Plan gate** — fog cleared (map or sharp path); answer key approved by you; agent does not invent the key mid-run.
 2. **Machine gate** — every verify command in the answer key exits 0 (plus at most 1–2 named human-only product checks).
 3. **Checker gate** — Bugbot on the PR (lightweight second opinion). Nits stay on the PR; key conflicts escalate to you.
-4. **Merge gate** — you review and merge (for UI stories: use PR screenshots as visual evidence).
+4. **Merge gate** — you review and merge (for UI stories: look at the running app).
 
 ## Hard stop
 
