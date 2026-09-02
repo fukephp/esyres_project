@@ -112,6 +112,7 @@ void i18n.use(initReactI18next).init({
         },
         owner: {
           title: 'Zahtjevi',
+          salon: 'Salon',
           date: 'Datum',
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',

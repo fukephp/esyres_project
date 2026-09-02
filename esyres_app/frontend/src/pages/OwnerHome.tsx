@@ -31,6 +31,8 @@ import {
   isPreferredSoon,
   occupyingBlock,
   ownerDateFromSearch,
+  ownerSalonFromSearch,
+  ownerSearchParams,
   panelCells,
   proposeErrorKey,
   trimDeclineReason,
@@ -41,7 +43,9 @@ export function OwnerHome() {
   const [params, setParams] = useSearchParams()
   const date = ownerDateFromSearch(params.get('date'))
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
-  const salon = data?.me?.salons[0] ?? null
+  const salons = data?.me?.salons ?? []
+  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
+  const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   const { data: queue, loading: queueLoading } = useQuery<PendingBookingsData>(PENDING_BOOKINGS_QUERY, {
     variables: { salonId: salon?.id ?? '', date },
@@ -65,12 +69,11 @@ export function OwnerHome() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   function onDate(value: string) {
-    const next = ownerDateFromSearch(value)
-    if (next === sarajevoToday()) {
-      setParams({})
-      return
-    }
-    setParams({ date: next })
+    setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
+  }
+
+  function onSalon(id: string) {
+    setParams(ownerSearchParams(date, sarajevoToday(), id, salons[0]?.id ?? null))
   }
 
   function refetchBoard() {
@@ -220,12 +223,46 @@ export function OwnerHome() {
   return (
     <div className="min-h-svh md:flex">
       <aside className="hidden bg-surface-dark px-5 py-8 text-on-dark md:flex md:w-56 md:shrink-0 md:flex-col">
-        <p className="text-sm font-semibold">{salon.name}</p>
+        {salons.length > 1 ? (
+          <label className="block text-sm">
+            {t('owner.salon')}
+            <select
+              value={salon.id}
+              onChange={(e) => onSalon(e.target.value)}
+              className="mt-1 w-full rounded-md border border-white/20 bg-surface-dark px-2 py-1.5 text-sm text-on-dark"
+            >
+              {salons.map((row) => (
+                <option key={row.id} value={row.id}>
+                  {row.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <p className="text-sm font-semibold">{salon.name}</p>
+        )}
         <p className="mt-6 text-sm font-medium">{t('owner.title')}</p>
       </aside>
       <main className="flex-1 px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
-        <p className="mt-1 text-sm text-body md:hidden">{salon.name}</p>
+        {salons.length > 1 ? (
+          <label className="mt-1 block max-w-xs text-sm text-body md:hidden">
+            {t('owner.salon')}
+            <select
+              value={salon.id}
+              onChange={(e) => onSalon(e.target.value)}
+              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+            >
+              {salons.map((row) => (
+                <option key={row.id} value={row.id}>
+                  {row.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <p className="mt-1 text-sm text-body md:hidden">{salon.name}</p>
+        )}
         <label className="mt-6 block max-w-xs text-sm text-body">
           {t('owner.date')}
           <input

@@ -18,6 +18,7 @@ import {
   type OwnerSalonData,
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
+import { sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
   canAcceptPreferredTime,
@@ -37,8 +38,7 @@ export function OwnerRequestDetail() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
-  const salon = data?.me?.salons[0] ?? null
-  const ownerReady = salon !== null && data?.me?.emailVerified === true
+  const ownerReady = (data?.me?.salons.length ?? 0) > 0 && data?.me?.emailVerified === true
   const {
     data: bookingData,
     loading: bookingLoading,
@@ -86,7 +86,11 @@ export function OwnerRequestDetail() {
     .map((row: OccupyingBooking) => occupyingBlock(row))
     .filter((row) => row !== null)
   const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
-  const queuePath = date === '' ? '/owner' : ownerQueuePath(date)
+  const firstOwnedId = data?.me?.salons[0]?.id ?? null
+  const queuePath =
+    booking === undefined
+      ? '/owner'
+      : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
   const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
   const bounce = forbidden || (booking !== undefined && booking.status !== 'REQUESTED')
 
@@ -94,7 +98,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    await navigate(ownerQueuePath(booking.preferredDate))
+    await navigate(ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId))
   }
 
   async function onAccept() {
@@ -176,7 +180,7 @@ export function OwnerRequestDetail() {
     )
   }
 
-  if (salon === null) {
+  if (data.me.salons.length === 0) {
     return (
       <main className="mx-auto max-w-md px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
@@ -196,12 +200,12 @@ export function OwnerRequestDetail() {
   return (
     <div className="min-h-svh md:flex">
       <aside className="hidden bg-surface-dark px-5 py-8 text-on-dark md:flex md:w-56 md:shrink-0 md:flex-col">
-        <p className="text-sm font-semibold">{salon.name}</p>
+        <p className="text-sm font-semibold">{booking?.salon.name ?? ''}</p>
         <p className="mt-6 text-sm font-medium">{t('owner.title')}</p>
       </aside>
       <main className="mx-auto w-full max-w-xl flex-1 px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
-        <p className="mt-1 text-sm text-body md:hidden">{salon.name}</p>
+        <p className="mt-1 text-sm text-body md:hidden">{booking?.salon.name ?? ''}</p>
         <p className="mt-6">
           <Link to={queuePath} className="text-sm font-medium text-ink underline">
             {t('owner.back')}
