@@ -12,14 +12,18 @@ import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonServ
 import {
   assistantBookingInput,
   assistantCanSend,
+  assistantDateChange,
+  assistantHoursForDate,
+  assistantShowOtherTime,
   isChatOpen,
   isPickerOpen,
   showChatCta,
+  suggestPreferredTimes,
   type ProfileMode,
 } from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
-import { formatFeninga, sarajevoToday } from '../lib/format'
+import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
 
 const busyBg = {
   'busy-free': 'bg-busy-free',
@@ -73,8 +77,13 @@ export function SalonProfile() {
   const { id } = useParams()
   const { t } = useTranslation()
   const date = sarajevoToday()
+  const [chatDate, setChatDate] = useState('')
+  const [chatTime, setChatTime] = useState('')
+  const [chatWorker, setChatWorker] = useState('')
+  const [chatWorkerConfirmed, setChatWorkerConfirmed] = useState(false)
+  const [chatOtherTime, setChatOtherTime] = useState(false)
   const { data, loading } = useQuery<PublicSalonData>(PUBLIC_SALON_QUERY, {
-    variables: { id, date },
+    variables: { id, date, chosenDate: chatDate !== '' ? chatDate : date },
     skip: !id,
   })
   const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
@@ -84,10 +93,6 @@ export function SalonProfile() {
   const [preferredTime, setPreferredTime] = useState('')
   const [workerChoice, setWorkerChoice] = useState('')
   const [chatSelected, setChatSelected] = useState<string[]>([])
-  const [chatDate, setChatDate] = useState('')
-  const [chatTime, setChatTime] = useState('')
-  const [chatWorker, setChatWorker] = useState('')
-  const [chatWorkerConfirmed, setChatWorkerConfirmed] = useState(false)
   const [needLogin, setNeedLogin] = useState(false)
   const [needEmail, setNeedEmail] = useState(false)
   const [needPhone, setNeedPhone] = useState(false)
@@ -122,6 +127,19 @@ export function SalonProfile() {
   const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
   const showAlternate = showChatCta(salon.services.length, sent) && !chatting
+  const hoursForDay = chatDate === '' ? undefined : assistantHoursForDate(salon.hours, chatDate)
+  const dayClosed =
+    hoursForDay === undefined ||
+    hoursForDay.closed ||
+    hoursForDay.opensAt === null ||
+    hoursForDay.closesAt === null
+  const suggestions = suggestPreferredTimes({
+    hoursForDay,
+    busyLevel: salon.chatBusyLevel,
+    date: chatDate,
+    today: date,
+    nowMinutes: chatDate === date ? sarajevoNowMinutes() : undefined,
+  })
 
   function toggle(service: SalonService) {
     setSelected((ids) =>
@@ -430,9 +448,27 @@ export function SalonProfile() {
           }}
           workerConfirmed={chatWorkerConfirmed}
           preferredDate={chatDate}
-          onDate={setChatDate}
+          onDate={(value) => {
+            const next = assistantDateChange(value)
+            setChatDate(next.preferredDate)
+            setChatTime(next.preferredTime)
+            setChatOtherTime(next.otherTime)
+          }}
           preferredTime={chatTime}
-          onTime={setChatTime}
+          onPickSuggestion={(value) => {
+            setChatTime(value)
+            setChatOtherTime(false)
+          }}
+          onNativeTime={setChatTime}
+          dayClosed={dayClosed}
+          dayBusy={salon.chatBusyLevel}
+          suggestions={suggestions}
+          showOtherTime={assistantShowOtherTime(dayClosed)}
+          otherTime={chatOtherTime}
+          onOtherTime={() => {
+            setChatOtherTime(true)
+            setChatTime('')
+          }}
           error={error}
           busy={busy}
           needLogin={needLogin}

@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 import type { BusyLevel } from '../lib/busyToken'
 
 export const PUBLIC_SALON_QUERY = gql`
-  query PublicSalon($id: ID!, $date: String!) {
+  query PublicSalon($id: ID!, $date: String!, $chosenDate: String!) {
     salon(id: $id) {
       id
       name
@@ -26,6 +26,7 @@ export const PUBLIC_SALON_QUERY = gql`
         name
       }
       busyLevel(date: $date)
+      chatBusyLevel: busyLevel(date: $chosenDate)
     }
   }
 `
@@ -59,6 +60,7 @@ export type PublicSalon = {
   services: SalonService[]
   workers: SalonWorker[]
   busyLevel: BusyLevel
+  chatBusyLevel: BusyLevel
 }
 
 export type PublicSalonData = {

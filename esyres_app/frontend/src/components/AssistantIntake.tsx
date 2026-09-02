@@ -5,6 +5,7 @@ import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
 import { assistantCanSend, assistantStep } from '../lib/assistant'
+import type { BusyLevel } from '../lib/busyToken'
 import { formatFeninga } from '../lib/format'
 
 type Props = {
@@ -19,7 +20,14 @@ type Props = {
   preferredDate: string
   onDate: (value: string) => void
   preferredTime: string
-  onTime: (value: string) => void
+  onPickSuggestion: (value: string) => void
+  onNativeTime: (value: string) => void
+  dayClosed: boolean
+  dayBusy: BusyLevel
+  suggestions: string[]
+  showOtherTime: boolean
+  otherTime: boolean
+  onOtherTime: () => void
   error: string | null
   busy: boolean
   needLogin: boolean
@@ -45,7 +53,14 @@ export function AssistantIntake({
   preferredDate,
   onDate,
   preferredTime,
-  onTime,
+  onPickSuggestion,
+  onNativeTime,
+  dayClosed,
+  dayBusy,
+  suggestions,
+  showOtherTime,
+  otherTime,
+  onOtherTime,
   error,
   busy,
   needLogin,
@@ -68,6 +83,7 @@ export function AssistantIntake({
     workerChoice === ''
       ? t('salon.noPreference')
       : (workers.find((w) => w.id === workerChoice)?.name ?? t('salon.noPreference'))
+  const timeStep = step === 'time' || step === 'send'
 
   return (
     <form className="mt-8 space-y-5" onSubmit={onSend}>
@@ -122,7 +138,7 @@ export function AssistantIntake({
         </>
       )}
 
-      {(step === 'date' || step === 'time' || step === 'send') && (
+      {(step === 'date' || timeStep) && (
         <>
           <p className="text-sm text-ink">{t('assistant.date')}</p>
           <label className="block text-sm text-body">
@@ -139,20 +155,51 @@ export function AssistantIntake({
         </>
       )}
 
-      {(step === 'time' || step === 'send') && (
+      {timeStep && dayClosed && (
+        <p className="text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
+      )}
+
+      {timeStep && !dayClosed && (
         <>
+          <p className="text-sm text-muted">{t(`salon.busy.${dayBusy}`)}</p>
           <p className="text-sm text-ink">{t('assistant.time')}</p>
-          <label className="block text-sm text-body">
-            {t('salon.time')}
-            <input
-              type="time"
-              required
-              step={900}
-              value={preferredTime}
-              onChange={(e) => onTime(e.target.value)}
-              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-            />
-          </label>
+          {suggestions.length > 0 && (
+            <ul className="flex flex-wrap gap-2">
+              {suggestions.map((time) => (
+                <li key={time}>
+                  <button
+                    type="button"
+                    className={!otherTime && preferredTime === time ? chipOn : chipIdle}
+                    onClick={() => onPickSuggestion(time)}
+                  >
+                    {time}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {showOtherTime && (
+            <button
+              type="button"
+              className="text-sm text-body underline underline-offset-4"
+              onClick={onOtherTime}
+            >
+              {t('assistant.otherTime')}
+            </button>
+          )}
+          {otherTime && (
+            <label className="block text-sm text-body">
+              {t('salon.time')}
+              <input
+                type="time"
+                required
+                step={900}
+                value={preferredTime}
+                onChange={(e) => onNativeTime(e.target.value)}
+                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+              />
+            </label>
+          )}
         </>
       )}
 
