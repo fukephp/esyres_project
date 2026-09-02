@@ -113,6 +113,15 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
   }
 `
 
+export const BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION = gql`
+  subscription BookingCustomerResponded($salonId: ID!) {
+    bookingCustomerResponded(salonId: $salonId) {
+      id
+      status
+    }
+  }
+`
+
 export type OwnerBooking = {
   id: string
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'

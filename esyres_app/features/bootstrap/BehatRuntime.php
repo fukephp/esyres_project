@@ -123,6 +123,10 @@ trait BehatRuntime
         $this->putEnv('SESSION_DRIVER', 'array');
         $this->putEnv('QUEUE_CONNECTION', 'sync');
         $this->putEnv('APP_TIMEZONE', 'Europe/Sarajevo');
+        $this->putEnv('BROADCAST_CONNECTION', 'log');
+        $this->putEnv('LIGHTHOUSE_BROADCASTER', 'log');
+        $this->putEnv('LIGHTHOUSE_QUEUE_BROADCASTS', 'false');
+        $this->putEnv('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'array');
         $this->putEnv('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', 'false');
         $this->putEnv('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'false');
     }

@@ -1,5 +1,5 @@
 import { DndContext, PointerSensor, useDraggable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -9,6 +9,7 @@ import { WorkerPanel } from '../components/WorkerPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
+  BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
   DECLINE_BOOKING_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
   OWNER_SALON_QUERY,
@@ -47,7 +48,7 @@ export function OwnerHome() {
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
-  const { data: queue, loading: queueLoading } = useQuery<PendingBookingsData>(PENDING_BOOKINGS_QUERY, {
+  const { data: queue, loading: queueLoading, refetch: refetchQueue } = useQuery<PendingBookingsData>(PENDING_BOOKINGS_QUERY, {
     variables: { salonId: salon?.id ?? '', date },
     skip: !ownerReady,
   })
@@ -55,9 +56,17 @@ export function OwnerHome() {
     variables: { id: salon?.id ?? '' },
     skip: !ownerReady,
   })
-  const { data: occupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
+  const { data: occupying, refetch: refetchOccupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
     variables: { salonId: salon?.id ?? '', date },
     skip: !ownerReady,
+  })
+  useSubscription(BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+    onData: () => {
+      void refetchQueue()
+      void refetchOccupying()
+    },
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)

@@ -7,6 +7,57 @@ use Behat\Gherkin\Node\PyStringNode;
 trait OwnerSteps
 {
     /**
+     * @When I subscribe to booking customer responded
+     */
+    public function iSubscribeToBookingCustomerResponded(): void
+    {
+        $this->graphql($this->bookingCustomerRespondedSubscription(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking customer responded as a guest
+     */
+    public function iSubscribeToBookingCustomerRespondedAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iSubscribeToBookingCustomerResponded();
+    }
+
+    /**
+     * @When I subscribe to booking customer responded for the other salon
+     */
+    public function iSubscribeToBookingCustomerRespondedForTheOtherSalon(): void
+    {
+        $this->graphql($this->bookingCustomerRespondedSubscription(), [
+            'salonId' => (string) $this->otherSalon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking customer responded for salon id :id
+     */
+    public function iSubscribeToBookingCustomerRespondedForSalonId(string $id): void
+    {
+        $this->graphql($this->bookingCustomerRespondedSubscription(), [
+            'salonId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then the subscription channel is present
+     */
+    public function theSubscriptionChannelIsPresent(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $channel = $this->graphql['extensions']['lighthouse_subscriptions']['channel'] ?? null;
+        if (! is_string($channel) || $channel === '') {
+            throw new RuntimeException('Expected subscription channel, got '.json_encode($this->graphql));
+        }
+    }
+
+    /**
      * @When I decline the booking
      */
     public function iDeclineTheBooking(): void
@@ -599,6 +650,18 @@ GQL, ['id' => (string) $this->salon->id]);
         foreach ($this->graphql['data']['salon']['hours'] as $day) {
             $this->assertTrue($day['closed'], $day['weekday'].' should be closed');
         }
+    }
+
+    private function bookingCustomerRespondedSubscription(): string
+    {
+        return <<<'GQL'
+subscription BookingCustomerResponded($salonId: ID!) {
+  bookingCustomerResponded(salonId: $salonId) {
+    id
+    status
+  }
+}
+GQL;
     }
 
     private function declineBookingMutation(): string

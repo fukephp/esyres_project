@@ -164,3 +164,7 @@ type Mutation {
     rejectProposedTime(bookingId: ID!): Booking!
     askOtherTime(bookingId: ID!, preferredDate: String!, preferredTime: String!): Booking!
 }
+
+type Subscription {
+    bookingCustomerResponded(salonId: ID!): Booking
+}

@@ -3,6 +3,7 @@
 namespace App\GraphQL\Mutations;
 
 use App\Exceptions\ClientError;
+use App\GraphQL\BroadcastCustomerResponded;
 use App\GraphQL\CustomerAccess;
 use App\Models\Booking;
 use App\Models\Salon;
@@ -30,8 +31,10 @@ final class AskOtherTime
             $booking->proposed_starts_at = null;
             $booking->proposed_worker_id = null;
             $booking->save();
+            $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
+            BroadcastCustomerResponded::send($booking);
 
-            return $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
+            return $booking;
         });
     }
 

@@ -10,7 +10,9 @@
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
-        "nuwave/lighthouse": "^6.69"
+        "laravel/reverb": "^1.6",
+        "nuwave/lighthouse": "^6.69",
+        "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
         "behat/behat": "^3.32",
