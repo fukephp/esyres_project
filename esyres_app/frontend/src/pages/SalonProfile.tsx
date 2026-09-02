@@ -2,12 +2,21 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
+import { AssistantIntake } from '../components/AssistantIntake'
 import { AuthShell } from '../components/AuthShell'
 import { BookingsLink } from '../components/BookingsLink'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
+import {
+  assistantBookingInput,
+  assistantCanSend,
+  isChatOpen,
+  isPickerOpen,
+  showChatCta,
+  type ProfileMode,
+} from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoToday } from '../lib/format'
@@ -69,16 +78,20 @@ export function SalonProfile() {
     skip: !id,
   })
   const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
-  const [picking, setPicking] = useState(false)
+  const [mode, setMode] = useState<ProfileMode>('idle')
   const [selected, setSelected] = useState<string[]>([])
   const [preferredDate, setPreferredDate] = useState('')
   const [preferredTime, setPreferredTime] = useState('')
   const [workerChoice, setWorkerChoice] = useState('')
+  const [chatSelected, setChatSelected] = useState<string[]>([])
+  const [chatDate, setChatDate] = useState('')
+  const [chatTime, setChatTime] = useState('')
+  const [chatWorker, setChatWorker] = useState('')
+  const [chatWorkerConfirmed, setChatWorkerConfirmed] = useState(false)
   const [needLogin, setNeedLogin] = useState(false)
   const [needEmail, setNeedEmail] = useState(false)
   const [needPhone, setNeedPhone] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
 
   if (loading) {
@@ -103,7 +116,12 @@ export function SalonProfile() {
   const token = busyToken(salon.busyLevel)
   const chosen = salon.services.filter((s) => selected.includes(s.id))
   const stack = stackSelection(chosen)
-  const canSend = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
+  const picking = isPickerOpen(mode)
+  const chatting = isChatOpen(mode)
+  const sent = mode === 'sent'
+  const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
+  const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
+  const showAlternate = showChatCta(salon.services.length, sent) && !chatting
 
   function toggle(service: SalonService) {
     setSelected((ids) =>
@@ -114,7 +132,7 @@ export function SalonProfile() {
   async function send(input: CreateBookingInput) {
     try {
       await createBooking({ variables: { input } })
-      setSent(true)
+      setMode('sent')
       setNeedLogin(false)
       setNeedEmail(false)
       setNeedPhone(false)
@@ -148,9 +166,26 @@ export function SalonProfile() {
     }
   }
 
+  function openIntake(next: 'picker' | 'chat') {
+    setMode(next)
+    setNeedLogin(false)
+    setNeedEmail(false)
+    setNeedPhone(false)
+    setError(null)
+  }
+
   function bookingInput(): CreateBookingInput | null {
     if (!id) {
       return null
+    }
+    if (chatting) {
+      return assistantBookingInput({
+        salonId: id,
+        serviceIds: chatSelected,
+        workerChoice: chatWorker,
+        preferredDate: chatDate,
+        preferredTime: chatTime,
+      })
     }
     const input: CreateBookingInput = {
       salonId: id,
@@ -167,7 +202,8 @@ export function SalonProfile() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!id || !canSend || busy) {
+    const ready = chatting ? canSendChat : canSendPicker
+    if (!id || !ready || busy) {
       return
     }
     const input = bookingInput()
@@ -269,9 +305,18 @@ export function SalonProfile() {
         <button
           type="button"
           className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
-          onClick={() => setPicking(true)}
+          onClick={() => openIntake('picker')}
         >
           {t('salon.send')}
+        </button>
+      )}
+      {showAlternate && (
+        <button
+          type="button"
+          className="mt-3 w-full px-4 py-2 text-sm text-body underline underline-offset-4"
+          onClick={() => openIntake('chat')}
+        >
+          {t('assistant.ask')}
         </button>
       )}
 
@@ -342,7 +387,7 @@ export function SalonProfile() {
             {!needLogin && !needEmail && !needPhone && (
               <button
                 type="submit"
-                disabled={!canSend || busy}
+                disabled={!canSendPicker || busy}
                 className="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
               >
                 {t('salon.submit')}
@@ -365,6 +410,37 @@ export function SalonProfile() {
             </div>
           )}
         </>
+      )}
+
+      {chatting && !sent && id && (
+        <AssistantIntake
+          services={salon.services}
+          workers={salon.workers}
+          minDate={date}
+          selected={chatSelected}
+          onToggleService={(serviceId) =>
+            setChatSelected((ids) =>
+              ids.includes(serviceId) ? ids.filter((sid) => sid !== serviceId) : [...ids, serviceId],
+            )
+          }
+          workerChoice={chatWorker}
+          onPickWorker={(workerId) => {
+            setChatWorker(workerId)
+            setChatWorkerConfirmed(true)
+          }}
+          workerConfirmed={chatWorkerConfirmed}
+          preferredDate={chatDate}
+          onDate={setChatDate}
+          preferredTime={chatTime}
+          onTime={setChatTime}
+          error={error}
+          busy={busy}
+          needLogin={needLogin}
+          needEmail={needEmail}
+          needPhone={needPhone}
+          onSend={onSubmit}
+          onAfterAuth={() => void afterAuth()}
+        />
       )}
 
       {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
