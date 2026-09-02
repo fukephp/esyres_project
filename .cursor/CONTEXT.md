@@ -15,11 +15,11 @@ Bosnian-first UI. Prices in KM (integer feninga in the data model). Preserve QR 
 
 ## Architecture (locked)
 
-See `docs/architecture/`. Short version: Laravel + Lighthouse GraphQL + MySQL + Redis + Reverb, one React TypeScript PWA, Sanctum cookies, same origin via Nginx. Slim Docker Compose (`php` + `vite` + `mysql`) lives in `esyres_app/`; nginx, redis, reverb, and the rest of the full list are not written yet.
+See `docs/architecture/`. Short version: Laravel + Lighthouse GraphQL + MySQL + Redis + Reverb, one React TypeScript PWA, Sanctum cookies, same origin via Nginx. Slim Docker Compose (`php` + `vite` + `mysql` + `reverb`) lives in `esyres_app/`; nginx, redis, queue worker, and mailpit are not written yet.
 
 Do not invent a different stack. Do not expand the scaffold into product features unless the user asks.
 
-**Local verify** (from `esyres_app/`): `docker compose up -d`; `docker compose exec -T php php artisan --version`; `docker compose exec -T php vendor/bin/behat`; frontend `typecheck` / `test` / `build`; marketing `build`. Never `docker compose run` for verify or servers; reuse :5173/:8000. See `esyres_app/README.md`. Backend gate is Behat, not `php artisan test`.
+**Local verify** (from `esyres_app/`): `docker compose up -d`; `docker compose exec -T php php artisan --version`; `docker compose exec -T php vendor/bin/behat`; frontend `typecheck` / `test` / `build`; marketing `build`. Never `docker compose run` for verify or servers; reuse :5173/:8000/:8080. See `esyres_app/README.md`. Backend gate is Behat, not `php artisan test`.
 
 ## Folder map
 

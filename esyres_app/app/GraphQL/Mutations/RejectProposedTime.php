@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Mutations;
 
+use App\GraphQL\BroadcastCustomerResponded;
 use App\GraphQL\CustomerAccess;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
@@ -22,8 +23,10 @@ final class RejectProposedTime
             $booking->proposed_starts_at = null;
             $booking->proposed_worker_id = null;
             $booking->save();
+            $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
+            BroadcastCustomerResponded::send($booking);
 
-            return $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
+            return $booking;
         });
     }
 }

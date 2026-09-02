@@ -412,7 +412,7 @@ return [
         /*
          * Determines if broadcasts should be queued by default.
          */
-        'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
+        'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', false),
 
         /*
          * Determines the queue to use for broadcasting queue jobs.
@@ -424,7 +424,7 @@ return [
          *
          * Any Laravel supported cache driver options are available here.
          */
-        'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
+        'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'database'),
 
         /*
          * Default subscription storage time to live in seconds.
@@ -433,7 +433,7 @@ return [
          * Setting this to `null` means the subscriptions are stored forever. This may cause
          * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
          */
-        'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
+        'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', 3600),
 
         /*
          * Encrypt subscription channels by prefixing their names with "private-encrypted-"?
@@ -443,7 +443,7 @@ return [
         /*
          * Default subscription broadcaster.
          */
-        'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
+        'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'reverb'),
 
         /*
          * Subscription broadcasting drivers with config options.
