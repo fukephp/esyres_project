@@ -16,6 +16,10 @@ _Avoid_: merchant, vendor, admin, staff login
 A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
 _Avoid_: location, branch, store, storefront
 
+**Salon switcher**:
+The owner control that chooses which of their salons is in context. Shown only when they own more than one. Each salon stays a separate shop. Not a chain location picker and not a customer discovery list.
+_Avoid_: location switcher, branch picker, store selector
+
 **Salon profile**:
 The guest-facing page for one salon: name, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
 _Avoid_: storefront, landing, listing detail, shop page

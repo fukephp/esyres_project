@@ -10,6 +10,7 @@ import {
   occupyingBlock,
   ownerDateFromSearch,
   ownerQueuePath,
+  ownerSalonFromSearch,
   panelCells,
   proposeErrorKey,
   proposeStartTimes,
@@ -118,6 +119,22 @@ test('propose start times are droppable starts for that worker', () => {
 test('owner queue path omits today', () => {
   expect(ownerQueuePath('2026-08-29', '2026-08-29')).toBe('/owner')
   expect(ownerQueuePath('2026-08-30', '2026-08-29')).toBe('/owner?date=2026-08-30')
+})
+
+test('salon from search falls back to first owned', () => {
+  const salons = [{ id: '1' }, { id: '2' }]
+  expect(ownerSalonFromSearch(null, salons)).toBe('1')
+  expect(ownerSalonFromSearch('nope', salons)).toBe('1')
+  expect(ownerSalonFromSearch('9', salons)).toBe('1')
+  expect(ownerSalonFromSearch('2', salons)).toBe('2')
+  expect(ownerSalonFromSearch('1', [])).toBeNull()
+})
+
+test('owner queue path omits first-owned salon and keeps date', () => {
+  expect(ownerQueuePath('2026-08-29', '2026-08-29', '1', '1')).toBe('/owner')
+  expect(ownerQueuePath('2026-08-29', '2026-08-29', '2', '1')).toBe('/owner?salon=2')
+  expect(ownerQueuePath('2026-08-30', '2026-08-29', '1', '1')).toBe('/owner?date=2026-08-30')
+  expect(ownerQueuePath('2026-08-30', '2026-08-29', '2', '1')).toBe('/owner?date=2026-08-30&salon=2')
 })
 
 test('occupying block uses proposed fields for time proposed', () => {

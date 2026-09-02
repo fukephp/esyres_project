@@ -19,6 +19,7 @@ export const OWNER_BOOKING_QUERY = gql`
       }
       salon {
         id
+        name
       }
     }
   }
@@ -121,7 +122,7 @@ export type OwnerBooking = {
   durationMinutes: number
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
-  salon: { id: string }
+  salon: { id: string; name: string }
 }
 
 export type OwnerBookingData = {

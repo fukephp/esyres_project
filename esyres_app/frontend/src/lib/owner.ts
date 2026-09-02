@@ -177,12 +177,42 @@ export function proposeStartTimes(cells: PanelCell[], blocks: OccupyingBlock[], 
   return cells.filter((cell) => canDropOnStart(cellKind(cell.time, cell.off, blocks, workerId))).map((cell) => cell.time)
 }
 
-export function ownerQueuePath(date: string, today = sarajevoToday()): string {
-  if (date === today) {
-    return '/owner'
+export function ownerSalonFromSearch(param: string | null, salons: { id: string }[]): string | null {
+  if (salons.length === 0) {
+    return null
+  }
+  if (param !== null && salons.some((row) => row.id === param)) {
+    return param
   }
 
-  return `/owner?date=${date}`
+  return salons[0].id
+}
+
+export function ownerSearchParams(
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+): URLSearchParams {
+  const params = new URLSearchParams()
+  if (date !== today) {
+    params.set('date', date)
+  }
+  if (salonId !== null && firstOwnedId !== null && salonId !== firstOwnedId) {
+    params.set('salon', salonId)
+  }
+
+  return params
+}
+
+export function ownerQueuePath(
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+): string {
+  const query = ownerSearchParams(date, today, salonId, firstOwnedId).toString()
+  return query === '' ? '/owner' : `/owner?${query}`
 }
 
 export function occupyingBlock(row: {
