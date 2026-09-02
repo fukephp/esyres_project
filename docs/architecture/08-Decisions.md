@@ -6,8 +6,8 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 2. **Sanctum cookies, not Bearer** — httpOnly session; tokens later for native.
 3. **One users table + roles** — same human can book and own salons. Workers are not users.
 4. **Email+password login** — phone is not the username. Guest browse stays open.
-5. **Phone OTP required to send a request and to respond to a counter-proposal, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login. Phone stored as E.164, any country (see `docs/adr/0006-phone-e164-any-country.md`). Customer respond mutations share the `createBooking` gates (`docs/adr/0011-customer-respond-same-verify-gates.md`).
-6. **Email verified before request or owner panel** — reminders and fake-owner protection.
+5. **Phone OTP required to send a request and to respond to a counter-proposal, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login. Phone stored as E.164, any country (see `docs/adr/0006-phone-e164-any-country.md`). Customer respond mutations share the `createBooking` gates (`docs/adr/0011-customer-respond-same-verify-gates.md`). Exception: `APP_ENV=local` treats phone as verified for gates and GraphQL fields; timestamps stay null (`docs/adr/0013-local-skip-verification-gates.md`).
+6. **Email verified before request or owner panel** — reminders and fake-owner protection. Exception: `APP_ENV=local` treats email as verified for gates and GraphQL fields; timestamps stay null (`docs/adr/0013-local-skip-verification-gates.md`).
 7. **Invite-only owners** — first 15–20 salons are provisioned, not self-serve.
 8. **Lighthouse code-first, one endpoint** — PHP is the contract; codegen introspects local schema. Exception: email verification completes via Laravel signed GET (`verification.verify`), not a GraphQL mutation. See `docs/adr/0003-email-verify-signed-get.md`.
 9. **Redis from day one** — OTP, queues, cache, Reverb. Slim Compose still has no redis service (ADR 0001 / #36). OTP codes and throttle use Laravel Cache until Redis is the cache driver; see `docs/adr/0005-otp-in-laravel-cache.md`.

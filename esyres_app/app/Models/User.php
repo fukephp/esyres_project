@@ -36,9 +36,14 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new VerifyEmail);
     }
 
+    public function hasVerifiedEmail(): bool
+    {
+        return app()->environment('local') || $this->email_verified_at !== null;
+    }
+
     public function hasVerifiedPhone(): bool
     {
-        return $this->phone_verified_at !== null;
+        return app()->environment('local') || $this->phone_verified_at !== null;
     }
 
     /**

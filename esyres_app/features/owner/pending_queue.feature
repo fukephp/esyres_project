@@ -113,6 +113,13 @@ Feature: Owner pending queue for a day
     And I query pending bookings for date "2026-08-29"
     Then the GraphQL error code is "EMAIL_UNVERIFIED"
 
+  Scenario: Local env lets an unverified owner read the queue
+    Given an unverified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    And the app environment is local
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query pending bookings for date "2026-08-29"
+    Then pending bookings are empty
+
   Scenario: Other user cannot read the queue
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
     And another verified user "other@example.com" with password "secret-pass"

@@ -21,7 +21,7 @@ final class VerifyEmailController
             return redirect()->away(SpaUrl::bookings('verify=mismatch'));
         }
 
-        if (! $user->hasVerifiedEmail()) {
+        if ($user->email_verified_at === null) {
             $user->markEmailAsVerified();
         }
 

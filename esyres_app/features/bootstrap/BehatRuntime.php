@@ -94,6 +94,7 @@ trait BehatRuntime
             }
         }
         $this->app = BehatKernel::$app;
+        $this->app['env'] = 'testing';
         $this->truncateData();
         Cache::flush();
         Carbon::setTestNow(Carbon::parse('2026-08-29 09:00:00', 'Europe/Sarajevo'));
@@ -202,6 +203,22 @@ trait BehatRuntime
     {
         if ($value === null) {
             throw new RuntimeException('Expected not null');
+        }
+    }
+
+    /**
+     * @Given the app environment is local
+     */
+    public function theAppEnvironmentIsLocal(): void
+    {
+        $this->app['env'] = 'local';
+    }
+
+    /** @AfterScenario */
+    public function restoreTestingEnvironment(): void
+    {
+        if (isset($this->app)) {
+            $this->app['env'] = 'testing';
         }
     }
 

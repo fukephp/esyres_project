@@ -63,6 +63,18 @@ Feature: Customer multi-service booking request
     And I create a booking on "2026-08-31" at "10:00" with the salon services
     Then the GraphQL error code is "EMAIL_UNVERIFIED"
 
+  Scenario: Local env lets an unverified customer create a booking
+    Given a customer "ana@example.com" with password "secret-pass" with no verifications
+    And the app environment is local
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I query me
+    Then me has a verified email
+    And me phone is verified
+    When I create a booking on "2026-08-31" at "10:00" with the salon services
+    Then the booking status is "REQUESTED"
+    And the customer email is not verified in the database
+    And the customer phone is not verified
+
   Scenario: Unverified phone cannot create a booking
     Given a customer "ana@example.com" with password "secret-pass" whose phone is not verified
     When I log in as "ana@example.com" with password "secret-pass"

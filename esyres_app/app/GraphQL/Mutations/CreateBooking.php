@@ -24,10 +24,10 @@ final class CreateBooking
         if (! $user instanceof User) {
             throw new ClientError('UNAUTHENTICATED');
         }
-        if ($user->email_verified_at === null) {
+        if (! $user->hasVerifiedEmail()) {
             throw new ClientError('EMAIL_UNVERIFIED');
         }
-        if ($user->phone_verified_at === null) {
+        if (! $user->hasVerifiedPhone()) {
             throw new ClientError('PHONE_UNVERIFIED');
         }
 

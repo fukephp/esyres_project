@@ -422,6 +422,17 @@ trait GuestSteps
     }
 
     /**
+     * @Given a customer :email with password :password with no verifications
+     */
+    public function aCustomerWithNoVerifications(string $email, string $password): void
+    {
+        $this->user = User::factory()->unverified()->create([
+            'email' => $email,
+            'password' => $password,
+        ]);
+    }
+
+    /**
      * @Given a customer :email with password :password whose phone is not verified
      */
     public function aCustomerWhosePhoneIsNotVerified(string $email, string $password): void
