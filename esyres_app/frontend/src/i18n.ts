@@ -51,7 +51,8 @@ void i18n.use(initReactI18next).init({
           services: 'Koje usluge želiš?',
           worker: 'Imaš li preferenciju za radnika?',
           date: 'Koji dan ti odgovara?',
-          time: 'U koje vrijeme?',
+          time: 'Evo vremena koja nam odgovaraju.',
+          otherTime: 'Drugo vrijeme',
           send: 'Ako ti ovo odgovara, pošalji zahtjev.',
         },
         discovery: {

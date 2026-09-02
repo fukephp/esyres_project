@@ -29,3 +29,17 @@ export function formatSarajevoDateTime(iso: string): string {
 
   return `${date} ${formatSarajevoTime(iso)}`
 }
+
+export function sarajevoNowMinutes(now = new Date()): number {
+  const [hour, minute] = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Sarajevo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+    .format(now)
+    .split(':')
+    .map(Number)
+
+  return hour * 60 + minute
+}

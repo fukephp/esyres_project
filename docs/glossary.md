@@ -64,6 +64,10 @@ _Avoid_: Cora, chatbot, WhatsApp bot, AI assistant, customer inbox, live chat
 The assistant’s guided steps on that profile. The guest answers with taps, not free-form understanding. Not NLU and not a slot grid.
 _Avoid_: wizard (as a separate product), NLU flow, conversation inbox
 
+**Preferred-time suggestion**:
+One of at most three coarse preferred clocks the assistant offers from working hours and that day’s busy-level. Not a live slot, not a hold, and not the picker’s native time control.
+_Avoid_: slot offer, free slot, availability chip, recommended slot
+
 ## Bookings
 
 **My Bookings**:
