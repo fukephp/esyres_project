@@ -7,7 +7,7 @@ This git root is the Cursor/docs workspace. Application code lives in `esyres_ap
 - `esyres_app/` — Laravel + PWA (all app commands run here)
 - `esyres_app/frontend/` — product PWA (Vite + React + TypeScript)
 - `esyres_app/marketing/` — Design 1 static marketing site (Vite + HTML/CSS; sibling under Laravel root, not under `public/`)
-- `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from grill-with-docs
+- `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from domain-modeling (via grill-with-docs)
 - `.cursor/` — rules, skills, commands, hooks
 - `AGENTS.md` — this file
 
@@ -26,5 +26,8 @@ Read `.cursor/CONTEXT.md`. Prefer `docs/mvp/` and `docs/architecture/` over inve
 
 ## Plans and designs
 
-- **grill-me** — throwaway interview of a plan; writes nothing
-- **grill-with-docs** (`/grill-with-docs`) — against the codebase; writes `docs/glossary.md` and `docs/adr/`. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
+Before locking a plan or design, prefer **grilling** over guessing:
+
+- **grilling** — default interview engine (rounds/frontier); auto before locking a plan
+- **grill-me** (`/grill-me`) — user-invoked; persist at end of topic
+- **grill-with-docs** (`/grill-with-docs`) — against the codebase; glossary + ADRs as they lock via domain-modeling; product/stories end-batch. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.

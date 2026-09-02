@@ -43,4 +43,4 @@ Application code lives in `esyres_app/` (Laravel + PWA). Product scope: `docs/mv
 - `docs/architecture/` — locked stack (Laravel/Lighthouse, React PWA, MySQL, Docker). No app folders yet.
 - `docs/diagrams/lifecycle.md` — once-per-story loop (pick → draft key → you approve → plan-gate or PR)
 
-Until `esyres_app/` has real code, stress-test plans with **grill-me**. After that, use **grill-with-docs** / `/grill-with-docs`.
+Stress-test plans with **grilling** (default engine). App code exists: use **grill-with-docs** / `/grill-with-docs` so glossary, ADRs, and product/stories persist land on disk.

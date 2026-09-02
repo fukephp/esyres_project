@@ -47,7 +47,7 @@ After the story is picked, decide whether fog is **non-trivial**:
 ### Work the map
 
 1. Fill Destination and Notes; list Open decisions and Not yet specified honestly.
-2. Use grill-me style: resolve **one open decision at a time** with a recommended answer. Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` / `docs/stories/` over guessing. If app code exists, use **grill-with-docs** (glossary/ADRs as they lock; product/stories at end of topic). Do not create new `STORY-xx` files during the loop.
+2. Use **grilling** rounds: resolve the frontier of open decisions (numbered questions, each with a recommended answer). Prefer exploring the codebase and `docs/mvp/` / `docs/architecture/` / `docs/stories/` over guessing. If app code exists, use **grill-with-docs** (glossary/ADRs as they lock; product/stories at end of topic). Do not create new `STORY-xx` files during the loop.
 3. Move each locked answer into **Decisions so far**. Graduate fog into Open decisions only when the question is sharp enough to ask.
 4. Do **not** compile an answer key while **Not yet specified** or **Open decisions** still have items. If a likely product check has no verifier, leave it there.
 5. When both are empty, compile the **draft** key in the same turn (set map Status to `compiled`). Ask for **key** approval, not compile OK.
@@ -116,5 +116,6 @@ Remind: Bugbot → human merge. Machine gates already passed; Bugbot is the ligh
 - Maps: `.cursor/loops/maps/`
 - Answer key template: `.cursor/loops/ANSWER_KEY_TEMPLATE.md`
 - Tests: `.cursor/commands/run-tests.md`
+- Grilling: `.cursor/skills/grilling/SKILL.md`
 - Grill-me: `.cursor/skills/grill-me/SKILL.md`
 - Grill-with-docs: `.cursor/skills/grill-with-docs/SKILL.md`

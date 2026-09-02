@@ -14,7 +14,7 @@ description: Add or change a product feature against MVP epics and stories. Use 
    - **Not in docs** → write the gap in the reply; do not silently invent product behavior.
 3. Prefer the smallest change that ships the story. Follow `docs/architecture/` for stack; do not invent a second API style.
 4. Respect surfaces and constraints documented in CONTEXT.md and `docs/mvp/`.
-5. If docs are still stubs only, use **grill-me** (persist at end of topic) before inventing behavior. If app code exists, use **grill-with-docs**.
+5. If docs are still stubs only, use **grilling** / `/grill-me` (persist at end of topic) before inventing behavior. If app code exists, use **grill-with-docs**.
 
 ## Feature checklist
 

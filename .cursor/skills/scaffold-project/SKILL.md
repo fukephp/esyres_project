@@ -9,7 +9,7 @@ description: >-
 
 # Scaffold project
 
-Copy the canonical Cursor AI framework layout into a new sibling project. Stop before inventing product or stack. Hand off to **grill-me** after the user opens the new workspace.
+Copy the canonical Cursor AI framework layout into a new sibling project. Stop before inventing product or stack. Hand off to **grilling** / `/grill-me` after the user opens the new workspace.
 
 ## Canonical template
 
@@ -36,7 +36,7 @@ Copy the full framework tree into the target **except**:
 - `.git/` (do not copy history)
 - `.cursor/plans/` (local noise)
 
-Keep: skills (including grill-me, grill-with-docs, story-loop, scaffold-project, sync-framework), `.cursor/loops/`, hooks, commands, rules, docs stubs, `refs/.gitkeep`, `AGENTS.md`, `DESIGN.md`, `README.md`, `.gitignore`, and this skill/command.
+Keep: skills (including grilling, grill-me, grill-with-docs, domain-modeling, story-loop, scaffold-project, sync-framework), `.cursor/loops/`, hooks, commands, rules, docs stubs, `refs/.gitkeep`, `AGENTS.md`, `DESIGN.md`, `README.md`, `.gitignore`, and this skill/command.
 
 ## Steps (agent executes — no committed script)
 
@@ -50,8 +50,8 @@ Keep: skills (including grill-me, grill-with-docs, story-loop, scaffold-project,
    - Root files present (`AGENTS.md`, `DESIGN.md`, `README.md`, `.gitignore`, `.cursor/CONTEXT.md`)
    - `.git` exists and is new
    - `.cursor/plans` was not copied (or is absent/empty)
-8. Reply with the new path and: open that folder as the Cursor workspace, then run **grill-me** (a finished product grill persists `docs/mvp/` and `docs/stories/STORY-xx.md`).
-9. Do **not** start grill-me automatically while still in `esy_framework`.
+8. Reply with the new path and: open that folder as the Cursor workspace, then run **grilling** / `/grill-me` (a finished product grill persists `docs/mvp/` and `docs/stories/STORY-xx.md`).
+9. Do **not** start grilling automatically while still in `esy_framework`.
 10. Do not scaffold application code unless the user asks in a later step. To update an **existing** sibling later, use **sync-framework** / `/sync-framework <name>` — not this skill.
 
 ## Out of scope (v1)

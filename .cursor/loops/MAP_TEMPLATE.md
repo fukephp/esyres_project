@@ -22,7 +22,7 @@
 ## Notes
 
 - Consult: `.cursor/CONTEXT.md`, `docs/mvp/`, `docs/architecture/`, `docs/stories/STORY-xx.md`
-- Skills: `.cursor/skills/custom-feature-skills/SKILL.md`; grill-me style for open decisions; grill-with-docs when app code exists
+- Skills: `.cursor/skills/custom-feature-skills/SKILL.md`; grilling rounds for open decisions; grill-with-docs when app code exists
 - If a likely product check has no verifier, leave it in Not yet specified or Open decisions
 - Standing preferences for this effort:
 
@@ -34,7 +34,7 @@
 
 ## Open decisions
 
-<!-- Frontier: sharp questions ready to grill. Resolve one at a time; move the answer into Decisions so far. -->
+<!-- Frontier: sharp questions ready to grill. Resolve in grilling rounds; move answers into Decisions so far. -->
 
 - …
 

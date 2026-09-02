@@ -44,16 +44,12 @@ Run from the **app root** named in `.cursor/CONTEXT.md` unless noted. Every comm
 TBD after scaffold
 ```
 
-Examples to replace TBD once the app exists (from `esyres_app/`; never `docker compose run`):
+Examples to replace TBD once the app exists (adjust to real scripts):
 
 ```text
-docker compose up -d
-docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat
-docker compose exec -T vite npm run typecheck
-docker compose exec -T vite npm run test
-docker compose exec -T vite npm run build
-docker compose exec -T --workdir /app/marketing vite npm run build
+# npm test
+# npm run typecheck
+# npm run lint
 ```
 
 ## Out of scope

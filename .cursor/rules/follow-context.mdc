@@ -12,4 +12,4 @@ Read and obey `.cursor/CONTEXT.md` for every task. It applies to all sub-folders
 - Stories inventory is `docs/stories/` (`STORY-xx.md`). Do not invent stories.
 - Use `rules/frontend/` when touching UI. Use `rules/backend/` when touching APIs or data.
 - Use skills and slash commands listed in CONTEXT.md instead of inventing a parallel workflow.
-- Prefer **grill-me** before locking plans when there is no app code. Prefer **grill-with-docs** when a codebase exists to align against.
+- Prefer **grilling** before locking a plan or design. User starts `/grill-me` when there is no app code; `/grill-with-docs` when a codebase exists to align against.

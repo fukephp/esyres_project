@@ -1,6 +1,6 @@
 Grill a plan or design against the codebase. Write glossary terms / ADRs as they lock. Persist product/stories at end of topic (same routing as grill-me).
 
-Follow `.cursor/skills/grill-with-docs/SKILL.md` exactly. That skill is the source of truth.
+Follow `.cursor/skills/grill-with-docs/SKILL.md` exactly. That skill is the source of truth. The interview engine is grilling; glossary/ADRs are domain-modeling.
 
 If the user named a plan, feature, or change after this command, use that as the subject. Otherwise ask what to grill.
 

@@ -66,7 +66,7 @@ Do **not** copy, overwrite, or delete:
 4. **Copy technique (critical):** for directories that already exist on the target, sync **contents into** the destination (e.g. `robocopy <srcDir> <dstDir> /E`, or copy `srcDir\*` into `dstDir`). Do **not** `Copy-Item` the source folder onto an existing same-named folder — that nests as `skills/skills`, `commands/commands`, etc.
 5. **Do not delete** files that exist only on the target outside this copy set (additive + overwrite only).
 6. Print a short **summary** of paths copied (list allowlist entries that were written).
-7. Stop. Do not start grill-me, story-loop, or commits unless the user asks.
+7. Stop. Do not start grilling, story-loop, or commits unless the user asks.
 
 ## Out of scope
 

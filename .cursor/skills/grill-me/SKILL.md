@@ -1,17 +1,17 @@
 ---
 name: grill-me
 description: >-
-  Interview the user relentlessly about a plan or design until shared
-  understanding; persist decided docs at end of topic. Use when the user
-  says "grill me", or when stress-testing a plan with no application code
-  yet. When a codebase exists to align against, use grill-with-docs instead.
+  User-invoked grilling session; persist decided docs at end of topic. Use
+  when the user says "grill me" or /grill-me. Interview engine is grilling.
+  When a codebase exists to align against, use grill-with-docs instead.
+disable-model-invocation: true
 ---
 
 # Grill me
 
-Interview relentlessly about every aspect of this plan until shared understanding. Walk down each branch of the design tree, resolving dependencies one-by-one. For each question, provide your recommended answer. Ask the questions one at a time. If a question can be answered by exploring the codebase, explore instead.
+Read and follow [grilling](../grilling/SKILL.md). Then persist per the table below.
 
-If application code exists, prefer **grill-with-docs** (same interview; glossary + ADRs as they lock; same product/stories end-batch).
+If application code exists, prefer **grill-with-docs** (same interview via grilling; glossary + ADRs as they lock via domain-modeling; same product/stories end-batch).
 
 Do **not** write after every answer. Do **not** auto-implement after persist.
 
