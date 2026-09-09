@@ -55,12 +55,32 @@ export function isChatOpen(mode: ProfileMode): boolean {
   return mode === 'chat'
 }
 
+export type AssistantSendChrome = 'submit' | 'login' | 'email' | 'phone'
+
 export function assistantCanSend(
   serviceIds: string[],
   preferredDate: string,
   preferredTime: string,
 ): boolean {
   return serviceIds.length > 0 && preferredDate !== '' && preferredTime !== ''
+}
+
+export function assistantSendChrome(flags: {
+  needLogin: boolean
+  needEmail: boolean
+  needPhone: boolean
+}): AssistantSendChrome {
+  if (flags.needLogin) {
+    return 'login'
+  }
+  if (flags.needEmail) {
+    return 'email'
+  }
+  if (flags.needPhone) {
+    return 'phone'
+  }
+
+  return 'submit'
 }
 
 export function assistantStep(input: {

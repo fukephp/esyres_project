@@ -3,6 +3,7 @@ import {
   assistantAddressLine,
   assistantBookingInput,
   assistantCanSend,
+  assistantSendChrome,
   assistantDateChange,
   assistantHelloName,
   assistantHoursFacts,
@@ -73,6 +74,23 @@ test('canSend needs services, date, and time', () => {
   expect(assistantCanSend(['1'], '', '14:00')).toBe(false)
   expect(assistantCanSend(['1'], '2026-09-03', '')).toBe(false)
   expect(assistantCanSend(['1', '2'], '2026-09-03', '14:00')).toBe(true)
+})
+
+test('send chrome is one submit when no gates', () => {
+  expect(assistantSendChrome({ needLogin: false, needEmail: false, needPhone: false })).toBe('submit')
+})
+
+test('send chrome is one exclusive gate surface', () => {
+  expect(assistantSendChrome({ needLogin: true, needEmail: false, needPhone: false })).toBe('login')
+  expect(assistantSendChrome({ needLogin: false, needEmail: true, needPhone: false })).toBe('email')
+  expect(assistantSendChrome({ needLogin: false, needEmail: false, needPhone: true })).toBe('phone')
+})
+
+test('send chrome priority is login then email then phone', () => {
+  expect(assistantSendChrome({ needLogin: true, needEmail: true, needPhone: false })).toBe('login')
+  expect(assistantSendChrome({ needLogin: true, needEmail: false, needPhone: true })).toBe('login')
+  expect(assistantSendChrome({ needLogin: false, needEmail: true, needPhone: true })).toBe('email')
+  expect(assistantSendChrome({ needLogin: true, needEmail: true, needPhone: true })).toBe('login')
 })
 
 test('booking input matches picker createBooking shape and has no slots', () => {

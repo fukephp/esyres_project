@@ -69,6 +69,34 @@ Feature: Guest assistant intake persistence
     When I query in-flight intake count as a guest
     Then the GraphQL error code is "UNAUTHENTICATED"
 
+  Scenario: Guest createBooking with intake token stays unauthenticated
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the GraphQL error code is "UNAUTHENTICATED"
+    When I query the assistant intake as a guest
+    Then the intake customer name is "Gost"
+
+  Scenario: Unverified email createBooking with intake token stays email unverified
+    Given an unverified customer "ana@example.com" with password "secret-pass"
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the GraphQL error code is "EMAIL_UNVERIFIED"
+    When I query the assistant intake
+    Then the intake customer name is "Gost"
+
+  Scenario: Unverified phone createBooking with intake token stays phone unverified
+    Given a customer "ana@example.com" with password "secret-pass" whose phone is not verified
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the GraphQL error code is "PHONE_UNVERIFIED"
+    When I query the assistant intake
+    Then the intake customer name is "Gost"
+
   Scenario: Valid intake token on createBooking drops the row
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I upsert a new assistant intake as a guest
