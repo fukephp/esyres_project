@@ -217,6 +217,13 @@ trait BehatRuntime
         }
     }
 
+    protected function assertIsArray(mixed $value): void
+    {
+        if (! is_array($value)) {
+            throw new RuntimeException('Expected array, got '.json_encode($value));
+        }
+    }
+
     /**
      * @Given the app environment is local
      */

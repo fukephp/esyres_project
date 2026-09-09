@@ -234,6 +234,19 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that intake prefers :date at :time
+     */
+    public function thatIntakePrefers(string $date, string $time): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->intake->preferred_date = $date;
+        $this->intake->preferred_time = $time;
+        $this->intake->save();
+    }
+
+    /**
      * @Given the other salon has an in-flight intake
      */
     public function theOtherSalonHasAnInFlightIntake(): void

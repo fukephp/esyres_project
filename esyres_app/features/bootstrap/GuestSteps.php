@@ -1362,6 +1362,24 @@ GQL;
     }
 
     /**
+     * @Then this my booking intake is null
+     */
+    public function thisMyBookingIntakeIsNull(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $id = (string) $this->booking->id;
+        foreach ($this->graphql['data']['myBookings'] as $row) {
+            if ((string) $row['id'] === $id) {
+                $this->assertSame(null, $row['intake']);
+
+                return;
+            }
+        }
+
+        throw new RuntimeException("Expected booking {$id} in myBookings");
+    }
+
+    /**
      * @Then my bookings are empty
      */
     public function myBookingsAreEmpty(): void
@@ -1524,6 +1542,7 @@ query MyBookings($limit: Int = 20, $offset: Int = 0) {
     declineReason
     salon { id name }
     services { name durationMinutes }
+    intake { id }
   }
 }
 GQL;

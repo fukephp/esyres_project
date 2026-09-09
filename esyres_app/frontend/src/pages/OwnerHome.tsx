@@ -31,6 +31,7 @@ import { sarajevoToday } from '../lib/format'
 import { chatBadgeCount } from '../lib/intake'
 import {
   acceptErrorKey,
+  assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
   formatSarajevoTime,
@@ -399,11 +400,18 @@ function QueueRow({
     >
       <div className="flex items-baseline justify-between gap-3">
         <p className="font-semibold text-ink">{formatSarajevoTime(row.preferredStartsAt)}</p>
-        {isPreferredSoon(row.preferredStartsAt) ? (
-          <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
-            {t('owner.soon')}
-          </span>
-        ) : null}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {assistantOriginVisible(row.intake) ? (
+            <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+              {t('owner.assistant')}
+            </span>
+          ) : null}
+          {isPreferredSoon(row.preferredStartsAt) ? (
+            <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
+              {t('owner.soon')}
+            </span>
+          ) : null}
+        </div>
       </div>
       <p className="mt-1 text-sm text-ink">{row.customerName}</p>
       <p className="mt-1 text-sm text-body">

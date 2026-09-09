@@ -316,6 +316,103 @@ trait OwnerSteps
     }
 
     /**
+     * @Given a verified customer :email with password :password
+     */
+    public function aVerifiedCustomer(string $email, string $password): void
+    {
+        $this->user = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'phone' => '+38761'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with the salon services
+     */
+    public function iCreateABookingWithSalonServices(string $date, string $time): void
+    {
+        $this->postOwnerCreateBooking($date, $time, null);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with the salon services and the intake token
+     */
+    public function iCreateABookingWithSalonServicesAndIntakeToken(string $date, string $time): void
+    {
+        $this->postOwnerCreateBooking($date, $time, $this->intakeToken);
+    }
+
+    private function postOwnerCreateBooking(string $date, string $time, ?string $intakeToken): void
+    {
+        $ids = [];
+        foreach ($this->services as $service) {
+            $ids[] = (string) $service->id;
+        }
+        $input = [
+            'salonId' => (string) $this->salon->id,
+            'serviceIds' => $ids,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ];
+        if ($intakeToken !== null) {
+            $input['intakeToken'] = $intakeToken;
+        }
+        $this->graphql($this->createBookingMutation(), ['input' => $input]);
+        $id = $this->graphql['data']['createBooking']['id'] ?? null;
+        if (is_string($id) || is_int($id)) {
+            $this->booking = Booking::query()->find($id);
+        }
+    }
+
+    /**
+     * @Then the booking status is :status
+     */
+    public function theBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['createBooking']['status']);
+    }
+
+    /**
+     * @Then this pending booking intake prefers :date at :time
+     */
+    public function thisPendingBookingIntakePrefers(string $date, string $time): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertConvertedIntake($this->pendingRowIntake(), $date, $time);
+    }
+
+    /**
+     * @Then this pending booking intake is null
+     */
+    public function thisPendingBookingIntakeIsNull(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->pendingRowIntake());
+    }
+
+    /**
+     * @Then the owner booking intake prefers :date at :time
+     */
+    public function theOwnerBookingIntakePrefers(string $date, string $time): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertConvertedIntake($this->graphql['data']['ownerBooking']['intake'], $date, $time);
+    }
+
+    /**
+     * @Then the owner booking intake is null
+     */
+    public function theOwnerBookingIntakeIsNull(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['ownerBooking']['intake']);
+    }
+
+    /**
      * @When I query the owner booking
      */
     public function iQueryTheOwnerBooking(): void
@@ -797,6 +894,42 @@ query Occupying($salonId: ID!, $date: String!) {
 GQL;
     }
 
+    /**
+     * @param  mixed  $intake
+     */
+    private function assertConvertedIntake(mixed $intake, string $date, string $time): void
+    {
+        $this->assertIsArray($intake);
+        $this->assertSame([(string) $this->services[0]->id], $intake['serviceIds']);
+        $this->assertSame(null, $intake['workerId']);
+        $this->assertSame($date, $intake['preferredDate']);
+        $this->assertSame($time, $intake['preferredTime']);
+    }
+
+    private function pendingRowIntake(): mixed
+    {
+        $id = (string) $this->booking->id;
+        foreach ($this->graphql['data']['pendingBookings'] as $row) {
+            if ((string) $row['id'] === $id) {
+                return $row['intake'];
+            }
+        }
+
+        throw new RuntimeException("Expected booking {$id} in pendingBookings");
+    }
+
+    private function createBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation CreateBooking($input: CreateBookingInput!) {
+  createBooking(input: $input) {
+    id
+    status
+  }
+}
+GQL;
+    }
+
     private function ownerBookingQuery(): string
     {
         return <<<'GQL'
@@ -810,6 +943,13 @@ query OwnerBooking($id: ID!) {
     durationMinutes
     worker { id name }
     services { name durationMinutes }
+    intake {
+      id
+      serviceIds
+      workerId
+      preferredDate
+      preferredTime
+    }
   }
 }
 GQL;
@@ -828,6 +968,13 @@ query Pending($salonId: ID!, $date: String!, $limit: Int = 20, $offset: Int = 0)
     durationMinutes
     worker { id name }
     services { name durationMinutes }
+    intake {
+      id
+      serviceIds
+      workerId
+      preferredDate
+      preferredTime
+    }
   }
 }
 GQL;

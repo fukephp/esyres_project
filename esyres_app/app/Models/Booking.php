@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason'])]
 class Booking extends Model
@@ -70,6 +71,14 @@ class Booking extends Model
     public function services(): HasMany
     {
         return $this->hasMany(BookingService::class)->orderBy('id');
+    }
+
+    /**
+     * @return HasOne<AssistantIntake, $this>
+     */
+    public function intake(): HasOne
+    {
+        return $this->hasOne(AssistantIntake::class);
     }
 
     /**

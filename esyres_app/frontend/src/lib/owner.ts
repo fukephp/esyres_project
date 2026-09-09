@@ -232,6 +232,29 @@ export function ownerChatPath(salonId: string | null = null, firstOwnedId: strin
   return query === '' ? '/owner/chats' : `/owner/chats?${query}`
 }
 
+export function assistantOriginVisible(intake: { id: string } | null | undefined): boolean {
+  return intake != null
+}
+
+export type AssistantTranscriptStep = 'services' | 'worker' | 'date' | 'time'
+
+export type AssistantTranscriptLine = { step: AssistantTranscriptStep; value: string }
+
+export function assistantTranscriptLines(input: {
+  services: { name: string }[]
+  workerName: string | null
+  preferredDate: string | null
+  preferredTime: string | null
+  noPreference: string
+}): AssistantTranscriptLine[] {
+  return [
+    { step: 'services', value: input.services.map((row) => row.name).join(', ') },
+    { step: 'worker', value: input.workerName ?? input.noPreference },
+    { step: 'date', value: input.preferredDate ?? '' },
+    { step: 'time', value: input.preferredTime ?? '' },
+  ]
+}
+
 export function occupyingBlock(row: {
   status: string
   preferredStartsAt: string
