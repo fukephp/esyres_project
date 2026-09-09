@@ -1,11 +1,19 @@
 <?php
 
 use App\Models\Booking;
+use App\Models\Salon;
+use App\Models\User;
 use App\Models\Worker;
+use App\SalonHours\WeeklyHours;
 use Behat\Gherkin\Node\PyStringNode;
+use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\LocalDemoSeeder;
+use Illuminate\Support\Facades\Hash;
 
 trait OwnerSteps
 {
+    private ?\Throwable $seederException = null;
+
     /**
      * @When I subscribe to booking customer responded
      */
@@ -986,5 +994,104 @@ mutation UpdateWorker($id: ID!, $input: UpdateSalonWorkerInput!) {
   }
 }
 GQL;
+    }
+
+    /**
+     * @When I run the database seeder
+     */
+    public function iRunTheDatabaseSeeder(): void
+    {
+        try {
+            (new DatabaseSeeder)->run();
+            $this->seederException = null;
+        } catch (\Throwable $e) {
+            $this->seederException = $e;
+        }
+    }
+
+    /**
+     * @Then the database seeder is rejected as not local
+     */
+    public function theDatabaseSeederIsRejectedAsNotLocal(): void
+    {
+        if (! $this->seederException instanceof \Throwable) {
+            throw new RuntimeException('Expected DatabaseSeeder to throw');
+        }
+        if (! str_contains($this->seederException->getMessage(), 'APP_ENV=local')) {
+            throw new RuntimeException('Unexpected seeder error: '.$this->seederException->getMessage());
+        }
+        $this->assertSame(0, User::query()->count());
+    }
+
+    /**
+     * @When I run the local demo seeder
+     */
+    public function iRunTheLocalDemoSeeder(): void
+    {
+        (new LocalDemoSeeder)->run();
+    }
+
+    /**
+     * @Then the local demo catalog matches the story
+     */
+    public function theLocalDemoCatalogMatchesTheStory(): void
+    {
+        $owner = User::query()->where('email', 'owner@esyres.test')->first();
+        $guest = User::query()->where('email', 'guest@esyres.test')->first();
+        $owner2 = User::query()->where('email', 'owner2@esyres.test')->first();
+        $this->assertNotNull($owner);
+        $this->assertNotNull($guest);
+        $this->assertNotNull($owner2);
+        $this->assertTrue(Hash::check('password', $owner->password));
+        $this->assertTrue(Hash::check('password', $guest->password));
+        $this->assertTrue(Hash::check('password', $owner2->password));
+        $this->assertSame(2, $owner->salons()->count());
+        $this->assertSame(1, $owner2->salons()->count());
+        $this->assertSame(0, $guest->salons()->count());
+
+        $salons = Salon::query()->orderBy('id')->get();
+        $this->assertSame(3, $salons->count());
+        $categories = [];
+        foreach ($salons as $salon) {
+            if ($salon->lat === null || $salon->lng === null) {
+                throw new RuntimeException('Expected Sarajevo coords on '.$salon->name);
+            }
+            if ($salon->lat < 43.7 || $salon->lat > 44.1 || $salon->lng < 18.2 || $salon->lng > 18.6) {
+                throw new RuntimeException('Coords not in Sarajevo for '.$salon->name);
+            }
+            if ($salon->hours === WeeklyHours::closedWeek()) {
+                throw new RuntimeException('Expected open hours on '.$salon->name);
+            }
+            if ($salon->workers()->count() < 1 || $salon->services()->count() < 1) {
+                throw new RuntimeException('Expected worker and service on '.$salon->name);
+            }
+            foreach ($salon->services as $service) {
+                $categories[$service->category] = true;
+            }
+        }
+        foreach (['HAIR', 'MAKE_UP', 'MASSAGE'] as $category) {
+            if (! isset($categories[$category])) {
+                throw new RuntimeException('Missing service category '.$category);
+            }
+        }
+
+        $primary = $owner->salons()->orderBy('id')->first();
+        $second = $owner->salons()->orderBy('id')->skip(1)->first();
+        $this->assertNotNull($primary);
+        $this->assertNotNull($second);
+        $this->assertSame(0, $second->bookings()->count());
+        $bookings = $primary->bookings()->orderBy('id')->get();
+        $this->assertSame(4, $bookings->count());
+        foreach ($bookings as $booking) {
+            $this->assertSame($guest->id, $booking->customer_id);
+        }
+        $this->assertSame(2, $bookings->where('status', Booking::REQUESTED)->count());
+        $proposed = $bookings->firstWhere('status', Booking::TIME_PROPOSED);
+        $confirmed = $bookings->firstWhere('status', Booking::CONFIRMED);
+        $this->assertNotNull($proposed);
+        $this->assertNotNull($confirmed);
+        $this->assertNotNull($proposed->proposed_starts_at);
+        $this->assertNotNull($proposed->proposed_worker_id);
+        $this->assertNotNull($confirmed->worker_id);
     }
 }
