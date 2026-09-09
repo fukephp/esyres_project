@@ -13,8 +13,10 @@ import {
   assistantBookingInput,
   assistantCanSend,
   assistantDateChange,
+  assistantHoursFacts,
   assistantHoursForDate,
   assistantShowOtherTime,
+  formatAssistantHoursLine,
   isChatOpen,
   isPickerOpen,
   showChatCta,
@@ -32,14 +34,15 @@ const busyBg = {
 } as const
 
 function hoursLine(day: DayHours, t: (key: string, opts?: Record<string, string>) => string): string {
-  if (day.closed || !day.opensAt || !day.closesAt) {
+  const facts = assistantHoursFacts(day)
+  if (facts === null) {
     return t('salon.closed')
   }
-  let line = `${day.opensAt}–${day.closesAt}`
-  if (day.breakStartsAt && day.breakEndsAt) {
-    line += ` · ${t('salon.break', { start: day.breakStartsAt, end: day.breakEndsAt })}`
-  }
-  return line
+
+  return formatAssistantHoursLine(facts, {
+    closed: t('salon.closed'),
+    break: (start, end) => t('salon.break', { start, end }),
+  })
 }
 
 function gateMessage(
@@ -432,8 +435,11 @@ export function SalonProfile() {
 
       {chatting && !sent && id && (
         <AssistantIntake
+          salonName={salon.name}
+          address={salon.address}
           services={salon.services}
           workers={salon.workers}
+          dayHours={hoursForDay}
           minDate={date}
           selected={chatSelected}
           onToggleService={(serviceId) =>

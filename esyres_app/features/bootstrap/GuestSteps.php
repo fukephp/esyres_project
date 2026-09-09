@@ -729,6 +729,24 @@ trait GuestSteps
     }
 
     /**
+     * @Then the public salon address is :address
+     */
+    public function thePublicSalonAddressIs(string $address): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($address, $this->graphql['data']['salon']['address']);
+    }
+
+    /**
+     * @Then the public salon has no address
+     */
+    public function thePublicSalonHasNoAddress(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['salon']['address']);
+    }
+
+    /**
      * @Then the salon is null
      */
     public function theSalonIsNull(): void
@@ -1412,6 +1430,7 @@ query PublicSalon($id: ID!) {
   salon(id: $id) {
     id
     name
+    address
     hours {
       weekday
       closed

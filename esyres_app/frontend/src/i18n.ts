@@ -48,6 +48,7 @@ void i18n.use(initReactI18next).init({
         },
         assistant: {
           ask: 'Nisi sigurna? Pitaj salon.',
+          hello: '{{name}} ovdje.',
           services: 'Koje usluge želiš?',
           worker: 'Imaš li preferenciju za radnika?',
           date: 'Koji dan ti odgovara?',

@@ -126,6 +126,7 @@ type User {
 type Salon {
     id: ID!
     name: String!
+    address: String
     cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")

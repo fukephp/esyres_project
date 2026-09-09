@@ -254,6 +254,15 @@ trait SharedFixtures
     }
 
     /**
+     * @Given the salon address is :address
+     */
+    public function theSalonAddressIs(string $address): void
+    {
+        $this->salon->address = $address;
+        $this->salon->save();
+    }
+
+    /**
      * @Given the salon is at lat :lat lng :lng
      */
     public function theSalonIsAt(string $lat, string $lng): void
