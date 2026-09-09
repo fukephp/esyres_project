@@ -20,6 +20,6 @@ final class OwnerBooking
             throw new ClientError('FORBIDDEN');
         }
 
-        return $booking->load(['customer', 'worker', 'services', 'salon']);
+        return $booking->load(['customer', 'worker', 'services', 'salon', 'intake']);
     }
 }

@@ -104,6 +104,7 @@ type Booking {
     declineReason: String @rename(attribute: "decline_reason")
     salon: Salon!
     services: [BookingService!]! @method(name: "snapshotList")
+    intake: AssistantIntake @field(resolver: "App\\GraphQL\\Queries\\BookingIntake")
 }
 
 input CreateBookingInput {

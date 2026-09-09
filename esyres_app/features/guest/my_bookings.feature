@@ -135,6 +135,15 @@ Feature: Customer My Bookings status list
       ["REQUESTED"]
       """
 
+  Scenario: Converted chat intake is hidden on My Bookings
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And the customer has a requested booking on "2026-08-29" at "10:00"
+    And the salon has an in-flight intake
+    And that intake is converted
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I query my bookings
+    Then this my booking intake is null
+
   Scenario: Invalid page is rejected
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I log in as "ana@example.com" with password "secret-pass"

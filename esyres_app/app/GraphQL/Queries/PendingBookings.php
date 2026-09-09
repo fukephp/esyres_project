@@ -22,7 +22,7 @@ final class PendingBookings
         [$limit, $offset] = ListPage::parse($args['limit'] ?? null, $args['offset'] ?? null);
 
         return Booking::query()
-            ->with(['customer', 'worker', 'services'])
+            ->with(['customer', 'worker', 'services', 'salon', 'intake'])
             ->where('salon_id', $salon->id)
             ->where('status', Booking::REQUESTED)
             ->whereDate('preferred_date', $date)

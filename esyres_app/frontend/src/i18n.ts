@@ -130,6 +130,8 @@ void i18n.use(initReactI18next).init({
           noWorkers: 'Nema radnika.',
           closedDay: 'Zatvoreno ovaj dan.',
           soon: 'Uskoro',
+          assistant: 'Asistent',
+          transcript: 'Zašto ovo vrijeme',
           accept: 'Prihvati',
           decline: 'Odbi',
           propose: 'Predloži',

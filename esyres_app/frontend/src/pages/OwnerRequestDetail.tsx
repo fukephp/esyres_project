@@ -21,6 +21,8 @@ import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
+  assistantOriginVisible,
+  assistantTranscriptLines,
   canAcceptPreferredTime,
   declineErrorKey,
   formatSarajevoTime,
@@ -226,6 +228,31 @@ export function OwnerRequestDetail() {
               {' · '}
               {booking.worker ? booking.worker.name : t('salon.noPreference')}
             </p>
+            {assistantOriginVisible(booking.intake) ? (
+              <>
+                <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+                  {t('owner.assistant')}
+                </span>
+                <details className="mt-2 text-sm text-body">
+                <summary className="cursor-pointer font-medium text-ink">{t('owner.transcript')}</summary>
+                <ul className="mt-2 space-y-1">
+                  {assistantTranscriptLines({
+                    services: booking.services,
+                    workerName: booking.worker?.name ?? null,
+                    preferredDate: booking.intake?.preferredDate ?? booking.preferredDate,
+                    preferredTime: booking.intake?.preferredTime ?? formatSarajevoTime(booking.preferredStartsAt),
+                    noPreference: t('salon.noPreference'),
+                  }).map((line) => (
+                    <li key={line.step}>
+                      {t(`owner.chatStep.${line.step}`)}
+                      {': '}
+                      {line.value}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+              </>
+            ) : null}
             {workers.length === 0 ? (
               <p className="mt-8 text-sm text-body">{t('owner.noWorkers')}</p>
             ) : cells.length === 0 ? (

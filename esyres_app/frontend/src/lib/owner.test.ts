@@ -18,6 +18,8 @@ import {
   declineErrorKey,
   trimDeclineReason,
   sarajevoWeekday,
+  assistantOriginVisible,
+  assistantTranscriptLines,
 } from './owner'
 
 test('omit or invalid date falls back to Sarajevo today', () => {
@@ -142,6 +144,43 @@ test('owner chat path is not home and omits first-owned salon', () => {
   expect(ownerChatPath()).toBe('/owner/chats')
   expect(ownerChatPath('1', '1')).toBe('/owner/chats')
   expect(ownerChatPath('2', '1')).toBe('/owner/chats?salon=2')
+})
+
+test('assistant origin chip shows only when intake is present', () => {
+  expect(assistantOriginVisible(null)).toBe(false)
+  expect(assistantOriginVisible(undefined)).toBe(false)
+  expect(assistantOriginVisible({ id: '1' })).toBe(true)
+})
+
+test('assistant transcript lines use snapshot date/time and booking names', () => {
+  expect(
+    assistantTranscriptLines({
+      services: [{ name: 'Šišanje' }, { name: 'Farbanje' }],
+      workerName: null,
+      preferredDate: '2026-08-31',
+      preferredTime: '10:00',
+      noPreference: 'Nema preference',
+    }),
+  ).toEqual([
+    { step: 'services', value: 'Šišanje, Farbanje' },
+    { step: 'worker', value: 'Nema preference' },
+    { step: 'date', value: '2026-08-31' },
+    { step: 'time', value: '10:00' },
+  ])
+  expect(
+    assistantTranscriptLines({
+      services: [{ name: 'Šišanje' }],
+      workerName: 'Lejla',
+      preferredDate: '2026-08-31',
+      preferredTime: '14:00',
+      noPreference: 'Nema preference',
+    }),
+  ).toEqual([
+    { step: 'services', value: 'Šišanje' },
+    { step: 'worker', value: 'Lejla' },
+    { step: 'date', value: '2026-08-31' },
+    { step: 'time', value: '14:00' },
+  ])
 })
 
 test('occupying block uses proposed fields for time proposed', () => {

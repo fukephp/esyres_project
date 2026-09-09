@@ -17,6 +17,13 @@ export const OWNER_BOOKING_QUERY = gql`
         name
         durationMinutes
       }
+      intake {
+        id
+        serviceIds
+        workerId
+        preferredDate
+        preferredTime
+      }
       salon {
         id
         name
@@ -40,6 +47,13 @@ export const PENDING_BOOKINGS_QUERY = gql`
       services {
         name
         durationMinutes
+      }
+      intake {
+        id
+        serviceIds
+        workerId
+        preferredDate
+        preferredTime
       }
     }
   }
@@ -126,6 +140,14 @@ export const BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION = gql`
   }
 `
 
+export type BookingIntake = {
+  id: string
+  serviceIds: string[]
+  workerId: string | null
+  preferredDate: string | null
+  preferredTime: string | null
+}
+
 export type OwnerBooking = {
   id: string
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'
@@ -135,6 +157,7 @@ export type OwnerBooking = {
   durationMinutes: number
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
+  intake: BookingIntake | null
   salon: { id: string; name: string }
 }
 
@@ -150,6 +173,7 @@ export type PendingBooking = {
   durationMinutes: number
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
+  intake: BookingIntake | null
 }
 
 export type PendingBookingsData = {
