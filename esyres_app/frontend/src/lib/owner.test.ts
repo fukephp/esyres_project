@@ -10,6 +10,7 @@ import {
   occupyingBlock,
   ownerDateFromSearch,
   ownerQueuePath,
+  ownerChatPath,
   ownerSalonFromSearch,
   panelCells,
   proposeErrorKey,
@@ -135,6 +136,12 @@ test('owner queue path omits first-owned salon and keeps date', () => {
   expect(ownerQueuePath('2026-08-29', '2026-08-29', '2', '1')).toBe('/owner?salon=2')
   expect(ownerQueuePath('2026-08-30', '2026-08-29', '1', '1')).toBe('/owner?date=2026-08-30')
   expect(ownerQueuePath('2026-08-30', '2026-08-29', '2', '1')).toBe('/owner?date=2026-08-30&salon=2')
+})
+
+test('owner chat path is not home and omits first-owned salon', () => {
+  expect(ownerChatPath()).toBe('/owner/chats')
+  expect(ownerChatPath('1', '1')).toBe('/owner/chats')
+  expect(ownerChatPath('2', '1')).toBe('/owner/chats?salon=2')
 })
 
 test('occupying block uses proposed fields for time proposed', () => {

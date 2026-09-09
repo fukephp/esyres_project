@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
@@ -510,6 +511,148 @@ trait GuestSteps
     }
 
     /**
+     * @When I upsert a new assistant intake as a guest
+     */
+    public function iUpsertANewAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->postUpsertIntake(null);
+    }
+
+    /**
+     * @When I upsert the assistant intake as a guest
+     */
+    public function iUpsertTheAssistantIntakeAsAGuest(): void
+    {
+        $this->postUpsertIntake($this->intakeToken);
+    }
+
+    /**
+     * @When I upsert the assistant intake
+     */
+    public function iUpsertTheAssistantIntake(): void
+    {
+        $this->postUpsertIntake($this->intakeToken);
+    }
+
+    /**
+     * @When I query the assistant intake as a guest
+     */
+    public function iQueryTheAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->assistantIntakeQuery(), ['token' => $this->intakeToken ?? '']);
+    }
+
+    /**
+     * @When I query the assistant intake
+     */
+    public function iQueryTheAssistantIntake(): void
+    {
+        $this->graphql($this->assistantIntakeQuery(), ['token' => $this->intakeToken ?? '']);
+    }
+
+    /**
+     * @When I query an unknown assistant intake as a guest
+     */
+    public function iQueryAnUnknownAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->assistantIntakeQuery(), ['token' => '00000000-0000-4000-8000-000000000000']);
+    }
+
+    /**
+     * @When I query in-flight intakes as a guest
+     */
+    public function iQueryInFlightIntakesAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->inFlightIntakesQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I query in-flight intake count as a guest
+     */
+    public function iQueryInFlightIntakeCountAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->inFlightIntakeCountQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with the salon services and the intake token
+     */
+    public function iCreateABookingWithSalonServicesAndIntakeToken(string $date, string $time): void
+    {
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), null, $this->intakeToken);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with the salon services and an unknown intake token
+     */
+    public function iCreateABookingWithUnknownIntakeToken(string $date, string $time): void
+    {
+        $this->postCreateBooking($date, $time, $this->salonServiceIds(), null, '00000000-0000-4000-8000-000000000000');
+    }
+
+    /**
+     * @Then the intake token is a uuid
+     */
+    public function theIntakeTokenIsAUuid(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $token = $this->graphql['data']['upsertAssistantIntake']['token'] ?? null;
+        if (! is_string($token) || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $token) !== 1) {
+            throw new RuntimeException('Expected uuid token, got '.json_encode($token));
+        }
+        $this->intakeToken = $token;
+    }
+
+    /**
+     * @Then the intake customer name is :name
+     */
+    public function theIntakeCustomerNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['upsertAssistantIntake'] ?? $this->graphql['data']['assistantIntake'] ?? null;
+        $this->assertNotNull($row);
+        $this->assertSame($name, $row['customerName']);
+    }
+
+    /**
+     * @Then the assistant intake is null
+     */
+    public function theAssistantIntakeIsNull(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['assistantIntake']);
+    }
+
+    /**
+     * @Then the intake service count is :count
+     */
+    public function theIntakeServiceCountIs(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['upsertAssistantIntake'] ?? $this->graphql['data']['assistantIntake'] ?? null;
+        $this->assertNotNull($row);
+        $this->assertSame((int) $count, count($row['serviceIds']));
+    }
+
+    /**
+     * @Given that customer is named :name
+     */
+    public function thatCustomerIsNamed(string $name): void
+    {
+        $this->user->name = $name;
+        $this->user->save();
+    }
+
+    /**
      * @Then the booking status is :status
      */
     public function theBookingStatusIs(string $status): void
@@ -858,7 +1001,7 @@ GQL;
     /**
      * @param  list<string>  $serviceIds
      */
-    private function postCreateBooking(string $date, string $time, array $serviceIds, ?string $workerId): void
+    private function postCreateBooking(string $date, string $time, array $serviceIds, ?string $workerId, ?string $intakeToken = null): void
     {
         $input = [
             'salonId' => (string) $this->salon->id,
@@ -869,7 +1012,27 @@ GQL;
         if ($workerId !== null) {
             $input['workerId'] = $workerId;
         }
+        if ($intakeToken !== null) {
+            $input['intakeToken'] = $intakeToken;
+        }
         $this->graphql($this->createBookingMutation(), ['input' => $input]);
+    }
+
+    private function postUpsertIntake(?string $token): void
+    {
+        $input = [
+            'salonId' => (string) $this->salon->id,
+            'serviceIds' => $this->salonServiceIds() === [] ? [] : [$this->salonServiceIds()[0]],
+            'workerConfirmed' => false,
+        ];
+        if ($token !== null) {
+            $input['token'] = $token;
+        }
+        $this->graphql($this->upsertAssistantIntakeMutation(), ['input' => $input]);
+        if (isset($this->graphql['data']['upsertAssistantIntake']['token'])) {
+            $this->intakeToken = $this->graphql['data']['upsertAssistantIntake']['token'];
+            $this->intake = AssistantIntake::query()->where('token', $this->intakeToken)->first();
+        }
     }
 
     /** @return list<string> */
@@ -1419,6 +1582,61 @@ mutation CreateBooking($input: CreateBookingInput!) {
       priceFeninga
     }
   }
+}
+GQL;
+    }
+
+    private function upsertAssistantIntakeMutation(): string
+    {
+        return <<<'GQL'
+mutation UpsertIntake($input: UpsertAssistantIntakeInput!) {
+  upsertAssistantIntake(input: $input) {
+    id
+    token
+    customerName
+    serviceIds
+    workerConfirmed
+    preferredDate
+    preferredTime
+  }
+}
+GQL;
+    }
+
+    private function assistantIntakeQuery(): string
+    {
+        return <<<'GQL'
+query Intake($token: String!) {
+  assistantIntake(token: $token) {
+    id
+    token
+    customerName
+    serviceIds
+    workerConfirmed
+    preferredDate
+    preferredTime
+  }
+}
+GQL;
+    }
+
+    private function inFlightIntakesQuery(): string
+    {
+        return <<<'GQL'
+query InFlight($salonId: ID!) {
+  inFlightIntakes(salonId: $salonId) {
+    id
+    customerName
+  }
+}
+GQL;
+    }
+
+    private function inFlightIntakeCountQuery(): string
+    {
+        return <<<'GQL'
+query InFlightCount($salonId: ID!) {
+  inFlightIntakeCount(salonId: $salonId)
 }
 GQL;
     }

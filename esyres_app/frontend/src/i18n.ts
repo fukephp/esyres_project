@@ -114,6 +114,15 @@ void i18n.use(initReactI18next).init({
         },
         owner: {
           title: 'Zahtjevi',
+          chat: 'Chat',
+          chatsEmpty: 'Nema razgovora.',
+          chatStep: {
+            services: 'Usluge',
+            worker: 'Radnik',
+            date: 'Dan',
+            time: 'Vrijeme',
+            send: 'Slanje',
+          },
           salon: 'Salon',
           date: 'Datum',
           empty: 'Nema zahtjeva za ovaj dan.',

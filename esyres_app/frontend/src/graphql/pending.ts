@@ -89,6 +89,10 @@ export const OWNER_SALON_QUERY = gql`
         breakStartsAt
         breakEndsAt
       }
+      services {
+        id
+        name
+      }
     }
   }
 `
@@ -178,5 +182,6 @@ export type OwnerSalonData = {
       breakStartsAt: string | null
       breakEndsAt: string | null
     }[]
+    services: { id: string; name: string }[]
   } | null
 }

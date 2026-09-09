@@ -112,6 +112,29 @@ input CreateBookingInput {
     workerId: ID
     preferredDate: String!
     preferredTime: String!
+    intakeToken: String
+}
+
+type AssistantIntake {
+    id: ID!
+    token: String!
+    customerName: String! @method(name: "customerName")
+    updatedAt: String! @method(name: "updatedAtIso")
+    serviceIds: [ID!]! @method(name: "serviceIdList")
+    workerId: ID @method(name: "workerIdString")
+    workerConfirmed: Boolean! @rename(attribute: "worker_confirmed")
+    preferredDate: String @rename(attribute: "preferred_date")
+    preferredTime: String @rename(attribute: "preferred_time")
+}
+
+input UpsertAssistantIntakeInput {
+    salonId: ID!
+    token: String
+    serviceIds: [ID!]!
+    workerId: ID
+    workerConfirmed: Boolean!
+    preferredDate: String
+    preferredTime: String
 }
 
 type User {
@@ -143,6 +166,9 @@ type Query {
     occupyingBookings(salonId: ID!, date: String!): [Booking!]!
     ownerBooking(id: ID!): Booking!
     myBookings(limit: Int = 20, offset: Int = 0): [Booking!]!
+    assistantIntake(token: String!): AssistantIntake
+    inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
+    inFlightIntakeCount(salonId: ID!): Int!
 }
 
 type Mutation {
@@ -158,6 +184,7 @@ type Mutation {
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
+    upsertAssistantIntake(input: UpsertAssistantIntakeInput!): AssistantIntake!
     acceptPreferredTime(bookingId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
     declineBooking(bookingId: ID!, reason: String): Booking!
