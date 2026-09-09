@@ -9,6 +9,7 @@ import {
   assistantCanSend,
   assistantHoursFacts,
   assistantHelloName,
+  assistantSendChrome,
   assistantServiceChipParts,
   assistantStep,
   formatAssistantHoursLine,
@@ -93,6 +94,7 @@ export function AssistantIntake({
     preferredTime,
   })
   const canSend = assistantCanSend(selected, preferredDate, preferredTime)
+  const chrome = assistantSendChrome({ needLogin, needEmail, needPhone })
   const chosen = services.filter((s) => selected.includes(s.id))
   const pickedWorker =
     workerChoice === ''
@@ -236,7 +238,7 @@ export function AssistantIntake({
 
       {step === 'send' && <p className="text-sm text-ink">{t('assistant.send')}</p>}
       {error && <p className="text-sm text-busy-busy">{error}</p>}
-      {step === 'send' && !needLogin && !needEmail && !needPhone && (
+      {step === 'send' && chrome === 'submit' && (
         <button
           type="submit"
           disabled={!canSend || busy}
@@ -245,9 +247,9 @@ export function AssistantIntake({
           {t('salon.submit')}
         </button>
       )}
-      {needEmail && <EmailVerifyPanel onRetry={onAfterAuth} />}
-      {needPhone && <PhoneOtpPanel onRetry={onAfterAuth} />}
-      {needLogin && <AuthShell onAuthenticated={onAfterAuth} />}
+      {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}
+      {chrome === 'phone' && <PhoneOtpPanel onRetry={onAfterAuth} />}
+      {chrome === 'login' && <AuthShell onAuthenticated={onAfterAuth} />}
     </form>
   )
 }
