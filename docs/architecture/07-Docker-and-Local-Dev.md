@@ -23,5 +23,6 @@ Not in compose: Horizon container, SMS container, Laravel Sail as the named appr
 - `SmsGateway` fake/log locally.
 - Photos on local `public` disk.
 - Frontend talks to `/graphql` on the same host (Vite proxies `/graphql` and `/sanctum` to the `php` service, and `/app` to `reverb`).
+- Local click-through data: `docker compose exec -T php php artisan migrate:fresh --seed` when `APP_ENV=local` (known logins in `esyres_app/README.md`). `DatabaseSeeder` throws outside local. Staging/prod must not seed. Behat stays per-scenario Gherkin fixtures — not a shared seeded DB.
 
 Staging host and secrets are not chosen here. `deploy-staging` stays unused until a real pipeline exists.

@@ -25,3 +25,17 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`. Marketing: `docker compose exec -T --workdir /app/marketing vite npm install`.
 
 If `up` fails on 5173 or 8000, stop leftover `php-run-*` / `node-run-*` one-offs first. Reuse those ports; do not publish 5174/8001. Reverb is :8080.
+
+## Local demo seed
+
+App DB only, when `APP_ENV=local`. Throws on staging, production, and Behat (`testing`). Behat stays per-scenario Gherkin fixtures — do not `db:seed` the test DB.
+
+```text
+docker compose exec -T php php artisan migrate:fresh --seed
+```
+
+| Email | Password | Role |
+|-------|----------|------|
+| `owner@esyres.test` | `password` | Owner (two salons) |
+| `guest@esyres.test` | `password` | Customer |
+| `owner2@esyres.test` | `password` | Owner (one salon, discovery) |

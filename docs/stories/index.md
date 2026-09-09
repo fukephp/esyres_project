@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-38` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Marketing and scaffold keys are not in this inventory.
 
@@ -60,3 +60,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-35 | Trust data capture | 8 | — | STORY-14 |
 | STORY-36 | Basic stats | 9 | — | STORY-14 |
 | STORY-37 | QR conversion stats | 9 | — | STORY-34 |
+| STORY-38 | Local demo seed | 7 | — | STORY-03, STORY-04, STORY-05, STORY-13, STORY-15, STORY-18 |
