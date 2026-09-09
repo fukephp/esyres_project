@@ -6,6 +6,7 @@ export const PUBLIC_SALON_QUERY = gql`
     salon(id: $id) {
       id
       name
+      address
       hours {
         weekday
         closed
@@ -56,6 +57,7 @@ export type SalonWorker = {
 export type PublicSalon = {
   id: string
   name: string
+  address: string | null
   hours: DayHours[]
   services: SalonService[]
   workers: SalonWorker[]

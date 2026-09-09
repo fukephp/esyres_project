@@ -4,11 +4,22 @@ import { AuthShell } from './AuthShell'
 import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
-import { assistantCanSend, assistantStep } from '../lib/assistant'
+import {
+  assistantAddressLine,
+  assistantCanSend,
+  assistantHoursFacts,
+  assistantHelloName,
+  assistantServiceChipParts,
+  assistantStep,
+  formatAssistantHoursLine,
+  type AssistantDayHours,
+} from '../lib/assistant'
 import type { BusyLevel } from '../lib/busyToken'
 import { formatFeninga } from '../lib/format'
 
 type Props = {
+  salonName: string
+  address: string | null
   services: SalonService[]
   workers: SalonWorker[]
   minDate: string
@@ -22,6 +33,7 @@ type Props = {
   preferredTime: string
   onPickSuggestion: (value: string) => void
   onNativeTime: (value: string) => void
+  dayHours: AssistantDayHours | undefined
   dayClosed: boolean
   dayBusy: BusyLevel
   suggestions: string[]
@@ -42,6 +54,8 @@ const chipIdle = `${chip} border-hairline text-ink`
 const chipOn = `${chip} border-ink bg-ink text-canvas`
 
 export function AssistantIntake({
+  salonName,
+  address,
   services,
   workers,
   minDate,
@@ -55,6 +69,7 @@ export function AssistantIntake({
   preferredTime,
   onPickSuggestion,
   onNativeTime,
+  dayHours,
   dayClosed,
   dayBusy,
   suggestions,
@@ -84,9 +99,20 @@ export function AssistantIntake({
       ? t('salon.noPreference')
       : (workers.find((w) => w.id === workerChoice)?.name ?? t('salon.noPreference'))
   const timeStep = step === 'time' || step === 'send'
+  const addressLine = assistantAddressLine(address)
+  const hoursFacts = assistantHoursFacts(dayHours)
+  const hoursLine =
+    hoursFacts === null
+      ? null
+      : formatAssistantHoursLine(hoursFacts, {
+          closed: t('salon.closed'),
+          break: (start, end) => t('salon.break', { start, end }),
+        })
 
   return (
     <form className="mt-8 space-y-5" onSubmit={onSend}>
+      <p className="text-sm text-ink">{t('assistant.hello', { name: assistantHelloName(salonName) })}</p>
+      {addressLine !== null && <p className="text-sm text-muted">{addressLine}</p>}
       <p className="text-sm text-ink">{t('assistant.services')}</p>
       {chosen.length > 0 && (
         <p className="text-sm text-muted">{chosen.map((s) => s.name).join(', ')}</p>
@@ -94,6 +120,7 @@ export function AssistantIntake({
       <ul className="flex flex-wrap gap-2">
         {services.map((service) => {
           const on = selected.includes(service.id)
+          const chipParts = assistantServiceChipParts(service)
           return (
             <li key={service.id}>
               <button
@@ -101,8 +128,10 @@ export function AssistantIntake({
                 className={on ? chipOn : chipIdle}
                 onClick={() => onToggleService(service.id)}
               >
-                {service.name}
-                <span className="ml-1 text-xs opacity-70">{formatFeninga(service.priceFeninga)}</span>
+                {chipParts.name}
+                <span className="ml-1 text-xs opacity-70">
+                  {t('salon.duration', { n: chipParts.durationMinutes })} · {formatFeninga(chipParts.priceFeninga)}
+                </span>
               </button>
             </li>
           )
@@ -154,6 +183,8 @@ export function AssistantIntake({
           </label>
         </>
       )}
+
+      {timeStep && hoursLine !== null && <p className="text-sm text-muted">{hoursLine}</p>}
 
       {timeStep && dayClosed && (
         <p className="text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>

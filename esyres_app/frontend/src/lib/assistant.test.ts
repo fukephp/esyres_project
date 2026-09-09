@@ -1,9 +1,13 @@
 import { expect, test } from 'vitest'
 import {
+  assistantAddressLine,
   assistantBookingInput,
   assistantCanSend,
   assistantDateChange,
+  assistantHelloName,
+  assistantHoursFacts,
   assistantHoursForDate,
+  assistantServiceChipParts,
   assistantShowOtherTime,
   assistantStep,
   isChatOpen,
@@ -14,6 +18,7 @@ import {
   type AssistantDayHours,
   type ProfileMode,
 } from './assistant'
+import { PUBLIC_SALON_QUERY } from '../graphql/salon'
 
 const openDay: AssistantDayHours = {
   weekday: 'SATURDAY',
@@ -247,4 +252,68 @@ test('changing date clears time and other-time mode', () => {
 test('hoursForDate uses Sarajevo weekday', () => {
   expect(assistantHoursForDate([openDay, closedDay], '2026-09-05')).toEqual(openDay)
   expect(assistantHoursForDate([openDay, closedDay], '2026-09-06')).toEqual(closedDay)
+})
+
+test('opening name is the live salon name, not a platform bot', () => {
+  const name = assistantHelloName('Kosa Studio')
+  expect(name).toBe('Kosa Studio')
+  expect(name).not.toMatch(/Cora|Esyres|bot/i)
+})
+
+test('address line is the live string or omitted; never lat/lng', () => {
+  expect(assistantAddressLine(null)).toBeNull()
+  expect(assistantAddressLine(undefined)).toBeNull()
+  expect(assistantAddressLine('')).toBeNull()
+  expect(assistantAddressLine('   ')).toBeNull()
+  expect(assistantAddressLine('Ferhadija 12')).toBe('Ferhadija 12')
+  expect(assistantAddressLine('  Ferhadija 12  ')).toBe('Ferhadija 12')
+})
+
+test('hours facts come from that day only and do not invent clocks', () => {
+  expect(assistantHoursFacts(undefined)).toBeNull()
+  expect(assistantHoursFacts(closedDay)).toEqual({ closed: true })
+  expect(assistantHoursFacts({ ...openDay, opensAt: null, closesAt: null, closed: false })).toEqual({
+    closed: true,
+  })
+  expect(assistantHoursFacts(openDay)).toEqual({
+    closed: false,
+    opensAt: '09:00',
+    closesAt: '17:00',
+    breakStartsAt: null,
+    breakEndsAt: null,
+  })
+  expect(assistantHoursFacts(lunchDay)).toEqual({
+    closed: false,
+    opensAt: '09:00',
+    closesAt: '17:00',
+    breakStartsAt: '12:00',
+    breakEndsAt: '13:00',
+  })
+})
+
+test('service chip parts are live catalog fields', () => {
+  expect(
+    assistantServiceChipParts({ name: 'Šišanje', durationMinutes: 45, priceFeninga: 3200 }),
+  ).toEqual({
+    name: 'Šišanje',
+    durationMinutes: 45,
+    priceFeninga: 3200,
+  })
+})
+
+test('voice helpers do not take or return cancellation notice hours', () => {
+  const voice = {
+    helloName: assistantHelloName('Kosa Studio'),
+    addressLine: assistantAddressLine('Ferhadija 12'),
+    hours: assistantHoursFacts(openDay),
+    chip: assistantServiceChipParts({ name: 'Šišanje', durationMinutes: 30, priceFeninga: 2500 }),
+  }
+  expect(voice).not.toHaveProperty('cancellationNoticeHours')
+  expect(JSON.stringify(voice)).not.toMatch(/cancellation/i)
+})
+
+test('public salon query asks for address, not cancellation notice hours', () => {
+  const body = PUBLIC_SALON_QUERY.loc?.source.body ?? ''
+  expect(body).toContain('address')
+  expect(body).not.toContain('cancellationNoticeHours')
 })

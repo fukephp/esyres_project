@@ -10,6 +10,22 @@ export type AssistantDayHours = {
   breakEndsAt: string | null
 }
 
+export type AssistantHoursFacts =
+  | { closed: true }
+  | {
+      closed: false
+      opensAt: string
+      closesAt: string
+      breakStartsAt: string | null
+      breakEndsAt: string | null
+    }
+
+export type AssistantServiceChipParts = {
+  name: string
+  durationMinutes: number
+  priceFeninga: number
+}
+
 export type ProfileMode = 'idle' | 'picker' | 'chat' | 'sent'
 
 export type AssistantStep = 'services' | 'worker' | 'date' | 'time' | 'send'
@@ -89,6 +105,62 @@ export function assistantBookingInput(input: {
     booking.workerId = workerId
   }
   return booking
+}
+
+export function assistantHelloName(name: string): string {
+  return name
+}
+
+export function assistantAddressLine(address: string | null | undefined): string | null {
+  if (address === null || address === undefined) {
+    return null
+  }
+  const trimmed = address.trim()
+  return trimmed === '' ? null : trimmed
+}
+
+export function assistantHoursFacts(day: AssistantDayHours | undefined): AssistantHoursFacts | null {
+  if (day === undefined) {
+    return null
+  }
+  if (day.closed || day.opensAt === null || day.closesAt === null) {
+    return { closed: true }
+  }
+
+  return {
+    closed: false,
+    opensAt: day.opensAt,
+    closesAt: day.closesAt,
+    breakStartsAt: day.breakStartsAt,
+    breakEndsAt: day.breakEndsAt,
+  }
+}
+
+export function formatAssistantHoursLine(
+  facts: AssistantHoursFacts,
+  labels: { closed: string; break: (start: string, end: string) => string },
+): string {
+  if (facts.closed) {
+    return labels.closed
+  }
+  let line = `${facts.opensAt}–${facts.closesAt}`
+  if (facts.breakStartsAt !== null && facts.breakEndsAt !== null) {
+    line += ` · ${labels.break(facts.breakStartsAt, facts.breakEndsAt)}`
+  }
+
+  return line
+}
+
+export function assistantServiceChipParts(service: {
+  name: string
+  durationMinutes: number
+  priceFeninga: number
+}): AssistantServiceChipParts {
+  return {
+    name: service.name,
+    durationMinutes: service.durationMinutes,
+    priceFeninga: service.priceFeninga,
+  }
 }
 
 export function assistantHoursForDate(hours: AssistantDayHours[], date: string): AssistantDayHours | undefined {

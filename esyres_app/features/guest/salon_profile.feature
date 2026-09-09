@@ -41,6 +41,17 @@ Feature: Guest salon profile
       """
     And salon workers are empty
 
+  Scenario: Guest public salon address is null by default
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Kosa Studio"
+    When I query the public salon as a guest
+    Then the public salon has no address
+
+  Scenario: Guest can read salon address when set
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Kosa Studio"
+    And the salon address is "Ferhadija 12"
+    When I query the public salon as a guest
+    Then the public salon address is "Ferhadija 12"
+
   Scenario: Guest can read salon workers
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Kosa Studio"
     And the salon has a worker:

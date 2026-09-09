@@ -20,6 +20,7 @@ class SalonFactory extends Factory
         return [
             'owner_id' => User::factory(),
             'name' => fake()->company(),
+            'address' => null,
             'cancellation_notice_hours' => 24,
             'hours' => WeeklyHours::closedWeek(),
             'lat' => null,
