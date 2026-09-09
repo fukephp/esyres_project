@@ -13,9 +13,9 @@ From this directory. `up -d` is idempotent (starts php artisan on :8000 and Vite
 ```text
 docker compose up -d
 docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat
-docker compose exec -T php vendor/bin/behat --suite owner
-docker compose exec -T php vendor/bin/behat --suite guest
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure --suite owner
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure --suite guest
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build

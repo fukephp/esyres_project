@@ -44,7 +44,7 @@ Run from `esyres_app/` (app root in CONTEXT). Stack must be up (`docker compose 
 ```text
 docker compose up -d
 docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
@@ -74,7 +74,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 5. **Guest PWA:** cookie `esyres_intake_<salonId>` = token, Max-Age 24h, SameSite=Lax (SPA read/write). On `/salon/:id` mount, if cookie, query `assistantIntake` and hydrate; expand chat only when a snapshot exists. Call `upsertAssistantIntake` only when the snapshot changes (first chip/native control), not when the CTA opens. After login/register on the profile, upsert once so the name attaches. Chat `createBooking` sends `intakeToken` when present; on success clear cookie. Picker omits `intakeToken`. Keep existing mutually exclusive picker/chat and send-gate panels.
 6. **Owner PWA:** lazy `/owner/chats`. Shared owner nav: `Zahtjevi` → `ownerQueuePath`, `Chat` → `ownerChatPath` (salon query only, no date). Badge from `inFlightIntakeCount`; hide when helper says null. `/owner` still queue + panel + date; refetch count on mount. `/owner/chats`: list rows (name, time, progress line), empty `Nema razgovora.`, salon switcher, no date picker, refetch list+count on mount. No row click, no `/owner/chats/:id`, no owner messages. No settings/stats links.
 7. **Helpers:** `intakeProgressLine`, `chatBadgeCount`, `ownerChatPath` / cookie token helpers, `intakeSnapshotChanged` (or equivalent so CTA-open does not upsert). Reuse `assistantStep` for the no-services step. i18n: `owner.chat` (`Chat`), `owner.chatsEmpty`, step labels as needed. No English keys. No bot name.
-8. **Behat:** new guest + owner features named above. Cover create/update/resume, stale/convert null, `Gost` vs name, list isolation/sort/page, count vs page, auth, `intakeToken` convert and no-error paths. Full `vendor/bin/behat` must stay green.
+8. **Behat:** new guest + owner features named above. Cover create/update/resume, stale/convert null, `Gost` vs name, list isolation/sort/page, count vs page, auth, `intakeToken` convert and no-error paths. Full `vendor/bin/behat --format=progress --stop-on-failure` must stay green.
 9. **Vitest:** cover every Vitest product check. Keep existing owner/assistant tests green.
 10. Patch `docs/architecture/04-Frontend.md` (owner routes: `/owner/chats` list + badge, refetch on mount, no new subscription) and `docs/architecture/05-Data-Model.md` (`AssistantIntake` entity). Do not rewrite decision 35.
 11. Do not add Pest, Playwright, codegen, Redis, Take over, origin/transcript, or LLM.
