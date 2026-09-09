@@ -215,6 +215,23 @@ export function ownerQueuePath(
   return query === '' ? '/owner' : `/owner?${query}`
 }
 
+export function ownerChatSearchParams(
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+): URLSearchParams {
+  const params = new URLSearchParams()
+  if (salonId !== null && firstOwnedId !== null && salonId !== firstOwnedId) {
+    params.set('salon', salonId)
+  }
+
+  return params
+}
+
+export function ownerChatPath(salonId: string | null = null, firstOwnedId: string | null = null): string {
+  const query = ownerChatSearchParams(salonId, firstOwnedId).toString()
+  return query === '' ? '/owner/chats' : `/owner/chats?${query}`
+}
+
 export function occupyingBlock(row: {
   status: string
   preferredStartsAt: string

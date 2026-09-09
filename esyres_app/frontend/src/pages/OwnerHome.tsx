@@ -5,8 +5,13 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
+import { OwnerNav } from '../components/OwnerNav'
 import { WorkerPanel } from '../components/WorkerPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
+import {
+  IN_FLIGHT_INTAKE_COUNT_QUERY,
+  type InFlightIntakeCountData,
+} from '../graphql/intake'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
@@ -23,6 +28,7 @@ import {
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
+import { chatBadgeCount } from '../lib/intake'
 import {
   acceptErrorKey,
   canAcceptPreferredTime,
@@ -67,6 +73,11 @@ export function OwnerHome() {
       void refetchQueue()
       void refetchOccupying()
     },
+  })
+  const { data: chatCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+    fetchPolicy: 'network-only',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
@@ -228,6 +239,8 @@ export function OwnerHome() {
   const blocks = (occupying?.occupyingBookings ?? [])
     .map((row: OccupyingBooking) => occupyingBlock(row))
     .filter((row) => row !== null)
+  const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
+  const firstOwnedId = salons[0]?.id ?? salon.id
 
   return (
     <div className="min-h-svh md:flex">
@@ -250,7 +263,14 @@ export function OwnerHome() {
         ) : (
           <p className="text-sm font-semibold">{salon.name}</p>
         )}
-        <p className="mt-6 text-sm font-medium">{t('owner.title')}</p>
+        <OwnerNav
+          salonId={salon.id}
+          firstOwnedId={firstOwnedId}
+          date={date}
+          badge={badge}
+          active="queue"
+          tone="dark"
+        />
       </aside>
       <main className="flex-1 px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
@@ -272,6 +292,16 @@ export function OwnerHome() {
         ) : (
           <p className="mt-1 text-sm text-body md:hidden">{salon.name}</p>
         )}
+        <div className="md:hidden">
+          <OwnerNav
+            salonId={salon.id}
+            firstOwnedId={firstOwnedId}
+            date={date}
+            badge={badge}
+            active="queue"
+            tone="light"
+          />
+        </div>
         <label className="mt-6 block max-w-xs text-sm text-body">
           {t('owner.date')}
           <input

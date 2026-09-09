@@ -230,6 +230,72 @@ trait OwnerSteps
     }
 
     /**
+     * @When I query in-flight intakes
+     */
+    public function iQueryInFlightIntakes(): void
+    {
+        $this->graphql($this->inFlightIntakesQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I query in-flight intakes limit :limit offset :offset
+     */
+    public function iQueryInFlightIntakesPaged(string $limit, string $offset): void
+    {
+        $this->graphql($this->inFlightIntakesQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @When I query in-flight intake count
+     */
+    public function iQueryInFlightIntakeCount(): void
+    {
+        $this->graphql($this->inFlightIntakeCountQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I query in-flight intakes as a guest
+     */
+    public function iQueryInFlightIntakesAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->inFlightIntakesQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @Then in-flight customer names are:
+     */
+    public function inFlightCustomerNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['inFlightIntakes'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then in-flight intake count is :count
+     */
+    public function inFlightIntakeCountIs(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame((int) $count, $this->graphql['data']['inFlightIntakeCount']);
+    }
+
+    /**
      * @When I query pending bookings as a guest for date :date
      */
     public function iQueryPendingBookingsAsAGuest(string $date): void
@@ -755,6 +821,29 @@ query Pending($salonId: ID!, $date: String!, $limit: Int = 20, $offset: Int = 0)
     worker { id name }
     services { name durationMinutes }
   }
+}
+GQL;
+    }
+
+    private function inFlightIntakesQuery(): string
+    {
+        return <<<'GQL'
+query InFlight($salonId: ID!, $limit: Int = 20, $offset: Int = 0) {
+  inFlightIntakes(salonId: $salonId, limit: $limit, offset: $offset) {
+    id
+    customerName
+    serviceIds
+    updatedAt
+  }
+}
+GQL;
+    }
+
+    private function inFlightIntakeCountQuery(): string
+    {
+        return <<<'GQL'
+query InFlightCount($salonId: ID!) {
+  inFlightIntakeCount(salonId: $salonId)
 }
 GQL;
     }

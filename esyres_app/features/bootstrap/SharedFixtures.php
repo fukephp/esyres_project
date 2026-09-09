@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Salon;
@@ -218,6 +219,57 @@ trait SharedFixtures
             'price_feninga' => $input['priceFeninga'],
         ]);
         $this->services[] = $this->service;
+    }
+
+    /**
+     * @Given the salon has an in-flight intake
+     */
+    public function theSalonHasAnInFlightIntake(): void
+    {
+        $this->intake = AssistantIntake::factory()->create([
+            'salon_id' => $this->salon->id,
+            'service_ids' => $this->services === [] ? [] : [(string) $this->services[0]->id],
+        ]);
+        $this->intakeToken = $this->intake->token;
+    }
+
+    /**
+     * @Given the other salon has an in-flight intake
+     */
+    public function theOtherSalonHasAnInFlightIntake(): void
+    {
+        AssistantIntake::factory()->create([
+            'salon_id' => $this->otherSalon->id,
+            'service_ids' => [],
+        ]);
+    }
+
+    /**
+     * @Given that intake is stale
+     */
+    public function thatIntakeIsStale(): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->intake->timestamps = false;
+        $this->intake->updated_at = now()->subHours(25);
+        $this->intake->save();
+    }
+
+    /**
+     * @Given that intake is converted
+     */
+    public function thatIntakeIsConverted(): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        if ($this->booking === null) {
+            $this->insertRequestedBooking($this->salon, '2026-08-31', '10:00', 'Ana', null);
+        }
+        $this->intake->booking_id = $this->booking->id;
+        $this->intake->save();
     }
 
     /**

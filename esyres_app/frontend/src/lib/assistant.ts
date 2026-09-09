@@ -36,6 +36,7 @@ export type AssistantBookingInput = {
   workerId?: string
   preferredDate: string
   preferredTime: string
+  intakeToken?: string
 }
 
 export function showChatCta(serviceCount: number, sent: boolean): boolean {

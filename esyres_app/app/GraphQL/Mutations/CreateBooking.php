@@ -3,12 +3,14 @@
 namespace App\GraphQL\Mutations;
 
 use App\Exceptions\ClientError;
+use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use Illuminate\Support\Str;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -16,7 +18,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 final class CreateBooking
 {
     /**
-     * @param  array{input: array{salonId: string, serviceIds: list<string>, workerId?: string|null, preferredDate: string, preferredTime: string}}  $args
+     * @param  array{input: array{salonId: string, serviceIds: list<string>, workerId?: string|null, preferredDate: string, preferredTime: string, intakeToken?: string|null}}  $args
      */
     public function __invoke(mixed $root, array $args, GraphQLContext $context): Booking
     {
@@ -62,6 +64,8 @@ final class CreateBooking
                 $row->price_feninga = $service->price_feninga;
                 $row->save();
             }
+
+            $this->attachIntake($salon->id, $input['intakeToken'] ?? null, $booking->id);
 
             return $booking->load('services');
         });
@@ -135,5 +139,21 @@ final class CreateBooking
         }
 
         return $worker->id;
+    }
+
+    private function attachIntake(int $salonId, mixed $token, int $bookingId): void
+    {
+        if (! is_string($token) || $token === '' || ! Str::isUuid($token)) {
+            return;
+        }
+        $row = AssistantIntake::query()
+            ->where('salon_id', $salonId)
+            ->where('token', $token)
+            ->first();
+        if ($row === null || ! $row->isInFlight()) {
+            return;
+        }
+        $row->booking_id = $bookingId;
+        $row->save();
     }
 }

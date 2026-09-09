@@ -53,6 +53,7 @@ export type CreateBookingInput = {
   workerId?: string
   preferredDate: string
   preferredTime: string
+  intakeToken?: string
 }
 
 export type MyBooking = {

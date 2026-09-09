@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Salon;
 use App\Models\Service;
@@ -48,6 +49,10 @@ trait BehatRuntime
 
     protected ?Booking $firstCustomerBooking = null;
 
+    protected ?AssistantIntake $intake = null;
+
+    protected ?string $intakeToken = null;
+
     protected ?string $verifyUrl = null;
 
     protected ?User $verifyUser = null;
@@ -72,6 +77,8 @@ trait BehatRuntime
         $this->otherWorker = null;
         $this->booking = null;
         $this->firstCustomerBooking = null;
+        $this->intake = null;
+        $this->intakeToken = null;
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;

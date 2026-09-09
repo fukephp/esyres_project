@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { AssistantIntake } from '../components/AssistantIntake'
@@ -8,6 +8,12 @@ import { BookingsLink } from '../components/BookingsLink'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
+import {
+  ASSISTANT_INTAKE_QUERY,
+  UPSERT_ASSISTANT_INTAKE_MUTATION,
+  type AssistantIntakeData,
+  type UpsertAssistantIntakeData,
+} from '../graphql/intake'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
 import {
   assistantBookingInput,
@@ -26,6 +32,18 @@ import {
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
+import {
+  clearIntakeToken,
+  emptyIntakeSnapshot,
+  intakeSnapshotFromRow,
+  isEmptyIntakeSnapshot,
+  readIntakeToken,
+  shouldRestoreIntake,
+  shouldUpsertIntake,
+  withIntakeToken,
+  writeIntakeToken,
+  type IntakeSnapshot,
+} from '../lib/intake'
 
 const busyBg = {
   'busy-free': 'bg-busy-free',
@@ -101,6 +119,73 @@ export function SalonProfile() {
   const [needPhone, setNeedPhone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [intakeToken, setIntakeToken] = useState<string | null>(() => (id ? readIntakeToken(id) : null))
+  const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
+  const restored = useRef(false)
+  const { data: savedIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
+    variables: { token: intakeToken ?? '' },
+    skip: !intakeToken,
+  })
+  const [upsertIntake] = useMutation<UpsertAssistantIntakeData>(UPSERT_ASSISTANT_INTAKE_MUTATION)
+
+  useEffect(() => {
+    restored.current = false
+    lastSnapshot.current = emptyIntakeSnapshot()
+    setIntakeToken(id ? readIntakeToken(id) : null)
+  }, [id])
+
+  useEffect(() => {
+    const row = savedIntake?.assistantIntake ?? null
+    if (row === null || restored.current || !shouldRestoreIntake(intakeSnapshotFromRow(row))) {
+      return
+    }
+    restored.current = true
+    const snapshot = intakeSnapshotFromRow(row)
+    lastSnapshot.current = snapshot
+    setChatSelected(snapshot.serviceIds)
+    setChatWorker(snapshot.workerId ?? '')
+    setChatWorkerConfirmed(snapshot.workerConfirmed)
+    setChatDate(snapshot.preferredDate)
+    setChatTime(snapshot.preferredTime)
+    setMode('chat')
+  }, [savedIntake])
+
+  const chatSnapshot: IntakeSnapshot = {
+    serviceIds: chatSelected,
+    workerId: chatWorker === '' ? null : chatWorker,
+    workerConfirmed: chatWorkerConfirmed,
+    preferredDate: chatDate,
+    preferredTime: chatTime,
+  }
+
+  useEffect(() => {
+    if (!id || mode !== 'chat') {
+      return
+    }
+    if (!shouldUpsertIntake(lastSnapshot.current, chatSnapshot)) {
+      return
+    }
+    lastSnapshot.current = chatSnapshot
+    void upsertIntake({
+      variables: {
+        input: {
+          salonId: id,
+          token: intakeToken,
+          serviceIds: chatSnapshot.serviceIds,
+          workerId: chatSnapshot.workerId,
+          workerConfirmed: chatSnapshot.workerConfirmed,
+          preferredDate: chatSnapshot.preferredDate === '' ? null : chatSnapshot.preferredDate,
+          preferredTime: chatSnapshot.preferredTime === '' ? null : chatSnapshot.preferredTime,
+        },
+      },
+    }).then((result) => {
+      const token = result.data?.upsertAssistantIntake.token
+      if (typeof token === 'string') {
+        writeIntakeToken(id, token)
+        setIntakeToken(token)
+      }
+    })
+  }, [id, mode, chatSnapshot, intakeToken, upsertIntake])
 
   if (loading) {
     return (
@@ -158,6 +243,11 @@ export function SalonProfile() {
       setNeedEmail(false)
       setNeedPhone(false)
       setError(null)
+      if (id && chatting) {
+        clearIntakeToken(id)
+        setIntakeToken(null)
+        lastSnapshot.current = emptyIntakeSnapshot()
+      }
     } catch (err) {
       const code = graphqlErrorCode(err)
       if (code === 'UNAUTHENTICATED') {
@@ -200,13 +290,17 @@ export function SalonProfile() {
       return null
     }
     if (chatting) {
-      return assistantBookingInput({
+      const chatInput = assistantBookingInput({
         salonId: id,
         serviceIds: chatSelected,
         workerChoice: chatWorker,
         preferredDate: chatDate,
         preferredTime: chatTime,
       })
+      if (chatInput === null) {
+        return null
+      }
+      return withIntakeToken(chatInput, intakeToken)
     }
     const input: CreateBookingInput = {
       salonId: id,
@@ -241,6 +335,27 @@ export function SalonProfile() {
   }
 
   async function afterAuth() {
+    if (chatting && id && !isEmptyIntakeSnapshot(chatSnapshot)) {
+      lastSnapshot.current = chatSnapshot
+      const result = await upsertIntake({
+        variables: {
+          input: {
+            salonId: id,
+            token: intakeToken,
+            serviceIds: chatSnapshot.serviceIds,
+            workerId: chatSnapshot.workerId,
+            workerConfirmed: chatSnapshot.workerConfirmed,
+            preferredDate: chatSnapshot.preferredDate === '' ? null : chatSnapshot.preferredDate,
+            preferredTime: chatSnapshot.preferredTime === '' ? null : chatSnapshot.preferredTime,
+          },
+        },
+      })
+      const token = result.data?.upsertAssistantIntake.token
+      if (typeof token === 'string') {
+        writeIntakeToken(id, token)
+        setIntakeToken(token)
+      }
+    }
     const input = bookingInput()
     if (!input) {
       return
