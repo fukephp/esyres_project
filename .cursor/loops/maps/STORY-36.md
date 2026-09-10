@@ -49,16 +49,17 @@ An owner of the selected salon can open a Basic Stats screen and see bookings pe
 - **Cancellation rate (2026-09-10):** integer percent `cancelled / (confirmed + cancelled)` in that same window and status set. Denominator 0 → 0. Separate integer `lateCancels` = rows with `late_cancel` true. Do not recompute late.
 - **Query (from owner pattern):** dedicated `salonStats(salonId: ID!): SalonStats!` with `OwnerAccess`. Do not hang these fields on public `Salon` (guest already queries `salon`).
 - **Empty (from chats pattern):** still render the screen. Zeros are valid. No empty-state illustration. One Bosnian line when `bookingsCount` is 0.
+- **Days strip (2026-09-10):** exactly 7 `days` rows, oldest → today. Each: `date` (`Y-m-d`), `weekday`, `bookingsCount` (confirmed+cancelled that `preferred_date`), `busyPercent` (`Occupancy::percent`). No guest enum. No separate ranked-days list. No `busiestDay` scalar.
+- **Busiest hours (2026-09-10):** `hours` = start counts by Sarajevo hour-of-day (`0–23` from `preferred_starts_at`) for confirmed+cancelled in the window. Omit count 0. Sort count desc, then hour asc. Duration does not spill. Display `HH:00`.
+- **Payload (from schema conventions):** `salonStats(salonId)` returns `fromDate`, `toDate`, `bookingsCount`, `cancellationRatePercent`, `lateCancels`, `days`, `hours`. No stats subscription (mount refetch like chats).
 
 ## Open decisions
 
-- **Days strip** — 7 dates of booking count + busy percent vs today-only percent; how “busiest days” is derived
-- **Busiest hours** — start-hour counts vs occupied minutes; all non-zero hours vs top N
+- **Bosnian labels** — nav/title, four metrics, empty line
 
 ## Not yet specified
 
-- Exact GraphQL field names / types (waits on days + hours)
-- Bosnian labels for the four metrics (waits on payload)
+<!-- empty -->
 
 ## Out of scope
 
