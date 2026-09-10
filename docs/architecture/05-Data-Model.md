@@ -20,9 +20,10 @@ Sketch only — no migrations. Status machine: `requested → confirmed` (owner 
 - **Booking** — `salon_id`, `customer_id`, optional `worker_id` (null = no preference until accept/propose), `preferred_date`, `preferred_starts_at`, status, `proposed_starts_at`, `proposed_worker_id`, duration derived from services (sum, rounded up to 15 minutes), decline/expire reason. Optional overlay `reschedule_date` / `reschedule_starts_at` on a **confirmed** row (in-progress reschedule; does not occupy). Customer cancel of confirmed sets `cancelled` and snapshots `cancelled_at` plus late (inside `cancellation_notice_hours` at cancel time). `owner_responded_at` is set once on the first successful accept, counter-propose, or decline (see `docs/adr/0007-owner-responded-at-on-first-action.md`). Optional `CreateBookingInput.intakeToken` may attach an in-flight `AssistantIntake` (does not change the status machine). Converted intake is the origin signal (no `bookings.origin`); owner GraphQL may nest it on `Booking` when the session owns the salon.
 - **AssistantIntake** — salon-scoped scripted-chat snapshot that is not a request yet (`token` UUID for the guest, bigint PK internally). In-flight while `booking_id` is null and `updated_at` is within 24h. Optional `taken_over_at` pauses guest upsert/chat-send while the salon is open and DND is off (`takenOver` is that pause **in effect**, not the raw flag). Optional `pinged_at` marks a guest ping (`pinged` is true when that timestamp is set; not gated by hours or DND). Converted when chat `createBooking` attaches `booking_id`. Not a message log; Request Detail transcript is the labeled snapshot (services, worker, day, time).
 - **BookingService** — services on a booking; durations/prices snapshot at request time.
-- **QrScan** — scan events; guest hold is a cookie until reconcile.
+- **Favorite** — unique customer+salon bookmark (`favorites`: `user_id`, `salon_id`). QR reconnect `firstOrCreate`s one. Not a QR visit. No `visited_at` column.
+- **QrScan** — one row per successful reconnect (`user_id`, `salon_id`, timestamps). Guest hold is a cookie until reconcile. A QR visit is the existence of a row for that pair, not a separate column.
 - **PushSubscription** — VAPID endpoint + keys per user.
-- Trust counters / timestamps on user, salon, and booking as needed (response time, no-show, cancel, visited). Badge **display** is still Phase 2.
+- Trust counters / timestamps on user, salon, and booking as needed (response time, no-show, cancel). Badge **display** is still Phase 2.
 
 ## Slot occupancy
 

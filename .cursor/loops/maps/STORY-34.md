@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-34 |
 | Source | `docs/stories/STORY-34.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-34.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-34.md` |
 
 ## Destination
 
@@ -49,13 +49,15 @@ Scanning the existing salon QR sets a ~7 day guest hold cookie (last salon wins,
 - **Reconcile hooks (2026-09-10):** when a **session** user has both email+phone verification **and** the cookie: (1) QR GET if already both-verified, (2) `verifyPhoneOtp` if email already verified, (3) signed email GET only if that user is the session user and phone already verified, (4) `login` after a guest scan. No-session email GET does not reconcile (cookie stays). Register does not (timestamps still null).
 - **Owner see (2026-09-10):** data + GraphQL only. No Customer History screen. Owner of that salon can query scan/visited rows. Behat asserts GraphQL.
 - **Favorites (2026-09-10):** silent auto-favorite on reconcile only. `me` can read favorite ids. No heart, no `/favorites` list.
+- **Persistence (2026-09-10):** `favorites` unique `(user_id, salon_id)` + timestamps. `qr_scans` event rows `(user_id, salon_id, timestamps)`. QR visit = at least one `qr_scans` row for that pair. No `visited_at` column.
+- **Repeat (2026-09-10):** each reconcile appends a `qr_scans` row. Favorite is `firstOrCreate` (no duplicate bookmark).
+- **GraphQL (2026-09-10):** `me.favoriteSalonIds: [ID!]!` (empty if none). `qrScans(salonId, limit=20, offset=0): [QrScan!]!` newest first — `id`, `salonId`, `customerId`, `createdAt`. `ListPage` cap. `OwnerAccess` (guest `UNAUTHENTICATED`, not-your-salon / missing salon `FORBIDDEN`).
+- **Verified (2026-09-10):** reconcile only if both `email_verified_at` and `phone_verified_at` are non-null. Do not use `hasVerifiedEmail/Phone()` (local skip must not fake visits). ADR 0018.
+- **Stale cookie:** missing/invalid salon id → forget cookie, write nothing.
 
 ## Open decisions
 
-- **Persistence:** `favorites` pivot vs extra `visited_at`; is a QR visit a `qr_scans` row or a column?
-- **Repeat reconcile:** append a scan row each time vs upsert one row per customer+salon vs no-op if already favorited.
-- **GraphQL shape:** how `me` exposes favorites and how the owner reads scans (auth codes, pagination).
-- **Verified for reconcile:** real `email_verified_at` + `phone_verified_at`, or `hasVerifiedEmail/Phone()` (true in `APP_ENV=local` with null timestamps)?
+<!-- empty -->
 
 ## Not yet specified
 
