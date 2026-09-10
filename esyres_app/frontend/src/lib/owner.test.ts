@@ -12,6 +12,7 @@ import {
   ownerDateFromSearch,
   ownerQueuePath,
   ownerChatPath,
+  ownerStatsPath,
   ownerSalonFromSearch,
   panelCells,
   proposeErrorKey,
@@ -187,6 +188,20 @@ test('owner chat path is not home and omits first-owned salon', () => {
   expect(ownerChatPath()).toBe('/owner/chats')
   expect(ownerChatPath('1', '1')).toBe('/owner/chats')
   expect(ownerChatPath('2', '1')).toBe('/owner/chats?salon=2')
+})
+
+test('owner stats path is not home and omits first-owned salon', () => {
+  expect(ownerStatsPath()).toBe('/owner/stats')
+  expect(ownerStatsPath('1', '1')).toBe('/owner/stats')
+  expect(ownerStatsPath('2', '1')).toBe('/owner/stats?salon=2')
+})
+
+test('owner stats copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.stats')).toBe('Statistika')
+  expect(i18n.t('owner.qrScans')).toBe('Skeniranja QR')
+  expect(i18n.t('owner.qrVisits')).toBe('QR posjete')
+  expect(i18n.t('owner.qrConversion')).toBe('Konverzija')
 })
 
 test('assistant origin chip shows only when intake is present', () => {

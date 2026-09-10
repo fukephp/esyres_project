@@ -13,8 +13,8 @@
 | Goal (one sentence) | Owner of the selected salon sees all-time QR scan count, QR visit count, and conversion percent on `/owner/stats`; each successful `GET /qr/{existing}` appends a scan; visits stay `qr_scans` at reconnect. |
 | Branch name | `cursor/story-37-qr-conversion-stats-c0b8` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-10 |
 
 ## Pass/fail — product
 

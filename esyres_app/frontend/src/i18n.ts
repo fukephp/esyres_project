@@ -151,6 +151,11 @@ void i18n.use(initReactI18next).init({
         owner: {
           title: 'Zahtjevi',
           chat: 'Chat',
+          stats: 'Statistika',
+          qrScans: 'Skeniranja QR',
+          qrVisits: 'QR posjete',
+          qrConversion: 'Konverzija',
+          qrPercent: '{{n}}%',
           chatsEmpty: 'Nema razgovora.',
           ping: 'Pitanje',
           takeOver: 'Preuzmi',
