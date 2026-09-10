@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-36 |
 | Source | `docs/stories/STORY-36.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-36.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-36.md` |
 
 ## Destination
 
@@ -52,10 +52,11 @@ An owner of the selected salon can open a Basic Stats screen and see bookings pe
 - **Days strip (2026-09-10):** exactly 7 `days` rows, oldest → today. Each: `date` (`Y-m-d`), `weekday`, `bookingsCount` (confirmed+cancelled that `preferred_date`), `busyPercent` (`Occupancy::percent`). No guest enum. No separate ranked-days list. No `busiestDay` scalar.
 - **Busiest hours (2026-09-10):** `hours` = start counts by Sarajevo hour-of-day (`0–23` from `preferred_starts_at`) for confirmed+cancelled in the window. Omit count 0. Sort count desc, then hour asc. Duration does not spill. Display `HH:00`.
 - **Payload (from schema conventions):** `salonStats(salonId)` returns `fromDate`, `toDate`, `bookingsCount`, `cancellationRatePercent`, `lateCancels`, `days`, `hours`. No stats subscription (mount refetch like chats).
+- **Copy (2026-09-10):** nav/h1 `Statistika`; `Termini ove sedmice`; `Otkazivanja`; `Kasna otkazivanja`; `Zauzetost`; `Najzauzetiji sati`; empty `Nema termina ove sedmice.`; values `{{n}}%`; hours `HH:00`; no date-range caption. Weekdays reuse `weekday.*`.
 
 ## Open decisions
 
-- **Bosnian labels** — nav/title, four metrics, empty line
+<!-- empty -->
 
 ## Not yet specified
 
