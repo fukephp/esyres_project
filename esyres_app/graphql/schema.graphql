@@ -154,6 +154,14 @@ type User {
     phone: String
     phoneVerified: Boolean! @method(name: "hasVerifiedPhone")
     salons: [Salon!]! @method(name: "salonList")
+    favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
+}
+
+type QrScan {
+    id: ID!
+    salonId: ID! @method(name: "salonIdString")
+    customerId: ID! @method(name: "customerIdString")
+    createdAt: String! @method(name: "createdAtIso")
 }
 
 type Salon {
@@ -205,6 +213,7 @@ type Query {
     inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
     inFlightIntakeCount(salonId: ID!): Int!
     salonStats(salonId: ID!): SalonStats! @field(resolver: "App\\GraphQL\\Queries\\SalonStats")
+    qrScans(salonId: ID!, limit: Int = 20, offset: Int = 0): [QrScan!]!
 }
 
 type Mutation {

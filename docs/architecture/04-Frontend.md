@@ -5,6 +5,7 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 ## Routing
 
 - `/` — customer: discover, salon, request (picker or scripted salon-profile chat), bookings, favorites
+- Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Sets the hold cookie and 302s to `/salon/:id`. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie.
 - `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route.
 - `/owner` — owner: inbox, worker panel (home), in-flight chat tab (`/owner/chats`, list + optional Take over / Release + DND toggle), settings, Basic Stats (`/owner/stats`); **salon switcher** when the user owns more than one salon
 

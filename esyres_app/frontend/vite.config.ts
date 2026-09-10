@@ -30,6 +30,7 @@ export default defineConfig({
     proxy: {
       '/graphql': api,
       '/sanctum': api,
+      '/qr': api,
       '/app': {
         target: reverb,
         ws: true,

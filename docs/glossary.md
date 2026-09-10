@@ -232,6 +232,24 @@ _Avoid_: cancellation policy (as a hard block), deposit rule
 A customer phone that has passed OTP. Required to send a request. Optional at register. Not the login username. SMS fallback uses this number, not an unverified one.
 _Avoid_: phone login, SMS login, 2FA, phone username
 
+## Favorites and QR
+
+**QR hold**:
+The guest’s last physically scanned salon, remembered until they are verified. Not a login, not a booking, and not an Instagram-bio visit.
+_Avoid_: QR cookie, scan session, check-in
+
+**QR reconnect**:
+Silently favoriting that salon and recording a QR visit once the customer is verified after a physical scan. Not a second sticker, not a popup, and not a remote favorite.
+_Avoid_: check-in, stamp, reconnect QR (as a second product)
+
+**Favorite**:
+A customer bookmark of one salon. QR reconnect creates one without a tap. Not a QR visit and not a booking.
+_Avoid_: like, save, follow, wishlist
+
+**QR visit**:
+The owner-side fact that this customer physically scanned that salon’s QR and then verified. Not a remote favorite and not a completed booking.
+_Avoid_: check-in, walk-in, stamp, Regular (the badge)
+
 ## Signals
 
 **Busy-level**:

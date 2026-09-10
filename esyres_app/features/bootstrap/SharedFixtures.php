@@ -8,8 +8,11 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Models\Favorite;
 use App\Models\PushSubscription;
+use App\Models\QrScan;
 use App\Notifications\BookingReminder;
+use App\Qr\QrHold;
 use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\SalonHours\WeeklyHours;
@@ -1102,6 +1105,260 @@ mutation PingIntake($salonId: ID!, $token: String) {
     preferredTime
     takenOver
     pinged
+  }
+}
+GQL;
+    }
+
+    /**
+     * @When I visit the QR for the salon
+     */
+    public function iVisitTheQrForTheSalon(): void
+    {
+        $this->getQr('/qr/'.$this->salon->id);
+    }
+
+    /**
+     * @When I visit the QR for salon :id
+     */
+    public function iVisitTheQrForSalonId(string $id): void
+    {
+        $this->getQr('/qr/'.$id);
+    }
+
+    /**
+     * @When I visit the salon profile URL
+     */
+    public function iVisitTheSalonProfileUrl(): void
+    {
+        $this->forgetRequestUser();
+        $response = $this->get('/salon/'.$this->salon->id);
+        $this->lastLocation = $response->headers->get('Location');
+        $this->rememberCookies($response);
+        $this->forgetRequestUser();
+    }
+
+    /**
+     * @When the QR cookie is :value
+     */
+    public function theQrCookieIs(string $value): void
+    {
+        unset($this->defaultCookies[QrHold::COOKIE]);
+        $this->withUnencryptedCookie(QrHold::COOKIE, $value);
+    }
+
+    /**
+     * @When the salon is deleted
+     */
+    public function theSalonIsDeleted(): void
+    {
+        $this->salon->delete();
+    }
+
+    /**
+     * @Then the QR cookie is the salon id
+     */
+    public function theQrCookieIsTheSalonId(): void
+    {
+        $live = $this->liveQrCookie();
+        if ($live !== null) {
+            $this->assertSame((string) $this->salon->id, $live->getValue());
+            if (! $live->isHttpOnly()) {
+                throw new RuntimeException('Expected httpOnly esyres_qr');
+            }
+            $this->assertSame('lax', strtolower((string) $live->getSameSite()));
+            $age = $live->getMaxAge();
+            if ($age < QrHold::MINUTES * 60 - 30 || $age > QrHold::MINUTES * 60) {
+                throw new RuntimeException('Expected ~7 day max-age, got '.$age);
+            }
+        }
+        $value = $live?->getValue() ?? $this->qrCookieValueFromJar();
+        $this->assertSame((string) $this->salon->id, $value);
+    }
+
+    /**
+     * @Then I am redirected to the salon profile
+     */
+    public function iAmRedirectedToTheSalonProfile(): void
+    {
+        $this->assertSame('http://localhost/salon/'.$this->salon->id, $this->lastLocation);
+    }
+
+    /**
+     * @Then I am redirected to the spa home
+     */
+    public function iAmRedirectedToTheSpaHome(): void
+    {
+        $this->assertSame('http://localhost/', $this->lastLocation);
+    }
+
+    /**
+     * @Then there is no QR cookie
+     */
+    public function thereIsNoQrCookie(): void
+    {
+        if ($this->liveQrCookie() !== null) {
+            throw new RuntimeException('Expected no live esyres_qr cookie');
+        }
+        if ($this->qrCookieValueFromJar() !== null) {
+            throw new RuntimeException('Expected esyres_qr cookie to be cleared');
+        }
+    }
+
+    /**
+     * @Then me favorite salon ids are empty
+     */
+    public function meFavoriteSalonIdsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['me']['favoriteSalonIds']);
+    }
+
+    /**
+     * @Then me favorite salon ids are the salon
+     */
+    public function meFavoriteSalonIdsAreTheSalon(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([(string) $this->salon->id], $this->graphql['data']['me']['favoriteSalonIds']);
+    }
+
+    /**
+     * @When I query QR scans
+     */
+    public function iQueryQrScans(): void
+    {
+        $this->graphql($this->qrScansQuery(), ['salonId' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query QR scans as a guest
+     */
+    public function iQueryQrScansAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->qrScansQuery(), ['salonId' => '1']);
+    }
+
+    /**
+     * @When I query QR scans for salon :id
+     */
+    public function iQueryQrScansForSalon(string $id): void
+    {
+        $this->graphql($this->qrScansQuery(), ['salonId' => $id]);
+    }
+
+    /**
+     * @When I query QR scans limit :limit offset :offset
+     */
+    public function iQueryQrScansLimitOffset(string $limit, string $offset): void
+    {
+        $this->graphql($this->qrScansQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
+        ]);
+    }
+
+    /**
+     * @Then QR scans have :count rows
+     */
+    public function qrScansHaveRows(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame((int) $count, count($this->graphql['data']['qrScans']));
+    }
+
+    /**
+     * @Then the first QR scan is for the customer and salon
+     */
+    public function theFirstQrScanIsForTheCustomerAndSalon(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['qrScans'][0] ?? null;
+        if (! is_array($row)) {
+            throw new RuntimeException('Expected a QR scan row');
+        }
+        $this->assertSame((string) $this->salon->id, $row['salonId']);
+        $this->assertSame((string) $this->user->id, $row['customerId']);
+    }
+
+    /**
+     * @Then the customer has :count favorite rows
+     */
+    public function theCustomerHasFavoriteRows(string $count): void
+    {
+        $this->assertSame((int) $count, Favorite::query()->where('user_id', $this->user->id)->count());
+    }
+
+    /**
+     * @Then the salon has :count QR scan rows
+     */
+    public function theSalonHasQrScanRows(string $count): void
+    {
+        $this->assertSame((int) $count, QrScan::query()->where('salon_id', $this->salon->id)->count());
+    }
+
+    /**
+     * @Then the customer has :count QR scan rows for the salon
+     */
+    public function theCustomerHasQrScanRowsForTheSalon(string $count): void
+    {
+        $this->assertSame(
+            (int) $count,
+            QrScan::query()->where('user_id', $this->user->id)->where('salon_id', $this->salon->id)->count(),
+        );
+    }
+
+    private function getQr(string $uri): void
+    {
+        $this->forgetRequestUser();
+        $response = $this->get($uri);
+        $this->lastLocation = $response->headers->get('Location');
+        $this->rememberCookies($response);
+        $this->forgetRequestUser();
+    }
+
+    private function qrCookieValueFromJar(): ?string
+    {
+        $value = $this->unencryptedCookies[QrHold::COOKIE] ?? $this->defaultCookies[QrHold::COOKIE] ?? null;
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function liveQrCookie(): ?\Symfony\Component\HttpFoundation\Cookie
+    {
+        foreach ($this->lastSetCookies as $cookie) {
+            if ($cookie->getName() !== QrHold::COOKIE) {
+                continue;
+            }
+            $value = (string) $cookie->getValue();
+            if ($value === '') {
+                return null;
+            }
+            $expires = $cookie->getExpiresTime();
+            if ($expires !== 0 && $expires < time()) {
+                return null;
+            }
+
+            return $cookie;
+        }
+
+        return null;
+    }
+
+    private function qrScansQuery(): string
+    {
+        return <<<'GQL'
+query QrScans($salonId: ID!, $limit: Int = 20, $offset: Int = 0) {
+  qrScans(salonId: $salonId, limit: $limit, offset: $offset) {
+    id
+    salonId
+    customerId
+    createdAt
   }
 }
 GQL;
