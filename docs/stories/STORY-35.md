@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-35 |
 | Epic | 8 — Trust Signal Data Foundations |
-| Loop | — |
+| Loop | `STORY-35` |
 | Depends on | STORY-14 |
 
 ## User story

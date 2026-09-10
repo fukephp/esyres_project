@@ -1,0 +1,3 @@
+# Trust counters increment on the event, not at badge time
+
+Fast Responder / Regular display is Phase 2 and owner cancellation-rate UI is STORY-36, but the counts must exist from day one so those reads are not a backfill. Successful cancel increments `cancel_count` on that customer and that salon; late cancel also increments `late_cancel_count`. Owner no-show increments `no_show_count` on both. The booking row is the idempotency stamp (`no_show_at`, existing `cancelled_at`). Count-on-read from booking flags alone would leave a gap if events are later hard to reconstruct. `email_verified_at` / `phone_verified_at` stay the verification record; they are not a third counter.

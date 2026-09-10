@@ -47,6 +47,9 @@ class Salon extends Model
             'dnd' => 'boolean',
             'lat' => 'float',
             'lng' => 'float',
+            'cancel_count' => 'integer',
+            'late_cancel_count' => 'integer',
+            'no_show_count' => 'integer',
         ];
     }
 

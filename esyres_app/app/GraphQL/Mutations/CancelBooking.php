@@ -6,6 +6,9 @@ use App\Exceptions\ClientError;
 use App\GraphQL\BroadcastCancelled;
 use App\GraphQL\CustomerAccess;
 use App\Models\Booking;
+use App\Models\Salon;
+use App\Models\User;
+use App\Trust\Counters;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -33,6 +36,11 @@ final class CancelBooking
             $booking->reschedule_date = null;
             $booking->reschedule_starts_at = null;
             $booking->save();
+            $customer = User::query()->whereKey($booking->customer_id)->lockForUpdate()->first();
+            $salonRow = Salon::query()->whereKey($booking->salon_id)->lockForUpdate()->first();
+            if ($customer !== null && $salonRow !== null) {
+                Counters::onCancel($customer, $salonRow, $late);
+            }
             $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             BroadcastCancelled::send($booking);
 

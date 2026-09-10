@@ -112,6 +112,7 @@ type Booking {
     lateToCancel: Boolean! @method(name: "lateToCancel")
     cancelledAt: String @method(name: "cancelledAtIso")
     lateCancel: Boolean! @method(name: "lateCancel")
+    noShowAt: String @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@noShowAt")
 }
 
 input CreateBookingInput {
@@ -171,6 +172,9 @@ type Salon {
     cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
     dnd: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@dnd")
     takeoverAllowed: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@takeoverAllowed")
+    noShowCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@noShowCount")
+    cancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancelCount")
+    lateCancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@lateCancelCount")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
     workers: [Worker!]! @method(name: "workerList")
@@ -245,6 +249,7 @@ type Mutation {
     acceptReschedule(bookingId: ID!): Booking!
     dismissReschedule(bookingId: ID!): Booking!
     cancelBooking(bookingId: ID!): Booking!
+    markNoShow(bookingId: ID!): Booking!
 }
 
 type Subscription {

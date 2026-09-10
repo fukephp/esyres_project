@@ -194,6 +194,10 @@ _Avoid_: cancelled (as requested), expired (as a fifth status), rejected appoint
 A confirmed booking the customer cancelled. It does not occupy a clock slot. Not declined, not expired, and not a no-show.
 _Avoid_: declined, expired, rejected, no-show
 
+**No-show**:
+A confirmed booking the owner marked as missed after the appointment start. Not a cancel, not a late cancel, and not declined.
+_Avoid_: late cancel, cancelled, missed (as a sixth status), auto-expire
+
 **Preferred time**:
 The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.
 _Avoid_: slot, availability, booking time (as confirmed), hold

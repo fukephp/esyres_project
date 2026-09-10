@@ -422,15 +422,6 @@ trait OwnerSteps
     }
 
     /**
-     * @Given that booking is declined
-     */
-    public function thatBookingIsDeclined(): void
-    {
-        $this->booking->status = Booking::DECLINED;
-        $this->booking->save();
-    }
-
-    /**
      * @When I query salon stats
      */
     public function iQuerySalonStats(): void
