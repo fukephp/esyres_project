@@ -24,9 +24,16 @@ final class PendingBookings
         return Booking::query()
             ->with(['customer', 'worker', 'services', 'salon', 'intake'])
             ->where('salon_id', $salon->id)
-            ->where('status', Booking::REQUESTED)
-            ->whereDate('preferred_date', $date)
-            ->orderBy('preferred_starts_at')
+            ->where(function ($query) use ($date): void {
+                $query->where(function ($query) use ($date): void {
+                    $query->where('status', Booking::REQUESTED)->whereDate('preferred_date', $date);
+                })->orWhere(function ($query) use ($date): void {
+                    $query->where('status', Booking::CONFIRMED)
+                        ->whereNotNull('reschedule_starts_at')
+                        ->whereDate('reschedule_date', $date);
+                });
+            })
+            ->orderByRaw('COALESCE(reschedule_starts_at, preferred_starts_at)')
             ->orderBy('created_at')
             ->offset($offset)
             ->limit($limit)

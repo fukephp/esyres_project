@@ -133,3 +133,11 @@ test('unknown and ping copy is Bosnian', async () => {
   expect(i18n.t('owner.ping')).toBe('Pitanje')
 })
 
+test('reschedule copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('bookings.reschedule')).toBe('Promijeni termin')
+  expect(i18n.t('bookings.reschedulePending')).toBe('Premještaj u toku. Hvala na strpljenju.')
+  expect(i18n.t('owner.reschedule')).toBe('Premještaj')
+  expect(i18n.t('owner.keepOriginal')).toBe('Zadrži stari')
+})
+

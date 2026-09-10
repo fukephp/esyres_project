@@ -104,6 +104,8 @@ void i18n.use(initReactI18next).init({
           rejectConfirm: 'Potvrdi',
           cancel: 'Odustani',
           askSend: 'Pošalji',
+          reschedule: 'Promijeni termin',
+          reschedulePending: 'Premještaj u toku. Hvala na strpljenju.',
           respondError: {
             NOT_TIME_PROPOSED: 'Predlog više nije aktivan.',
             EMAIL_UNVERIFIED: 'Potvrdi email prije odgovora.',
@@ -115,6 +117,18 @@ void i18n.use(initReactI18next).init({
             FORBIDDEN: 'Zahtjev nije tvoj.',
             SLOT_TAKEN: 'Taj termin je zauzet.',
             fallback: 'Odgovor nije poslan.',
+          },
+          rescheduleError: {
+            NOT_CONFIRMED: 'Termin nije potvrđen.',
+            RESCHEDULE_DISABLED: 'Premještaj nije dozvoljen.',
+            EMAIL_UNVERIFIED: 'Potvrdi email prije odgovora.',
+            PHONE_UNVERIFIED: 'Potvrdi telefon prije odgovora.',
+            SALON_CLOSED: 'Salon je zatvoren taj dan.',
+            PAST_TIME: 'Odaberi vrijeme u budućnosti.',
+            INVALID_DATE: 'Neispravan datum ili vrijeme.',
+            INVALID_TIME: 'Neispravan datum ili vrijeme.',
+            FORBIDDEN: 'Zahtjev nije tvoj.',
+            fallback: 'Premještaj nije poslan.',
           },
         },
         owner: {
@@ -140,6 +154,8 @@ void i18n.use(initReactI18next).init({
           closedDay: 'Zatvoreno ovaj dan.',
           soon: 'Uskoro',
           assistant: 'Asistent',
+          reschedule: 'Premještaj',
+          keepOriginal: 'Zadrži stari',
           transcript: 'Zašto ovo vrijeme',
           accept: 'Prihvati',
           decline: 'Odbi',
@@ -152,6 +168,7 @@ void i18n.use(initReactI18next).init({
           acceptError: {
             SLOT_TAKEN: 'Taj termin je zauzet.',
             NOT_REQUESTED: 'Zahtjev više nije na čekanju.',
+            NOT_RESCHEDULE: 'Premještaj više nije aktivan.',
             fallback: 'Zahtjev nije prihvaćen.',
           },
           proposeError: {

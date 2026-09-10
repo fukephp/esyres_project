@@ -28,7 +28,7 @@ Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `
 
 ## Realtime
 
-Laravel Reverb + Lighthouse subscriptions on the owner panel (new request, customer response, reschedule). Customer may refetch; owner should not poll.
+Laravel Reverb + Lighthouse subscriptions on the owner panel (`bookingCustomerResponded`, `bookingRescheduled`). Customer may refetch; owner should not poll.
 
 ## Notifications (queued)
 

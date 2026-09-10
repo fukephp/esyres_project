@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
@@ -30,6 +30,8 @@ class Booking extends Model
             'duration_minutes' => 'integer',
             'owner_responded_at' => 'datetime',
             'proposed_starts_at' => 'datetime',
+            'reschedule_date' => 'date',
+            'reschedule_starts_at' => 'datetime',
         ];
     }
 
@@ -125,6 +127,29 @@ class Booking extends Model
     public function customerName(): string
     {
         return $this->customer->name;
+    }
+
+    public function rescheduleDateString(): ?string
+    {
+        if ($this->reschedule_starts_at === null || $this->reschedule_date === null) {
+            return null;
+        }
+
+        return $this->reschedule_date->format('Y-m-d');
+    }
+
+    public function rescheduleStartsAtIso(): ?string
+    {
+        if ($this->reschedule_starts_at === null) {
+            return null;
+        }
+
+        return $this->reschedule_starts_at->utc()->toIso8601String();
+    }
+
+    public function reschedulePending(): bool
+    {
+        return $this->reschedule_starts_at !== null;
     }
 
     public static function roundUp15(int $minutes): int

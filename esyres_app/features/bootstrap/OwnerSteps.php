@@ -66,6 +66,151 @@ trait OwnerSteps
     }
 
     /**
+     * @When I accept the reschedule
+     */
+    public function iAcceptTheReschedule(): void
+    {
+        $this->graphql($this->acceptRescheduleMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I accept the reschedule as a guest
+     */
+    public function iAcceptTheRescheduleAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iAcceptTheReschedule();
+    }
+
+    /**
+     * @When I accept reschedule for booking id :id
+     */
+    public function iAcceptRescheduleForBookingId(string $id): void
+    {
+        $this->graphql($this->acceptRescheduleMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @When I dismiss the reschedule
+     */
+    public function iDismissTheReschedule(): void
+    {
+        $this->graphql($this->dismissRescheduleMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I dismiss the reschedule as a guest
+     */
+    public function iDismissTheRescheduleAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iDismissTheReschedule();
+    }
+
+    /**
+     * @Then accept reschedule matches:
+     */
+    public function acceptRescheduleMatches(PyStringNode $payload): void
+    {
+        $this->assertRescheduleOwnerBooking('acceptReschedule', $payload);
+    }
+
+    /**
+     * @Then dismiss reschedule matches:
+     */
+    public function dismissRescheduleMatches(PyStringNode $payload): void
+    {
+        $this->assertRescheduleOwnerBooking('dismissReschedule', $payload);
+    }
+
+    /**
+     * @Then occupying bookings include this booking as :status
+     */
+    public function occupyingBookingsIncludeThisBookingAs(string $status): void
+    {
+        $this->assertBookingListed('occupyingBookings', $status, true);
+    }
+
+    /**
+     * @Then occupying bookings do not include this booking
+     */
+    public function occupyingBookingsDoNotIncludeThisBooking(): void
+    {
+        $this->assertBookingListed('occupyingBookings', null, false);
+    }
+
+    /**
+     * @Then pending bookings include this booking as :status
+     */
+    public function pendingBookingsIncludeThisBookingAs(string $status): void
+    {
+        $this->assertBookingListed('pendingBookings', $status, true);
+    }
+
+    /**
+     * @Then pending bookings do not include this booking
+     */
+    public function pendingBookingsDoNotIncludeThisBooking(): void
+    {
+        $this->assertBookingListed('pendingBookings', null, false);
+    }
+
+    /**
+     * @Then that booking still has the same owner_responded_at
+     */
+    public function thatBookingStillHasTheSameOwnerRespondedAt(): void
+    {
+        $this->booking->refresh();
+        $after = $this->booking->owner_responded_at?->utc()->toIso8601String();
+        $this->assertSame($this->ownerRespondedAt, $after);
+    }
+
+    /**
+     * @When I subscribe to booking rescheduled
+     */
+    public function iSubscribeToBookingRescheduled(): void
+    {
+        $this->graphql($this->bookingRescheduledSubscription(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking rescheduled as a guest
+     */
+    public function iSubscribeToBookingRescheduledAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iSubscribeToBookingRescheduled();
+    }
+
+    /**
+     * @When I subscribe to booking rescheduled for the other salon
+     */
+    public function iSubscribeToBookingRescheduledForTheOtherSalon(): void
+    {
+        $this->graphql($this->bookingRescheduledSubscription(), [
+            'salonId' => (string) $this->otherSalon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking rescheduled for salon id :id
+     */
+    public function iSubscribeToBookingRescheduledForSalonId(string $id): void
+    {
+        $this->graphql($this->bookingRescheduledSubscription(), [
+            'salonId' => $id,
+        ]);
+    }
+
+    /**
      * @When I decline the booking
      */
     public function iDeclineTheBooking(): void
@@ -821,6 +966,94 @@ GQL, ['id' => (string) $this->salon->id]);
         foreach ($this->graphql['data']['salon']['hours'] as $day) {
             $this->assertTrue($day['closed'], $day['weekday'].' should be closed');
         }
+    }
+
+    private function bookingRescheduledSubscription(): string
+    {
+        return <<<'GQL'
+subscription BookingRescheduled($salonId: ID!) {
+  bookingRescheduled(salonId: $salonId) {
+    id
+    status
+  }
+}
+GQL;
+    }
+
+    private function acceptRescheduleMutation(): string
+    {
+        return <<<'GQL'
+mutation AcceptReschedule($bookingId: ID!) {
+  acceptReschedule(bookingId: $bookingId) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    reschedulePending
+    rescheduleDate
+    rescheduleStartsAt
+  }
+}
+GQL;
+    }
+
+    private function dismissRescheduleMutation(): string
+    {
+        return <<<'GQL'
+mutation DismissReschedule($bookingId: ID!) {
+  dismissReschedule(bookingId: $bookingId) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    reschedulePending
+    rescheduleDate
+    rescheduleStartsAt
+  }
+}
+GQL;
+    }
+
+    /**
+     * @param  'occupyingBookings'|'pendingBookings'  $field
+     */
+    private function assertBookingListed(string $field, ?string $status, bool $present): void
+    {
+        $this->assertNoGraphqlErrors();
+        $id = (string) $this->booking->id;
+        foreach ($this->graphql['data'][$field] as $row) {
+            if ((string) $row['id'] === $id) {
+                if (! $present) {
+                    throw new RuntimeException("Did not expect booking {$id} in {$field}");
+                }
+                $this->assertSame($status, $row['status']);
+
+                return;
+            }
+        }
+        if ($present) {
+            throw new RuntimeException("Expected booking {$id} in {$field}");
+        }
+    }
+
+    /**
+     * @param  'acceptReschedule'|'dismissReschedule'  $field
+     */
+    private function assertRescheduleOwnerBooking(string $field, PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $row = $this->graphql['data'][$field];
+        $this->assertSame((string) $this->booking->id, (string) $row['id']);
+        $this->assertSame($expected['status'], $row['status']);
+        $this->assertSame($expected['preferredDate'], $row['preferredDate']);
+        $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
+        $this->assertSame($expected['reschedulePending'], $row['reschedulePending']);
+        $this->assertSame($expected['rescheduleDate'], $row['rescheduleDate']);
     }
 
     private function bookingCustomerRespondedSubscription(): string

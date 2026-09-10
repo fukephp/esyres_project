@@ -35,6 +35,9 @@ export const MY_BOOKINGS_QUERY = gql`
         name
       }
       declineReason
+      rescheduleDate
+      rescheduleStartsAt
+      reschedulePending
       salon {
         id
         name
@@ -66,6 +69,9 @@ export type MyBooking = {
   proposedStartsAt: string | null
   proposedWorker: { id: string; name: string } | null
   declineReason: string | null
+  rescheduleDate: string | null
+  rescheduleStartsAt: string | null
+  reschedulePending: boolean
   salon: { id: string; name: string }
   services: { name: string; durationMinutes: number }[]
 }
@@ -97,6 +103,16 @@ export const ASK_OTHER_TIME_MUTATION = gql`
     askOtherTime(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
       id
       status
+    }
+  }
+`
+
+export const REQUEST_RESCHEDULE_MUTATION = gql`
+  mutation RequestReschedule($bookingId: ID!, $preferredDate: String!, $preferredTime: String!) {
+    requestReschedule(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
+      id
+      status
+      reschedulePending
     }
   }
 `

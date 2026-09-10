@@ -75,3 +75,33 @@ export function respondErrorKey(code: string | null): RespondErrorKey {
 
   return 'fallback'
 }
+
+export function rescheduleChrome(args: { confirmed: boolean; pending: boolean }): 'ask' | 'pending' | 'hidden' {
+  if (!args.confirmed) {
+    return 'hidden'
+  }
+
+  return args.pending ? 'pending' : 'ask'
+}
+
+const RESCHEDULE_ERROR_KEYS = [
+  'NOT_CONFIRMED',
+  'RESCHEDULE_DISABLED',
+  'EMAIL_UNVERIFIED',
+  'PHONE_UNVERIFIED',
+  'SALON_CLOSED',
+  'PAST_TIME',
+  'INVALID_DATE',
+  'INVALID_TIME',
+  'FORBIDDEN',
+] as const
+
+export type RescheduleErrorKey = (typeof RESCHEDULE_ERROR_KEYS)[number] | 'fallback'
+
+export function rescheduleErrorKey(code: string | null): RescheduleErrorKey {
+  if (code !== null && (RESCHEDULE_ERROR_KEYS as readonly string[]).includes(code)) {
+    return code as (typeof RESCHEDULE_ERROR_KEYS)[number]
+  }
+
+  return 'fallback'
+}

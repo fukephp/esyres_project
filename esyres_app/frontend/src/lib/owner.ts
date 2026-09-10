@@ -38,8 +38,55 @@ export function canAcceptPreferredTime(worker: { id: string } | null): boolean {
   return worker !== null
 }
 
-export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'fallback' {
-  if (code === 'SLOT_TAKEN' || code === 'NOT_REQUESTED') {
+export function overlayQueueChrome(pending: boolean): {
+  tag: boolean
+  clock: 'reschedule' | 'preferred'
+  draggable: boolean
+  propose: boolean
+  decline: boolean
+  acceptPreferred: boolean
+  acceptReschedule: boolean
+  dismiss: boolean
+} {
+  if (pending) {
+    return {
+      tag: true,
+      clock: 'reschedule',
+      draggable: false,
+      propose: false,
+      decline: false,
+      acceptPreferred: false,
+      acceptReschedule: true,
+      dismiss: true,
+    }
+  }
+
+  return {
+    tag: false,
+    clock: 'preferred',
+    draggable: true,
+    propose: true,
+    decline: true,
+    acceptPreferred: true,
+    acceptReschedule: false,
+    dismiss: false,
+  }
+}
+
+export function queueRowClock(row: {
+  reschedulePending: boolean
+  rescheduleStartsAt: string | null
+  preferredStartsAt: string
+}): string {
+  if (row.reschedulePending && row.rescheduleStartsAt !== null) {
+    return row.rescheduleStartsAt
+  }
+
+  return row.preferredStartsAt
+}
+
+export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'NOT_RESCHEDULE' | 'fallback' {
+  if (code === 'SLOT_TAKEN' || code === 'NOT_REQUESTED' || code === 'NOT_RESCHEDULE') {
     return code
   }
 
