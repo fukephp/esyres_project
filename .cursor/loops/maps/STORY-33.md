@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-33 |
 | Source | `docs/stories/STORY-33.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-33.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-33.md` |
 
 ## Destination
 
@@ -43,14 +43,15 @@ A confirmed booking emails the customer once the day before and once an hour bef
 - **Appointment clock (2026-09-10):** `preferred_starts_at` (Sarajevo date of that instant is D). Overlay does not change reminders until accept-reschedule. Dismiss reschedule: no stamp/clock change. Cancelled / not `confirmed`: no send. Each confirmed row is independent. Customer email only; owner does not get a reminder.
 - **Day-before (2026-09-10):** first successful send on calendar D−1 at or after 09:00 Europe/Sarajevo (rest of that Sarajevo day stays eligible until stamped). Not T−24h. Not midnight.
 - **Hour-before (2026-09-10):** `now >= start − 60min` and `now < start`.
-- **Missed windows (2026-09-10):** no catch-up after the window. If we are already on D or later, skip day-before. If `now >= start`, skip hour-before. Confirm 30 min before start → neither. Confirm on D−1 at 10:00 → day-before on the next command run that day.
+- **Missed windows (2026-09-10):** no catch-up after the window has **closed**. In-window still sends (confirm on D−1 at 10:00 → day-before; confirm 30 min before start → skip day-before if already D, **do** send hour-before because `[T−60, T)` is still open). If calendar is already D, skip day-before. If `now >= start`, skip hour-before (and day-before).
 - **Idempotency (2026-09-10):** `reminder_day_sent_at` / `reminder_hour_sent_at` on `bookings`. Second command run is a no-op for that kind.
 - **Verified column (2026-09-10):** send only if customer `email_verified_at` is not null. Local skip-gates that confirm with a null timestamp get no mail.
-- **Copy (2026-09-10):** queued mail notification, two variants. Day-before subject `Podsjetnik: {salon} sutra`; hour-before `Podsjetnik: {salon} za sat vremena`. Body: salon name + Sarajevo date and time. No address, no `/bookings` link, no marketing.
+- **Copy (2026-09-10):** queued mail notification, two variants. Day-before subject `Podsjetnik: {salon} sutra`; hour-before `Podsjetnik: {salon} za sat vremena`. Body: `Imate termin u {salon} {j. n. Y.} u {H:i}.` (Sarajevo). No address, no `/bookings` link, no marketing.
+- **Accept reschedule (2026-09-10):** clear both stamps. New clock can get day-before and/or hour-before if those windows are still ahead.
 
 ## Open decisions
 
-- After **accept reschedule**, if a stamp was already set for the old time: clear stamps so the new clock can remind, or keep them?
+<!-- empty -->
 
 ## Not yet specified
 
