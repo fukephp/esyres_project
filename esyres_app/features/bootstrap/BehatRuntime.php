@@ -119,6 +119,7 @@ trait BehatRuntime
         }
         $this->app = BehatKernel::$app;
         $this->app['env'] = 'testing';
+        $this->app['cookie']->flushQueuedCookies();
         $this->truncateData();
         Cache::flush();
         Carbon::setTestNow(Carbon::parse('2026-08-29 09:00:00', 'Europe/Sarajevo'));
