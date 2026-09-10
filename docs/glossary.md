@@ -260,6 +260,12 @@ _Avoid_: availability, occupancy grid, traffic light, capacity, trust badge
 When the owner first accepts a preferred time, counter-proposes, or declines a request. Captured at MVP. Badge display is Phase 2. Not how long it took to reach confirmed after a counter-proposal.
 _Avoid_: time to confirmed, Fast Responder (the badge), accepted_at
 
+## Notifications
+
+**Reminder**:
+The day-before and hour-before email for a confirmed booking. Not a status-change notify (push or SMS) and not marketing mail.
+_Avoid_: appointment SMS, status email, marketing email, push reminder
+
 **SMS fallback**:
 The SMS to a customer’s verified phone when web push did not reach them for a time-critical status change. Not OTP, not a reminder, not marketing, and not owner SMS.
 _Avoid_: marketing SMS, OTP, reminder SMS, owner SMS, dual-send

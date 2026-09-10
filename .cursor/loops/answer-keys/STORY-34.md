@@ -35,7 +35,7 @@
 
 ## Pass/fail — architecture
 
-Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #10 #25, ADRs 0013, 0017, 0018.
+Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #10 #25, ADRs 0013, 0019, 0020.
 
 - [ ] Laravel `GET /qr/{salonId}` (not a React route, not GraphQL). Cookie `esyres_qr` httpOnly SameSite=Lax ~7 days, payload salon id string. Vite `server.proxy['/qr']` → API (same as `/sanctum`). 302 uses `FRONTEND_URL`. Organic `/salon/:id` does not set the cookie. No second sticker UI, no popup — verify: routes + `vite.config.ts`; Behat cookies; `App.tsx` has no `/qr` route and no favorites list route
 - [ ] Tables: `favorites` unique `(user_id, salon_id)` + timestamps, FKs cascade; `qr_scans` (`user_id`, `salon_id`, timestamps) append-only, FKs cascade. No `visited_at`. GraphQL: `User.favoriteSalonIds: [ID!]!`; `QrScan { id, salonId, customerId, createdAt }`; `qrScans(salonId, limit, offset)` via `OwnerAccess` + `ListPage`. Reconcile is a shared PHP helper called from QR GET, `verifyPhoneOtp`, sessioned `VerifyEmailController`, `login` only — verify: migrations + schema + call sites
@@ -70,7 +70,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 
 ## Implementer instructions
 
-1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-34.md`, `docs/glossary.md` (**QR hold**, **QR reconnect**, **Favorite**, **QR visit**), `docs/adr/0017-qr-sticker-is-not-salon-profile.md`, `docs/adr/0018-qr-reconnect-requires-timestamps.md`, `docs/adr/0013-local-skip-verification-gates.md`, and `docs/architecture/` (03, 04, 05, 06, 08 #10 #25). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No new persistent chrome. Bosnian-first if any copy is required (none expected).
+1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-34.md`, `docs/glossary.md` (**QR hold**, **QR reconnect**, **Favorite**, **QR visit**), `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, `docs/adr/0013-local-skip-verification-gates.md`, and `docs/architecture/` (03, 04, 05, 06, 08 #10 #25). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No new persistent chrome. Bosnian-first if any copy is required (none expected).
 2. Branch: `story/STORY-34-qr-reconnect` (keep `cursor/story-34-qr-reconnect-dc55` if that is already the working branch).
 3. **HTTP:** `GET /qr/{salonId}` named route. Existing salon: `cookie()->queue('esyres_qr', id, 60*24*7)` httpOnly SameSite=Lax; 302 `SpaUrl` salon profile. Missing salon: 302 `SpaUrl` `/`; do not set cookie. If session user already has both timestamps, reconcile then 302 profile **without** leaving the cookie. Do not create a session. Do not add a React `/qr` route.
 4. **Vite:** proxy `/qr` to the API (same target as `/graphql` / `/sanctum`).

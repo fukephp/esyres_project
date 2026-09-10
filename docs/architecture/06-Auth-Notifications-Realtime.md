@@ -24,7 +24,7 @@ Same origin. Sanctum cookie, httpOnly, SameSite=Lax, CSRF on mutations. Apollo s
 
 ## QR hold
 
-Physical scan is `GET /qr/{salonId}` (sets the cookie, 302 to `/salon/{id}`). Organic `/salon/:id` does not set the cookie. Missing salon: 302 `/`, no cookie. Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. Reconcile when a session user has both `email_verified_at` and `phone_verified_at` (real columns, not `hasVerified*`) and the cookie is present: `firstOrCreate` favorite + append `qr_scans` row; then clear cookie. Hooks: that QR GET, `verifyPhoneOtp`, sessioned email-verify GET, and `login`. Last scan wins. Stale/invalid cookie: clear, write nothing. See `docs/adr/0017-qr-sticker-is-not-salon-profile.md` and `docs/adr/0018-qr-reconnect-requires-timestamps.md`.
+Physical scan is `GET /qr/{salonId}` (sets the cookie, 302 to `/salon/{id}`). Organic `/salon/:id` does not set the cookie. Missing salon: 302 `/`, no cookie. Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. Reconcile when a session user has both `email_verified_at` and `phone_verified_at` (real columns, not `hasVerified*`) and the cookie is present: `firstOrCreate` favorite + append `qr_scans` row; then clear cookie. Hooks: that QR GET, `verifyPhoneOtp`, sessioned email-verify GET, and `login`. Last scan wins. Stale/invalid cookie: clear, write nothing. See `docs/adr/0019-qr-sticker-is-not-salon-profile.md` and `docs/adr/0020-qr-reconnect-requires-timestamps.md`.
 
 ## Realtime
 
@@ -34,6 +34,6 @@ Laravel Reverb + Lighthouse subscriptions on the owner panel (`bookingCustomerRe
 
 - Web push (VAPID) for owner (open or closed tab) and customer time-critical status changes (owner propose / accept preferred / decline)
 - SMS fallback when that customer push misses (no subscription or every send fails; e.g. iOS without PWA). Requires `phone` + `phone_verified_at`. See `docs/adr/0017-customer-sms-fallback-on-push-miss.md`.
-- Email for day-before / hour-before reminders
+- Email for day-before / hour-before reminders (scheduled scan + sent-at stamps; not delayed jobs on confirm — `docs/adr/0018-reminder-scan-not-delayed-jobs.md`)
 
 Push payload includes `salonId`.

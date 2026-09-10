@@ -25,6 +25,7 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 - Busy-level is computed on the server (`LOW | MEDIUM | HIGH` + percent). Thresholds remain product placeholders.
 - Overlap: `time_proposed` and `confirmed` occupy `[startsAt, startsAt + duration)` on a worker. `requested` does not occupy a clock slot. `cancelled` does not occupy. `acceptPreferredTime` sets `confirmed` directly when the owner accepts the guest's preferred time.
 - Expire job: placeholder TTLs in config; status becomes `declined` with reason `expired` (no fifth status for expire). Customer cancel of a confirmed booking is `cancelled` (see `docs/adr/0016-cancel-fifth-status.md`).
+- Reminder scan: scheduled `bookings:send-reminders` (not delayed jobs on confirm). Stamps `reminder_day_sent_at` / `reminder_hour_sent_at`. See `docs/adr/0018-reminder-scan-not-delayed-jobs.md`.
 
 ## Backend testing (Behat)
 
