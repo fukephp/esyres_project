@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-37 |
 | Source | `docs/stories/STORY-37.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-37.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-37.md` |
 
 ## Destination
 
@@ -27,6 +27,7 @@ Owner of the selected salon sees all-time QR scan count, QR visit count, and con
 - Story AC: scan count + converted-visit count (reconcile at verification) for the selected salon; use STORY-34 capture; no badge display.
 - Round 1 (2026-09-10): persist anonymous sticker hits; `/owner/stats` QR block; all-time counts + percent.
 - Round 2 (2026-09-10): every successful sticker GET appends a scan; `salonQrStats`; Bosnian zeros; counts+percent only. ADR 0021.
+- Round 3 (2026-09-10): backfill one `qr_hits` row per existing `qr_scans` row.
 - Epic 9 / `docs/mvp/03`: QR stats live on the owner **Basic Stats** screen. STORY-36 out-of-scopes QR conversion and is unbuilt.
 - Standing preferences:
   - One story → one PR; do not reopen STORY-34 cookie / favorite / visited meaning
@@ -53,10 +54,11 @@ Owner of the selected salon sees all-time QR scan count, QR visit count, and con
 - **GraphQL (2026-09-10):** `salonQrStats(salonId: ID!): SalonQrStats!` with `scanCount`, `visitCount`, `conversionPercent` (`Int!`). Same `OwnerAccess` as `qrScans`. Percent on the server: `0` if `scanCount` is 0, else nearest integer (`1/3` → `33`). Not on public `Salon`. Do not derive totals from `qrScans` (max 50).
 - **Copy (2026-09-10):** Nav `Statistika`. Labels `Skeniranja QR`, `QR posjete`, `Konverzija`. Always show integers including `0` and `0%`. No empty-state illustration.
 - **Block (2026-09-10):** Two counts + percent only. No `qrScans` customer list on this page.
+- **Backfill (2026-09-10):** Migration inserts one `qr_hits` row per existing `qr_scans` row (same `salon_id`). Reconcile does **not** write hits. Only `GET /qr/{existing}` writes hits going forward.
 
 ## Open decisions
 
-- **Existing `qr_scans` without hits:** STORY-34 already wrote QR visits with no QR scan rows. After this ships, `visitCount` can exceed `scanCount` (percent > 100) unless we backfill.
+<!-- empty -->
 
 ## Not yet specified
 

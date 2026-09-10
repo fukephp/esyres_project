@@ -8,7 +8,7 @@ Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optiona
 
 - Customer: guest discovery, day-level busy badge (🟢/🟡/🔴), simple date+time picker (no slot grid). Chat is the messy-intent alternate on the salon profile (salon-branded Bosnian, live salon data only, coarse 1–3 time suggestions, same email+phone OTP to send). Email+password login (not a homepage wall). Verified email + phone OTP required to **send a request**, **respond to a counter-proposal**, **ask to reschedule**, and **cancel** a confirmed booking (skipped when `APP_ENV=local`; staging and production keep the gates).
 - Owner: invite-only. Pending queue (shows preferred date/time), Worker Availability Panel (one-tap accept + drag-to-counter-propose + tap fallback) is home. In-flight chat tab + badge; optional Take over (pause that intake, not live owner messages; guest waits only after that tap; after hours / DND assistant always finishes). Salon switcher if they own more than one salon. Complexity stays on this side. A confirmed booking may carry an in-progress reschedule overlay; the original slot stays occupied until the owner accepts.
-- MVP captures trust data (response time, no-show, QR visit, verification). Badge **display** is Phase 2.
+- MVP captures trust data (response time, no-show, QR scan, QR visit, verification). Badge **display** is Phase 2.
 - Not MVP: native apps, in-app payments, worker logins, reviews, Viber/WhatsApp/Instagram DM messaging, LLM NLU, chain multi-location, receptionist roles.
 
 Bosnian-first UI. Prices in KM (integer feninga in the data model). QR sticker is `/qr/{id}` then the salon profile (hold cookie); Instagram-bio and organic `/salon/:id` do not set the hold. Preserve that browse → request path.
