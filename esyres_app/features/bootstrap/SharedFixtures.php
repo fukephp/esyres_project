@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\Favorite;
+use App\Models\PushSubscription;
 use App\Models\QrScan;
 use App\Qr\QrHold;
 use App\Push\FakePushGateway;
