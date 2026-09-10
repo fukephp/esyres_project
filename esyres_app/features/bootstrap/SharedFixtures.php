@@ -1122,7 +1122,8 @@ GQL;
      */
     public function theQrCookieIs(string $value): void
     {
-        $this->withCookie(QrHold::COOKIE, $value);
+        unset($this->defaultCookies[QrHold::COOKIE]);
+        $this->withUnencryptedCookie(QrHold::COOKIE, $value);
     }
 
     /**
@@ -1299,7 +1300,7 @@ GQL;
 
     private function qrCookieValueFromJar(): ?string
     {
-        $value = $this->defaultCookies[QrHold::COOKIE] ?? null;
+        $value = $this->unencryptedCookies[QrHold::COOKIE] ?? $this->defaultCookies[QrHold::COOKIE] ?? null;
         if (! is_string($value) || $value === '') {
             return null;
         }

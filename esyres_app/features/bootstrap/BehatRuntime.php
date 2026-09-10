@@ -6,6 +6,7 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Qr\QrHold;
 use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\Sms\FakeSmsGateway;
@@ -74,6 +75,7 @@ trait BehatRuntime
     {
         $this->defaultHeaders = [];
         $this->defaultCookies = [];
+        $this->unencryptedCookies = [];
         $this->graphql = [];
         $this->user = null;
         $this->salon = null;
@@ -200,7 +202,19 @@ trait BehatRuntime
     {
         $this->lastSetCookies = $response->headers->getCookies();
         foreach ($this->lastSetCookies as $cookie) {
-            $this->withCookie($cookie->getName(), $cookie->getValue());
+            $name = $cookie->getName();
+            $value = $cookie->getValue();
+            $expired = $cookie->getExpiresTime() !== 0 && $cookie->getExpiresTime() < time();
+            if (! is_string($value) || $value === '' || $value === 'deleted' || $expired) {
+                unset($this->defaultCookies[$name], $this->unencryptedCookies[$name]);
+                continue;
+            }
+            if ($name === QrHold::COOKIE) {
+                unset($this->defaultCookies[$name]);
+                $this->withUnencryptedCookie($name, $value);
+                continue;
+            }
+            $this->withCookie($name, $value);
         }
     }
 
