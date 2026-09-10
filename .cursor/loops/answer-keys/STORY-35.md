@@ -20,29 +20,29 @@
 
 Behat now starts at `2026-08-29 09:00` Europe/Sarajevo. User counters are asserted via Eloquent (same as `owner_responded_at`). Salon counters via owner-gated GraphQL.
 
-- [ ] On-time `cancelBooking` (`now < preferred_starts_at - notice hours`) → status `CANCELLED`; that customer and that salon `cancel_count` 1; `late_cancel_count` 0; `no_show_count` 0; `owner_responded_at` unchanged; `email_verified_at` / `phone_verified_at` unchanged — verify: Behat
-- [ ] Late `cancelBooking` → `lateCancel` true; customer and salon `cancel_count` 1 and `late_cancel_count` 1; `no_show_count` 0 — verify: Behat
-- [ ] Second salon owned by the same owner is unchanged (all three counters stay 0) after a cancel on the first salon — verify: Behat
-- [ ] `PAST_START` / `NOT_CONFIRMED` cancel → no counter increment — verify: Behat
-- [ ] Owner `markNoShow` on own confirmed booking with `preferred_starts_at` in the past (`2026-08-28 11:00`) → status still `CONFIRMED`; `noShowAt` set; overlay null; still in `occupyingBookings` for that date; customer and salon `no_show_count` 1; cancel counters 0; `owner_responded_at` unchanged — verify: Behat
-- [ ] Same `markNoShow` again → 200; same `noShowAt`; still `no_show_count` 1 — verify: Behat
-- [ ] Overlay row, original start past: `markNoShow` clears overlay; still occupying original range; pending on overlay day omits it — verify: Behat
-- [ ] `markNoShow` when `now < preferred_starts_at` → `NOT_STARTED`; no write; counters 0 — verify: Behat
-- [ ] `requested` / `time_proposed` / `declined` / `cancelled` → `NOT_CONFIRMED`; counters unchanged — verify: Behat
-- [ ] Guest `markNoShow` → `UNAUTHENTICATED`; verified customer on own booking → `FORBIDDEN`; unverified-email owner → `EMAIL_UNVERIFIED`; other salon / missing id → `FORBIDDEN` — verify: Behat
-- [ ] Guest `salon { noShowCount cancelCount lateCancelCount }` → `UNAUTHENTICATED`; non-owner logged in → `FORBIDDEN`; verified owner reads zeros then the incremented values after cancel / mark — verify: Behat
-- [ ] `me` has no `noShowCount` / `cancelCount` / `lateCancelCount` fields (schema reject or field missing) — verify: Behat
-- [ ] Existing accept / propose / decline still stamp `owner_responded_at` once; failed accept still does not — verify: Behat (existing owner features stay green)
-- [ ] PWA GraphQL documents do not call `markNoShow` and do not select `noShowCount` / `cancelCount` / `lateCancelCount` / `noShowAt` on discovery or salon profile — verify: Vitest (or a small helper test that the public/owner operation strings omit those names)
+- [x] On-time `cancelBooking` (`now < preferred_starts_at - notice hours`) → status `CANCELLED`; that customer and that salon `cancel_count` 1; `late_cancel_count` 0; `no_show_count` 0; `owner_responded_at` unchanged; `email_verified_at` / `phone_verified_at` unchanged — verify: Behat
+- [x] Late `cancelBooking` → `lateCancel` true; customer and salon `cancel_count` 1 and `late_cancel_count` 1; `no_show_count` 0 — verify: Behat
+- [x] Second salon owned by the same owner is unchanged (all three counters stay 0) after a cancel on the first salon — verify: Behat
+- [x] `PAST_START` / `NOT_CONFIRMED` cancel → no counter increment — verify: Behat
+- [x] Owner `markNoShow` on own confirmed booking with `preferred_starts_at` in the past (`2026-08-28 11:00`) → status still `CONFIRMED`; `noShowAt` set; overlay null; still in `occupyingBookings` for that date; customer and salon `no_show_count` 1; cancel counters 0; `owner_responded_at` unchanged — verify: Behat
+- [x] Same `markNoShow` again → 200; same `noShowAt`; still `no_show_count` 1 — verify: Behat
+- [x] Overlay row, original start past: `markNoShow` clears overlay; still occupying original range; pending on overlay day omits it — verify: Behat
+- [x] `markNoShow` when `now < preferred_starts_at` → `NOT_STARTED`; no write; counters 0 — verify: Behat
+- [x] `requested` / `time_proposed` / `declined` / `cancelled` → `NOT_CONFIRMED`; counters unchanged — verify: Behat
+- [x] Guest `markNoShow` → `UNAUTHENTICATED`; verified customer on own booking → `FORBIDDEN`; unverified-email owner → `EMAIL_UNVERIFIED`; other salon / missing id → `FORBIDDEN` — verify: Behat
+- [x] Guest `salon { noShowCount cancelCount lateCancelCount }` → `UNAUTHENTICATED`; non-owner logged in → `FORBIDDEN`; verified owner reads zeros then the incremented values after cancel / mark — verify: Behat
+- [x] `me` has no `noShowCount` / `cancelCount` / `lateCancelCount` fields (schema reject or field missing) — verify: Behat
+- [x] Existing accept / propose / decline still stamp `owner_responded_at` once; failed accept still does not — verify: Behat (existing owner features stay green)
+- [x] PWA GraphQL documents do not call `markNoShow` and do not select `noShowCount` / `cancelCount` / `lateCancelCount` / `noShowAt` on discovery or salon profile — verify: Vitest (or a small helper test that the public/owner operation strings omit those names)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #5 #6 #38 #39 #40, `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`.
 
-- [ ] Columns: `users` and `salons` `cancel_count` / `late_cancel_count` / `no_show_count` unsigned int default 0; `bookings.no_show_at` nullable datetime. No sixth booking status. `WorkerOverlap::OCCUPYING` still `confirmed` + `time_proposed`. Occupying/busy-level status sets unchanged — verify: migration + `WorkerOverlap`; Occupancy unchanged
-- [ ] GraphQL: `markNoShow(bookingId: ID!): Booking!`; `Booking.noShowAt: String` (ISO or null) owner-only resolver (same gate idea as `SalonOwnerField`: session + verified email + owns the booking’s salon); `Salon.noShowCount` / `cancelCount` / `lateCancelCount` via `SalonOwnerField`. Do not add those three to `User`. Do not expose `ownerRespondedAt`. Do not add a no-show subscription — verify: schema
-- [ ] `markNoShow` uses `OwnerAccess::user` (not phone OTP). Increment customer + salon in the same DB transaction as the stamp (lock booking + those rows). No VAPID/SMS/email job. No PWA chrome, no chips on `/` or salon profile — verify: mutation + `esyres_app/frontend/src` has no `markNoShow` / trust-counter selections
-- [ ] No Playwright, no Pest, no GraphQL codegen, no `vite-plugin-pwa` change this PR — verify: `esyres_app/frontend/package.json`; no `pestphp` require
+- [x] Columns: `users` and `salons` `cancel_count` / `late_cancel_count` / `no_show_count` unsigned int default 0; `bookings.no_show_at` nullable datetime. No sixth booking status. `WorkerOverlap::OCCUPYING` still `confirmed` + `time_proposed`. Occupying/busy-level status sets unchanged — verify: migration + `WorkerOverlap`; Occupancy unchanged
+- [x] GraphQL: `markNoShow(bookingId: ID!): Booking!`; `Booking.noShowAt: String` (ISO or null) owner-only resolver (same gate idea as `SalonOwnerField`: session + verified email + owns the booking’s salon); `Salon.noShowCount` / `cancelCount` / `lateCancelCount` via `SalonOwnerField`. Do not add those three to `User`. Do not expose `ownerRespondedAt`. Do not add a no-show subscription — verify: schema
+- [x] `markNoShow` uses `OwnerAccess::user` (not phone OTP). Increment customer + salon in the same DB transaction as the stamp (lock booking + those rows). No VAPID/SMS/email job. No PWA chrome, no chips on `/` or salon profile — verify: mutation + `esyres_app/frontend/src` has no `markNoShow` / trust-counter selections
+- [x] No Playwright, no Pest, no GraphQL codegen, no `vite-plugin-pwa` change this PR — verify: `esyres_app/frontend/package.json`; no `pestphp` require
 
 ## Verify commands
 
