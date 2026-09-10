@@ -69,7 +69,9 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 - Changing accept / propose / decline behavior
 - Owner Basic Stats / cancellation-rate screen (STORY-36)
 - QR reconnect / visited markers (STORY-34)
+- Customer History screen / mark-no-show UI (no story; capture-only this PR)
 - Customer History notes
+- Scheduled auto no-show
 - Hard-block late cancel
 - Auto-expire command
 - Playwright, Pest, GraphQL codegen
