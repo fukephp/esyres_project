@@ -66,6 +66,10 @@ trait BehatRuntime
 
     protected ?int $occupancyPercent = null;
 
+    protected ?string $rememberedDayStamp = null;
+
+    protected ?string $rememberedHourStamp = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -89,6 +93,8 @@ trait BehatRuntime
         $this->lastLocation = null;
         $this->ownerRespondedAt = null;
         $this->occupancyPercent = null;
+        $this->rememberedDayStamp = null;
+        $this->rememberedHourStamp = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();

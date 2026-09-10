@@ -60,6 +60,8 @@ final class AcceptReschedule
             $booking->preferred_date = $start->timezone('Europe/Sarajevo')->format('Y-m-d');
             $booking->reschedule_date = null;
             $booking->reschedule_starts_at = null;
+            $booking->reminder_day_sent_at = null;
+            $booking->reminder_hour_sent_at = null;
             $booking->save();
             $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             BroadcastRescheduled::send($booking);

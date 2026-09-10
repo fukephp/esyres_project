@@ -13,8 +13,8 @@
 | Goal (one sentence) | A confirmed booking with a verified customer email gets one day-before and one hour-before reminder mail from a scheduled scan (`preferred_starts_at`, stamps, accept-reschedule clears stamps). |
 | Branch name | `cursor/story-33-reminder-email-11eb` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-10 |
 
 ## Pass/fail — product
 

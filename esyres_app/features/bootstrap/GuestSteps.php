@@ -1173,6 +1173,16 @@ GQL;
     }
 
     /**
+     * @When I accept the preferred time
+     */
+    public function iAcceptThePreferredTime(): void
+    {
+        $this->graphql($this->acceptPreferredTimeMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
      * @When I confirm the proposed time as a guest
      */
     public function iConfirmTheProposedTimeAsAGuest(): void
@@ -1615,6 +1625,18 @@ mutation ConfirmProposed($bookingId: ID!) {
     proposedWorker { id name }
     declineReason
     services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function acceptPreferredTimeMutation(): string
+    {
+        return <<<'GQL'
+mutation Accept($bookingId: ID!) {
+  acceptPreferredTime(bookingId: $bookingId) {
+    id
+    status
   }
 }
 GQL;
