@@ -127,6 +127,7 @@ type AssistantIntake {
     preferredDate: String @rename(attribute: "preferred_date")
     preferredTime: String @rename(attribute: "preferred_time")
     takenOver: Boolean! @method(name: "takenOver")
+    pinged: Boolean! @method(name: "pinged")
 }
 
 input UpsertAssistantIntakeInput {
@@ -189,6 +190,7 @@ type Mutation {
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
     upsertAssistantIntake(input: UpsertAssistantIntakeInput!): AssistantIntake!
+    pingAssistantIntake(salonId: ID!, token: String): AssistantIntake!
     takeOverAssistantIntake(id: ID!): AssistantIntake!
     releaseAssistantIntake(id: ID!): AssistantIntake!
     updateSalonDnd(salonId: ID!, dnd: Boolean!): Salon

@@ -68,6 +68,14 @@ _Avoid_: wizard (as a separate product), NLU flow, conversation inbox
 One of at most three coarse preferred clocks the assistant offers from working hours and that day’s busy-level. Not a live slot, not a hold, and not the picker’s native time control.
 _Avoid_: slot offer, free slot, availability chip, recommended slot
 
+**Unknown**:
+The assistant saying it does not know, after the guest asks something that is not in live salon data. Not invented policy, not a live-data fact, and not take-over.
+_Avoid_: FAQ miss, hallucination, fallback answer, I don’t know (as a stored policy)
+
+**Ping**:
+The guest’s optional notify to the owner after unknown. The guest does not wait and can still finish the request. Not take-over, not a WhatsApp message, and not auto-page on every chat.
+_Avoid_: page (as every chat), handoff, live chat, owner push (as this notify)
+
 **Take over**:
 The owner’s optional pause of one in-flight scripted intake. The guest waits on that intake. Not live owner messages, not a ping, and not the owner sending the request.
 _Avoid_: live chat, owner composer, takeover thread, handoff (as a worker)

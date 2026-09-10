@@ -156,3 +156,71 @@ Feature: Guest assistant intake persistence
   Scenario: Guest cannot read salon dnd
     When I query salon takeover fields as a guest
     Then the GraphQL error code is "UNAUTHENTICATED"
+
+  Scenario: Guest ping without a token creates an empty in-flight row
+    When I ping the assistant intake as a guest
+    Then the intake token is a uuid
+    And the intake customer name is "Gost"
+    And the intake service count is 0
+    And the intake pinged is true
+    When I query the assistant intake as a guest
+    Then the intake pinged is true
+    And the intake service count is 0
+
+  Scenario: Guest ping on an existing intake keeps the snapshot
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    And the intake service count is 1
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+    And the intake service count is 1
+
+  Scenario: Guest ping is idempotent
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+
+  Scenario: Stale token ping mints a new row
+    Given the salon has an in-flight intake
+    And that intake is stale
+    When I ping the assistant intake as a guest
+    Then the intake token is a uuid
+    And the intake pinged is true
+
+  Scenario: Unknown token ping mints a new row
+    When I ping an unknown assistant intake as a guest
+    Then the intake token is a uuid
+    And the intake pinged is true
+
+  Scenario: Invalid salon ping is rejected
+    When I ping an invalid salon as a guest
+    Then the GraphQL error code is "INVALID_SALON"
+
+  Scenario: Taken over intake rejects ping
+    Given the salon has an in-flight intake
+    And that intake is taken over
+    When I ping the assistant intake as a guest
+    Then the GraphQL error code is "INTAKE_TAKEN_OVER"
+
+  Scenario: After hours ping still succeeds
+    Given the salon has an in-flight intake
+    And the salon is open saturday from "10:00" to "17:00"
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+
+  Scenario: DND ping still succeeds
+    Given the salon has an in-flight intake
+    And the salon dnd is on
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+
+  Scenario: Pinged intake can still send a request
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    When I ping the assistant intake as a guest
+    Then the intake token is a uuid
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+    When I query the assistant intake
+    Then the assistant intake is null

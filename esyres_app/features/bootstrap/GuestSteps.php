@@ -606,7 +606,8 @@ trait GuestSteps
     public function theIntakeTokenIsAUuid(): void
     {
         $this->assertNoGraphqlErrors();
-        $token = $this->graphql['data']['upsertAssistantIntake']['token'] ?? null;
+        $row = $this->intakePayload() ?? [];
+        $token = $row['token'] ?? null;
         if (! is_string($token) || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $token) !== 1) {
             throw new RuntimeException('Expected uuid token, got '.json_encode($token));
         }
@@ -619,7 +620,7 @@ trait GuestSteps
     public function theIntakeCustomerNameIs(string $name): void
     {
         $this->assertNoGraphqlErrors();
-        $row = $this->graphql['data']['upsertAssistantIntake'] ?? $this->graphql['data']['assistantIntake'] ?? null;
+        $row = $this->intakePayload();
         $this->assertNotNull($row);
         $this->assertSame($name, $row['customerName']);
     }
@@ -639,7 +640,7 @@ trait GuestSteps
     public function theIntakeServiceCountIs(string $count): void
     {
         $this->assertNoGraphqlErrors();
-        $row = $this->graphql['data']['upsertAssistantIntake'] ?? $this->graphql['data']['assistantIntake'] ?? null;
+        $row = $this->intakePayload();
         $this->assertNotNull($row);
         $this->assertSame((int) $count, count($row['serviceIds']));
     }
@@ -1034,6 +1035,20 @@ GQL;
             $this->intakeToken = $this->graphql['data']['upsertAssistantIntake']['token'];
             $this->intake = AssistantIntake::query()->where('token', $this->intakeToken)->first();
         }
+    }
+
+    /** @return array<string, mixed>|null */
+    private function intakePayload(): ?array
+    {
+        $row = $this->graphql['data']['pingAssistantIntake']
+            ?? $this->graphql['data']['upsertAssistantIntake']
+            ?? $this->graphql['data']['assistantIntake']
+            ?? null;
+        if (! is_array($row)) {
+            return null;
+        }
+
+        return $row;
     }
 
     /** @return list<string> */
@@ -1619,6 +1634,7 @@ mutation UpsertIntake($input: UpsertAssistantIntakeInput!) {
     preferredDate
     preferredTime
     takenOver
+    pinged
   }
 }
 GQL;
@@ -1637,6 +1653,7 @@ query Intake($token: String!) {
     preferredDate
     preferredTime
     takenOver
+    pinged
   }
 }
 GQL;

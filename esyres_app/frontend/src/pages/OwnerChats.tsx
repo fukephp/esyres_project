@@ -19,6 +19,7 @@ import { OWNER_SALON_QUERY, type OwnerSalonData } from '../graphql/pending'
 import { formatSarajevoDateTime } from '../lib/format'
 import {
   chatBadgeCount,
+  intakePingMark,
   intakeProgressLine,
   intakeSnapshotFromRow,
   intakeStepFromSnapshot,
@@ -229,6 +230,7 @@ function IntakeRow({
         <p className="text-xs text-muted">{formatSarajevoDateTime(row.updatedAt)}</p>
       </div>
       <p className="mt-1 text-sm text-body">{line}</p>
+      {intakePingMark(row.pinged) && <p className="mt-1 text-sm font-medium text-ink">{t('owner.ping')}</p>}
       {chrome === 'takeover' && (
         <button type="button" className="mt-2 text-sm font-medium text-ink underline underline-offset-4" onClick={onTakeOver}>
           {t('owner.takeOver')}

@@ -329,6 +329,33 @@ trait SharedFixtures
     }
 
     /**
+     * @When I ping the assistant intake as a guest
+     */
+    public function iPingTheAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->postPingIntake($this->intakeToken);
+    }
+
+    /**
+     * @When I ping an unknown assistant intake as a guest
+     */
+    public function iPingAnUnknownAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->postPingIntake('00000000-0000-4000-8000-000000000000');
+    }
+
+    /**
+     * @When I ping an invalid salon as a guest
+     */
+    public function iPingAnInvalidSalonAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->pingAssistantIntakeMutation(), ['salonId' => '999999']);
+    }
+
+    /**
      * @When I release the intake as a guest
      */
     public function iReleaseTheIntakeAsAGuest(): void
@@ -418,6 +445,21 @@ trait SharedFixtures
             ?? ($this->graphql['data']['inFlightIntakes'][0] ?? null);
         $this->assertNotNull($row);
         $this->assertSame($expected, $row['takenOver']);
+    }
+
+    /**
+     * @Then the intake pinged is :flag
+     */
+    public function theIntakePingedIs(string $flag): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = $flag === 'true';
+        $row = $this->graphql['data']['pingAssistantIntake']
+            ?? $this->graphql['data']['upsertAssistantIntake']
+            ?? $this->graphql['data']['assistantIntake']
+            ?? ($this->graphql['data']['inFlightIntakes'][0] ?? null);
+        $this->assertNotNull($row);
+        $this->assertSame($expected, $row['pinged']);
     }
 
     /**
@@ -702,6 +744,38 @@ query SalonTakeover($id: ID!) {
     id
     dnd
     takeoverAllowed
+  }
+}
+GQL;
+    }
+
+    private function postPingIntake(?string $token): void
+    {
+        $variables = ['salonId' => (string) $this->salon->id];
+        if ($token !== null && $token !== '') {
+            $variables['token'] = $token;
+        }
+        $this->graphql($this->pingAssistantIntakeMutation(), $variables);
+        if (isset($this->graphql['data']['pingAssistantIntake']['token'])) {
+            $this->intakeToken = $this->graphql['data']['pingAssistantIntake']['token'];
+            $this->intake = AssistantIntake::query()->where('token', $this->intakeToken)->first();
+        }
+    }
+
+    private function pingAssistantIntakeMutation(): string
+    {
+        return <<<'GQL'
+mutation PingIntake($salonId: ID!, $token: String) {
+  pingAssistantIntake(salonId: $salonId, token: $token) {
+    id
+    token
+    customerName
+    serviceIds
+    workerConfirmed
+    preferredDate
+    preferredTime
+    takenOver
+    pinged
   }
 }
 GQL;

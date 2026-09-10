@@ -54,8 +54,34 @@ export function takeoverRowChrome(input: { takeoverAllowed: boolean; takenOver: 
   return input.takenOver ? 'release' : 'takeover'
 }
 
-export function shouldRestoreIntake(row: IntakeSnapshot | null): boolean {
-  return row !== null && !isEmptyIntakeSnapshot(row)
+export function shouldRestoreIntake(row: IntakeSnapshot | null, pinged = false): boolean {
+  return pinged || (row !== null && !isEmptyIntakeSnapshot(row))
+}
+
+export type UnknownChipChrome = 'shown' | 'hidden'
+
+export function unknownChipChrome(input: { waiting: boolean; sent: boolean }): UnknownChipChrome {
+  return !input.waiting && !input.sent ? 'shown' : 'hidden'
+}
+
+export type PingChrome = 'hidden' | 'cta' | 'done'
+
+export function pingChrome(input: { waiting: boolean; unknownShown: boolean; pinged: boolean }): PingChrome {
+  if (input.waiting) {
+    return 'hidden'
+  }
+  if (input.pinged) {
+    return 'done'
+  }
+  if (input.unknownShown) {
+    return 'cta'
+  }
+
+  return 'hidden'
+}
+
+export function intakePingMark(pinged: boolean): boolean {
+  return pinged
 }
 
 export function intakeSnapshotFromRow(row: {

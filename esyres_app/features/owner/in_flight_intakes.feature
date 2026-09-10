@@ -97,3 +97,32 @@ Feature: Owner in-flight assistant intakes
     When I log in as "other@example.com" with password "secret-pass"
     And I query in-flight intakes
     Then the GraphQL error code is "FORBIDDEN"
+
+  Scenario: Ping on an existing row does not change count
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    And the salon has an in-flight intake
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query in-flight intake count
+    Then in-flight intake count is 1
+    When I query in-flight intakes
+    Then the intake pinged is true
+
+  Scenario: Ping that creates a row increases count
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query in-flight intake count
+    Then in-flight intake count is 1
+
+  Scenario: Converted pinged row drops off the list
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    And the salon has an in-flight intake
+    When I ping the assistant intake as a guest
+    Then the intake pinged is true
+    And that intake is converted
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query in-flight intake count
+    Then in-flight intake count is 0
