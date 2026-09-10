@@ -24,7 +24,7 @@ Same origin. Sanctum cookie, httpOnly, SameSite=Lax, CSRF on mutations. Apollo s
 
 ## QR hold
 
-Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. At email+phone verification, reconcile: favorite + owner visited + `qr_scans` row; then clear cookie. Last scan wins.
+Physical scan is `GET /qr/{salonId}` (sets the cookie, 302 to `/salon/{id}`). Organic `/salon/:id` does not set the cookie. Missing salon: 302 `/`, no cookie. Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. Reconcile when a session user is email+phone verified and the cookie is present: favorite + QR visit + `qr_scans` row; then clear cookie. Hooks: that QR GET, `verifyPhoneOtp`, sessioned email-verify GET, and `login`. Last scan wins. See `docs/adr/0017-qr-sticker-is-not-salon-profile.md`.
 
 ## Realtime
 

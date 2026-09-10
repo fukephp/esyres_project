@@ -21,7 +21,7 @@ Scanning the existing salon QR sets a ~7 day guest hold cookie (last salon wins,
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03 QR Reconnect Loop, 06 Epic 8, 08 QR hold decided), `docs/architecture/` (03 Epic 8, 05 `QrScan`, 06 QR hold, 08 #10 #25), `docs/stories/STORY-34.md` plus STORY-07 / 11 / 12 / 35 / 37 / 38, `docs/glossary.md` (no QR/Favorites/visited terms yet)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03 QR Reconnect Loop, 06 Epic 8, 08 QR hold decided), `docs/architecture/` (03 Epic 8, 05 `QrScan`, 06 QR hold, 08 #10 #25), `docs/stories/STORY-34.md` plus STORY-07 / 11 / 12 / 35 / 37 / 38, `docs/glossary.md` (QR hold / QR reconnect / Favorite / QR visit), `docs/adr/0017-qr-sticker-is-not-salon-profile.md`
 - Skills: grill-with-docs (app code exists); custom-feature-skills; playbook plan-gate until this map compiles
 - Code today (`esyres_app/`): no `esyres_qr` cookie, no `qr_scans` / favorites / visited tables or GraphQL. Guest `/salon/:id` is public (`salon_profile.feature`). Email verify is signed GET `verification.verify` (no session required, does not log in). Phone OTP is sessioned `verifyPhoneOtp`. Cookie httpOnly ⇒ SPA cannot set it; Behat already copies `Set-Cookie` from HTTP responses. Laravel `routes/web.php` has only `/` welcome + `verification.verify`. No owner Customer History route. No customer Favorites route. STORY-07 treated `/salon/:id` as the QR/IG destination but left the hold cookie to this story.
 - Backend rule: “QR scan after verify silently favorites the salon and marks owner customer history as visited.”
@@ -36,7 +36,7 @@ Scanning the existing salon QR sets a ~7 day guest hold cookie (last salon wins,
 
 ## Decisions so far
 
-- Cookie name `esyres_qr`, ~7 days, httpOnly, SameSite=Lax, payload last scanned `salonId`, last scan wins (`docs/architecture/06-Auth-Notifications-Realtime.md`, 08 #25).
+- Cookie name `esyres_qr`, ~7 days, httpOnly, SameSite=Lax, payload last scanned `salonId` (plain id string), last scan wins (`docs/architecture/06-Auth-Notifications-Realtime.md`, 08 #25).
 - Reconcile effects: favorite that salon + owner visited marker + `qr_scans` row + clear cookie (`docs/stories/STORY-34.md`, architecture 06).
 - No second sticker, no popup (`docs/mvp/03-Key-Features.md`).
 - Guest browse from QR still has no login wall (story AC; architecture 04).
@@ -45,19 +45,21 @@ Scanning the existing salon QR sets a ~7 day guest hold cookie (last salon wins,
 - Anonymous scan counting for conversion stats is not this PR (cookie until reconcile).
 - Owner QR image / print UI is not this PR (STORY-38 OOS “Photos, QR, push”; no second QR product).
 - Stack: Lighthouse `/graphql`, Sanctum cookies, Behat GraphQL-over-HTTP (+ cookie GET), Vitest/typecheck/build. Bosnian-first. Design 2. No Pest / Playwright / codegen this PR.
+- **Sticker URL (2026-09-10):** `GET /qr/{salonId}` sets the cookie and 302s to `/salon/{id}`. Organic `/salon/:id` and IG bio do not set the cookie. Missing salon → 302 `/`, no cookie. ADR 0017.
+- **Reconcile hooks (2026-09-10):** when a **session** user has both email+phone verification **and** the cookie: (1) QR GET if already both-verified, (2) `verifyPhoneOtp` if email already verified, (3) signed email GET only if that user is the session user and phone already verified, (4) `login` after a guest scan. No-session email GET does not reconcile (cookie stays). Register does not (timestamps still null).
+- **Owner see (2026-09-10):** data + GraphQL only. No Customer History screen. Owner of that salon can query scan/visited rows. Behat asserts GraphQL.
+- **Favorites (2026-09-10):** silent auto-favorite on reconcile only. `me` can read favorite ids. No heart, no `/favorites` list.
 
 ## Open decisions
 
-- **Sticker URL:** How does a physical QR scan set `esyres_qr` without treating Instagram-bio / organic `/salon/:id` as a visit? (httpOnly ⇒ Laravel GET, not SPA JS.)
-- **Already-verified reconnect:** Architecture says reconcile at email+phone verification. The user story is a *returning* customer who may already be verified. When does a later scan still favorite + visit + scan-row?
-- **Owner “see” this PR:** No Customer History screen exists. Is visited a persisted GraphQL fact the owner of that salon can query, or new owner chrome?
-- **Favorites this PR:** Silent auto-favorite only, or also a customer Favorites list / manual heart?
+- **Persistence:** `favorites` pivot vs extra `visited_at`; is a QR visit a `qr_scans` row or a column?
+- **Repeat reconcile:** append a scan row each time vs upsert one row per customer+salon vs no-op if already favorited.
+- **GraphQL shape:** how `me` exposes favorites and how the owner reads scans (auth codes, pagination).
+- **Verified for reconcile:** real `email_verified_at` + `phone_verified_at`, or `hasVerifiedEmail/Phone()` (true in `APP_ENV=local` with null timestamps)?
 
 ## Not yet specified
 
-- Exact `favorites` / `qr_scans` / visited columns (graduates after owner-see + favorites surface lock).
-- Unknown or missing salon on the QR GET (graduates after sticker URL locks).
-- Which code paths call reconcile besides “at verification” (email GET with/without session, `verifyPhoneOtp`, login after a guest scan) — hangs off already-verified reconnect.
+<!-- empty -->
 
 ## Out of scope
 
@@ -66,8 +68,8 @@ Scanning the existing salon QR sets a ~7 day guest hold cookie (last salon wins,
 - A second “reconnect” QR product
 - Anonymous scan-hit counter (STORY-37 may add later)
 - Owner QR artwork / download / print
-- Customer Favorites list UI unless this map locks it in
-- Owner Customer History screen unless this map locks it in
+- Customer Favorites list UI / manual heart
+- Owner Customer History screen
 - No-show / cancel counters / `owner_responded_at` (STORY-35)
 - Playwright, Pest, GraphQL codegen
 - Redis, nginx, mailpit, queue worker containers
