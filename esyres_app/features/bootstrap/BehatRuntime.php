@@ -10,6 +10,7 @@ use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\Sms\FakeSmsGateway;
 use App\Sms\SmsGateway;
+use Dotenv\Dotenv;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Support\Carbon;
@@ -92,15 +93,20 @@ trait BehatRuntime
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();
             BehatKernel::$app = require dirname(__DIR__, 2).'/bootstrap/app.php';
+            BehatKernel::$app->loadEnvironmentFrom('.env.behat');
             BehatKernel::$app->make(ConsoleKernel::class)->bootstrap();
             $hasher = Hash::driver();
             if (method_exists($hasher, 'setRounds')) {
                 $hasher->setRounds(4);
             }
+            $database = DB::connection()->getDatabaseName();
+            if ($database !== 'esyres_test' || config('database.connections.mysql.database') !== 'esyres_test') {
+                throw new RuntimeException('Behat connected to '.$database.' instead of esyres_test');
+            }
             Artisan::call('migrate:fresh');
             BehatKernel::$tablesToTruncate = [];
-            foreach (Schema::getTableListing() as $table) {
-                if ($table !== 'migrations') {
+            foreach (Schema::getTableListing($database, false) as $table) {
+                if ($table !== 'migrations' && ! str_contains($table, '.')) {
                     BehatKernel::$tablesToTruncate[] = $table;
                 }
             }
@@ -125,29 +131,21 @@ trait BehatRuntime
 
     private function bootEnvironment(): void
     {
-        $this->putEnv('APP_ENV', 'testing');
-        $this->putEnv('APP_URL', 'http://localhost');
-        $this->putEnv('FRONTEND_URL', 'http://localhost');
-        $this->putEnv('BCRYPT_ROUNDS', '4');
-        $this->putEnv('DB_CONNECTION', 'mysql');
-        $this->putEnv('DB_HOST', 'mysql');
-        $this->putEnv('DB_PORT', '3306');
-        $this->putEnv('DB_DATABASE', 'esyres_test');
-        $this->putEnv('DB_USERNAME', 'esyres');
-        $this->putEnv('DB_PASSWORD', 'secret');
-        $this->putEnv('CACHE_STORE', 'array');
-        $this->putEnv('SESSION_DRIVER', 'array');
-        $this->putEnv('QUEUE_CONNECTION', 'sync');
-        $this->putEnv('APP_TIMEZONE', 'Europe/Sarajevo');
-        $this->putEnv('BROADCAST_CONNECTION', 'log');
-        $this->putEnv('LIGHTHOUSE_BROADCASTER', 'log');
-        $this->putEnv('LIGHTHOUSE_QUEUE_BROADCASTS', 'false');
-        $this->putEnv('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'array');
-        $this->putEnv('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', 'false');
-        $this->putEnv('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'false');
-        $this->putEnv('VAPID_PUBLIC_KEY', 'test-public');
-        $this->putEnv('VAPID_PRIVATE_KEY', 'test-private');
-        $this->putEnv('VAPID_SUBJECT', 'mailto:hello@example.com');
+        $base = dirname(__DIR__, 2);
+        $path = $base.DIRECTORY_SEPARATOR.'.env.behat';
+        if (! is_file($path)) {
+            throw new RuntimeException('.env.behat is missing');
+        }
+        Dotenv::createUnsafeMutable($base, '.env.behat')->load();
+        $key = (string) ($_ENV['APP_KEY'] ?? getenv('APP_KEY') ?: '');
+        if ($key === '') {
+            $this->putEnv('APP_KEY', 'base64:'.base64_encode(random_bytes(32)));
+        }
+        $appEnv = (string) ($_ENV['APP_ENV'] ?? '');
+        $database = (string) ($_ENV['DB_DATABASE'] ?? '');
+        if ($appEnv !== 'testing' || $database !== 'esyres_test') {
+            throw new RuntimeException('Behat must use APP_ENV=testing and DB_DATABASE=esyres_test');
+        }
     }
 
     private function resetAuth(): void
