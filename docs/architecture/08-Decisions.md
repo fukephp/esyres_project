@@ -26,7 +26,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 22. **Owner salon switcher** — many `Salon` rows, each a separate customer profile. Not chain multi-location (shared workers). Receptionist roles still Phase 2.
 23. **VAPID web push** — no OneSignal.
 24. **Ask other day or time = same booking row** — no duplicate busy-level.
-25. **QR guest cookie ~7 days** — last salon wins; physical scan is `GET /qr/{salonId}` (not `/salon/:id`); reconcile when a session user has both verification **timestamps** and still holds the cookie (QR GET, `verifyPhoneOtp`, sessioned email GET, `login`). Local `hasVerified*` skip does not count. See `docs/adr/0019-qr-sticker-is-not-salon-profile.md` and `docs/adr/0020-qr-reconnect-requires-timestamps.md`.
+25. **QR guest cookie ~7 days** — last salon wins; physical scan is `GET /qr/{salonId}` (not `/salon/:id`); each successful GET records a QR scan; reconcile when a session user has both verification **timestamps** and still holds the cookie (QR GET, `verifyPhoneOtp`, sessioned email GET, `login`). Local `hasVerified*` skip does not count. See `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, and `docs/adr/0021-qr-scan-on-sticker-get.md`.
 26. **Full local compose list** — nginx, php, mysql, redis, worker, reverb, vite, mailpit.
 27. **Expire → declined** — no fifth status; TTL numbers placeholder.
 28. **OTP throttle in cache** — no CAPTCHA. Same Laravel Cache store as codes (Redis when that service lands). See ADR 0005.
