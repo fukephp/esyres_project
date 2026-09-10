@@ -18,24 +18,24 @@
 
 ## Pass/fail — product
 
-- [ ] `salonStats(salonId)` with Behat now `2026-08-29 09:00` Europe/Sarajevo → `fromDate=2026-08-23`, `toDate=2026-08-29`, `days` length 7 oldest→today (`days[0].date=2026-08-23`, `days[6].date=2026-08-29`), each `weekday` matches that date — verify: Behat (`features/owner/salon_stats.feature`)
-- [ ] Empty owned salon: `bookingsCount=0`, `cancellationRatePercent=0`, `lateCancels=0`, every `days[].bookingsCount=0`, `hours=[]` — verify: Behat
-- [ ] Count includes `confirmed` and `cancelled` whose `preferred_date` is in `[fromDate, toDate]`; excludes `requested`, `time_proposed`, `declined`; excludes rows whose `preferred_date` is `2026-08-22` or `2026-08-30`; other salon’s rows excluded — verify: Behat
-- [ ] `cancellationRatePercent` = `intdiv(cancelled * 100, confirmed + cancelled)` in that window (same status set); denominator 0 → 0. Example: 2 confirmed + 1 cancelled → `33`. `lateCancels` = count of those cancelled rows with `late_cancel` true (snapshot; do not recompute) — verify: Behat
-- [ ] Each `days[].busyPercent` = `Occupancy::percent` for that date (requested + time_proposed + confirmed minutes / open minutes, cancelled excluded). Example: Saturday open 09:00–17:00 (480 min) + one 120-min `requested` on 2026-08-29 → that day’s `bookingsCount=0` and `busyPercent=25` — verify: Behat
-- [ ] `hours`: Sarajevo hour-of-day (`0–23`) of `preferred_starts_at` for confirmed+cancelled in the window; omit count 0; sort count desc then hour asc; duration does not spill. Example: two starts at 11:00 and one at 14:00 → `[{hour:11,bookingsCount:2},{hour:14,bookingsCount:1}]` — verify: Behat
-- [ ] Guest → `UNAUTHENTICATED`; unverified-email owner → `EMAIL_UNVERIFIED`; sessioned non-owner / other salon → `FORBIDDEN` — verify: Behat
-- [ ] Helper: `ownerStatsPath` mirrors `ownerChatPath` (`/owner/stats`, `?salon=` only when not first owned) — verify: Vitest
-- [ ] Helper: `statsHourLabel(0\|9\|14)` → `00:00` / `09:00` / `14:00` — verify: Vitest
-- [ ] i18n: `Statistika` / `Termini ove sedmice` / `Otkazivanja` / `Kasna otkazivanja` / `Zauzetost` / `Najzauzetiji sati` / `Nema termina ove sedmice.` — verify: Vitest (i18n keys)
+- [x] `salonStats(salonId)` with Behat now `2026-08-29 09:00` Europe/Sarajevo → `fromDate=2026-08-23`, `toDate=2026-08-29`, `days` length 7 oldest→today (`days[0].date=2026-08-23`, `days[6].date=2026-08-29`), each `weekday` matches that date — verify: Behat (`features/owner/salon_stats.feature`)
+- [x] Empty owned salon: `bookingsCount=0`, `cancellationRatePercent=0`, `lateCancels=0`, every `days[].bookingsCount=0`, `hours=[]` — verify: Behat
+- [x] Count includes `confirmed` and `cancelled` whose `preferred_date` is in `[fromDate, toDate]`; excludes `requested`, `time_proposed`, `declined`; excludes rows whose `preferred_date` is `2026-08-22` or `2026-08-30`; other salon’s rows excluded — verify: Behat
+- [x] `cancellationRatePercent` = `intdiv(cancelled * 100, confirmed + cancelled)` in that window (same status set); denominator 0 → 0. Example: 2 confirmed + 1 cancelled → `33`. `lateCancels` = count of those cancelled rows with `late_cancel` true (snapshot; do not recompute) — verify: Behat
+- [x] Each `days[].busyPercent` = `Occupancy::percent` for that date (requested + time_proposed + confirmed minutes / open minutes, cancelled excluded). Example: Saturday open 09:00–17:00 (480 min) + one 120-min `requested` on 2026-08-29 → that day’s `bookingsCount=0` and `busyPercent=25` — verify: Behat
+- [x] `hours`: Sarajevo hour-of-day (`0–23`) of `preferred_starts_at` for confirmed+cancelled in the window; omit count 0; sort count desc then hour asc; duration does not spill. Example: two starts at 11:00 and one at 14:00 → `[{hour:11,bookingsCount:2},{hour:14,bookingsCount:1}]` — verify: Behat
+- [x] Guest → `UNAUTHENTICATED`; unverified-email owner → `EMAIL_UNVERIFIED`; sessioned non-owner / other salon → `FORBIDDEN` — verify: Behat
+- [x] Helper: `ownerStatsPath` mirrors `ownerChatPath` (`/owner/stats`, `?salon=` only when not first owned) — verify: Vitest
+- [x] Helper: `statsHourLabel(0\|9\|14)` → `00:00` / `09:00` / `14:00` — verify: Vitest
+- [x] i18n: `Statistika` / `Termini ove sedmice` / `Otkazivanja` / `Kasna otkazivanja` / `Zauzetost` / `Najzauzetiji sati` / `Nema termina ove sedmice.` — verify: Vitest (i18n keys)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/03-Backend.md` (Epic 9 same busy math), `04-Frontend.md` (`/owner` stats; lazy owner chunks; salon switcher), `05-Data-Model.md` (busy-level percent; cancel snapshot), `08-Decisions.md` #8 #10 #15 #16 #19 #22, `docs/adr/0016-cancel-fifth-status.md`.
 
-- [ ] GraphQL `salonStats(salonId: ID!): SalonStats!` with `OwnerAccess` (same codes as `pendingBookings`). Types: `SalonStats` (`fromDate`, `toDate`, `bookingsCount`, `cancellationRatePercent`, `lateCancels`, `days: [SalonStatsDay!]!`, `hours: [SalonStatsHour!]!`); `SalonStatsDay` (`date`, `weekday: Weekday!`, `bookingsCount`, `busyPercent`); `SalonStatsHour` (`hour: Int!`, `bookingsCount`). No stats fields on public `Salon`. No `busyPercent` on guest `busyLevel`. No new `Subscription`. No REST. No new tables/columns. `Occupancy` formula and thresholds unchanged — verify: schema; `Occupancy.php` unchanged math; no new migration
-- [ ] `/owner/stats` lazy owner route (clone chats chrome: AuthShell, email gate, `notOwner`, `?salon=` switcher, `OwnerNav` + chat badge, `useOwnerPush`). Customer routes (`/`, `/salon/:id`, `/bookings`) do not link or mount stats. Home stays `/owner` queue+panel — verify: `App.tsx` + owner/customer pages
-- [ ] No Playwright, no Pest, no GraphQL codegen, no `vite-plugin-pwa` this PR — verify: `esyres_app/frontend/package.json`; no `pestphp` require
+- [x] GraphQL `salonStats(salonId: ID!): SalonStats!` with `OwnerAccess` (same codes as `pendingBookings`). Types: `SalonStats` (`fromDate`, `toDate`, `bookingsCount`, `cancellationRatePercent`, `lateCancels`, `days: [SalonStatsDay!]!`, `hours: [SalonStatsHour!]!`); `SalonStatsDay` (`date`, `weekday: Weekday!`, `bookingsCount`, `busyPercent`); `SalonStatsHour` (`hour: Int!`, `bookingsCount`). No stats fields on public `Salon`. No `busyPercent` on guest `busyLevel`. No new `Subscription`. No REST. No new tables/columns. `Occupancy` formula and thresholds unchanged — verify: schema; `Occupancy.php` unchanged math; no new migration
+- [x] `/owner/stats` lazy owner route (clone chats chrome: AuthShell, email gate, `notOwner`, `?salon=` switcher, `OwnerNav` + chat badge, `useOwnerPush`). Customer routes (`/`, `/salon/:id`, `/bookings`) do not link or mount stats. Home stays `/owner` queue+panel — verify: `App.tsx` + owner/customer pages
+- [x] No Playwright, no Pest, no GraphQL codegen, no `vite-plugin-pwa` this PR — verify: `esyres_app/frontend/package.json`; no `pestphp` require
 
 ## Verify commands
 

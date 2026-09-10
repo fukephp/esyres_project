@@ -468,7 +468,7 @@ trait OwnerSteps
         $stats = $this->graphql['data']['salonStats'];
         $this->assertSame($from, $stats['fromDate']);
         $this->assertSame($to, $stats['toDate']);
-        $this->assertCount(7, $stats['days']);
+        $this->assertSame(7, count($stats['days']));
         $this->assertSame($from, $stats['days'][0]['date']);
         $this->assertSame($to, $stats['days'][6]['date']);
     }
