@@ -27,6 +27,7 @@ import {
   respondErrorKey,
 } from '../lib/booking'
 import { formatSarajevoDateTime } from '../lib/format'
+import { useCustomerPush } from '../lib/push'
 
 type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' | 'cancel' } | null
 
@@ -288,6 +289,7 @@ export function MyBookings() {
   const { t } = useTranslation()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const loggedIn = data?.me != null
+  useCustomerPush(loggedIn)
   const { data: list, loading: listLoading, refetch: refetchList } = useQuery<MyBookingsData>(MY_BOOKINGS_QUERY, {
     skip: !loggedIn,
   })

@@ -110,6 +110,11 @@ void i18n.use(initReactI18next).init({
           cancelBooking: 'Otkaži',
           cancelConfirm: 'Potvrdi',
           cancelLate: 'Kasniš s otkazivanjem. Termin se ipak može otkazati.',
+          push: {
+            timeProposed: 'Predloženo vrijeme',
+            confirmed: 'Potvrđeno',
+            declined: 'Odbijeno',
+          },
           respondError: {
             NOT_TIME_PROPOSED: 'Predlog više nije aktivan.',
             EMAIL_UNVERIFIED: 'Potvrdi email prije odgovora.',

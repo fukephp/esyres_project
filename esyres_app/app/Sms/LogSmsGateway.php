@@ -10,4 +10,9 @@ final class LogSmsGateway implements SmsGateway
     {
         Log::info('SMS OTP', ['phone' => $phone, 'code' => $code]);
     }
+
+    public function notify(string $phone, string $body): void
+    {
+        Log::info('SMS status', ['phone' => $phone, 'body' => $body]);
+    }
 }

@@ -5,6 +5,10 @@ export function pushClickPath(salonId: string): string {
   return `/owner?salon=${salonId}`
 }
 
+export function customerPushClickPath(): string {
+  return '/bookings'
+}
+
 const VAPID_QUERY = gql`
   query VapidPublicKey {
     vapidPublicKey
@@ -18,16 +22,24 @@ const SUBSCRIBE_PUSH = gql`
 `
 
 export function useOwnerPush(ready: boolean): void {
+  useSessionPush(ready)
+}
+
+export function useCustomerPush(ready: boolean): void {
+  useSessionPush(ready)
+}
+
+function useSessionPush(ready: boolean): void {
   const client = useApolloClient()
   useEffect(() => {
     if (!ready) {
       return
     }
-    void subscribeOwnerPush(client)
+    void subscribeSessionPush(client)
   }, [ready, client])
 }
 
-async function subscribeOwnerPush(client: ApolloClient): Promise<void> {
+async function subscribeSessionPush(client: ApolloClient): Promise<void> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
     return
   }
@@ -44,10 +56,10 @@ async function subscribeOwnerPush(client: ApolloClient): Promise<void> {
   if (registration === null) {
     return
   }
-    const sub = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
-    })
+  const sub = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
+  })
   const json = sub.toJSON()
   const endpoint = json.endpoint
   const p256dh = json.keys?.p256dh
