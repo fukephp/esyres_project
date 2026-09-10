@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-35 |
 | Source | `docs/stories/STORY-35.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-35.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-35.md` |
 
 ## Destination
 
@@ -21,7 +21,7 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05 trust counters line, 08 #5 #6), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **No-show**, **Owner response time**, **Verified phone**)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05, 08 #5 #6 #39 #40), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **No-show**, **Owner response time**, **Verified phone**)
 - Skills: grill-with-docs (app code exists); custom-feature-skills
 - Code today (`esyres_app/`):
   - `bookings.owner_responded_at` stamps once on first successful `acceptPreferredTime` / `proposeTime` / `declineBooking` (ADR 0007). Failed overlap / not-requested does not write it. GraphQL Booking type does **not** expose it (Behat reads the column).
@@ -35,7 +35,7 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
   - Do not invent revocation rules (open in mvp 08)
   - Do not ship owner Basic Stats UI (STORY-36)
   - Do not redo QR reconnect (STORY-34)
-  - Do not add a sixth booking status unless a locked decision requires it
+  - Do not add a sixth booking status
   - Behat GraphQL-over-HTTP; no Playwright, Pest, codegen this PR
 
 ## Decisions so far
@@ -51,16 +51,17 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 - **Counter write (2026-09-10):** increment integers on both `users` and `salons` in the same transaction as the event. Booking row is the idempotency stamp. No backfill of rows that already cancelled before this PR. ADR 0020.
 - **Cancel increment (2026-09-10):** every successful `cancelBooking` → `cancel_count++` on that customer and that salon. If `late_cancel`, also `late_cancel_count++`. Never `no_show_count` from cancel.
 - **Capture surface (2026-09-10):** owner-gated GraphQL only. No PWA chrome, no Customer History screen, no chips. Failed mark/cancel does not increment.
+- **End-state (2026-09-10):** stay `confirmed` + `no_show_at`. Still occupying. Clear overlay. No sixth status. `WorkerOverlap::OCCUPYING` unchanged.
+- **Second mark (2026-09-10):** success, no second increment (same `no_show_at`).
+- **GraphQL (2026-09-10):** `markNoShow(bookingId): Booking!`. Owner-gated `Salon.noShowCount` / `cancelCount` / `lateCancelCount`. Owner-only `Booking.noShowAt`. User integers are not on `me` (Behat reads Eloquent). Guest/public salon cannot read the counts. `User` GraphQL type unchanged.
 
 ## Open decisions
 
-- **No-show end-state:** stay `confirmed` + `no_show_at` (still occupying) vs a sixth status that does or does not occupy. Overlay on that row: clear vs leave pending.
-- **Second mark:** idempotent success (no second increment) vs error `ALREADY_NO_SHOW`.
-- **GraphQL fields:** `markNoShow` + owner-gated salon counters + owner-only `Booking.noShowAt`; user integers Behat-via-Eloquent (like `owner_responded_at`) vs also expose counters on `me`.
+<!-- empty -->
 
 ## Not yet specified
 
-<!-- empty — remaining items are the open decisions above -->
+<!-- empty -->
 
 ## Out of scope
 
@@ -74,4 +75,6 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 - Scheduled auto no-show
 - Hard-block late cancel
 - Auto-expire command
+- Exposing `owner_responded_at` on GraphQL
+- Trust counters on `me`
 - Playwright, Pest, GraphQL codegen

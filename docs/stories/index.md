@@ -57,7 +57,7 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-32 | Customer SMS fallback | 6 | — | STORY-12, STORY-19 |
 | STORY-33 | Reminder email | 6 | — | STORY-11, STORY-14 |
 | STORY-34 | QR reconnect | 8 | — | STORY-11 |
-| STORY-35 | Trust data capture | 8 | — | STORY-14 |
+| STORY-35 | Trust data capture | 8 | `STORY-35` | STORY-14 |
 | STORY-36 | Basic stats | 9 | — | STORY-14 |
 | STORY-37 | QR conversion stats | 9 | — | STORY-34 |
 | STORY-38 | Local demo seed | 7 | — | STORY-03, STORY-04, STORY-05, STORY-13, STORY-15, STORY-18 |
