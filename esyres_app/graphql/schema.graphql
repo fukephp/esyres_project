@@ -169,6 +169,28 @@ type Salon {
     busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
 }
 
+type SalonStatsDay {
+    date: String!
+    weekday: Weekday!
+    bookingsCount: Int!
+    busyPercent: Int!
+}
+
+type SalonStatsHour {
+    hour: Int!
+    bookingsCount: Int!
+}
+
+type SalonStats {
+    fromDate: String!
+    toDate: String!
+    bookingsCount: Int!
+    cancellationRatePercent: Int!
+    lateCancels: Int!
+    days: [SalonStatsDay!]!
+    hours: [SalonStatsHour!]!
+}
+
 type Query {
     vapidPublicKey: String!
     me: User
@@ -182,6 +204,7 @@ type Query {
     assistantIntake(token: String!): AssistantIntake
     inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
     inFlightIntakeCount(salonId: ID!): Int!
+    salonStats(salonId: ID!): SalonStats! @field(resolver: "App\\GraphQL\\Queries\\SalonStats")
 }
 
 type Mutation {

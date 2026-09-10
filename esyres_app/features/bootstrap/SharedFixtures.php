@@ -126,6 +126,24 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that booking lasts :minutes minutes
+     */
+    public function thatBookingLastsMinutes(string $minutes): void
+    {
+        $this->booking->duration_minutes = (int) $minutes;
+        $this->booking->save();
+    }
+
+    /**
+     * @Given that booking late cancel is true
+     */
+    public function thatBookingLateCancelIsTrue(): void
+    {
+        $this->booking->late_cancel = true;
+        $this->booking->save();
+    }
+
+    /**
      * @Given the salon cancellation notice hours is :hours
      */
     public function theSalonCancellationNoticeHoursIs(string $hours): void

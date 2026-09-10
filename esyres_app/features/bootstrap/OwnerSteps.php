@@ -422,6 +422,117 @@ trait OwnerSteps
     }
 
     /**
+     * @Given that booking is declined
+     */
+    public function thatBookingIsDeclined(): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->save();
+    }
+
+    /**
+     * @When I query salon stats
+     */
+    public function iQuerySalonStats(): void
+    {
+        $this->graphql($this->salonStatsQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I query salon stats as a guest
+     */
+    public function iQuerySalonStatsAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iQuerySalonStats();
+    }
+
+    /**
+     * @When I query salon stats for the other salon
+     */
+    public function iQuerySalonStatsForTheOtherSalon(): void
+    {
+        $this->graphql($this->salonStatsQuery(), [
+            'salonId' => (string) $this->otherSalon->id,
+        ]);
+    }
+
+    /**
+     * @Then salon stats window is :from to :to
+     */
+    public function salonStatsWindowIs(string $from, string $to): void
+    {
+        $this->assertNoGraphqlErrors();
+        $stats = $this->graphql['data']['salonStats'];
+        $this->assertSame($from, $stats['fromDate']);
+        $this->assertSame($to, $stats['toDate']);
+        $this->assertCount(7, $stats['days']);
+        $this->assertSame($from, $stats['days'][0]['date']);
+        $this->assertSame($to, $stats['days'][6]['date']);
+    }
+
+    /**
+     * @Then salon stats day weekdays are:
+     */
+    public function salonStatsDayWeekdaysAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = array_map(fn (array $day) => $day['weekday'], $this->graphql['data']['salonStats']['days']);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then salon stats bookings count is :count
+     */
+    public function salonStatsBookingsCountIs(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame((int) $count, $this->graphql['data']['salonStats']['bookingsCount']);
+    }
+
+    /**
+     * @Then salon stats cancellation rate is :percent and late cancels is :late
+     */
+    public function salonStatsCancellationRateIs(string $percent, string $late): void
+    {
+        $this->assertNoGraphqlErrors();
+        $stats = $this->graphql['data']['salonStats'];
+        $this->assertSame((int) $percent, $stats['cancellationRatePercent']);
+        $this->assertSame((int) $late, $stats['lateCancels']);
+    }
+
+    /**
+     * @Then salon stats day :date bookings count is :count and busy percent is :percent
+     */
+    public function salonStatsDayBookingsAndBusy(string $date, string $count, string $percent): void
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->graphql['data']['salonStats']['days'] as $day) {
+            if ($day['date'] === $date) {
+                $this->assertSame((int) $count, $day['bookingsCount']);
+                $this->assertSame((int) $percent, $day['busyPercent']);
+
+                return;
+            }
+        }
+
+        throw new RuntimeException('Expected stats day '.$date);
+    }
+
+    /**
+     * @Then salon stats hours are:
+     */
+    public function salonStatsHoursAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($expected, $this->graphql['data']['salonStats']['hours']);
+    }
+
+    /**
      * @When I query in-flight intakes
      */
     public function iQueryInFlightIntakes(): void
@@ -1285,6 +1396,31 @@ GQL;
         return <<<'GQL'
 query InFlightCount($salonId: ID!) {
   inFlightIntakeCount(salonId: $salonId)
+}
+GQL;
+    }
+
+    private function salonStatsQuery(): string
+    {
+        return <<<'GQL'
+query SalonStats($salonId: ID!) {
+  salonStats(salonId: $salonId) {
+    fromDate
+    toDate
+    bookingsCount
+    cancellationRatePercent
+    lateCancels
+    days {
+      date
+      weekday
+      bookingsCount
+      busyPercent
+    }
+    hours {
+      hour
+      bookingsCount
+    }
+  }
 }
 GQL;
     }

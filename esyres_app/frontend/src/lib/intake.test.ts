@@ -150,3 +150,14 @@ test('cancel copy is Bosnian', async () => {
   expect(i18n.t('bookings.cancel')).toBe('Odustani')
 })
 
+test('owner stats copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.stats')).toBe('Statistika')
+  expect(i18n.t('owner.statsBookings')).toBe('Termini ove sedmice')
+  expect(i18n.t('owner.statsRate')).toBe('Otkazivanja')
+  expect(i18n.t('owner.statsLate')).toBe('Kasna otkazivanja')
+  expect(i18n.t('owner.statsBusy')).toBe('Zauzetost')
+  expect(i18n.t('owner.statsHours')).toBe('Najzauzetiji sati')
+  expect(i18n.t('owner.statsEmpty')).toBe('Nema termina ove sedmice.')
+})
+
