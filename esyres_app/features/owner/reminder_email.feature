@@ -32,7 +32,7 @@ Feature: Reminder email after reschedule
     Then the booking reminder stamps are empty
     When the current time is "2026-09-04 09:00" in Sarajevo
     And I send booking reminders
-    Then 1 day reminder was sent to the booking customer
+    Then 2 day reminders were sent to the booking customer
     And the last day reminder line is "Imate termin u Kosa Studio 5. 9. 2026. u 14:00."
 
   Scenario: Dismiss reschedule keeps stamps
