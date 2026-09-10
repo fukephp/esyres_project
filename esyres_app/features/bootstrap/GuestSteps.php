@@ -181,7 +181,6 @@ trait GuestSteps
     }
 
     /**
-     * @When I remember the verify-email URL
      * @Then I remember the verify-email URL
      */
     public function iRememberTheVerifyEmailUrl(): void
