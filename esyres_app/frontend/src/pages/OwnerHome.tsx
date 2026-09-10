@@ -14,8 +14,11 @@ import {
 } from '../graphql/intake'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
+  ACCEPT_RESCHEDULE_MUTATION,
   BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
+  BOOKING_RESCHEDULED_SUBSCRIPTION,
   DECLINE_BOOKING_MUTATION,
+  DISMISS_RESCHEDULE_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
   OWNER_SALON_QUERY,
   PENDING_BOOKINGS_QUERY,
@@ -38,11 +41,13 @@ import {
   hoursForDate,
   isPreferredSoon,
   occupyingBlock,
+  overlayQueueChrome,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
   panelCells,
   proposeErrorKey,
+  queueRowClock,
   trimDeclineReason,
 } from '../lib/owner'
 
@@ -75,16 +80,27 @@ export function OwnerHome() {
       void refetchOccupying()
     },
   })
+  useSubscription(BOOKING_RESCHEDULED_SUBSCRIPTION, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+    onData: () => {
+      void refetchQueue()
+      void refetchOccupying()
+    },
+  })
   const { data: chatCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     fetchPolicy: 'network-only',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
+  const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [declineId, setDeclineId] = useState<string | null>(null)
+  const [dismissId, setDismissId] = useState<string | null>(null)
   const [reasonDraft, setReasonDraft] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
@@ -118,7 +134,8 @@ export function OwnerHome() {
       return next
     })
     try {
-      await accept({
+      const mutate = row.reschedulePending ? acceptReschedule : accept
+      await mutate({
         variables: { bookingId: row.id },
         refetchQueries: refetchBoard(),
       })
@@ -182,12 +199,42 @@ export function OwnerHome() {
     }
   }
 
+  async function onDismiss(row: PendingBooking) {
+    if (salon === null) {
+      return
+    }
+    setBusyId(row.id)
+    setErrors((current) => {
+      const next = { ...current }
+      delete next[row.id]
+      return next
+    })
+    try {
+      await dismissReschedule({
+        variables: { bookingId: row.id },
+        refetchQueries: refetchBoard(),
+      })
+      setDismissId(null)
+    } catch (error) {
+      setErrors((current) => ({
+        ...current,
+        [row.id]: t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(error))}`),
+      }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   function onDragEnd(event: DragEndEvent) {
     const over = event.over
     if (over === null || busyId !== null) {
       return
     }
     const bookingId = String(event.active.id)
+    const dragged = (queue?.pendingBookings ?? []).find((row) => row.id === bookingId)
+    if (dragged?.reschedulePending === true) {
+      return
+    }
     const data = over.data.current
     if (data === undefined || typeof data.workerId !== 'string' || typeof data.time !== 'string') {
       return
@@ -326,6 +373,7 @@ export function OwnerHome() {
                   busy={busyId === row.id}
                   error={errors[row.id]}
                   declineOpen={declineId === row.id}
+                  dismissOpen={dismissId === row.id}
                   reasonDraft={reasonDraft}
                   onAccept={() => void onAccept(row)}
                   onDeclineOpen={() => {
@@ -342,6 +390,16 @@ export function OwnerHome() {
                     setReasonDraft('')
                   }}
                   onDeclineConfirm={() => void onDecline(row)}
+                  onDismissOpen={() => {
+                    setDismissId(row.id)
+                    setErrors((current) => {
+                      const next = { ...current }
+                      delete next[row.id]
+                      return next
+                    })
+                  }}
+                  onDismissCancel={() => setDismissId(null)}
+                  onDismissConfirm={() => void onDismiss(row)}
                   onReasonChange={setReasonDraft}
                 />
               ))}
@@ -365,28 +423,38 @@ function QueueRow({
   busy,
   error,
   declineOpen,
+  dismissOpen,
   reasonDraft,
   onAccept,
   onDeclineOpen,
   onDeclineCancel,
   onDeclineConfirm,
+  onDismissOpen,
+  onDismissCancel,
+  onDismissConfirm,
   onReasonChange,
 }: {
   row: PendingBooking
   busy: boolean
   error?: string
   declineOpen: boolean
+  dismissOpen: boolean
   reasonDraft: string
   onAccept: () => void
   onDeclineOpen: () => void
   onDeclineCancel: () => void
   onDeclineConfirm: () => void
+  onDismissOpen: () => void
+  onDismissCancel: () => void
+  onDismissConfirm: () => void
   onReasonChange: (value: string) => void
 }) {
   const { t } = useTranslation()
+  const chrome = overlayQueueChrome(row.reschedulePending)
+  const clock = queueRowClock(row)
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: row.id,
-    disabled: busy || declineOpen,
+    disabled: busy || declineOpen || dismissOpen || !chrome.draggable,
   })
   const style = transform === null ? undefined : { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
 
@@ -399,14 +467,19 @@ function QueueRow({
       {...attributes}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="font-semibold text-ink">{formatSarajevoTime(row.preferredStartsAt)}</p>
+        <p className="font-semibold text-ink">{formatSarajevoTime(clock)}</p>
         <div className="flex flex-wrap items-center justify-end gap-2">
+          {chrome.tag ? (
+            <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+              {t('owner.reschedule')}
+            </span>
+          ) : null}
           {assistantOriginVisible(row.intake) ? (
             <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
               {t('owner.assistant')}
             </span>
           ) : null}
-          {isPreferredSoon(row.preferredStartsAt) ? (
+          {isPreferredSoon(clock) ? (
             <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
               {t('owner.soon')}
             </span>
@@ -422,7 +495,7 @@ function QueueRow({
         {row.worker ? row.worker.name : t('salon.noPreference')}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {canAcceptPreferredTime(row.worker) ? (
+        {chrome.acceptReschedule || (chrome.acceptPreferred && canAcceptPreferredTime(row.worker)) ? (
           <button
             type="button"
             disabled={busy}
@@ -432,14 +505,16 @@ function QueueRow({
             {t('owner.accept')}
           </button>
         ) : null}
-        <Link
-          to={`/owner/requests/${row.id}`}
-          onPointerDown={(e) => e.stopPropagation()}
-          className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink"
-        >
-          {t('owner.propose')}
-        </Link>
-        {declineOpen ? null : (
+        {chrome.propose ? (
+          <Link
+            to={`/owner/requests/${row.id}`}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink"
+          >
+            {t('owner.propose')}
+          </Link>
+        ) : null}
+        {chrome.decline && !declineOpen ? (
           <button
             type="button"
             disabled={busy}
@@ -448,7 +523,17 @@ function QueueRow({
           >
             {t('owner.decline')}
           </button>
-        )}
+        ) : null}
+        {chrome.dismiss && !dismissOpen ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onDismissOpen}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('owner.keepOriginal')}
+          </button>
+        ) : null}
       </div>
       {declineOpen ? (
         <div className="mt-3 space-y-2">
@@ -484,6 +569,28 @@ function QueueRow({
               {t('owner.declineCancel')}
             </button>
           </div>
+        </div>
+      ) : null}
+      {dismissOpen ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onDismissConfirm}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+          >
+            {t('owner.declineConfirm')}
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onDismissCancel}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('owner.declineCancel')}
+          </button>
         </div>
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}

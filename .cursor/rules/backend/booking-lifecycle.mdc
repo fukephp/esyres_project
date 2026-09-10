@@ -12,7 +12,7 @@ Status flow: `requested → confirmed` (owner accepts preferred time), `requeste
 
 - A request holds preferred date and time but does not occupy a clock slot until `confirmed` or `time_proposed`. `time_proposed` and `confirmed` occupy the worker slot; `requested` does not.
 - Owner `acceptPreferredTime` sets `confirmed` directly. Owner `proposeTime` (counter-propose) sets `time_proposed`, not `confirmed`. Customer `confirmProposedTime` / `rejectProposedTime` / `askOtherTime` act on `time_proposed`. Ask-another-day-or-time reopens the **same** row (`requested` + new preferred date/time).
-- Reschedule: the confirmed booking stays protected until the new proposed time is approved.
-- Default reschedule cap is 1 in-progress reschedule per booking (owner-configurable).
+- Reschedule: overlay on the same **confirmed** row (`reschedule_date` / `reschedule_starts_at`). Original occupied range stays until owner `acceptReschedule`. Overlay does not occupy. `dismissReschedule` clears the overlay. Do not reuse `askOtherTime`. See `docs/adr/0015-reschedule-same-row-overlay.md`.
+- Default reschedule cap is 1 in-progress overlay per booking (`salons.reschedule_cap`; `0` disables). Owner settings UI is still out of this story.
 - Cancellation uses owner `cancellation_notice_hours`. Late cancel warns; it does not hard-block.
 - Worker "no preference" is a first-class choice, not an empty worker id hack.

@@ -11,13 +11,21 @@ import {
   CONFIRM_PROPOSED_TIME_MUTATION,
   MY_BOOKINGS_QUERY,
   REJECT_PROPOSED_TIME_MUTATION,
+  REQUEST_RESCHEDULE_MUTATION,
   type MyBooking,
   type MyBookingsData,
 } from '../graphql/booking'
-import { bookingClock, bookingStatusKey, graphqlErrorCode, respondErrorKey } from '../lib/booking'
+import {
+  bookingClock,
+  bookingStatusKey,
+  graphqlErrorCode,
+  rescheduleChrome,
+  rescheduleErrorKey,
+  respondErrorKey,
+} from '../lib/booking'
 import { formatSarajevoDateTime } from '../lib/format'
 
-type Expand = { id: string; mode: 'reject' | 'ask' } | null
+type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' } | null
 
 function VerifyBanner() {
   const { t } = useTranslation()
@@ -44,6 +52,7 @@ function BookingRow({
   onConfirm,
   onRejectOpen,
   onAskOpen,
+  onRescheduleOpen,
   onRejectConfirm,
   onAskSend,
   onCancel,
@@ -59,6 +68,7 @@ function BookingRow({
   onConfirm: () => void
   onRejectOpen: () => void
   onAskOpen: () => void
+  onRescheduleOpen: () => void
   onRejectConfirm: () => void
   onAskSend: () => void
   onCancel: () => void
@@ -68,9 +78,14 @@ function BookingRow({
   const { t } = useTranslation()
   const clock = bookingClock(row)
   const proposed = row.status === 'TIME_PROPOSED'
+  const chrome = rescheduleChrome({
+    confirmed: row.status === 'CONFIRMED',
+    pending: row.reschedulePending,
+  })
   const open = expand !== null && expand.id === row.id
   const rejectOpen = open && expand.mode === 'reject'
   const askOpen = open && expand.mode === 'ask'
+  const rescheduleOpen = open && expand.mode === 'reschedule'
 
   return (
     <li className="rounded-lg border border-hairline px-4 py-3">
@@ -86,6 +101,33 @@ function BookingRow({
       </p>
       {row.status === 'DECLINED' && row.declineReason !== null ? (
         <p className="mt-1 text-sm text-body">{row.declineReason}</p>
+      ) : null}
+      {chrome === 'pending' ? (
+        <div className="mt-2 space-y-1">
+          <p className="text-sm text-body">{t('bookings.reschedulePending')}</p>
+          {row.rescheduleStartsAt !== null ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onRescheduleOpen}
+              className="text-sm font-medium text-ink underline disabled:opacity-40"
+            >
+              {formatSarajevoDateTime(row.rescheduleStartsAt)}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {chrome === 'ask' && !open ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onRescheduleOpen}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('bookings.reschedule')}
+          </button>
+        </div>
       ) : null}
       {proposed && !open ? (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -135,7 +177,7 @@ function BookingRow({
           </button>
         </div>
       ) : null}
-      {askOpen ? (
+      {askOpen || rescheduleOpen ? (
         <div className="mt-3 space-y-2">
           <label className="block text-sm text-body">
             {t('salon.date')}
@@ -194,6 +236,7 @@ export function MyBookings() {
   const [confirmProposed] = useMutation(CONFIRM_PROPOSED_TIME_MUTATION)
   const [rejectProposed] = useMutation(REJECT_PROPOSED_TIME_MUTATION)
   const [askOther] = useMutation(ASK_OTHER_TIME_MUTATION)
+  const [requestReschedule] = useMutation(REQUEST_RESCHEDULE_MUTATION)
   const [expand, setExpand] = useState<Expand>(null)
   const [askDate, setAskDate] = useState('')
   const [askTime, setAskTime] = useState('')
@@ -227,7 +270,11 @@ export function MyBookings() {
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        [id]: t(`bookings.respondError.${respondErrorKey(graphqlErrorCode(error))}`),
+        [id]: t(
+          expand?.mode === 'reschedule'
+            ? `bookings.rescheduleError.${rescheduleErrorKey(graphqlErrorCode(error))}`
+            : `bookings.respondError.${respondErrorKey(graphqlErrorCode(error))}`,
+        ),
       }))
     } finally {
       setBusyId(null)
@@ -293,17 +340,19 @@ export function MyBookings() {
               onConfirm={() => void run(row.id, () => confirmProposed({ variables: { bookingId: row.id } }))}
               onRejectOpen={() => onExpand({ id: row.id, mode: 'reject' })}
               onAskOpen={() => onExpand({ id: row.id, mode: 'ask' })}
+              onRescheduleOpen={() => onExpand({ id: row.id, mode: 'reschedule' })}
               onRejectConfirm={() => void run(row.id, () => rejectProposed({ variables: { bookingId: row.id } }))}
               onAskSend={() =>
-                void run(row.id, () =>
-                  askOther({
-                    variables: {
-                      bookingId: row.id,
-                      preferredDate: askDate,
-                      preferredTime: askTime.slice(0, 5),
-                    },
-                  }),
-                )
+                void run(row.id, () => {
+                  const variables = {
+                    bookingId: row.id,
+                    preferredDate: askDate,
+                    preferredTime: askTime.slice(0, 5),
+                  }
+                  return expand?.mode === 'reschedule'
+                    ? requestReschedule({ variables })
+                    : askOther({ variables })
+                })
               }
               onCancel={() => onExpand(null)}
               onAskDate={setAskDate}

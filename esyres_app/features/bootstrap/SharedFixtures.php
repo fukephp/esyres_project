@@ -45,6 +45,15 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that owner is email unverified
+     */
+    public function thatOwnerIsEmailUnverified(): void
+    {
+        $this->user->email_verified_at = null;
+        $this->user->save();
+    }
+
+    /**
      * @Given another verified user :email with password :password
      */
     public function anotherVerifiedUser(string $email, string $password): void
@@ -104,6 +113,47 @@ trait SharedFixtures
     {
         $this->booking->status = Booking::CONFIRMED;
         $this->booking->save();
+        $this->ownerRespondedAt = $this->booking->fresh()->owner_responded_at?->utc()->toIso8601String();
+    }
+
+    /**
+     * @Given that booking recorded an owner response
+     */
+    public function thatBookingRecordedAnOwnerResponse(): void
+    {
+        $this->booking->owner_responded_at = now();
+        $this->booking->save();
+        $this->ownerRespondedAt = $this->booking->fresh()->owner_responded_at->utc()->toIso8601String();
+    }
+
+    /**
+     * @Given that booking has a reschedule overlay on :date at :time
+     */
+    public function thatBookingHasARescheduleOverlay(string $date, string $time): void
+    {
+        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $this->booking->reschedule_date = $date;
+        $this->booking->reschedule_starts_at = $starts;
+        $this->booking->save();
+    }
+
+    /**
+     * @Given the salon reschedule cap is :cap
+     */
+    public function theSalonRescheduleCapIs(string $cap): void
+    {
+        $this->salon->reschedule_cap = (int) $cap;
+        $this->salon->save();
+    }
+
+    /**
+     * @Then that booking has no reschedule overlay
+     */
+    public function thatBookingHasNoRescheduleOverlay(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame(null, $this->booking->reschedule_starts_at);
+        $this->assertSame(null, $this->booking->reschedule_date);
     }
 
     /**

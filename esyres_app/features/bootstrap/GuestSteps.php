@@ -1214,6 +1214,47 @@ GQL;
     }
 
     /**
+     * @When I request reschedule :date at :time
+     */
+    public function iRequestReschedule(string $date, string $time): void
+    {
+        $this->graphql($this->requestRescheduleMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I request reschedule :date at :time as a guest
+     */
+    public function iRequestRescheduleAsAGuest(string $date, string $time): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iRequestReschedule($date, $time);
+    }
+
+    /**
+     * @When I request reschedule :date at :time for booking id :id
+     */
+    public function iRequestRescheduleForBookingId(string $date, string $time, string $id): void
+    {
+        $this->graphql($this->requestRescheduleMutation(), [
+            'bookingId' => $id,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ]);
+    }
+
+    /**
+     * @Then request reschedule matches:
+     */
+    public function requestRescheduleMatches(PyStringNode $payload): void
+    {
+        $this->assertRespondBooking('requestReschedule', $payload);
+    }
+
+    /**
      * @When I query occupying bookings for date :date
      */
     public function iQueryOccupyingBookingsForDate(string $date): void
@@ -1332,8 +1373,12 @@ GQL;
         $this->assertSame($expected['status'], $row['status']);
         $this->assertSame($expected['preferredDate'], $row['preferredDate']);
         $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
-        $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
-        $this->assertSame($expected['declineReason'], $row['declineReason']);
+        if (array_key_exists('proposedWorker', $expected)) {
+            $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
+        }
+        if (array_key_exists('declineReason', $expected)) {
+            $this->assertSame($expected['declineReason'], $row['declineReason']);
+        }
         if (array_key_exists('proposedStartsAt', $expected)) {
             if ($expected['proposedStartsAt'] === null) {
                 $this->assertSame(null, $row['proposedStartsAt']);
@@ -1346,6 +1391,15 @@ GQL;
         }
         if (array_key_exists('services', $expected)) {
             $this->assertSame($expected['services'], $row['services']);
+        }
+        if (array_key_exists('reschedulePending', $expected)) {
+            $this->assertSame($expected['reschedulePending'], $row['reschedulePending']);
+        }
+        if (array_key_exists('rescheduleDate', $expected)) {
+            $this->assertSame($expected['rescheduleDate'], $row['rescheduleDate']);
+        }
+        if (array_key_exists('rescheduleStartsAt', $expected)) {
+            $this->assertSame($expected['rescheduleStartsAt'], $row['rescheduleStartsAt']);
         }
     }
 
@@ -1513,6 +1567,29 @@ mutation AskOther($bookingId: ID!, $preferredDate: String!, $preferredTime: Stri
     proposedWorker { id name }
     declineReason
     services { name durationMinutes }
+  }
+}
+GQL;
+    }
+
+    private function requestRescheduleMutation(): string
+    {
+        return <<<'GQL'
+mutation RequestReschedule($bookingId: ID!, $preferredDate: String!, $preferredTime: String!) {
+  requestReschedule(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    services { name durationMinutes }
+    reschedulePending
+    rescheduleDate
+    rescheduleStartsAt
   }
 }
 GQL;

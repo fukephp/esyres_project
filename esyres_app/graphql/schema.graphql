@@ -105,6 +105,9 @@ type Booking {
     salon: Salon!
     services: [BookingService!]! @method(name: "snapshotList")
     intake: AssistantIntake @field(resolver: "App\\GraphQL\\Queries\\BookingIntake")
+    rescheduleDate: String @method(name: "rescheduleDateString")
+    rescheduleStartsAt: String @method(name: "rescheduleStartsAtIso")
+    reschedulePending: Boolean! @method(name: "reschedulePending")
 }
 
 input CreateBookingInput {
@@ -200,8 +203,12 @@ type Mutation {
     confirmProposedTime(bookingId: ID!): Booking!
     rejectProposedTime(bookingId: ID!): Booking!
     askOtherTime(bookingId: ID!, preferredDate: String!, preferredTime: String!): Booking!
+    requestReschedule(bookingId: ID!, preferredDate: String!, preferredTime: String!): Booking!
+    acceptReschedule(bookingId: ID!): Booking!
+    dismissReschedule(bookingId: ID!): Booking!
 }
 
 type Subscription {
     bookingCustomerResponded(salonId: ID!): Booking
+    bookingRescheduled(salonId: ID!): Booking
 }

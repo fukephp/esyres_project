@@ -8,6 +8,7 @@ import {
   isFifteenMinute,
   isPreferredSoon,
   occupyingBlock,
+  overlayQueueChrome,
   ownerDateFromSearch,
   ownerQueuePath,
   ownerChatPath,
@@ -15,6 +16,7 @@ import {
   panelCells,
   proposeErrorKey,
   proposeStartTimes,
+  queueRowClock,
   declineErrorKey,
   trimDeclineReason,
   sarajevoWeekday,
@@ -41,9 +43,50 @@ test('Prihvati only when the request has a worker', () => {
   expect(canAcceptPreferredTime(null)).toBe(false)
 })
 
+test('overlay queue chrome', () => {
+  expect(overlayQueueChrome(true)).toEqual({
+    tag: true,
+    clock: 'reschedule',
+    draggable: false,
+    propose: false,
+    decline: false,
+    acceptPreferred: false,
+    acceptReschedule: true,
+    dismiss: true,
+  })
+  expect(overlayQueueChrome(false)).toEqual({
+    tag: false,
+    clock: 'preferred',
+    draggable: true,
+    propose: true,
+    decline: true,
+    acceptPreferred: true,
+    acceptReschedule: false,
+    dismiss: false,
+  })
+})
+
+test('overlay queue clock uses reschedule start', () => {
+  expect(
+    queueRowClock({
+      reschedulePending: true,
+      rescheduleStartsAt: '2026-08-31T12:00:00.000Z',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+    }),
+  ).toBe('2026-08-31T12:00:00.000Z')
+  expect(
+    queueRowClock({
+      reschedulePending: false,
+      rescheduleStartsAt: '2026-08-31T12:00:00.000Z',
+      preferredStartsAt: '2026-08-29T09:00:00.000Z',
+    }),
+  ).toBe('2026-08-29T09:00:00.000Z')
+})
+
 test('accept error keys', () => {
   expect(acceptErrorKey('SLOT_TAKEN')).toBe('SLOT_TAKEN')
   expect(acceptErrorKey('NOT_REQUESTED')).toBe('NOT_REQUESTED')
+  expect(acceptErrorKey('NOT_RESCHEDULE')).toBe('NOT_RESCHEDULE')
   expect(acceptErrorKey('WORKER_REQUIRED')).toBe('fallback')
   expect(acceptErrorKey(null)).toBe('fallback')
 })

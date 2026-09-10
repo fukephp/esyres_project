@@ -4,6 +4,8 @@ import {
   bookingStatusKey,
   bookingWorkerId,
   graphqlErrorCode,
+  rescheduleChrome,
+  rescheduleErrorKey,
   respondErrorKey,
   stackSelection,
 } from './booking'
@@ -75,6 +77,21 @@ test('other statuses use preferred start and worker', () => {
       proposedWorker: null,
     }),
   ).toEqual({ startsAt: '2026-08-29T09:00:00.000Z', worker: null })
+})
+
+test('rescheduleChrome', () => {
+  expect(rescheduleChrome({ confirmed: true, pending: false })).toBe('ask')
+  expect(rescheduleChrome({ confirmed: true, pending: true })).toBe('pending')
+  expect(rescheduleChrome({ confirmed: false, pending: false })).toBe('hidden')
+  expect(rescheduleChrome({ confirmed: false, pending: true })).toBe('hidden')
+})
+
+test('rescheduleErrorKey maps known codes', () => {
+  expect(rescheduleErrorKey('NOT_CONFIRMED')).toBe('NOT_CONFIRMED')
+  expect(rescheduleErrorKey('RESCHEDULE_DISABLED')).toBe('RESCHEDULE_DISABLED')
+  expect(rescheduleErrorKey('EMAIL_UNVERIFIED')).toBe('EMAIL_UNVERIFIED')
+  expect(rescheduleErrorKey('SLOT_TAKEN')).toBe('fallback')
+  expect(rescheduleErrorKey(null)).toBe('fallback')
 })
 
 test('status maps to i18n keys', () => {

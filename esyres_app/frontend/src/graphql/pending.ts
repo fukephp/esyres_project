@@ -55,6 +55,8 @@ export const PENDING_BOOKINGS_QUERY = gql`
         preferredDate
         preferredTime
       }
+      rescheduleStartsAt
+      reschedulePending
     }
   }
 `
@@ -142,6 +144,33 @@ export const BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION = gql`
   }
 `
 
+export const BOOKING_RESCHEDULED_SUBSCRIPTION = gql`
+  subscription BookingRescheduled($salonId: ID!) {
+    bookingRescheduled(salonId: $salonId) {
+      id
+      status
+    }
+  }
+`
+
+export const ACCEPT_RESCHEDULE_MUTATION = gql`
+  mutation AcceptReschedule($bookingId: ID!) {
+    acceptReschedule(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
+export const DISMISS_RESCHEDULE_MUTATION = gql`
+  mutation DismissReschedule($bookingId: ID!) {
+    dismissReschedule(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
 export type BookingIntake = {
   id: string
   serviceIds: string[]
@@ -176,6 +205,8 @@ export type PendingBooking = {
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
   intake: BookingIntake | null
+  rescheduleStartsAt: string | null
+  reschedulePending: boolean
 }
 
 export type PendingBookingsData = {

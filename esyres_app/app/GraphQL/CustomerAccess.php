@@ -40,4 +40,20 @@ final class CustomerAccess
 
         return $booking;
     }
+
+    public static function lockedConfirmed(User $user, string $bookingId): Booking
+    {
+        $booking = Booking::query()
+            ->whereKey($bookingId)
+            ->lockForUpdate()
+            ->first();
+        if ($booking === null || (int) $booking->customer_id !== (int) $user->id) {
+            throw new ClientError('FORBIDDEN');
+        }
+        if ($booking->status !== Booking::CONFIRMED) {
+            throw new ClientError('NOT_CONFIRMED');
+        }
+
+        return $booking;
+    }
 }

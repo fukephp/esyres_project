@@ -91,7 +91,7 @@ _Avoid_: quiet hours, owner offline, do-not-disturb (as a user-global flag)
 ## Bookings
 
 **My Bookings**:
-The customer place that lists their requests by status. Time Proposed screen actions live on those rows. Not discovery, not the salon profile, and not the pending queue.
+The customer place that lists their requests by status. Time Proposed screen actions and reschedule of a confirmed booking live on those rows. Not discovery, not the salon profile, and not the pending queue.
 _Avoid_: schedule, inbox (customer), booking history, dashboard
 
 **Time Proposed screen**:
@@ -99,7 +99,7 @@ The Approve / Reject / Ask other time actions on a time-proposed booking, shown 
 _Avoid_: booking detail, proposal page, respond inbox
 
 **Pending queue**:
-The owner’s list of requested bookings for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
+The owner’s list of requested bookings and in-progress reschedules for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
@@ -149,6 +149,30 @@ _Avoid_: pending (as requested), confirmed, hold (as a request)
 **Ask other time**:
 The customer’s new preferred day and time on a time-proposed booking. It reopens that same request. Not a second request and not reschedule of a confirmed booking.
 _Avoid_: new booking, duplicate request, reschedule (Epic 5)
+
+**Reschedule**:
+The customer’s ask to move a confirmed booking to a new preferred day and time. The original occupied range stays until the owner accepts that new time. Not ask other time, not a second request, and not cancel.
+_Avoid_: ask other time, new booking, duplicate request
+
+**In-progress reschedule**:
+A confirmed booking that has a pending new preferred time. Still confirmed. Not a request and not time-proposed.
+_Avoid_: pending (as requested), time-proposed, hold
+
+**Accept reschedule**:
+The owner’s yes to an in-progress reschedule. The booking stays confirmed at the new time; the original range is released. Not accept preferred time and not confirm proposed time.
+_Avoid_: accept preferred time, confirm (customer), approve reschedule
+
+**Dismiss reschedule**:
+The owner’s no to an in-progress reschedule. The confirmed booking stays at the original time. Not decline and not cancel.
+_Avoid_: decline, reject, cancel (as confirmed)
+
+**Reschedule preferred time**:
+The asked new day and time on an in-progress reschedule. Not the occupied confirmed range and not a counter-proposal.
+_Avoid_: preferred time (as the held clock), proposed time, slot
+
+**Reschedule cap**:
+How many in-progress reschedules a confirmed booking may have at once. Default one. Not a lifetime count and not the cancellation notice window.
+_Avoid_: cancel window, max bookings, lifetime reschedule limit
 
 **Decline**:
 The owner’s refusal of a request. Optional reason for the customer. Does not require a counter-proposal first. Not the customer’s reject of a time-proposed booking, not expire, and not a cancel of a confirmed booking.

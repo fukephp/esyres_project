@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'name', 'address', 'cancellation_notice_hours', 'hours', 'lat', 'lng', 'dnd'])]
+#[Fillable(['owner_id', 'name', 'address', 'cancellation_notice_hours', 'reschedule_cap', 'hours', 'lat', 'lng', 'dnd'])]
 class Salon extends Model
 {
     /** @use HasFactory<SalonFactory> */
@@ -29,6 +29,9 @@ class Salon extends Model
             if ($salon->dnd === null) {
                 $salon->dnd = false;
             }
+            if ($salon->reschedule_cap === null) {
+                $salon->reschedule_cap = 1;
+            }
         });
     }
 
@@ -40,6 +43,7 @@ class Salon extends Model
         return [
             'hours' => 'array',
             'cancellation_notice_hours' => 'integer',
+            'reschedule_cap' => 'integer',
             'dnd' => 'boolean',
             'lat' => 'float',
             'lng' => 'float',
