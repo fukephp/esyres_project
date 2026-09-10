@@ -6,6 +6,7 @@ use App\Booking\WorkerOverlap;
 use App\Exceptions\ClientError;
 use App\GraphQL\OwnerAccess;
 use App\Models\Booking;
+use App\Push\CustomerStatus;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -18,7 +19,7 @@ final class AcceptPreferredTime
     {
         $user = OwnerAccess::user($context);
 
-        return DB::transaction(function () use ($user, $args): Booking {
+        $booking = DB::transaction(function () use ($user, $args): Booking {
             $booking = Booking::query()->find($args['bookingId']);
             if ($booking === null || $booking->salon->owner_id !== $user->id) {
                 throw new ClientError('FORBIDDEN');
@@ -63,5 +64,8 @@ final class AcceptPreferredTime
 
             return $booking->load(['customer', 'worker', 'services']);
         });
+        CustomerStatus::send($booking, 'confirmed');
+
+        return $booking;
     }
 }

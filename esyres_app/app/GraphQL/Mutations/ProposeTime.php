@@ -7,6 +7,7 @@ use App\Exceptions\ClientError;
 use App\GraphQL\OwnerAccess;
 use App\Models\Booking;
 use App\Models\Worker;
+use App\Push\CustomerStatus;
 use App\SalonHours\OpenWindow;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ final class ProposeTime
     {
         $user = OwnerAccess::user($context);
 
-        return DB::transaction(function () use ($user, $args): Booking {
+        $booking = DB::transaction(function () use ($user, $args): Booking {
             $booking = Booking::query()->find($args['bookingId']);
             if ($booking === null || $booking->salon->owner_id !== $user->id) {
                 throw new ClientError('FORBIDDEN');
@@ -68,6 +69,9 @@ final class ProposeTime
 
             return $booking->load(['customer', 'worker', 'proposedWorker', 'services']);
         });
+        CustomerStatus::send($booking, 'time_proposed');
+
+        return $booking;
     }
 
     private function proposedStarts(string $date, string $time): CarbonImmutable

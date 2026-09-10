@@ -5,6 +5,7 @@ namespace App\GraphQL\Mutations;
 use App\Exceptions\ClientError;
 use App\GraphQL\OwnerAccess;
 use App\Models\Booking;
+use App\Push\CustomerStatus;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -17,7 +18,7 @@ final class DeclineBooking
     {
         $user = OwnerAccess::user($context);
 
-        return DB::transaction(function () use ($user, $args): Booking {
+        $booking = DB::transaction(function () use ($user, $args): Booking {
             $booking = Booking::query()
                 ->whereKey($args['bookingId'])
                 ->lockForUpdate()
@@ -40,6 +41,9 @@ final class DeclineBooking
 
             return $booking->load(['customer', 'worker', 'services']);
         });
+        CustomerStatus::send($booking, 'declined');
+
+        return $booking;
     }
 
     private static function trimReason(mixed $reason): ?string
