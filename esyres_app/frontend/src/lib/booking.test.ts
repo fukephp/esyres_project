@@ -3,6 +3,8 @@ import {
   bookingClock,
   bookingStatusKey,
   bookingWorkerId,
+  cancelChrome,
+  cancelErrorKey,
   graphqlErrorCode,
   rescheduleChrome,
   rescheduleErrorKey,
@@ -99,6 +101,7 @@ test('status maps to i18n keys', () => {
   expect(bookingStatusKey('TIME_PROPOSED')).toBe('TIME_PROPOSED')
   expect(bookingStatusKey('CONFIRMED')).toBe('CONFIRMED')
   expect(bookingStatusKey('DECLINED')).toBe('DECLINED')
+  expect(bookingStatusKey('CANCELLED')).toBe('CANCELLED')
   expect(bookingStatusKey('nope')).toBe('REQUESTED')
 })
 
@@ -114,4 +117,22 @@ test('respondErrorKey maps known codes', () => {
   expect(respondErrorKey('SLOT_TAKEN')).toBe('SLOT_TAKEN')
   expect(respondErrorKey('NOT_REQUESTED')).toBe('fallback')
   expect(respondErrorKey(null)).toBe('fallback')
+})
+
+test('cancelChrome shows only before start on confirmed', () => {
+  const start = '2026-08-29T11:00:00.000Z'
+  expect(cancelChrome({ confirmed: true, startsAt: start, now: Date.parse('2026-08-29T10:00:00.000Z') })).toBe('show')
+  expect(cancelChrome({ confirmed: true, startsAt: start, now: Date.parse('2026-08-29T11:00:00.000Z') })).toBe('hidden')
+  expect(cancelChrome({ confirmed: true, startsAt: start, now: Date.parse('2026-08-29T12:00:00.000Z') })).toBe('hidden')
+  expect(cancelChrome({ confirmed: false, startsAt: start, now: Date.parse('2026-08-29T10:00:00.000Z') })).toBe('hidden')
+})
+
+test('cancelErrorKey maps known codes', () => {
+  expect(cancelErrorKey('NOT_CONFIRMED')).toBe('NOT_CONFIRMED')
+  expect(cancelErrorKey('PAST_START')).toBe('PAST_START')
+  expect(cancelErrorKey('EMAIL_UNVERIFIED')).toBe('EMAIL_UNVERIFIED')
+  expect(cancelErrorKey('PHONE_UNVERIFIED')).toBe('PHONE_UNVERIFIED')
+  expect(cancelErrorKey('FORBIDDEN')).toBe('FORBIDDEN')
+  expect(cancelErrorKey('SLOT_TAKEN')).toBe('fallback')
+  expect(cancelErrorKey(null)).toBe('fallback')
 })

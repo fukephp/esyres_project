@@ -1255,6 +1255,75 @@ GQL;
     }
 
     /**
+     * @When I cancel the booking
+     */
+    public function iCancelTheBooking(): void
+    {
+        $this->graphql($this->cancelBookingMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I cancel the booking as a guest
+     */
+    public function iCancelTheBookingAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iCancelTheBooking();
+    }
+
+    /**
+     * @When I cancel booking id :id
+     */
+    public function iCancelBookingId(string $id): void
+    {
+        $this->graphql($this->cancelBookingMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then cancel booking matches:
+     */
+    public function cancelBookingMatches(PyStringNode $payload): void
+    {
+        $this->assertRespondBooking('cancelBooking', $payload);
+    }
+
+    /**
+     * @Then this my booking lateToCancel is true
+     */
+    public function thisMyBookingLateToCancelIsTrue(): void
+    {
+        $this->assertSame(true, $this->myBookingRow()['lateToCancel']);
+    }
+
+    /**
+     * @Then this my booking lateToCancel is false
+     */
+    public function thisMyBookingLateToCancelIsFalse(): void
+    {
+        $this->assertSame(false, $this->myBookingRow()['lateToCancel']);
+    }
+
+    /**
+     * @Then this my booking lateCancel is true
+     */
+    public function thisMyBookingLateCancelIsTrue(): void
+    {
+        $this->assertSame(true, $this->myBookingRow()['lateCancel']);
+    }
+
+    /**
+     * @Then this my booking status is :status
+     */
+    public function thisMyBookingStatusIs(string $status): void
+    {
+        $this->assertSame($status, $this->myBookingRow()['status']);
+    }
+
+    /**
      * @When I query occupying bookings for date :date
      */
     public function iQueryOccupyingBookingsForDate(string $date): void
@@ -1401,6 +1470,19 @@ GQL;
         if (array_key_exists('rescheduleStartsAt', $expected)) {
             $this->assertSame($expected['rescheduleStartsAt'], $row['rescheduleStartsAt']);
         }
+        if (array_key_exists('lateCancel', $expected)) {
+            $this->assertSame($expected['lateCancel'], $row['lateCancel']);
+        }
+        if (array_key_exists('lateToCancel', $expected)) {
+            $this->assertSame($expected['lateToCancel'], $row['lateToCancel']);
+        }
+        if (array_key_exists('cancelledAt', $expected)) {
+            if ($expected['cancelledAt'] === true) {
+                $this->assertNotNull($row['cancelledAt']);
+            } else {
+                $this->assertSame($expected['cancelledAt'], $row['cancelledAt']);
+            }
+        }
     }
 
     /**
@@ -1436,13 +1518,19 @@ GQL;
      */
     public function thisMyBookingIntakeIsNull(): void
     {
+        $this->assertSame(null, $this->myBookingRow()['intake']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function myBookingRow(): array
+    {
         $this->assertNoGraphqlErrors();
         $id = (string) $this->booking->id;
         foreach ($this->graphql['data']['myBookings'] as $row) {
             if ((string) $row['id'] === $id) {
-                $this->assertSame(null, $row['intake']);
-
-                return;
+                return $row;
             }
         }
 
@@ -1595,6 +1683,32 @@ mutation RequestReschedule($bookingId: ID!, $preferredDate: String!, $preferredT
 GQL;
     }
 
+    private function cancelBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation CancelBooking($bookingId: ID!) {
+  cancelBooking(bookingId: $bookingId) {
+    id
+    status
+    preferredDate
+    preferredStartsAt
+    durationMinutes
+    worker { id name }
+    proposedStartsAt
+    proposedWorker { id name }
+    declineReason
+    services { name durationMinutes }
+    reschedulePending
+    rescheduleDate
+    rescheduleStartsAt
+    lateCancel
+    lateToCancel
+    cancelledAt
+  }
+}
+GQL;
+    }
+
     private function occupyingBookingsQuery(): string
     {
         return <<<'GQL'
@@ -1636,6 +1750,9 @@ query MyBookings($limit: Int = 20, $offset: Int = 0) {
     salon { id name }
     services { name durationMinutes }
     intake { id }
+    lateToCancel
+    lateCancel
+    cancelledAt
   }
 }
 GQL;

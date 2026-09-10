@@ -22,7 +22,7 @@ export function bookingWorkerId(selected: string): string | undefined {
   return selected
 }
 
-export type BookingStatus = 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED'
+export type BookingStatus = 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED' | 'CANCELLED'
 
 export type BookingClockRow = {
   status: BookingStatus
@@ -47,7 +47,12 @@ export function bookingClock(row: BookingClockRow): {
 }
 
 export function bookingStatusKey(status: string): BookingStatus {
-  if (status === 'TIME_PROPOSED' || status === 'CONFIRMED' || status === 'DECLINED') {
+  if (
+    status === 'TIME_PROPOSED' ||
+    status === 'CONFIRMED' ||
+    status === 'DECLINED' ||
+    status === 'CANCELLED'
+  ) {
     return status
   }
 
@@ -101,6 +106,35 @@ export type RescheduleErrorKey = (typeof RESCHEDULE_ERROR_KEYS)[number] | 'fallb
 export function rescheduleErrorKey(code: string | null): RescheduleErrorKey {
   if (code !== null && (RESCHEDULE_ERROR_KEYS as readonly string[]).includes(code)) {
     return code as (typeof RESCHEDULE_ERROR_KEYS)[number]
+  }
+
+  return 'fallback'
+}
+
+export function cancelChrome(args: { confirmed: boolean; startsAt: string; now: number }): 'show' | 'hidden' {
+  if (!args.confirmed) {
+    return 'hidden'
+  }
+  if (Date.parse(args.startsAt) <= args.now) {
+    return 'hidden'
+  }
+
+  return 'show'
+}
+
+const CANCEL_ERROR_KEYS = [
+  'NOT_CONFIRMED',
+  'PAST_START',
+  'EMAIL_UNVERIFIED',
+  'PHONE_UNVERIFIED',
+  'FORBIDDEN',
+] as const
+
+export type CancelErrorKey = (typeof CANCEL_ERROR_KEYS)[number] | 'fallback'
+
+export function cancelErrorKey(code: string | null): CancelErrorKey {
+  if (code !== null && (CANCEL_ERROR_KEYS as readonly string[]).includes(code)) {
+    return code as (typeof CANCEL_ERROR_KEYS)[number]
   }
 
   return 'fallback'

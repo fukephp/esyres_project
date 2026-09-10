@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at', 'cancelled_at', 'late_cancel'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
@@ -18,6 +18,8 @@ class Booking extends Model
     public const TIME_PROPOSED = 'time_proposed';
 
     public const DECLINED = 'declined';
+
+    public const CANCELLED = 'cancelled';
 
     /**
      * @return array<string, string>
@@ -32,6 +34,8 @@ class Booking extends Model
             'proposed_starts_at' => 'datetime',
             'reschedule_date' => 'date',
             'reschedule_starts_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'late_cancel' => 'boolean',
         ];
     }
 
@@ -150,6 +154,34 @@ class Booking extends Model
     public function reschedulePending(): bool
     {
         return $this->reschedule_starts_at !== null;
+    }
+
+    public function lateToCancel(): bool
+    {
+        if ($this->status !== self::CONFIRMED) {
+            return false;
+        }
+        $start = $this->preferred_starts_at;
+        $now = now();
+        if ($now->gte($start)) {
+            return false;
+        }
+
+        return $now->gte($start->copy()->subHours((int) $this->salon->cancellation_notice_hours));
+    }
+
+    public function cancelledAtIso(): ?string
+    {
+        if ($this->cancelled_at === null) {
+            return null;
+        }
+
+        return $this->cancelled_at->utc()->toIso8601String();
+    }
+
+    public function lateCancel(): bool
+    {
+        return $this->late_cancel === true;
     }
 
     public static function roundUp15(int $minutes): int

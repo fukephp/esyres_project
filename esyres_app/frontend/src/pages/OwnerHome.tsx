@@ -17,6 +17,7 @@ import {
   ACCEPT_RESCHEDULE_MUTATION,
   BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
   BOOKING_RESCHEDULED_SUBSCRIPTION,
+  BOOKING_CANCELLED_SUBSCRIPTION,
   DECLINE_BOOKING_MUTATION,
   DISMISS_RESCHEDULE_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
@@ -81,6 +82,14 @@ export function OwnerHome() {
     },
   })
   useSubscription(BOOKING_RESCHEDULED_SUBSCRIPTION, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+    onData: () => {
+      void refetchQueue()
+      void refetchOccupying()
+    },
+  })
+  useSubscription(BOOKING_CANCELLED_SUBSCRIPTION, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     onData: () => {

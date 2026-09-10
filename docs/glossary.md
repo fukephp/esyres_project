@@ -91,7 +91,7 @@ _Avoid_: quiet hours, owner offline, do-not-disturb (as a user-global flag)
 ## Bookings
 
 **My Bookings**:
-The customer place that lists their requests by status. Time Proposed screen actions and reschedule of a confirmed booking live on those rows. Not discovery, not the salon profile, and not the pending queue.
+The customer place that lists their requests by status. Time Proposed screen actions, reschedule of a confirmed booking, and cancel of a confirmed booking live on those rows. Not discovery, not the salon profile, and not the pending queue.
 _Avoid_: schedule, inbox (customer), booking history, dashboard
 
 **Time Proposed screen**:
@@ -166,6 +166,14 @@ _Avoid_: accept preferred time, confirm (customer), approve reschedule
 The owner’s no to an in-progress reschedule. The confirmed booking stays at the original time. Not decline and not cancel.
 _Avoid_: decline, reject, cancel (as confirmed)
 
+**Cancel**:
+The customer’s end of a confirmed booking, including one with an in-progress reschedule. It frees the occupied range. Not owner Decline, not reject of a time-proposed booking, and not withdraw of a request.
+_Avoid_: decline, reject, expire, withdraw request
+
+**Late cancel**:
+A cancel inside the salon’s cancellation notice window. The customer sees a warning; the cancel still happens. Not a hard block and not a no-show.
+_Avoid_: blocked cancel, penalty, no-show
+
 **Reschedule preferred time**:
 The asked new day and time on an in-progress reschedule. Not the occupied confirmed range and not a counter-proposal.
 _Avoid_: preferred time (as the held clock), proposed time, slot
@@ -181,6 +189,10 @@ _Avoid_: reject (owner), cancel (as requested), expire, refuse slot
 **Declined booking**:
 A booking the owner declined, the customer rejected after a counter-proposal, or that later expired into the same status. It does not occupy a clock slot. Not a cancelled confirmed booking.
 _Avoid_: cancelled (as requested), expired (as a fifth status), rejected appointment
+
+**Cancelled booking**:
+A confirmed booking the customer cancelled. It does not occupy a clock slot. Not declined, not expired, and not a no-show.
+_Avoid_: declined, expired, rejected, no-show
 
 **Preferred time**:
 The guest’s stated calendar day and clock time on a request. Not a reserved slot and not the owner’s counter-proposal.
