@@ -10,6 +10,7 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Push\OwnerPush;
 use Illuminate\Support\Str;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -46,7 +47,7 @@ final class CreateBooking
         $workerId = $this->workerId($salon, $input['workerId'] ?? null);
         $duration = Booking::roundUp15(array_sum(array_map(fn (Service $s): int => $s->duration_minutes, $services)));
 
-        return DB::transaction(function () use ($user, $salon, $services, $workerId, $starts, $input, $duration): Booking {
+        $booking = DB::transaction(function () use ($user, $salon, $services, $workerId, $starts, $input, $duration): Booking {
             $booking = new Booking;
             $booking->salon_id = $salon->id;
             $booking->customer_id = $user->id;
@@ -70,6 +71,9 @@ final class CreateBooking
 
             return $booking->load('services');
         });
+        OwnerPush::send($booking, 'requested');
+
+        return $booking;
     }
 
     private function preferredStarts(string $date, string $time): CarbonImmutable

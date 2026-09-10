@@ -167,6 +167,13 @@ void i18n.use(initReactI18next).init({
           soon: 'Uskoro',
           assistant: 'Asistent',
           reschedule: 'Premještaj',
+          push: {
+            requested: 'Novi zahtjev',
+            confirmed: 'Gost je prihvatio',
+            rejected: 'Gost je odbio',
+            askOtherTime: 'Gost traži drugo vrijeme',
+            reschedule: 'Gost traži premještaj',
+          },
           keepOriginal: 'Zadrži stari',
           transcript: 'Zašto ovo vrijeme',
           accept: 'Prihvati',

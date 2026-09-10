@@ -6,6 +6,7 @@ use App\Booking\WorkerOverlap;
 use App\Exceptions\ClientError;
 use App\GraphQL\BroadcastCustomerResponded;
 use App\GraphQL\CustomerAccess;
+use App\Push\OwnerPush;
 use App\Models\Booking;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,7 @@ final class ConfirmProposedTime
             $booking->save();
             $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             BroadcastCustomerResponded::send($booking);
+            OwnerPush::send($booking, 'confirmed');
 
             return $booking;
         });

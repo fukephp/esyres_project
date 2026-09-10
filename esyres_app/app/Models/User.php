@@ -55,6 +55,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @return HasMany<PushSubscription, $this>
+     */
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Collection<int, Salon>
      */
     public function salonList()

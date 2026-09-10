@@ -6,6 +6,8 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Push\FakePushGateway;
+use App\Push\PushGateway;
 use App\Sms\FakeSmsGateway;
 use App\Sms\SmsGateway;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -112,6 +114,10 @@ trait BehatRuntime
         if ($sms instanceof FakeSmsGateway) {
             $sms->reset();
         }
+        $push = $this->app->make(PushGateway::class);
+        if ($push instanceof FakePushGateway) {
+            $push->reset();
+        }
         $this->resetAuth();
         $this->withCredentials();
         Notification::fake();
@@ -139,6 +145,9 @@ trait BehatRuntime
         $this->putEnv('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'array');
         $this->putEnv('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', 'false');
         $this->putEnv('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'false');
+        $this->putEnv('VAPID_PUBLIC_KEY', 'test-public');
+        $this->putEnv('VAPID_PRIVATE_KEY', 'test-private');
+        $this->putEnv('VAPID_SUBJECT', 'mailto:hello@example.com');
     }
 
     private function resetAuth(): void

@@ -6,6 +6,7 @@ use App\Booking\PreferredClock;
 use App\Exceptions\ClientError;
 use App\GraphQL\BroadcastRescheduled;
 use App\GraphQL\CustomerAccess;
+use App\Push\OwnerPush;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -33,6 +34,7 @@ final class RequestReschedule
             $booking->save();
             $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             BroadcastRescheduled::send($booking);
+            OwnerPush::send($booking, 'reschedule');
 
             return $booking;
         });
