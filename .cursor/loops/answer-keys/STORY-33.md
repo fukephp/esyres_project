@@ -20,27 +20,27 @@
 
 Behat now starts at `2026-08-29 09:00` Europe/Sarajevo. Command is `bookings:send-reminders`. Notification class `BookingReminder` (`kind` `day` \| `hour`). Customer of the booking is the only recipient.
 
-- [ ] Confirmed booking start `2026-08-30 14:00` Sarajevo; command at `2026-08-29 09:00` → one `kind=day` to that customer; subject `Podsjetnik: {salon} sutra`; mail line `Imate termin u {salon} 30. 8. 2026. u 14:00.`; `reminder_day_sent_at` set; no `hour` — verify: Behat
-- [ ] Same booking, command again at 09:00 → still one `day`, zero `hour`; stamp unchanged — verify: Behat
-- [ ] Same booking, command at `2026-08-30 13:00` → one `kind=hour`; subject `Podsjetnik: {salon} za sat vremena`; same body line as above; `reminder_hour_sent_at` set; still one `day` — verify: Behat
-- [ ] Command again at 13:00 → still one `hour` — verify: Behat
-- [ ] Confirmed start `2026-08-29 11:00`; command at 09:00 (already D) → no `day`; command at 10:00 → one `hour` only — verify: Behat
-- [ ] Confirmed start `2026-08-29 09:30`; command at 09:00 (inside `[T−60, T)`) → no `day`; one `hour` — verify: Behat
-- [ ] Confirmed start `2026-08-29 08:00`; command at 09:00 (`now >= start`) → no reminder — verify: Behat
-- [ ] `requested` / `time_proposed` / `declined` / `cancelled` in the day-before window → no reminder; confirmed row is independent of a second cancelled row — verify: Behat
-- [ ] Confirmed in the day-before window but customer `email_verified_at` is null → no reminder; stamps stay null — verify: Behat
-- [ ] `acceptPreferredTime` / `confirmProposedTime` / `cancelBooking` do not send `BookingReminder` until the command runs — verify: Behat
-- [ ] Overlay on a confirmed row (original `2026-08-30 14:00`, overlay `2026-09-05 14:00`); command at `2026-08-29 09:00` → `day` body uses **30. 8. 2026. u 14:00** (occupied clock), not the overlay — verify: Behat
-- [ ] After that `day` send, `acceptReschedule` → both stamps null; command at `2026-09-04 09:00` → new `day` with body `5. 9. 2026. u 14:00.` — verify: Behat
-- [ ] After a `day` send, `dismissReschedule` → stamps stay set; command again → no second `day` — verify: Behat
+- [x] Confirmed booking start `2026-08-30 14:00` Sarajevo; command at `2026-08-29 09:00` → one `kind=day` to that customer; subject `Podsjetnik: {salon} sutra`; mail line `Imate termin u {salon} 30. 8. 2026. u 14:00.`; `reminder_day_sent_at` set; no `hour` — verify: Behat
+- [x] Same booking, command again at 09:00 → still one `day`, zero `hour`; stamp unchanged — verify: Behat
+- [x] Same booking, command at `2026-08-30 13:00` → one `kind=hour`; subject `Podsjetnik: {salon} za sat vremena`; same body line as above; `reminder_hour_sent_at` set; still one `day` — verify: Behat
+- [x] Command again at 13:00 → still one `hour` — verify: Behat
+- [x] Confirmed start `2026-08-29 11:00`; command at 09:00 (already D) → no `day`; command at 10:00 → one `hour` only — verify: Behat
+- [x] Confirmed start `2026-08-29 09:30`; command at 09:00 (inside `[T−60, T)`) → no `day`; one `hour` — verify: Behat
+- [x] Confirmed start `2026-08-29 08:00`; command at 09:00 (`now >= start`) → no reminder — verify: Behat
+- [x] `requested` / `time_proposed` / `declined` / `cancelled` in the day-before window → no reminder; confirmed row is independent of a second cancelled row — verify: Behat
+- [x] Confirmed in the day-before window but customer `email_verified_at` is null → no reminder; stamps stay null — verify: Behat
+- [x] `acceptPreferredTime` / `confirmProposedTime` / `cancelBooking` do not send `BookingReminder` until the command runs — verify: Behat
+- [x] Overlay on a confirmed row (original `2026-08-30 14:00`, overlay `2026-09-05 14:00`); command at `2026-08-29 09:00` → `day` body uses **30. 8. 2026. u 14:00** (occupied clock), not the overlay — verify: Behat
+- [x] After that `day` send, `acceptReschedule` → both stamps null; command at `2026-09-04 09:00` → new `day` with body `5. 9. 2026. u 14:00.` — verify: Behat
+- [x] After a `day` send, `dismissReschedule` → stamps stay set; command again → no second `day` — verify: Behat
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/02-System-Context.md`, `03-Backend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #6 #19 #26 #36, `docs/adr/0017-reminder-scan-not-delayed-jobs.md`.
 
-- [ ] `bookings.reminder_day_sent_at` / `reminder_hour_sent_at` nullable datetimes. Artisan `bookings:send-reminders`. `bootstrap/app.php` `withSchedule` → that command `everyMinute()`. Queued `BookingReminder` mail notification (`ShouldQueue`); send via `$customer->notify(...)` from the command, never from a mutation. `acceptReschedule` clears both stamps after rewriting `preferred_starts_at`. No new GraphQL field. No delayed-on-confirm jobs — verify: migration + command + `AcceptReschedule`; schema.graphql unchanged for reminders
-- [ ] No worker / redis / nginx / mailpit / scheduler container. Behat stays `QUEUE_CONNECTION=sync` + `Notification::fake()`. `MAIL_MAILER=array` in `.env.behat` — verify: `esyres_app/docker-compose.yml` still php+vite+mysql+reverb only
-- [ ] No Pest, no Playwright, no GraphQL codegen, no PWA chrome, no i18n keys for this mail (copy lives on the notification) — verify: no `pestphp` require; frontend package.json; no reminder strings under `esyres_app/frontend/`
+- [x] `bookings.reminder_day_sent_at` / `reminder_hour_sent_at` nullable datetimes. Artisan `bookings:send-reminders`. `bootstrap/app.php` `withSchedule` → that command `everyMinute()`. Queued `BookingReminder` mail notification (`ShouldQueue`); send via `$customer->notify(...)` from the command, never from a mutation. `acceptReschedule` clears both stamps after rewriting `preferred_starts_at`. No new GraphQL field. No delayed-on-confirm jobs — verify: migration + command + `AcceptReschedule`; schema.graphql unchanged for reminders
+- [x] No worker / redis / nginx / mailpit / scheduler container. Behat stays `QUEUE_CONNECTION=sync` + `Notification::fake()`. `MAIL_MAILER=array` in `.env.behat` — verify: `esyres_app/docker-compose.yml` still php+vite+mysql+reverb only
+- [x] No Pest, no Playwright, no GraphQL codegen, no PWA chrome, no i18n keys for this mail (copy lives on the notification) — verify: no `pestphp` require; frontend package.json; no reminder strings under `esyres_app/frontend/`
 
 ## Verify commands
 
