@@ -13,6 +13,7 @@ import {
   ownerQueuePath,
   ownerChatPath,
   ownerStatsPath,
+  statsHourLabel,
   ownerSalonFromSearch,
   panelCells,
   proposeErrorKey,
@@ -202,6 +203,12 @@ test('owner stats copy is Bosnian', async () => {
   expect(i18n.t('owner.qrScans')).toBe('Skeniranja QR')
   expect(i18n.t('owner.qrVisits')).toBe('QR posjete')
   expect(i18n.t('owner.qrConversion')).toBe('Konverzija')
+})
+
+test('stats hour label is HH:00', () => {
+  expect(statsHourLabel(0)).toBe('00:00')
+  expect(statsHourLabel(9)).toBe('09:00')
+  expect(statsHourLabel(14)).toBe('14:00')
 })
 
 test('assistant origin chip shows only when intake is present', () => {

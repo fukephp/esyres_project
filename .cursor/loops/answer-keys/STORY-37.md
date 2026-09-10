@@ -27,11 +27,11 @@
 
 ## Pass/fail — architecture
 
-Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #10 #22 #25, ADRs 0019, 0020, 0021.
+Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #10 #22 #25, ADRs 0019, 0020, 0023.
 
 - [x] `qr_hits`: `id`, `salon_id` (FK cascade), timestamps, index `(salon_id, created_at)`. No `user_id`. `qr_scans` / `qrScans` list unchanged. GraphQL `SalonQrStats` + `salonQrStats(salonId)` via `OwnerAccess`. Percent: `0` if `scanCount` is 0, else `(int) round(100 * visitCount / scanCount)` (PHP default). Not on public `Salon` — verify: migration + schema; no `scanCount` on public `salon(id)`
 - [x] Hit write only in `GET /qr/{existing}` (Laravel, not a React route). Reconcile helper still favorite + `qr_scans` + forget cookie only. No Pest, Playwright, codegen, `vite-plugin-pwa`. `/owner` home stays queue + panel — verify: `QrController` + `ReconcileQrHold`; `App.tsx`; no `pestphp`
-- [x] Slim Compose unchanged. Patch `docs/architecture/04` (`/owner/stats` QR block), `05` (`qr_hits` vs `QrScan`), `06` (sticker GET records a QR scan). Do not rewrite ADR 0019/0020. ADR 0021 already on the branch — verify: those docs on the PR
+- [x] Slim Compose unchanged. Patch `docs/architecture/04` (`/owner/stats` QR block), `05` (`qr_hits` vs `QrScan`), `06` (sticker GET records a QR scan). Do not rewrite ADR 0019/0020. ADR 0023 is this story’s QR-scan-on-GET (master already used 0021/0022 for no-show/trust) — verify: those docs on the PR
 
 ## Verify commands
 
@@ -64,7 +64,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 
 ## Implementer instructions
 
-1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-37.md`, `docs/glossary.md` (**QR scan**, **QR visit**, **QR conversion**, **QR hold**, **QR reconnect**), `docs/adr/0021-qr-scan-on-sticker-get.md` (and 0019, 0020), `DESIGN.md`, `refs/design-2/DESIGN.md`, `docs/mvp/04-UI-Design-Goals.md`, and `docs/architecture/` (03, 04, 05, 06, 08). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. Bosnian-first. Design 2 owner dense. UI ready = machine gates; do not embed screenshots.
+1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-37.md`, `docs/glossary.md` (**QR scan**, **QR visit**, **QR conversion**, **QR hold**, **QR reconnect**), `docs/adr/0023-qr-scan-on-sticker-get.md` (and 0019, 0020), `DESIGN.md`, `refs/design-2/DESIGN.md`, `docs/mvp/04-UI-Design-Goals.md`, and `docs/architecture/` (03, 04, 05, 06, 08). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. Bosnian-first. Design 2 owner dense. UI ready = machine gates; do not embed screenshots.
 2. Branch: keep `cursor/story-37-qr-conversion-stats-c0b8`.
 3. **Hits:** Migration `qr_hits` as in architecture checks. Model `QrHit`. Shared PHP helper records one row for a salon; `QrController` calls it for an existing salon **before** cookie/reconcile. Missing salon: no hit (existing 302 `/`). Do **not** record a hit from `ReconcileQrHold` (login / OTP / email GET). Organic profile stays hitless.
 4. **Backfill:** Same helper (or `QrHit::backfillFromVisits()`) inserts one hit per existing `qr_scans` row. Call once from the migration after `Schema::create`. Behat invokes the helper on fixture rows (truncate already wiped migrate-time data).
@@ -72,7 +72,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 6. **PWA:** Lazy `/owner/stats`. Copy `OwnerChats` auth/verify/not-owner + switcher + `OwnerNav`. Nav item `Statistika` (`active: 'stats'`). `ownerStatsPath` / `ownerChatSearchParams`-style `?salon=` (no `date`). Query `salonQrStats` for the selected salon. Render the three numbers (`0` and `0%` included). i18n: `owner.stats` `Statistika`, `owner.qrScans` `Skeniranja QR`, `owner.qrVisits` `QR posjete`, `owner.qrConversion` `Konverzija` (percent via `{{n}}%`). No visit log. `/owner` home unchanged aside from the nav link.
 7. **Behat:** English Gherkin. Cover every Behat product check (guest GET hits + owner `salonQrStats` + access codes + isolation + percent + backfill). Existing `qr_reconnect` / `qr_scans` stay green. GET must not follow the SPA redirect. No Mink.
 8. **Vitest:** `ownerStatsPath` cases like `ownerChatPath`. Assert the four i18n strings. Keep existing owner tests green.
-9. Patch architecture 04/05/06 as in the architecture checks. Do not edit `docs/mvp/`, glossary, or ADRs 0019–0021 unless a check is wrong (then stop).
+9. Patch architecture 04/05/06 as in the architecture checks. Do not edit `docs/mvp/`, glossary, or ADRs 0019–0020 / 0023 unless a check is wrong (then stop).
 10. Loop: implement → run every verify command from `esyres_app/` → fix. Cap 8. Same failure twice → escalate.
 11. On success: ready PR linking this key; list commands run. Do **not** embed screenshots. Do not draft/block for missing shots.
 12. On escalate: draft/blocked PR with failing checks and the human decision needed.

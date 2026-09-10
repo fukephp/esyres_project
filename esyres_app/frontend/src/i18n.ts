@@ -177,6 +177,12 @@ void i18n.use(initReactI18next).init({
           soon: 'Uskoro',
           assistant: 'Asistent',
           reschedule: 'Premještaj',
+          statsBookings: 'Termini ove sedmice',
+          statsRate: 'Otkazivanja',
+          statsLate: 'Kasna otkazivanja',
+          statsBusy: 'Zauzetost',
+          statsHours: 'Najzauzetiji sati',
+          statsEmpty: 'Nema termina ove sedmice.',
           push: {
             requested: 'Novi zahtjev',
             confirmed: 'Gost je prihvatio',

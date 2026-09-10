@@ -130,6 +130,24 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that booking lasts :minutes minutes
+     */
+    public function thatBookingLastsMinutes(string $minutes): void
+    {
+        $this->booking->duration_minutes = (int) $minutes;
+        $this->booking->save();
+    }
+
+    /**
+     * @Given that booking late cancel is true
+     */
+    public function thatBookingLateCancelIsTrue(): void
+    {
+        $this->booking->late_cancel = true;
+        $this->booking->save();
+    }
+
+    /**
      * @Given the salon cancellation notice hours is :hours
      */
     public function theSalonCancellationNoticeHoursIs(string $hours): void
@@ -215,6 +233,27 @@ trait SharedFixtures
         $this->booking->proposed_starts_at = $this->booking->preferred_starts_at;
         $this->booking->proposed_worker_id = $this->booking->worker_id;
         $this->booking->save();
+    }
+
+    /**
+     * @Given that booking is declined
+     */
+    public function thatBookingIsDeclined(): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @Given that booking is declined with reason :reason
+     */
+    public function thatBookingIsDeclinedWithReason(string $reason): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->decline_reason = $reason;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
     }
 
     /**
@@ -655,6 +694,177 @@ trait SharedFixtures
             'lat' => (float) $lat,
             'lng' => (float) $lng,
         ]);
+    }
+
+    /**
+     * @Given the same owner also owns salon :name
+     */
+    public function theSameOwnerAlsoOwnsSalon(string $name): void
+    {
+        $this->otherSalon = Salon::factory()->create([
+            'owner_id' => $this->salon->owner_id,
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * @When I mark the booking as no-show
+     */
+    public function iMarkTheBookingAsNoShow(): void
+    {
+        $this->graphql($this->markNoShowMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I mark the booking as no-show as a guest
+     */
+    public function iMarkTheBookingAsNoShowAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iMarkTheBookingAsNoShow();
+    }
+
+    /**
+     * @When I mark no-show for booking id :id
+     */
+    public function iMarkNoShowForBookingId(string $id): void
+    {
+        $this->graphql($this->markNoShowMutation(), [
+            'bookingId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then mark no-show status is :status
+     */
+    public function markNoShowStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['markNoShow']['status']);
+    }
+
+    /**
+     * @Then mark no-show noShowAt is set
+     */
+    public function markNoShowNoShowAtIsSet(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNotNull($this->graphql['data']['markNoShow']['noShowAt']);
+        $this->booking->refresh();
+        $this->rememberedNoShowAt = $this->booking->no_show_at?->utc()->toIso8601String();
+        $this->assertSame($this->rememberedNoShowAt, $this->graphql['data']['markNoShow']['noShowAt']);
+    }
+
+    /**
+     * @Then mark no-show noShowAt is unchanged
+     */
+    public function markNoShowNoShowAtIsUnchanged(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($this->rememberedNoShowAt, $this->graphql['data']['markNoShow']['noShowAt']);
+        $this->booking->refresh();
+        $this->assertSame($this->rememberedNoShowAt, $this->booking->no_show_at?->utc()->toIso8601String());
+    }
+
+    /**
+     * @Then this booking customer has cancel_count :cancel late_cancel_count :late no_show_count :noShow
+     */
+    public function thisBookingCustomerHasCounters(string $cancel, string $late, string $noShow): void
+    {
+        $customer = $this->booking->fresh()->customer;
+        $this->assertSame((int) $cancel, (int) $customer->cancel_count);
+        $this->assertSame((int) $late, (int) $customer->late_cancel_count);
+        $this->assertSame((int) $noShow, (int) $customer->no_show_count);
+    }
+
+    /**
+     * @When I remember this booking customer verification timestamps
+     */
+    public function iRememberThisBookingCustomerVerificationTimestamps(): void
+    {
+        $customer = $this->booking->fresh()->customer;
+        $this->rememberedEmailVerifiedAt = $customer->email_verified_at?->utc()->toIso8601String();
+        $this->rememberedPhoneVerifiedAt = $customer->phone_verified_at?->utc()->toIso8601String();
+    }
+
+    /**
+     * @Then this booking customer verification timestamps are unchanged
+     */
+    public function thisBookingCustomerVerificationTimestampsAreUnchanged(): void
+    {
+        $customer = $this->booking->fresh()->customer;
+        $this->assertSame($this->rememberedEmailVerifiedAt, $customer->email_verified_at?->utc()->toIso8601String());
+        $this->assertSame($this->rememberedPhoneVerifiedAt, $customer->phone_verified_at?->utc()->toIso8601String());
+    }
+
+    /**
+     * @When I query salon trust counters
+     */
+    public function iQuerySalonTrustCounters(): void
+    {
+        $this->graphql($this->trustSalonQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon trust counters as a guest
+     */
+    public function iQuerySalonTrustCountersAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iQuerySalonTrustCounters();
+    }
+
+    /**
+     * @When I query salon trust counters for salon :name
+     */
+    public function iQuerySalonTrustCountersForSalon(string $name): void
+    {
+        $salon = Salon::query()->where('name', $name)->firstOrFail();
+        $this->graphql($this->trustSalonQuery(), ['id' => (string) $salon->id]);
+    }
+
+    /**
+     * @Then salon trust counters are cancel :cancel late :late no_show :noShow
+     */
+    public function salonTrustCountersAre(string $cancel, string $late, string $noShow): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['salon'];
+        $this->assertSame((int) $cancel, $row['cancelCount']);
+        $this->assertSame((int) $late, $row['lateCancelCount']);
+        $this->assertSame((int) $noShow, $row['noShowCount']);
+    }
+
+    /**
+     * @When I query me with trust counters
+     */
+    public function iQueryMeWithTrustCounters(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeTrust {
+  me {
+    noShowCount
+    cancelCount
+    lateCancelCount
+  }
+}
+GQL);
+    }
+
+    /**
+     * @Then the GraphQL errors mention :needle
+     */
+    public function theGraphqlErrorsMention(string $needle): void
+    {
+        $payload = json_encode($this->graphql);
+        if (! isset($this->graphql['errors'])) {
+            throw new RuntimeException("Expected GraphQL errors mentioning {$needle}, got {$payload}");
+        }
+        if (! str_contains($payload, $needle)) {
+            throw new RuntimeException("Expected errors to mention {$needle}, got {$payload}");
+        }
     }
 
     /**
@@ -1639,5 +1849,34 @@ GQL;
     private function userNamed(string $name): User
     {
         return User::query()->where('name', $name)->firstOrFail();
+    }
+
+    private function markNoShowMutation(): string
+    {
+        return <<<'GQL'
+mutation MarkNoShow($bookingId: ID!) {
+  markNoShow(bookingId: $bookingId) {
+    id
+    status
+    noShowAt
+    reschedulePending
+    rescheduleDate
+  }
+}
+GQL;
+    }
+
+    private function trustSalonQuery(): string
+    {
+        return <<<'GQL'
+query TrustSalon($id: ID!) {
+  salon(id: $id) {
+    id
+    noShowCount
+    cancelCount
+    lateCancelCount
+  }
+}
+GQL;
     }
 }

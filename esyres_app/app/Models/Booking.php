@@ -36,6 +36,7 @@ class Booking extends Model
             'reschedule_starts_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'late_cancel' => 'boolean',
+            'no_show_at' => 'datetime',
             'reminder_day_sent_at' => 'datetime',
             'reminder_hour_sent_at' => 'datetime',
         ];

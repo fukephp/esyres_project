@@ -284,6 +284,10 @@ export function ownerStatsPath(salonId: string | null = null, firstOwnedId: stri
   return query === '' ? '/owner/stats' : `/owner/stats?${query}`
 }
 
+export function statsHourLabel(hour: number): string {
+  return `${String(hour).padStart(2, '0')}:00`
+}
+
 export function assistantOriginVisible(intake: { id: string } | null | undefined): boolean {
   return intake != null
 }

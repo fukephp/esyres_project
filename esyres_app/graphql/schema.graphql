@@ -112,6 +112,7 @@ type Booking {
     lateToCancel: Boolean! @method(name: "lateToCancel")
     cancelledAt: String @method(name: "cancelledAtIso")
     lateCancel: Boolean! @method(name: "lateCancel")
+    noShowAt: String @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@noShowAt")
 }
 
 input CreateBookingInput {
@@ -177,10 +178,35 @@ type Salon {
     cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
     dnd: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@dnd")
     takeoverAllowed: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@takeoverAllowed")
+    noShowCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@noShowCount")
+    cancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancelCount")
+    lateCancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@lateCancelCount")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
     workers: [Worker!]! @method(name: "workerList")
     busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
+}
+
+type SalonStatsDay {
+    date: String!
+    weekday: Weekday!
+    bookingsCount: Int!
+    busyPercent: Int!
+}
+
+type SalonStatsHour {
+    hour: Int!
+    bookingsCount: Int!
+}
+
+type SalonStats {
+    fromDate: String!
+    toDate: String!
+    bookingsCount: Int!
+    cancellationRatePercent: Int!
+    lateCancels: Int!
+    days: [SalonStatsDay!]!
+    hours: [SalonStatsHour!]!
 }
 
 type Query {
@@ -196,6 +222,7 @@ type Query {
     assistantIntake(token: String!): AssistantIntake
     inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
     inFlightIntakeCount(salonId: ID!): Int!
+    salonStats(salonId: ID!): SalonStats! @field(resolver: "App\\GraphQL\\Queries\\SalonStats")
     qrScans(salonId: ID!, limit: Int = 20, offset: Int = 0): [QrScan!]!
     salonQrStats(salonId: ID!): SalonQrStats!
 }
@@ -229,6 +256,7 @@ type Mutation {
     acceptReschedule(bookingId: ID!): Booking!
     dismissReschedule(bookingId: ID!): Booking!
     cancelBooking(bookingId: ID!): Booking!
+    markNoShow(bookingId: ID!): Booking!
 }
 
 type Subscription {

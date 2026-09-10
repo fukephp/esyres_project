@@ -28,4 +28,25 @@ final class SalonOwnerField
 
         return $salon->takeoverAllowed();
     }
+
+    public function noShowCount(Salon $salon, array $args, GraphQLContext $context): int
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return (int) ($salon->fresh()?->no_show_count ?? 0);
+    }
+
+    public function cancelCount(Salon $salon, array $args, GraphQLContext $context): int
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return (int) ($salon->fresh()?->cancel_count ?? 0);
+    }
+
+    public function lateCancelCount(Salon $salon, array $args, GraphQLContext $context): int
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return (int) ($salon->fresh()?->late_cancel_count ?? 0);
+    }
 }

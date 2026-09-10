@@ -21,14 +21,14 @@ Owner of the selected salon sees all-time QR scan count, QR visit count, and con
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03, 05, 06, 07), `docs/architecture/` (03, 04, 05, 06, 08 #10 #22 #25), `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, `docs/adr/0021-qr-scan-on-sticker-get.md`, `docs/stories/STORY-37.md` plus STORY-34 / 36 / 04, `docs/glossary.md` (**QR hold**, **QR reconnect**, **QR visit**, **QR scan**, **QR conversion**, **Favorite**)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03, 05, 06, 07), `docs/architecture/` (03, 04, 05, 06, 08 #10 #22 #25), `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, `docs/adr/0023-qr-scan-on-sticker-get.md`, `docs/stories/STORY-37.md` plus STORY-34 / 36 / 04, `docs/glossary.md` (**QR hold**, **QR reconnect**, **QR visit**, **QR scan**, **QR conversion**, **Favorite**)
 - Skills: grill-with-docs (app code exists); custom-feature-skills; playbook plan-gate until this map compiles
 - Code today (`esyres_app/`): STORY-34 shipped. `GET /qr/{salonId}` sets `esyres_qr` (or reconciles immediately if both timestamps) and 302s to `/salon/{id}`. Organic `/salon/:id` does not set the cookie. `qr_scans` is append-only `(user_id, salon_id)` **at reconnect only** — one row per successful QR visit, not an anonymous hit. `qrScans(salonId, limit, offset)` is owner `OwnerAccess` + `ListPage` (default 20, max 50), newest first. No totals. No `/owner/stats`. `OwnerNav` is queue + chats. `/owner` home is queue + panel. SPA has no QR/stats chrome. STORY-34 key/map explicitly left **anonymous scan-hit counter** and **conversion stats UI** to this story.
 - Story AC: scan count + converted-visit count (reconcile at verification) for the selected salon; use STORY-34 capture; no badge display.
 - Round 1 (2026-09-10): persist anonymous sticker hits; `/owner/stats` QR block; all-time counts + percent.
-- Round 2 (2026-09-10): every successful sticker GET appends a scan; `salonQrStats`; Bosnian zeros; counts+percent only. ADR 0021.
+- Round 2 (2026-09-10): every successful sticker GET appends a scan; `salonQrStats`; Bosnian zeros; counts+percent only. ADR 0023.
 - Round 3 (2026-09-10): backfill one `qr_hits` row per existing `qr_scans` row.
-- Epic 9 / `docs/mvp/03`: QR stats live on the owner **Basic Stats** screen. STORY-36 out-of-scopes QR conversion and is unbuilt.
+- Epic 9 / `docs/mvp/03`: QR stats live on the owner **Basic Stats** screen. STORY-36 shipped booking stats on `/owner/stats`; this story adds the QR block.
 - Standing preferences:
   - One story → one PR; do not reopen STORY-34 cookie / favorite / visited meaning
   - Do not count organic `/salon/:id` or IG-bio hits as scans (ADR 0019)
