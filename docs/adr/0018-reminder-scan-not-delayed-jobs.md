@@ -1,0 +1,3 @@
+# Reminder emails are a scheduled scan, not delayed jobs on confirm
+
+A confirmed booking must email the customer the day before and an hour before the appointment. The obvious Laravel path is `delay()` on two jobs at confirm. Slim Compose has no worker, and Behat uses `QUEUE_CONNECTION=sync`, which ignores delay — those jobs would send at confirm. Reminders therefore run from a scheduled artisan command that scans `confirmed` rows and stamps `reminder_day_sent_at` / `reminder_hour_sent_at` so a second run does not double-send. The command is invoked directly in Behat (time frozen). Do not add a worker, mailpit, or scheduler container for this.

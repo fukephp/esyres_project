@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\PushSubscription;
+use App\Notifications\BookingReminder;
 use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\SalonHours\WeeklyHours;
@@ -16,6 +17,8 @@ use App\Sms\FakeSmsGateway;
 use App\Sms\SmsGateway;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Notification;
 
 trait SharedFixtures
 {
@@ -1084,5 +1087,170 @@ mutation PingIntake($salonId: ID!, $token: String) {
   }
 }
 GQL;
+    }
+
+    /**
+     * @When I send booking reminders
+     */
+    public function iSendBookingReminders(): void
+    {
+        Artisan::call('bookings:send-reminders');
+    }
+
+    /**
+     * @When the current time is :datetime in Sarajevo
+     */
+    public function theCurrentTimeIsInSarajevo(string $datetime): void
+    {
+        $now = Carbon::createFromFormat('Y-m-d H:i', $datetime, 'Europe/Sarajevo');
+        if ($now === false) {
+            throw new RuntimeException('Bad Sarajevo time '.$datetime);
+        }
+        Carbon::setTestNow($now);
+    }
+
+    /**
+     * @Given the booking customer email is unverified
+     */
+    public function theBookingCustomerEmailIsUnverified(): void
+    {
+        $customer = $this->booking->customer;
+        $customer->email_verified_at = null;
+        $customer->save();
+    }
+
+    /**
+     * @When I remember the booking reminder stamps
+     */
+    public function iRememberTheBookingReminderStamps(): void
+    {
+        $this->booking->refresh();
+        $this->rememberedDayStamp = $this->booking->reminder_day_sent_at?->utc()->toIso8601String();
+        $this->rememberedHourStamp = $this->booking->reminder_hour_sent_at?->utc()->toIso8601String();
+    }
+
+    /**
+     * @Then the booking reminder stamps are unchanged
+     */
+    public function theBookingReminderStampsAreUnchanged(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($this->rememberedDayStamp, $this->booking->reminder_day_sent_at?->utc()->toIso8601String());
+        $this->assertSame($this->rememberedHourStamp, $this->booking->reminder_hour_sent_at?->utc()->toIso8601String());
+    }
+
+    /**
+     * @Then the booking day reminder stamp is set
+     */
+    public function theBookingDayReminderStampIsSet(): void
+    {
+        $this->booking->refresh();
+        $this->assertNotNull($this->booking->reminder_day_sent_at);
+    }
+
+    /**
+     * @Then the booking hour reminder stamp is set
+     */
+    public function theBookingHourReminderStampIsSet(): void
+    {
+        $this->booking->refresh();
+        $this->assertNotNull($this->booking->reminder_hour_sent_at);
+    }
+
+    /**
+     * @Then the booking reminder stamps are empty
+     */
+    public function theBookingReminderStampsAreEmpty(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame(null, $this->booking->reminder_day_sent_at);
+        $this->assertSame(null, $this->booking->reminder_hour_sent_at);
+    }
+
+    /**
+     * @Then :count day reminder was sent to the booking customer
+     * @Then :count day reminders were sent to the booking customer
+     */
+    public function dayRemindersWereSentToTheBookingCustomer(string $count): void
+    {
+        $this->assertSame((int) $count, $this->bookingReminderCount('day'));
+    }
+
+    /**
+     * @Then :count hour reminder was sent to the booking customer
+     * @Then :count hour reminders were sent to the booking customer
+     */
+    public function hourRemindersWereSentToTheBookingCustomer(string $count): void
+    {
+        $this->assertSame((int) $count, $this->bookingReminderCount('hour'));
+    }
+
+    /**
+     * @Then no booking reminder was sent
+     */
+    public function noBookingReminderWasSent(): void
+    {
+        Notification::assertNotSentTo($this->booking->fresh()->customer, BookingReminder::class);
+    }
+
+    /**
+     * @Then no booking reminder was sent to customer :name
+     */
+    public function noBookingReminderWasSentToCustomer(string $name): void
+    {
+        Notification::assertNotSentTo($this->userNamed($name), BookingReminder::class);
+    }
+
+    /**
+     * @Then a day reminder was sent to customer :name
+     */
+    public function aDayReminderWasSentToCustomer(string $name): void
+    {
+        $this->assertSame(1, $this->bookingReminderCount('day', $this->userNamed($name)));
+    }
+
+    /**
+     * @Then the last :kind reminder subject is :subject
+     */
+    public function theLastReminderSubjectIs(string $kind, string $subject): void
+    {
+        $mail = $this->lastReminderMail($kind);
+        $this->assertSame($subject, $mail->subject);
+    }
+
+    /**
+     * @Then the last :kind reminder line is :line
+     */
+    public function theLastReminderLineIs(string $kind, string $line): void
+    {
+        $mail = $this->lastReminderMail($kind);
+        $this->assertSame([$line], $mail->introLines);
+    }
+
+    private function lastReminderMail(string $kind): \Illuminate\Notifications\Messages\MailMessage
+    {
+        $customer = $this->booking->fresh()->customer;
+        $notification = Notification::sent($customer, BookingReminder::class)
+            ->filter(static fn (BookingReminder $n): bool => $n->kind === $kind)
+            ->last();
+        if (! $notification instanceof BookingReminder) {
+            throw new RuntimeException('No '.$kind.' reminder for the booking customer');
+        }
+
+        return $notification->toMail($customer);
+    }
+
+    private function bookingReminderCount(string $kind, ?User $customer = null): int
+    {
+        $user = $customer ?? $this->booking->fresh()->customer;
+
+        return Notification::sent($user, BookingReminder::class)
+            ->filter(static fn (BookingReminder $n): bool => $n->kind === $kind)
+            ->count();
+    }
+
+    private function userNamed(string $name): User
+    {
+        return User::query()->where('name', $name)->firstOrFail();
     }
 }

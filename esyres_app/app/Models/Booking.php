@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at', 'cancelled_at', 'late_cancel'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at', 'cancelled_at', 'late_cancel', 'reminder_day_sent_at', 'reminder_hour_sent_at'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
@@ -36,6 +36,8 @@ class Booking extends Model
             'reschedule_starts_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'late_cancel' => 'boolean',
+            'reminder_day_sent_at' => 'datetime',
+            'reminder_hour_sent_at' => 'datetime',
         ];
     }
 

@@ -34,6 +34,6 @@ Laravel Reverb + Lighthouse subscriptions on the owner panel (`bookingCustomerRe
 
 - Web push (VAPID) for owner (open or closed tab) and customer time-critical status changes (owner propose / accept preferred / decline)
 - SMS fallback when that customer push misses (no subscription or every send fails; e.g. iOS without PWA). Requires `phone` + `phone_verified_at`. See `docs/adr/0017-customer-sms-fallback-on-push-miss.md`.
-- Email for day-before / hour-before reminders
+- Email for day-before / hour-before reminders (scheduled scan + sent-at stamps; not delayed jobs on confirm — `docs/adr/0018-reminder-scan-not-delayed-jobs.md`)
 
 Push payload includes `salonId`.
