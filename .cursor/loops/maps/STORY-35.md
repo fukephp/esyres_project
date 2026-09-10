@@ -21,7 +21,7 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05, 08 #5 #6 #39 #40), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **No-show**, **Owner response time**, **Verified phone**)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05, 08 #5 #6 #39 #40), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/adr/0021-owner-marks-no-show-after-start.md`, `docs/adr/0022-trust-counters-increment-on-event.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **No-show**, **Owner response time**, **Verified phone**)
 - Skills: grill-with-docs (app code exists); custom-feature-skills
 - Code today (`esyres_app/`):
   - `bookings.owner_responded_at` stamps once on first successful `acceptPreferredTime` / `proposeTime` / `declineBooking` (ADR 0007). Failed overlap / not-requested does not write it. GraphQL Booking type does **not** expose it (Behat reads the column).

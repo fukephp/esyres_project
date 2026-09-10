@@ -11,7 +11,7 @@ Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optiona
 - MVP captures trust data (response time, no-show, QR visit, verification). Owner marks no-show after start (stay `confirmed`). Cancel and no-show increment salon + customer counters. Badge **display** is Phase 2.
 - Not MVP: native apps, in-app payments, worker logins, reviews, Viber/WhatsApp/Instagram DM messaging, LLM NLU, chain multi-location, receptionist roles.
 
-Bosnian-first UI. Prices in KM (integer feninga in the data model). Preserve QR / Instagram-bio → browse → request.
+Bosnian-first UI. Prices in KM (integer feninga in the data model). QR sticker is `/qr/{id}` then the salon profile (hold cookie); Instagram-bio and organic `/salon/:id` do not set the hold. Preserve that browse → request path.
 
 ## Architecture (locked)
 

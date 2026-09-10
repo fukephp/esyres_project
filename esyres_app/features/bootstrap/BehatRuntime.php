@@ -6,6 +6,7 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Qr\QrHold;
 use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\Sms\FakeSmsGateway;
@@ -62,6 +63,9 @@ trait BehatRuntime
 
     protected ?string $lastLocation = null;
 
+    /** @var list<\Symfony\Component\HttpFoundation\Cookie> */
+    protected array $lastSetCookies = [];
+
     protected ?string $ownerRespondedAt = null;
 
     protected ?int $occupancyPercent = null;
@@ -81,6 +85,7 @@ trait BehatRuntime
     {
         $this->defaultHeaders = [];
         $this->defaultCookies = [];
+        $this->unencryptedCookies = [];
         $this->graphql = [];
         $this->user = null;
         $this->salon = null;
@@ -97,6 +102,7 @@ trait BehatRuntime
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;
+        $this->lastSetCookies = [];
         $this->ownerRespondedAt = null;
         $this->occupancyPercent = null;
         $this->rememberedDayStamp = null;
@@ -128,6 +134,7 @@ trait BehatRuntime
         }
         $this->app = BehatKernel::$app;
         $this->app['env'] = 'testing';
+        $this->app['cookie']->flushQueuedCookies();
         $this->truncateData();
         Cache::flush();
         Carbon::setTestNow(Carbon::parse('2026-08-29 09:00:00', 'Europe/Sarajevo'));
@@ -209,8 +216,21 @@ trait BehatRuntime
 
     protected function rememberCookies(\Illuminate\Testing\TestResponse $response): void
     {
-        foreach ($response->headers->getCookies() as $cookie) {
-            $this->withCookie($cookie->getName(), $cookie->getValue());
+        $this->lastSetCookies = $response->headers->getCookies();
+        foreach ($this->lastSetCookies as $cookie) {
+            $name = $cookie->getName();
+            $value = $cookie->getValue();
+            $expired = $cookie->getExpiresTime() !== 0 && $cookie->getExpiresTime() < time();
+            if (! is_string($value) || $value === '' || $value === 'deleted' || $expired) {
+                unset($this->defaultCookies[$name], $this->unencryptedCookies[$name]);
+                continue;
+            }
+            if ($name === QrHold::COOKIE) {
+                unset($this->defaultCookies[$name]);
+                $this->withUnencryptedCookie($name, $value);
+                continue;
+            }
+            $this->withCookie($name, $value);
         }
     }
 

@@ -37,7 +37,7 @@ Behat now starts at `2026-08-29 09:00` Europe/Sarajevo. User counters are assert
 
 ## Pass/fail — architecture
 
-Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #5 #6 #38 #39 #40, `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`.
+Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #5 #6 #38 #39 #40, `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0021-owner-marks-no-show-after-start.md`, `docs/adr/0022-trust-counters-increment-on-event.md`.
 
 - [x] Columns: `users` and `salons` `cancel_count` / `late_cancel_count` / `no_show_count` unsigned int default 0; `bookings.no_show_at` nullable datetime. No sixth booking status. `WorkerOverlap::OCCUPYING` still `confirmed` + `time_proposed`. Occupying/busy-level status sets unchanged — verify: migration + `WorkerOverlap`; Occupancy unchanged
 - [x] GraphQL: `markNoShow(bookingId: ID!): Booking!`; `Booking.noShowAt: String` (ISO or null) owner-only resolver (same gate idea as `SalonOwnerField`: session + verified email + owns the booking’s salon); `Salon.noShowCount` / `cancelCount` / `lateCancelCount` via `SalonOwnerField`. Do not add those three to `User`. Do not expose `ownerRespondedAt`. Do not add a no-show subscription — verify: schema
@@ -76,7 +76,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 
 ## Implementer instructions
 
-1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-35.md`, `docs/glossary.md` (**No-show**, **Late cancel**, **Cancelled booking**, **Owner response time**), `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`, and `docs/architecture/` (03, 04, 05, 06, 08 #39 #40). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No PWA UI this story.
+1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-35.md`, `docs/glossary.md` (**No-show**, **Late cancel**, **Cancelled booking**, **Owner response time**), `docs/adr/0021-owner-marks-no-show-after-start.md`, `docs/adr/0022-trust-counters-increment-on-event.md`, and `docs/architecture/` (03, 04, 05, 06, 08 #39 #40). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No PWA UI this story.
 2. Stay on branch `cursor/story-35-trust-data-capture-1169`.
 3. **Schema:** unsigned integer `cancel_count` / `late_cancel_count` / `no_show_count` default 0 on `users` and `salons`. Nullable datetime `no_show_at` on `bookings`. Cast. Do not put counters on model `Fillable`. Do not add a `no_show` status.
 4. **GraphQL:** `markNoShow(bookingId: ID!): Booking!`. `Booking.noShowAt` ISO or null; resolver throws `UNAUTHENTICATED` / `EMAIL_UNVERIFIED` / `FORBIDDEN` unless the session owns the salon (customer `myBookings` must not select this field). Salon counters on `SalonOwnerField` like `cancellationNoticeHours`. `User` type unchanged.

@@ -173,6 +173,14 @@ trait GuestSteps
     }
 
     /**
+     * @When I send a verification email
+     */
+    public function iSendAVerificationEmail(): void
+    {
+        $this->customer()->sendEmailVerificationNotification();
+    }
+
+    /**
      * @Then I remember the verify-email URL
      */
     public function iRememberTheVerifyEmailUrl(): void
@@ -1791,6 +1799,7 @@ query Me {
     emailVerified
     phone
     phoneVerified
+    favoriteSalonIds
   }
 }
 GQL;

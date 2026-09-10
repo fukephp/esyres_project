@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -63,6 +64,36 @@ class User extends Authenticatable implements MustVerifyEmail
     public function pushSubscriptions(): HasMany
     {
         return $this->hasMany(PushSubscription::class);
+    }
+
+    /**
+     * @return BelongsToMany<Salon, $this>
+     */
+    public function favoriteSalons(): BelongsToMany
+    {
+        return $this->belongsToMany(Salon::class, 'favorites')->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<QrScan, $this>
+     */
+    public function qrScans(): HasMany
+    {
+        return $this->hasMany(QrScan::class);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function favoriteSalonIdList(): array
+    {
+        return Favorite::query()
+            ->where('user_id', $this->id)
+            ->orderBy('salon_id')
+            ->pluck('salon_id')
+            ->map(fn (mixed $id): string => (string) $id)
+            ->values()
+            ->all();
     }
 
     /**
