@@ -21,7 +21,8 @@ Sketch only — no migrations. Status machine: `requested → confirmed` (owner 
 - **AssistantIntake** — salon-scoped scripted-chat snapshot that is not a request yet (`token` UUID for the guest, bigint PK internally). In-flight while `booking_id` is null and `updated_at` is within 24h. Optional `taken_over_at` pauses guest upsert/chat-send while the salon is open and DND is off (`takenOver` is that pause **in effect**, not the raw flag). Optional `pinged_at` marks a guest ping (`pinged` is true when that timestamp is set; not gated by hours or DND). Converted when chat `createBooking` attaches `booking_id`. Not a message log; Request Detail transcript is the labeled snapshot (services, worker, day, time).
 - **BookingService** — services on a booking; durations/prices snapshot at request time.
 - **Favorite** — unique customer+salon bookmark (`favorites`: `user_id`, `salon_id`). QR reconnect `firstOrCreate`s one. Not a QR visit. No `visited_at` column.
-- **QrScan** — one row per successful reconnect (`user_id`, `salon_id`, timestamps). Guest hold is a cookie until reconcile. A QR visit is the existence of a row for that pair, not a separate column.
+- **QrScan** — one row per successful reconnect (`user_id`, `salon_id`, timestamps). A QR visit is the existence of a row for that pair, not a separate column.
+- **QrHit** — one row per successful sticker `GET /qr/{existing salon}` (`salon_id`, timestamps, no `user_id`). Guest hold is a cookie until reconcile. Organic `/salon/:id` does not write a hit. Reconcile does not write a hit. Migration backfills one hit per existing `qr_scans` row.
 - **PushSubscription** — VAPID endpoint + keys per user.
 - Trust: `owner_responded_at` on the booking; `no_show_at` on the booking; cancel/late/no-show integer counters on user and salon; `email_verified_at` / `phone_verified_at` stay the verification record. QR visit is a `qr_scans` row. Badge **display** is still Phase 2.
 

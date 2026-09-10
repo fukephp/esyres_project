@@ -22,6 +22,16 @@ export const SALON_STATS_QUERY = gql`
   }
 `
 
+export const SALON_QR_STATS_QUERY = gql`
+  query SalonQrStats($salonId: ID!) {
+    salonQrStats(salonId: $salonId) {
+      scanCount
+      visitCount
+      conversionPercent
+    }
+  }
+`
+
 export type SalonStatsDay = {
   date: string
   weekday: string
@@ -46,4 +56,14 @@ export type SalonStats = {
 
 export type SalonStatsData = {
   salonStats: SalonStats
+}
+
+export type SalonQrStats = {
+  scanCount: number
+  visitCount: number
+  conversionPercent: number
+}
+
+export type SalonQrStatsData = {
+  salonQrStats: SalonQrStats
 }

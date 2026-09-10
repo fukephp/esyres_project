@@ -6,7 +6,12 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
-import { SALON_STATS_QUERY, type SalonStatsData } from '../graphql/stats'
+import {
+  SALON_QR_STATS_QUERY,
+  SALON_STATS_QUERY,
+  type SalonQrStatsData,
+  type SalonStatsData,
+} from '../graphql/stats'
 import { chatBadgeCount } from '../lib/intake'
 import { ownerChatSearchParams, ownerSalonFromSearch, statsHourLabel } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
@@ -30,9 +35,18 @@ export function OwnerStats() {
     skip: !ownerReady,
     fetchPolicy: 'network-only',
   })
+  const { data: qrData, loading: qrLoading } = useQuery<SalonQrStatsData>(SALON_QR_STATS_QUERY, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+    fetchPolicy: 'network-only',
+  })
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? ''
   const stats = statsData?.salonStats ?? null
+  const qr = qrData?.salonQrStats
+  const scans = qr?.scanCount ?? 0
+  const visits = qr?.visitCount ?? 0
+  const percent = qr?.conversionPercent ?? 0
 
   function onSalon(id: string) {
     setParams(ownerChatSearchParams(id, firstOwnedId))
@@ -101,48 +115,66 @@ export function OwnerStats() {
             tone="light"
           />
         </div>
-        {statsLoading || stats === null ? (
+        {(statsLoading && stats === null) || (qrLoading && qr === undefined) ? (
           <p className="mt-8 text-sm text-body">{t('salon.loading')}</p>
         ) : (
           <div className="mt-8 max-w-xl">
-            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {stats === null ? null : (
+              <>
+                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div>
+                    <dt className="text-sm text-body">{t('owner.statsBookings')}</dt>
+                    <dd className="mt-1 text-lg font-semibold text-ink">{stats.bookingsCount}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-body">{t('owner.statsRate')}</dt>
+                    <dd className="mt-1 text-lg font-semibold text-ink">{stats.cancellationRatePercent}%</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-body">{t('owner.statsLate')}</dt>
+                    <dd className="mt-1 text-lg font-semibold text-ink">{stats.lateCancels}</dd>
+                  </div>
+                </dl>
+                {stats.bookingsCount === 0 ? (
+                  <p className="mt-6 text-sm text-body">{t('owner.statsEmpty')}</p>
+                ) : null}
+                <ul className="mt-8 space-y-2">
+                  {stats.days.map((day) => (
+                    <li key={day.date} className="flex items-baseline justify-between gap-3 border-b border-hairline py-2 text-sm">
+                      <span className="font-medium text-ink">{t(`weekday.${day.weekday}`)}</span>
+                      <span className="text-body">
+                        {day.bookingsCount} · {t('owner.statsBusy')} {day.busyPercent}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <h2 className="mt-8 text-sm font-semibold text-ink">{t('owner.statsHours')}</h2>
+                {stats.hours.length === 0 ? null : (
+                  <ul className="mt-2 space-y-2">
+                    {stats.hours.map((row) => (
+                      <li key={row.hour} className="flex items-baseline justify-between gap-3 text-sm">
+                        <span className="text-ink">{statsHourLabel(row.hour)}</span>
+                        <span className="text-body">{row.bookingsCount}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+            <dl className="mt-8 max-w-md space-y-4">
               <div>
-                <dt className="text-sm text-body">{t('owner.statsBookings')}</dt>
-                <dd className="mt-1 text-lg font-semibold text-ink">{stats.bookingsCount}</dd>
+                <dt className="text-sm text-body">{t('owner.qrScans')}</dt>
+                <dd className="font-display text-[28px] font-semibold tracking-tight text-ink">{scans}</dd>
               </div>
               <div>
-                <dt className="text-sm text-body">{t('owner.statsRate')}</dt>
-                <dd className="mt-1 text-lg font-semibold text-ink">{stats.cancellationRatePercent}%</dd>
+                <dt className="text-sm text-body">{t('owner.qrVisits')}</dt>
+                <dd className="font-display text-[28px] font-semibold tracking-tight text-ink">{visits}</dd>
               </div>
               <div>
-                <dt className="text-sm text-body">{t('owner.statsLate')}</dt>
-                <dd className="mt-1 text-lg font-semibold text-ink">{stats.lateCancels}</dd>
+                <dt className="text-sm text-body">{t('owner.qrConversion')}</dt>
+                <dd className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.qrPercent', { n: percent })}</dd>
               </div>
             </dl>
-            {stats.bookingsCount === 0 ? (
-              <p className="mt-6 text-sm text-body">{t('owner.statsEmpty')}</p>
-            ) : null}
-            <ul className="mt-8 space-y-2">
-              {stats.days.map((day) => (
-                <li key={day.date} className="flex items-baseline justify-between gap-3 border-b border-hairline py-2 text-sm">
-                  <span className="font-medium text-ink">{t(`weekday.${day.weekday}`)}</span>
-                  <span className="text-body">
-                    {day.bookingsCount} · {t('owner.statsBusy')} {day.busyPercent}%
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <h2 className="mt-8 text-sm font-semibold text-ink">{t('owner.statsHours')}</h2>
-            {stats.hours.length === 0 ? null : (
-              <ul className="mt-2 space-y-2">
-                {stats.hours.map((row) => (
-                  <li key={row.hour} className="flex items-baseline justify-between gap-3 text-sm">
-                    <span className="text-ink">{statsHourLabel(row.hour)}</span>
-                    <span className="text-body">{row.bookingsCount}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         )}
       </main>

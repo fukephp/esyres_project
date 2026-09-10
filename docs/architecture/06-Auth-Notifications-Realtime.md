@@ -24,7 +24,7 @@ Same origin. Sanctum cookie, httpOnly, SameSite=Lax, CSRF on mutations. Apollo s
 
 ## QR hold
 
-Physical scan is `GET /qr/{salonId}` (sets the cookie, 302 to `/salon/{id}`). Organic `/salon/:id` does not set the cookie. Missing salon: 302 `/`, no cookie. Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. Reconcile when a session user has both `email_verified_at` and `phone_verified_at` (real columns, not `hasVerified*`) and the cookie is present: `firstOrCreate` favorite + append `qr_scans` row; then clear cookie. Hooks: that QR GET, `verifyPhoneOtp`, sessioned email-verify GET, and `login`. Last scan wins. Stale/invalid cookie: clear, write nothing. See `docs/adr/0019-qr-sticker-is-not-salon-profile.md` and `docs/adr/0020-qr-reconnect-requires-timestamps.md`.
+Physical scan is `GET /qr/{salonId}` (records a QR scan on `qr_hits`, sets the cookie, 302 to `/salon/{id}`). Organic `/salon/:id` does not set the cookie or record a scan. Missing salon: 302 `/`, no cookie, no hit. Guest cookie `esyres_qr` (~7 days, httpOnly, SameSite=Lax) stores last scanned `salonId`. Reconcile when a session user has both `email_verified_at` and `phone_verified_at` (real columns, not `hasVerified*`) and the cookie is present: `firstOrCreate` favorite + append `qr_scans` row; then clear cookie. Reconcile does not append a QR scan hit. Hooks: that QR GET, `verifyPhoneOtp`, sessioned email-verify GET, and `login`. Last scan wins. Stale/invalid cookie: clear, write nothing. See `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, and `docs/adr/0023-qr-scan-on-sticker-get.md`.
 
 ## Realtime
 

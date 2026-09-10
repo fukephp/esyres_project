@@ -165,6 +165,12 @@ type QrScan {
     createdAt: String! @method(name: "createdAtIso")
 }
 
+type SalonQrStats {
+    scanCount: Int!
+    visitCount: Int!
+    conversionPercent: Int!
+}
+
 type Salon {
     id: ID!
     name: String!
@@ -218,6 +224,7 @@ type Query {
     inFlightIntakeCount(salonId: ID!): Int!
     salonStats(salonId: ID!): SalonStats! @field(resolver: "App\\GraphQL\\Queries\\SalonStats")
     qrScans(salonId: ID!, limit: Int = 20, offset: Int = 0): [QrScan!]!
+    salonQrStats(salonId: ID!): SalonQrStats!
 }
 
 type Mutation {

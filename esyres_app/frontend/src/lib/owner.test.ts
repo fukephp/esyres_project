@@ -197,6 +197,14 @@ test('owner stats path is not home and omits first-owned salon', () => {
   expect(ownerStatsPath('2', '1')).toBe('/owner/stats?salon=2')
 })
 
+test('owner stats copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.stats')).toBe('Statistika')
+  expect(i18n.t('owner.qrScans')).toBe('Skeniranja QR')
+  expect(i18n.t('owner.qrVisits')).toBe('QR posjete')
+  expect(i18n.t('owner.qrConversion')).toBe('Konverzija')
+})
+
 test('stats hour label is HH:00', () => {
   expect(statsHourLabel(0)).toBe('00:00')
   expect(statsHourLabel(9)).toBe('09:00')

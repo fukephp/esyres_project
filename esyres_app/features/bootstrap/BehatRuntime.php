@@ -47,6 +47,8 @@ trait BehatRuntime
 
     protected ?Salon $otherSalon = null;
 
+    protected ?Salon $rememberedSalon = null;
+
     protected ?Worker $otherWorker = null;
 
     protected ?Booking $booking = null;
@@ -94,6 +96,7 @@ trait BehatRuntime
         $this->services = [];
         $this->otherUser = null;
         $this->otherSalon = null;
+        $this->rememberedSalon = null;
         $this->otherWorker = null;
         $this->booking = null;
         $this->firstCustomerBooking = null;

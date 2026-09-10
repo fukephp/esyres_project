@@ -9,8 +9,9 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\Favorite;
-use App\Models\PushSubscription;
+use App\Models\QrHit;
 use App\Models\QrScan;
+use App\Models\PushSubscription;
 use App\Notifications\BookingReminder;
 use App\Qr\QrHold;
 use App\Push\FakePushGateway;
@@ -1502,6 +1503,122 @@ GQL;
         );
     }
 
+    /**
+     * @Given I remember this salon
+     */
+    public function iRememberThisSalon(): void
+    {
+        $this->rememberedSalon = $this->salon;
+    }
+
+    /**
+     * @When I visit the QR for the remembered salon
+     */
+    public function iVisitTheQrForTheRememberedSalon(): void
+    {
+        if ($this->rememberedSalon === null) {
+            throw new RuntimeException('No remembered salon');
+        }
+        $this->getQr('/qr/'.$this->rememberedSalon->id);
+    }
+
+    /**
+     * @When I query salon QR stats
+     */
+    public function iQuerySalonQrStats(): void
+    {
+        $this->graphql($this->salonQrStatsQuery(), ['salonId' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query salon QR stats as a guest
+     */
+    public function iQuerySalonQrStatsAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonQrStatsQuery(), ['salonId' => '1']);
+    }
+
+    /**
+     * @When I query salon QR stats for salon :id
+     */
+    public function iQuerySalonQrStatsForSalon(string $id): void
+    {
+        $this->graphql($this->salonQrStatsQuery(), ['salonId' => $id]);
+    }
+
+    /**
+     * @When I query salon QR stats for the remembered salon
+     */
+    public function iQuerySalonQrStatsForTheRememberedSalon(): void
+    {
+        if ($this->rememberedSalon === null) {
+            throw new RuntimeException('No remembered salon');
+        }
+        $this->graphql($this->salonQrStatsQuery(), ['salonId' => (string) $this->rememberedSalon->id]);
+    }
+
+    /**
+     * @Then salon QR stats are :scans scans :visits visits :percent percent
+     */
+    public function salonQrStatsAre(string $scans, string $visits, string $percent): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['salonQrStats'];
+        $this->assertSame((int) $scans, $row['scanCount']);
+        $this->assertSame((int) $visits, $row['visitCount']);
+        $this->assertSame((int) $percent, $row['conversionPercent']);
+    }
+
+    /**
+     * @Then there are :count QR hit rows
+     */
+    public function thereAreQrHitRows(string $count): void
+    {
+        $this->assertSame((int) $count, QrHit::query()->count());
+    }
+
+    /**
+     * @Then the salon has :count QR hit rows
+     */
+    public function theSalonHasQrHitRows(string $count): void
+    {
+        $this->assertSame((int) $count, QrHit::query()->where('salon_id', $this->salon->id)->count());
+    }
+
+    /**
+     * @Then the remembered salon has :count QR hit rows
+     */
+    public function theRememberedSalonHasQrHitRows(string $count): void
+    {
+        if ($this->rememberedSalon === null) {
+            throw new RuntimeException('No remembered salon');
+        }
+        $this->assertSame((int) $count, QrHit::query()->where('salon_id', $this->rememberedSalon->id)->count());
+    }
+
+    /**
+     * @Given the customer has :count QR visits at the salon without hits
+     */
+    public function theCustomerHasQrVisitsAtTheSalonWithoutHits(string $count): void
+    {
+        for ($i = 0; $i < (int) $count; $i++) {
+            QrScan::query()->create([
+                'user_id' => $this->user->id,
+                'salon_id' => $this->salon->id,
+            ]);
+        }
+        $this->assertSame(0, QrHit::query()->where('salon_id', $this->salon->id)->count());
+    }
+
+    /**
+     * @When I backfill QR hits
+     */
+    public function iBackfillQrHits(): void
+    {
+        QrHit::backfillFromVisits();
+    }
+
     private function getQr(string $uri): void
     {
         $this->forgetRequestUser();
@@ -1551,6 +1668,19 @@ query QrScans($salonId: ID!, $limit: Int = 20, $offset: Int = 0) {
     salonId
     customerId
     createdAt
+  }
+}
+GQL;
+    }
+
+    private function salonQrStatsQuery(): string
+    {
+        return <<<'GQL'
+query SalonQrStats($salonId: ID!) {
+  salonQrStats(salonId: $salonId) {
+    scanCount
+    visitCount
+    conversionPercent
   }
 }
 GQL;

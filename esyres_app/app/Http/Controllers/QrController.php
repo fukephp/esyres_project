@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QrHit;
 use App\Models\Salon;
 use App\Models\User;
 use App\Qr\QrHold;
@@ -20,6 +21,8 @@ final class QrController
 
             return redirect()->away(SpaUrl::home());
         }
+
+        QrHit::record($row);
 
         $user = $request->user();
         if ($user instanceof User && ReconcileQrHold::hasTimestamps($user)) {
