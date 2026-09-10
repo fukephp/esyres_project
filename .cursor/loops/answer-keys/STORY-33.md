@@ -36,7 +36,7 @@ Behat now starts at `2026-08-29 09:00` Europe/Sarajevo. Command is `bookings:sen
 
 ## Pass/fail — architecture
 
-Cite `docs/architecture/02-System-Context.md`, `03-Backend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #6 #19 #26 #36, `docs/adr/0017-reminder-scan-not-delayed-jobs.md`.
+Cite `docs/architecture/02-System-Context.md`, `03-Backend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #6 #19 #26 #36, `docs/adr/0018-reminder-scan-not-delayed-jobs.md`.
 
 - [x] `bookings.reminder_day_sent_at` / `reminder_hour_sent_at` nullable datetimes. Artisan `bookings:send-reminders`. `bootstrap/app.php` `withSchedule` → that command `everyMinute()`. Queued `BookingReminder` mail notification (`ShouldQueue`); send via `$customer->notify(...)` from the command, never from a mutation. `acceptReschedule` clears both stamps after rewriting `preferred_starts_at`. No new GraphQL field. No delayed-on-confirm jobs — verify: migration + command + `AcceptReschedule`; schema.graphql unchanged for reminders
 - [x] No worker / redis / nginx / mailpit / scheduler container. Behat stays `QUEUE_CONNECTION=sync` + `Notification::fake()`. `MAIL_MAILER=array` in `.env.behat` — verify: `esyres_app/docker-compose.yml` still php+vite+mysql+reverb only
@@ -72,7 +72,7 @@ docker compose exec -T --workdir /app/marketing vite npm run build
 
 ## Implementer instructions
 
-1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-33.md`, `docs/glossary.md` (**Reminder**), `docs/adr/0017-reminder-scan-not-delayed-jobs.md`, and `docs/architecture/` (02, 03, 05, 06, 08). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No PWA UI this story.
+1. Read this key, `.cursor/CONTEXT.md`, `docs/stories/STORY-33.md`, `docs/glossary.md` (**Reminder**), `docs/adr/0018-reminder-scan-not-delayed-jobs.md`, and `docs/architecture/` (02, 03, 05, 06, 08). Follow `.cursor/skills/custom-feature-skills/SKILL.md`. No PWA UI this story.
 2. Stay on branch `cursor/story-33-reminder-email-11eb`.
 3. **Schema:** nullable `reminder_day_sent_at` / `reminder_hour_sent_at` on `bookings`. Cast datetimes. Add to `Fillable`. Do not expose them on GraphQL `Booking`.
 4. **Notification:** `App\Notifications\BookingReminder implements ShouldQueue`: constructor `(Booking $booking, string $kind)` where `$kind` is `day` or `hour`. `via` = `mail`. Subject `Podsjetnik: {salon->name} sutra` or `… za sat vremena`. One text line: `Imate termin u {salon} {j. n. Y.} u {H:i}.` using `preferred_starts_at` in `Europe/Sarajevo` (example `30. 8. 2026. u 14:00.`). No markdown marketing, no address, no URL. Do not reuse `VerifyEmail`.

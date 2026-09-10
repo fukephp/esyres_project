@@ -229,7 +229,7 @@ _Avoid_: cancellation policy (as a hard block), deposit rule
 ## Verification
 
 **Verified phone**:
-A customer phone that has passed OTP. Required to send a request. Optional at register. Not the login username.
+A customer phone that has passed OTP. Required to send a request. Optional at register. Not the login username. SMS fallback uses this number, not an unverified one.
 _Avoid_: phone login, SMS login, 2FA, phone username
 
 ## Signals
@@ -247,3 +247,11 @@ _Avoid_: time to confirmed, Fast Responder (the badge), accepted_at
 **Reminder**:
 The day-before and hour-before email for a confirmed booking. Not a status-change notify (push or SMS) and not marketing mail.
 _Avoid_: appointment SMS, status email, marketing email, push reminder
+
+**SMS fallback**:
+The SMS to a customer’s verified phone when web push did not reach them for a time-critical status change. Not OTP, not a reminder, not marketing, and not owner SMS.
+_Avoid_: marketing SMS, OTP, reminder SMS, owner SMS, dual-send
+
+**Time-critical status change**:
+The owner accepting a preferred time, counter-proposing, or declining a request. Not the customer’s own respond, not cancel, not reschedule, and not expire.
+_Avoid_: new request (customer), reminder, ping

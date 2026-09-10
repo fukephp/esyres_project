@@ -13,6 +13,8 @@ use App\Notifications\BookingReminder;
 use App\Push\FakePushGateway;
 use App\Push\PushGateway;
 use App\SalonHours\WeeklyHours;
+use App\Sms\FakeSmsGateway;
+use App\Sms\SmsGateway;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -251,6 +253,7 @@ trait SharedFixtures
         $customer = User::factory()->create([
             'name' => $name,
             'email_verified_at' => now(),
+            'phone' => '+38761'.substr(sha1($name.$date.$time.uniqid('', true)), 0, 6),
             'phone_verified_at' => now(),
         ]);
         $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
@@ -917,15 +920,47 @@ GQL;
     }
 
     /**
+     * @Given the booking customer subscribes to push
+     */
+    public function theBookingCustomerSubscribesToPush(): void
+    {
+        $row = new PushSubscription;
+        $row->user_id = $this->booking->customer_id;
+        $row->endpoint = 'https://push.example/customer';
+        $row->p256dh = 'p256';
+        $row->auth = 'auth';
+        $row->save();
+    }
+
+    /**
+     * @Given the booking customer's phone is not verified
+     */
+    public function theBookingCustomersPhoneIsNotVerified(): void
+    {
+        $customer = $this->booking->customer;
+        $customer->phone_verified_at = null;
+        $customer->save();
+    }
+
+    /**
+     * @Given the next push send fails
+     */
+    public function theNextPushSendFails(): void
+    {
+        $this->fakePush()->failNext = true;
+    }
+
+    /**
      * @Then the last owner push type is :type
      */
     public function theLastOwnerPushTypeIs(string $type): void
     {
-        $push = $this->fakePush();
-        $this->assertNotNull($push->last);
-        $this->assertSame($type, $push->last['type'] ?? null);
-        $this->assertSame((string) $this->salon->id, $push->last['salonId'] ?? null);
-        $this->assertSame($this->salon->name, $push->last['body'] ?? null);
+        $last = $this->fakePush()->lastFor((int) $this->salon->owner_id);
+        $this->assertNotNull($last);
+        $payload = $last['payload'];
+        $this->assertSame($type, $payload['type'] ?? null);
+        $this->assertSame((string) $this->salon->id, $payload['salonId'] ?? null);
+        $this->assertSame($this->salon->name, $payload['body'] ?? null);
         $titles = [
             'requested' => 'Novi zahtjev',
             'confirmed' => 'Gost je prihvatio',
@@ -933,10 +968,10 @@ GQL;
             'ask_other_time' => 'Gost traži drugo vrijeme',
             'reschedule' => 'Gost traži premještaj',
         ];
-        $this->assertSame($titles[$type] ?? $type, $push->last['title'] ?? null);
-        $this->assertSame('/owner?salon='.$this->salon->id, $push->last['url'] ?? null);
+        $this->assertSame($titles[$type] ?? $type, $payload['title'] ?? null);
+        $this->assertSame('/owner?salon='.$this->salon->id, $payload['url'] ?? null);
         $bookingId = (string) ($this->booking?->id ?? $this->graphql['data']['createBooking']['id'] ?? '');
-        $this->assertSame($bookingId, (string) ($push->last['bookingId'] ?? ''));
+        $this->assertSame($bookingId, (string) ($payload['bookingId'] ?? ''));
     }
 
     /**
@@ -944,7 +979,9 @@ GQL;
      */
     public function theLastOwnerPushUserIsTheSalonOwner(): void
     {
-        $this->assertSame((int) $this->salon->owner_id, $this->fakePush()->lastUserId);
+        $last = $this->fakePush()->lastFor((int) $this->salon->owner_id);
+        $this->assertNotNull($last);
+        $this->assertSame((int) $this->salon->owner_id, $last['userId']);
     }
 
     /**
@@ -952,7 +989,56 @@ GQL;
      */
     public function noOwnerPushWasSent(): void
     {
-        $this->assertSame(null, $this->fakePush()->last);
+        $this->assertSame(null, $this->fakePush()->lastFor((int) $this->salon->owner_id));
+    }
+
+    /**
+     * @Then the last customer push type is :type
+     */
+    public function theLastCustomerPushTypeIs(string $type): void
+    {
+        $last = $this->fakePush()->lastFor((int) $this->booking->customer_id);
+        $this->assertNotNull($last);
+        $payload = $last['payload'];
+        $this->assertSame($type, $payload['type'] ?? null);
+        $this->assertSame((string) $this->salon->id, $payload['salonId'] ?? null);
+        $this->assertSame($this->salon->name, $payload['body'] ?? null);
+        $titles = [
+            'time_proposed' => 'Predloženo vrijeme',
+            'confirmed' => 'Potvrđeno',
+            'declined' => 'Odbijeno',
+        ];
+        $this->assertSame($titles[$type] ?? $type, $payload['title'] ?? null);
+        $this->assertSame('/bookings', $payload['url'] ?? null);
+        $this->assertSame((string) $this->booking->id, (string) ($payload['bookingId'] ?? ''));
+        $this->assertSame((int) $this->booking->customer_id, $last['userId']);
+    }
+
+    /**
+     * @Then no customer push was sent
+     */
+    public function noCustomerPushWasSent(): void
+    {
+        $id = (int) ($this->booking?->customer_id ?? $this->user?->id ?? 0);
+        $this->assertSame(null, $this->fakePush()->lastFor($id));
+    }
+
+    /**
+     * @Then the last status SMS is :body
+     */
+    public function theLastStatusSmsIs(string $body): void
+    {
+        $sms = $this->fakeSms();
+        $this->assertSame($body, $sms->lastStatusBody);
+        $this->assertSame($this->booking->customer->fresh()->phone, $sms->lastStatusPhone);
+    }
+
+    /**
+     * @Then no status SMS was sent
+     */
+    public function noStatusSmsWasSent(): void
+    {
+        $this->assertSame(null, $this->fakeSms()->lastStatusBody);
     }
 
     private function fakePush(): FakePushGateway
@@ -963,6 +1049,16 @@ GQL;
         }
 
         return $push;
+    }
+
+    private function fakeSms(): FakeSmsGateway
+    {
+        $sms = $this->app->make(SmsGateway::class);
+        if (! $sms instanceof FakeSmsGateway) {
+            throw new RuntimeException('SmsGateway is not fake');
+        }
+
+        return $sms;
     }
 
     private function subscribePushMutation(): string
