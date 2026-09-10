@@ -241,3 +241,9 @@ _Avoid_: availability, occupancy grid, traffic light, capacity, trust badge
 **Owner response time**:
 When the owner first accepts a preferred time, counter-proposes, or declines a request. Captured at MVP. Badge display is Phase 2. Not how long it took to reach confirmed after a counter-proposal.
 _Avoid_: time to confirmed, Fast Responder (the badge), accepted_at
+
+## Notifications
+
+**Reminder**:
+The day-before and hour-before email for a confirmed booking. Not a status-change notify (push or SMS) and not marketing mail.
+_Avoid_: appointment SMS, status email, marketing email, push reminder
