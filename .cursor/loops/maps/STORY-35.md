@@ -21,7 +21,7 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05 trust counters line, 08 #5 #6), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **Owner response time**, **Verified phone**)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (01, 03, 05, 06, 07, 08 Trust & Badges), `docs/architecture/` (03 Epic 8, 05 trust counters line, 08 #5 #6), `docs/adr/0007-owner-responded-at-on-first-action.md`, `docs/adr/0016-cancel-fifth-status.md`, `docs/adr/0019-owner-marks-no-show-after-start.md`, `docs/adr/0020-trust-counters-increment-on-event.md`, `docs/stories/STORY-35.md` plus STORY-14 / 30 / 34 / 36, `docs/glossary.md` (**Late cancel**, **Cancelled booking**, **No-show**, **Owner response time**, **Verified phone**)
 - Skills: grill-with-docs (app code exists); custom-feature-skills
 - Code today (`esyres_app/`):
   - `bookings.owner_responded_at` stamps once on first successful `acceptPreferredTime` / `proposeTime` / `declineBooking` (ADR 0007). Failed overlap / not-requested does not write it. GraphQL Booking type does **not** expose it (Behat reads the column).
@@ -41,27 +41,26 @@ Response-time, no-show, and cancellation data exist as events happen so later ba
 ## Decisions so far
 
 - STORY-35 is **capture**, not badge display. Destination is persistence so Phase 2 badges and STORY-36 rates are not a backfill.
-- `owner_responded_at` already matches the first-action AC. This PR must not change when it stamps (story OOS: changing accept/propose/decline).
+- `owner_responded_at` already matches the first-action AC. This PR must not change when it stamps (story OOS: changing accept/propose/decline). Leave it off GraphQL this PR (Behat already reads the column).
 - Cancel already snapshots per-booking `cancelled_at` + `late_cancel`. This story owns **aggregate** no-show and cancellation counters on customer/salon (STORY-30 OOS).
 - Late cancel is not a no-show (glossary). Cancelled booking is not a no-show.
 - `email_verified_at` / `phone_verified_at` remain the verification record. Do not add a second verification signal or treat local skip-gates as timestamps.
 - Badge chips stay off profiles and discovery (guest `/` and salon profile).
 - Stack: existing Lighthouse `/graphql`, Sanctum cookies, Behat + Vitest/typecheck/build. No Pest, Playwright, codegen.
+- **No-show trigger (2026-09-10):** owner mutation after `preferred_starts_at` on a **confirmed** booking. Not a scheduled auto-mark. Not from cancel. ADR 0019. Before start / not confirmed / already cancelled → no write.
+- **Counter write (2026-09-10):** increment integers on both `users` and `salons` in the same transaction as the event. Booking row is the idempotency stamp. No backfill of rows that already cancelled before this PR. ADR 0020.
+- **Cancel increment (2026-09-10):** every successful `cancelBooking` → `cancel_count++` on that customer and that salon. If `late_cancel`, also `late_cancel_count++`. Never `no_show_count` from cancel.
+- **Capture surface (2026-09-10):** owner-gated GraphQL only. No PWA chrome, no Customer History screen, no chips. Failed mark/cancel does not increment.
 
 ## Open decisions
 
-- **No-show trigger:** who writes the no-show event, and when? Owner mutation after start vs scheduled auto-mark of past confirmed vs both.
-- **Counter write model:** increment integer counters on `users` and `salons` as events happen vs booking-row flags only (count later in STORY-36).
-- **Cancel increment:** every successful cancel vs late-only vs two counters (`cancel_count` + `late_cancel_count`).
-- **Capture surface this PR:** owner-gated GraphQL (fields and/or a mark mutation) with no PWA chrome vs also ship Customer History / mark-no-show UI.
+- **No-show end-state:** stay `confirmed` + `no_show_at` (still occupying) vs a sixth status that does or does not occupy. Overlay on that row: clear vs leave pending.
+- **Second mark:** idempotent success (no second increment) vs error `ALREADY_NO_SHOW`.
+- **GraphQL fields:** `markNoShow` + owner-gated salon counters + owner-only `Booking.noShowAt`; user integers Behat-via-Eloquent (like `owner_responded_at`) vs also expose counters on `me`.
 
 ## Not yet specified
 
-- No-show booking end-state (stay `confirmed` + timestamp vs new status) — depends on trigger.
-- Occupancy after a no-show (past start already; whether the row stays occupying).
-- Idempotency of a second no-show mark on the same booking.
-- Whether counters are owner-readable on `Salon` / customer-on-salon history vs Behat-only via GraphQL that the PWA never queries.
-- Whether `owner_responded_at` should be added to GraphQL this PR (today Behat reads SQL).
+<!-- empty — remaining items are the open decisions above -->
 
 ## Out of scope
 
