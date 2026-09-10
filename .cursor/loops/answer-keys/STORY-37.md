@@ -18,20 +18,20 @@
 
 ## Pass/fail — product
 
-- [ ] Existing salon `GET /qr/{id}` appends one `qr_hits` row for that salon (guest or already-verified). Missing salon 302 `/` writes no hit. Organic `/salon/{id}` and public `salon(id)` write no hit. Reconcile (`verifyPhoneOtp` / sessioned email GET / `login`) does **not** append a hit — verify: Behat
-- [ ] Already-verified `GET /qr/{id}`: one new hit **and** one `qr_scans` row. Guest `GET /qr/{A}` then `GET /qr/{B}` then verify: salon A `scanCount` 1 `visitCount` 0; salon B `scanCount` 1 `visitCount` 1 — verify: Behat
-- [ ] Guest two GETs same salon, then verify: `scanCount` 2, `visitCount` 1, `conversionPercent` 50. Repeat verified GET: counts both increment, percent 100 — verify: Behat
-- [ ] `salonQrStats(salonId)`: `scanCount`, `visitCount`, `conversionPercent` (`Int!`). `0/0` → percent `0`. `1` visit / `3` scans → `33`. Same `OwnerAccess` as `qrScans`: guest `UNAUTHENTICATED`, unverified-email owner `EMAIL_UNVERIFIED`, other user / missing salon `FORBIDDEN`. Other owned salon does not mix counts — verify: Behat
-- [ ] Backfill helper: given `qr_scans` rows and zero hits, one hit per visit row (same `salon_id`); then `scanCount == visitCount`. Migration calls that helper once after creating `qr_hits` — verify: Behat (invoke helper; do not rely on `migrate:fresh` having data)
-- [ ] `/owner/stats` is lazy owner route; nav `Statistika`; labels `Skeniranja QR`, `QR posjete`, `Konverzija`; `?salon=` like chats. Helper `ownerStatsPath`. i18n keys exist. No `qrScans` list on the page. Customer `App.tsx` routes unchanged — verify: Vitest (`ownerStatsPath` + i18n keys); `App.tsx` has `/owner/stats` and no customer stats route
+- [x] Existing salon `GET /qr/{id}` appends one `qr_hits` row for that salon (guest or already-verified). Missing salon 302 `/` writes no hit. Organic `/salon/{id}` and public `salon(id)` write no hit. Reconcile (`verifyPhoneOtp` / sessioned email GET / `login`) does **not** append a hit — verify: Behat
+- [x] Already-verified `GET /qr/{id}`: one new hit **and** one `qr_scans` row. Guest `GET /qr/{A}` then `GET /qr/{B}` then verify: salon A `scanCount` 1 `visitCount` 0; salon B `scanCount` 1 `visitCount` 1 — verify: Behat
+- [x] Guest two GETs same salon, then verify: `scanCount` 2, `visitCount` 1, `conversionPercent` 50. Repeat verified GET: counts both increment, percent 100 — verify: Behat
+- [x] `salonQrStats(salonId)`: `scanCount`, `visitCount`, `conversionPercent` (`Int!`). `0/0` → percent `0`. `1` visit / `3` scans → `33`. Same `OwnerAccess` as `qrScans`: guest `UNAUTHENTICATED`, unverified-email owner `EMAIL_UNVERIFIED`, other user / missing salon `FORBIDDEN`. Other owned salon does not mix counts — verify: Behat
+- [x] Backfill helper: given `qr_scans` rows and zero hits, one hit per visit row (same `salon_id`); then `scanCount == visitCount`. Migration calls that helper once after creating `qr_hits` — verify: Behat (invoke helper; do not rely on `migrate:fresh` having data)
+- [x] `/owner/stats` is lazy owner route; nav `Statistika`; labels `Skeniranja QR`, `QR posjete`, `Konverzija`; `?salon=` like chats. Helper `ownerStatsPath`. i18n keys exist. No `qrScans` list on the page. Customer `App.tsx` routes unchanged — verify: Vitest (`ownerStatsPath` + i18n keys); `App.tsx` has `/owner/stats` and no customer stats route
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/03-Backend.md`, `04-Frontend.md`, `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #10 #22 #25, ADRs 0019, 0020, 0021.
 
-- [ ] `qr_hits`: `id`, `salon_id` (FK cascade), timestamps, index `(salon_id, created_at)`. No `user_id`. `qr_scans` / `qrScans` list unchanged. GraphQL `SalonQrStats` + `salonQrStats(salonId)` via `OwnerAccess`. Percent: `0` if `scanCount` is 0, else `(int) round(100 * visitCount / scanCount)` (PHP default). Not on public `Salon` — verify: migration + schema; no `scanCount` on public `salon(id)`
-- [ ] Hit write only in `GET /qr/{existing}` (Laravel, not a React route). Reconcile helper still favorite + `qr_scans` + forget cookie only. No Pest, Playwright, codegen, `vite-plugin-pwa`. `/owner` home stays queue + panel — verify: `QrController` + `ReconcileQrHold`; `App.tsx`; no `pestphp`
-- [ ] Slim Compose unchanged. Patch `docs/architecture/04` (`/owner/stats` QR block), `05` (`qr_hits` vs `QrScan`), `06` (sticker GET records a QR scan). Do not rewrite ADR 0019/0020. ADR 0021 already on the branch — verify: those docs on the PR
+- [x] `qr_hits`: `id`, `salon_id` (FK cascade), timestamps, index `(salon_id, created_at)`. No `user_id`. `qr_scans` / `qrScans` list unchanged. GraphQL `SalonQrStats` + `salonQrStats(salonId)` via `OwnerAccess`. Percent: `0` if `scanCount` is 0, else `(int) round(100 * visitCount / scanCount)` (PHP default). Not on public `Salon` — verify: migration + schema; no `scanCount` on public `salon(id)`
+- [x] Hit write only in `GET /qr/{existing}` (Laravel, not a React route). Reconcile helper still favorite + `qr_scans` + forget cookie only. No Pest, Playwright, codegen, `vite-plugin-pwa`. `/owner` home stays queue + panel — verify: `QrController` + `ReconcileQrHold`; `App.tsx`; no `pestphp`
+- [x] Slim Compose unchanged. Patch `docs/architecture/04` (`/owner/stats` QR block), `05` (`qr_hits` vs `QrScan`), `06` (sticker GET records a QR scan). Do not rewrite ADR 0019/0020. ADR 0021 already on the branch — verify: those docs on the PR
 
 ## Verify commands
 
