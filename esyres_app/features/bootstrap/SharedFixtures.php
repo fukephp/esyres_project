@@ -8,6 +8,9 @@ use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Models\PushSubscription;
+use App\Push\FakePushGateway;
+use App\Push\PushGateway;
 use App\SalonHours\WeeklyHours;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Support\Carbon;
@@ -848,6 +851,124 @@ GQL;
             $this->intakeToken = $this->graphql['data']['pingAssistantIntake']['token'];
             $this->intake = AssistantIntake::query()->where('token', $this->intakeToken)->first();
         }
+    }
+
+    /**
+     * @When I subscribe to push
+     */
+    public function iSubscribeToPush(): void
+    {
+        $this->graphql($this->subscribePushMutation(), [
+            'endpoint' => 'https://push.example/1',
+            'p256dh' => 'p256',
+            'auth' => 'auth',
+        ]);
+    }
+
+    /**
+     * @When I subscribe to push as a guest
+     */
+    public function iSubscribeToPushAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->subscribePushMutation(), [
+            'endpoint' => 'https://push.example/1',
+            'p256dh' => 'p256',
+            'auth' => 'auth',
+        ]);
+    }
+
+    /**
+     * @When I query vapid public key as a guest
+     */
+    public function iQueryVapidPublicKeyAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql('query { vapidPublicKey }');
+    }
+
+    /**
+     * @Then subscribe push succeeds
+     */
+    public function subscribePushSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['subscribePush']);
+    }
+
+    /**
+     * @Then vapid public key is :key
+     */
+    public function vapidPublicKeyIs(string $key): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($key, $this->graphql['data']['vapidPublicKey']);
+    }
+
+    /**
+     * @Then push subscription count is :count
+     */
+    public function pushSubscriptionCountIs(string $count): void
+    {
+        $this->assertSame((int) $count, PushSubscription::query()->count());
+    }
+
+    /**
+     * @Then the last owner push type is :type
+     */
+    public function theLastOwnerPushTypeIs(string $type): void
+    {
+        $push = $this->fakePush();
+        $this->assertNotNull($push->last);
+        $this->assertSame($type, $push->last['type'] ?? null);
+        $this->assertSame((string) $this->salon->id, $push->last['salonId'] ?? null);
+        $this->assertSame($this->salon->name, $push->last['body'] ?? null);
+        $titles = [
+            'requested' => 'Novi zahtjev',
+            'confirmed' => 'Gost je prihvatio',
+            'rejected' => 'Gost je odbio',
+            'ask_other_time' => 'Gost traži drugo vrijeme',
+            'reschedule' => 'Gost traži premještaj',
+        ];
+        $this->assertSame($titles[$type] ?? $type, $push->last['title'] ?? null);
+        $this->assertSame('/owner?salon='.$this->salon->id, $push->last['url'] ?? null);
+        $bookingId = (string) ($this->booking?->id ?? $this->graphql['data']['createBooking']['id'] ?? '');
+        $this->assertSame($bookingId, (string) ($push->last['bookingId'] ?? ''));
+    }
+
+    /**
+     * @Then the last owner push user is the salon owner
+     */
+    public function theLastOwnerPushUserIsTheSalonOwner(): void
+    {
+        $this->assertSame((int) $this->salon->owner_id, $this->fakePush()->lastUserId);
+    }
+
+    /**
+     * @Then no owner push was sent
+     */
+    public function noOwnerPushWasSent(): void
+    {
+        $this->assertSame(null, $this->fakePush()->last);
+    }
+
+    private function fakePush(): FakePushGateway
+    {
+        $push = $this->app->make(PushGateway::class);
+        if (! $push instanceof FakePushGateway) {
+            throw new RuntimeException('PushGateway is not fake');
+        }
+
+        return $push;
+    }
+
+    private function subscribePushMutation(): string
+    {
+        return <<<'GQL'
+mutation SubscribePush($endpoint: String!, $p256dh: String!, $auth: String!) {
+  subscribePush(endpoint: $endpoint, p256dh: $p256dh, auth: $auth)
+}
+GQL;
     }
 
     private function pingAssistantIntakeMutation(): string

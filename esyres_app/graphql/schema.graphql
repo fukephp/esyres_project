@@ -170,6 +170,7 @@ type Salon {
 }
 
 type Query {
+    vapidPublicKey: String!
     me: User
     salon(id: ID!): Salon
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
@@ -184,6 +185,7 @@ type Query {
 }
 
 type Mutation {
+    subscribePush(endpoint: String!, p256dh: String!, auth: String!): Boolean!
     login(email: String!, password: String!): User!
     register(email: String!, password: String!, phone: String): User!
     logout: Boolean!

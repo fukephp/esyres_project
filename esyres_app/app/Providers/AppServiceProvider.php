@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Push\FakePushGateway;
+use App\Push\LogPushGateway;
+use App\Push\PushGateway;
 use App\Sms\FakeSmsGateway;
 use App\Sms\LogSmsGateway;
 use App\Sms\SmsGateway;
@@ -18,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
             return $app->environment('testing')
                 ? new FakeSmsGateway
                 : new LogSmsGateway;
+        });
+        $this->app->singleton(PushGateway::class, function ($app) {
+            return $app->environment('testing')
+                ? new FakePushGateway
+                : new LogPushGateway;
         });
     }
 

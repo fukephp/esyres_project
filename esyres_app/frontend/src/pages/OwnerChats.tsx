@@ -26,6 +26,7 @@ import {
   takeoverRowChrome,
 } from '../lib/intake'
 import { ownerChatSearchParams, ownerSalonFromSearch } from '../lib/owner'
+import { useOwnerPush } from '../lib/push'
 
 export function OwnerChats() {
   const { t } = useTranslation()
@@ -35,6 +36,7 @@ export function OwnerChats() {
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
+  useOwnerPush(ownerReady)
   const { data: countData, refetch: refetchCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,

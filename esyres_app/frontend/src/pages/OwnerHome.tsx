@@ -33,6 +33,7 @@ import {
 import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
 import { chatBadgeCount } from '../lib/intake'
+import { useOwnerPush } from '../lib/push'
 import {
   acceptErrorKey,
   assistantOriginVisible,
@@ -61,6 +62,7 @@ export function OwnerHome() {
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
+  useOwnerPush(ownerReady)
   const { data: queue, loading: queueLoading, refetch: refetchQueue } = useQuery<PendingBookingsData>(PENDING_BOOKINGS_QUERY, {
     variables: { salonId: salon?.id ?? '', date },
     skip: !ownerReady,

@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutations;
 
 use App\GraphQL\BroadcastCustomerResponded;
 use App\GraphQL\CustomerAccess;
+use App\Push\OwnerPush;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -25,6 +26,7 @@ final class RejectProposedTime
             $booking->save();
             $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             BroadcastCustomerResponded::send($booking);
+            OwnerPush::send($booking, 'rejected');
 
             return $booking;
         });

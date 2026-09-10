@@ -34,6 +34,7 @@ import {
   proposeStartTimes,
   trimDeclineReason,
 } from '../lib/owner'
+import { useOwnerPush } from '../lib/push'
 
 export function OwnerRequestDetail() {
   const { t } = useTranslation()
@@ -41,6 +42,7 @@ export function OwnerRequestDetail() {
   const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const ownerReady = (data?.me?.salons.length ?? 0) > 0 && data?.me?.emailVerified === true
+  useOwnerPush(ownerReady)
   const {
     data: bookingData,
     loading: bookingLoading,
