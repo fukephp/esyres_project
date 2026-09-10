@@ -126,6 +126,7 @@ type AssistantIntake {
     workerConfirmed: Boolean! @rename(attribute: "worker_confirmed")
     preferredDate: String @rename(attribute: "preferred_date")
     preferredTime: String @rename(attribute: "preferred_time")
+    takenOver: Boolean! @method(name: "takenOver")
 }
 
 input UpsertAssistantIntakeInput {
@@ -152,6 +153,8 @@ type Salon {
     name: String!
     address: String
     cancellationNoticeHours: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancellationNoticeHours")
+    dnd: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@dnd")
+    takeoverAllowed: Boolean! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@takeoverAllowed")
     hours: [DayHours!]! @method(name: "dayHours")
     services: [Service!]! @method(name: "serviceList")
     workers: [Worker!]! @method(name: "workerList")
@@ -186,6 +189,9 @@ type Mutation {
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
     upsertAssistantIntake(input: UpsertAssistantIntakeInput!): AssistantIntake!
+    takeOverAssistantIntake(id: ID!): AssistantIntake!
+    releaseAssistantIntake(id: ID!): AssistantIntake!
+    updateSalonDnd(salonId: ID!, dnd: Boolean!): Salon
     acceptPreferredTime(bookingId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
     declineBooking(bookingId: ID!, reason: String): Booking!

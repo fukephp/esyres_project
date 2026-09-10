@@ -22,6 +22,6 @@ final class AssistantIntake
             return null;
         }
 
-        return $row;
+        return $row->load('salon');
     }
 }

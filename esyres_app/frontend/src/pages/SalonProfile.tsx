@@ -36,6 +36,7 @@ import {
   clearIntakeToken,
   emptyIntakeSnapshot,
   intakeSnapshotFromRow,
+  intakeWaiting,
   isEmptyIntakeSnapshot,
   readIntakeToken,
   shouldRestoreIntake,
@@ -122,9 +123,10 @@ export function SalonProfile() {
   const [intakeToken, setIntakeToken] = useState<string | null>(() => (id ? readIntakeToken(id) : null))
   const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
   const restored = useRef(false)
-  const { data: savedIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
+  const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
     variables: { token: intakeToken ?? '' },
     skip: !intakeToken,
+    fetchPolicy: 'network-only',
   })
   const [upsertIntake] = useMutation<UpsertAssistantIntakeData>(UPSERT_ASSISTANT_INTAKE_MUTATION)
 
@@ -150,6 +152,27 @@ export function SalonProfile() {
     setMode('chat')
   }, [savedIntake])
 
+  const waiting = intakeWaiting(savedIntake?.assistantIntake?.takenOver === true)
+
+  useEffect(() => {
+    function refresh() {
+      if (intakeToken) {
+        void refetchIntake()
+      }
+    }
+    function onVisibility() {
+      if (document.visibilityState === 'visible') {
+        refresh()
+      }
+    }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [intakeToken, refetchIntake])
+
   const chatSnapshot: IntakeSnapshot = {
     serviceIds: chatSelected,
     workerId: chatWorker === '' ? null : chatWorker,
@@ -162,7 +185,7 @@ export function SalonProfile() {
     if (!id || mode !== 'chat') {
       return
     }
-    if (!shouldUpsertIntake(lastSnapshot.current, chatSnapshot)) {
+    if (!shouldUpsertIntake(lastSnapshot.current, chatSnapshot, waiting)) {
       return
     }
     lastSnapshot.current = chatSnapshot
@@ -184,8 +207,12 @@ export function SalonProfile() {
         writeIntakeToken(id, token)
         setIntakeToken(token)
       }
+    }).catch((err: unknown) => {
+      if (graphqlErrorCode(err) === 'INTAKE_TAKEN_OVER') {
+        void refetchIntake()
+      }
     })
-  }, [id, mode, chatSnapshot, intakeToken, upsertIntake])
+  }, [id, mode, chatSnapshot, intakeToken, upsertIntake, waiting, refetchIntake])
 
   if (loading) {
     return (
@@ -250,6 +277,11 @@ export function SalonProfile() {
       }
     } catch (err) {
       const code = graphqlErrorCode(err)
+      if (code === 'INTAKE_TAKEN_OVER') {
+        void refetchIntake()
+        setError(null)
+        return
+      }
       if (code === 'UNAUTHENTICATED') {
         setNeedLogin(true)
         setNeedEmail(false)
@@ -335,26 +367,37 @@ export function SalonProfile() {
   }
 
   async function afterAuth() {
-    if (chatting && id && !isEmptyIntakeSnapshot(chatSnapshot)) {
+    if (chatting && id && !isEmptyIntakeSnapshot(chatSnapshot) && !waiting) {
       lastSnapshot.current = chatSnapshot
-      const result = await upsertIntake({
-        variables: {
-          input: {
-            salonId: id,
-            token: intakeToken,
-            serviceIds: chatSnapshot.serviceIds,
-            workerId: chatSnapshot.workerId,
-            workerConfirmed: chatSnapshot.workerConfirmed,
-            preferredDate: chatSnapshot.preferredDate === '' ? null : chatSnapshot.preferredDate,
-            preferredTime: chatSnapshot.preferredTime === '' ? null : chatSnapshot.preferredTime,
+      try {
+        const result = await upsertIntake({
+          variables: {
+            input: {
+              salonId: id,
+              token: intakeToken,
+              serviceIds: chatSnapshot.serviceIds,
+              workerId: chatSnapshot.workerId,
+              workerConfirmed: chatSnapshot.workerConfirmed,
+              preferredDate: chatSnapshot.preferredDate === '' ? null : chatSnapshot.preferredDate,
+              preferredTime: chatSnapshot.preferredTime === '' ? null : chatSnapshot.preferredTime,
+            },
           },
-        },
-      })
-      const token = result.data?.upsertAssistantIntake.token
-      if (typeof token === 'string') {
-        writeIntakeToken(id, token)
-        setIntakeToken(token)
+        })
+        const token = result.data?.upsertAssistantIntake.token
+        if (typeof token === 'string') {
+          writeIntakeToken(id, token)
+          setIntakeToken(token)
+        }
+      } catch (err) {
+        if (graphqlErrorCode(err) === 'INTAKE_TAKEN_OVER') {
+          void refetchIntake()
+          return
+        }
+        throw err
       }
+    }
+    if (waiting) {
+      return
     }
     const input = bookingInput()
     if (!input) {
@@ -592,6 +635,7 @@ export function SalonProfile() {
           }}
           error={error}
           busy={busy}
+          waiting={waiting}
           needLogin={needLogin}
           needEmail={needEmail}
           needPhone={needPhone}

@@ -23,6 +23,7 @@ class SalonFactory extends Factory
             'address' => null,
             'cancellation_notice_hours' => 24,
             'hours' => WeeklyHours::closedWeek(),
+            'dnd' => false,
             'lat' => null,
             'lng' => null,
         ];

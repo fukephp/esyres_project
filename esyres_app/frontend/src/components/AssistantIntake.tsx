@@ -43,6 +43,7 @@ type Props = {
   onOtherTime: () => void
   error: string | null
   busy: boolean
+  waiting: boolean
   needLogin: boolean
   needEmail: boolean
   needPhone: boolean
@@ -79,6 +80,7 @@ export function AssistantIntake({
   onOtherTime,
   error,
   busy,
+  waiting,
   needLogin,
   needEmail,
   needPhone,
@@ -119,6 +121,10 @@ export function AssistantIntake({
       {chosen.length > 0 && (
         <p className="text-sm text-muted">{chosen.map((s) => s.name).join(', ')}</p>
       )}
+      {waiting && workerConfirmed && <p className="text-sm text-muted">{pickedWorker}</p>}
+      {waiting && <p className="text-sm text-ink">{t('assistant.wait')}</p>}
+      {!waiting && (
+        <>
       <ul className="flex flex-wrap gap-2">
         {services.map((service) => {
           const on = selected.includes(service.id)
@@ -250,6 +256,8 @@ export function AssistantIntake({
       {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}
       {chrome === 'phone' && <PhoneOtpPanel onRetry={onAfterAuth} />}
       {chrome === 'login' && <AuthShell onAuthenticated={onAfterAuth} />}
+        </>
+      )}
     </form>
   )
 }

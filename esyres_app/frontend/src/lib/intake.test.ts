@@ -5,9 +5,11 @@ import {
   intakeCookieName,
   intakeProgressLine,
   intakeSnapshotFromRow,
+  intakeWaiting,
   readIntakeToken,
   shouldRestoreIntake,
   shouldUpsertIntake,
+  takeoverRowChrome,
   withIntakeToken,
 } from './intake'
 
@@ -19,6 +21,22 @@ test('CTA-open empty snapshot does not upsert', () => {
 
 test('first service chip upserts', () => {
   expect(shouldUpsertIntake(empty, { ...empty, serviceIds: ['1'] })).toBe(true)
+})
+
+test('waiting snapshot does not upsert', () => {
+  expect(shouldUpsertIntake(empty, { ...empty, serviceIds: ['1'] }, true)).toBe(false)
+})
+
+test('intake waiting follows takenOver', () => {
+  expect(intakeWaiting(false)).toBe(false)
+  expect(intakeWaiting(true)).toBe(true)
+})
+
+test('row chrome hides when take-over is off', () => {
+  expect(takeoverRowChrome({ takeoverAllowed: false, takenOver: false })).toBe('hidden')
+  expect(takeoverRowChrome({ takeoverAllowed: false, takenOver: true })).toBe('hidden')
+  expect(takeoverRowChrome({ takeoverAllowed: true, takenOver: false })).toBe('takeover')
+  expect(takeoverRowChrome({ takeoverAllowed: true, takenOver: true })).toBe('release')
 })
 
 test('same snapshot does not upsert again', () => {
@@ -69,3 +87,12 @@ test('row restore maps null clocks to empty strings', () => {
     }),
   ).toEqual({ ...empty, serviceIds: ['1'] })
 })
+
+test('take over copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.takeOver')).toBe('Preuzmi')
+  expect(i18n.t('owner.releaseTakeOver')).toBe('Vrati asistentu')
+  expect(i18n.t('owner.dnd')).toBe('Ne uznemiravaj')
+  expect(i18n.t('assistant.wait')).toBe('Sačekaj, javit ćemo ti se.')
+})
+

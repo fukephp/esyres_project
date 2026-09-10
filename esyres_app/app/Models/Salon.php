@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\SalonHours\OpenNow;
 use App\SalonHours\WeeklyHours;
 use Database\Factories\SalonFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'name', 'address', 'cancellation_notice_hours', 'hours', 'lat', 'lng'])]
+#[Fillable(['owner_id', 'name', 'address', 'cancellation_notice_hours', 'hours', 'lat', 'lng', 'dnd'])]
 class Salon extends Model
 {
     /** @use HasFactory<SalonFactory> */
@@ -25,6 +26,9 @@ class Salon extends Model
             if ($salon->cancellation_notice_hours === null) {
                 $salon->cancellation_notice_hours = 24;
             }
+            if ($salon->dnd === null) {
+                $salon->dnd = false;
+            }
         });
     }
 
@@ -36,6 +40,7 @@ class Salon extends Model
         return [
             'hours' => 'array',
             'cancellation_notice_hours' => 'integer',
+            'dnd' => 'boolean',
             'lat' => 'float',
             'lng' => 'float',
         ];
@@ -95,5 +100,10 @@ class Salon extends Model
     public function dayHours(): array
     {
         return WeeklyHours::toGraphQL($this->hours ?? WeeklyHours::closedWeek());
+    }
+
+    public function takeoverAllowed(): bool
+    {
+        return $this->dnd !== true && OpenNow::at($this);
     }
 }

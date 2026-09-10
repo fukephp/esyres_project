@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
@@ -8,6 +8,9 @@ import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
   IN_FLIGHT_INTAKES_QUERY,
+  RELEASE_INTAKE_MUTATION,
+  TAKE_OVER_INTAKE_MUTATION,
+  UPDATE_SALON_DND_MUTATION,
   type InFlightIntakeCountData,
   type InFlightIntakeRow,
   type InFlightIntakesData,
@@ -19,6 +22,7 @@ import {
   intakeProgressLine,
   intakeSnapshotFromRow,
   intakeStepFromSnapshot,
+  takeoverRowChrome,
 } from '../lib/intake'
 import { ownerChatSearchParams, ownerSalonFromSearch } from '../lib/owner'
 
@@ -30,22 +34,34 @@ export function OwnerChats() {
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
-  const { data: countData } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
+  const { data: countData, refetch: refetchCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     fetchPolicy: 'network-only',
   })
-  const { data: listData, loading: listLoading } = useQuery<InFlightIntakesData>(IN_FLIGHT_INTAKES_QUERY, {
+  const { data: listData, loading: listLoading, refetch: refetchList } = useQuery<InFlightIntakesData>(IN_FLIGHT_INTAKES_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     fetchPolicy: 'network-only',
   })
-  const { data: board } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
+  const { data: board, refetch: refetchBoard } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
     variables: { id: salon?.id ?? '' },
     skip: !ownerReady,
+    fetchPolicy: 'network-only',
   })
+  const [takeOver] = useMutation(TAKE_OVER_INTAKE_MUTATION)
+  const [release] = useMutation(RELEASE_INTAKE_MUTATION)
+  const [setDnd] = useMutation(UPDATE_SALON_DND_MUTATION)
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? ''
+  const takeoverAllowed = board?.salon?.takeoverAllowed === true
+  const dnd = board?.salon?.dnd === true
+
+  function refreshChats() {
+    void refetchList()
+    void refetchCount()
+    void refetchBoard()
+  }
 
   function onSalon(id: string) {
     setParams(ownerChatSearchParams(id, firstOwnedId))
@@ -118,6 +134,16 @@ export function OwnerChats() {
             tone="light"
           />
         </div>
+        <label className="mt-6 flex items-center gap-2 text-sm text-body">
+          <input
+            type="checkbox"
+            checked={dnd}
+            onChange={(e) => {
+              void setDnd({ variables: { salonId: salon.id, dnd: e.target.checked } }).then(refreshChats)
+            }}
+          />
+          {t('owner.dnd')}
+        </label>
         {listLoading ? (
           <p className="mt-8 text-sm text-body">{t('salon.loading')}</p>
         ) : rows.length === 0 ? (
@@ -125,7 +151,15 @@ export function OwnerChats() {
         ) : (
           <ul className="mt-8 max-w-xl space-y-3">
             {rows.map((row) => (
-              <IntakeRow key={row.id} row={row} services={services} workerCount={workerCount} />
+              <IntakeRow
+                key={row.id}
+                row={row}
+                services={services}
+                workerCount={workerCount}
+                takeoverAllowed={takeoverAllowed}
+                onTakeOver={() => void takeOver({ variables: { id: row.id } }).then(refreshChats)}
+                onRelease={() => void release({ variables: { id: row.id } }).then(refreshChats)}
+              />
             ))}
           </ul>
         )}
@@ -170,16 +204,23 @@ function IntakeRow({
   row,
   services,
   workerCount,
+  takeoverAllowed,
+  onTakeOver,
+  onRelease,
 }: {
   row: InFlightIntakeRow
   services: { id: string; name: string }[]
   workerCount: number
+  takeoverAllowed: boolean
+  onTakeOver: () => void
+  onRelease: () => void
 }) {
   const { t } = useTranslation()
   const snapshot = intakeSnapshotFromRow(row)
   const names = services.filter((service) => row.serviceIds.includes(service.id)).map((service) => service.name)
   const progress = intakeProgressLine(names, intakeStepFromSnapshot(snapshot, workerCount))
   const line = progress.type === 'services' ? progress.text : t(`owner.chatStep.${progress.step}`)
+  const chrome = takeoverRowChrome({ takeoverAllowed, takenOver: row.takenOver })
 
   return (
     <li className="rounded-lg border border-hairline bg-canvas px-4 py-3">
@@ -188,6 +229,16 @@ function IntakeRow({
         <p className="text-xs text-muted">{formatSarajevoDateTime(row.updatedAt)}</p>
       </div>
       <p className="mt-1 text-sm text-body">{line}</p>
+      {chrome === 'takeover' && (
+        <button type="button" className="mt-2 text-sm font-medium text-ink underline underline-offset-4" onClick={onTakeOver}>
+          {t('owner.takeOver')}
+        </button>
+      )}
+      {chrome === 'release' && (
+        <button type="button" className="mt-2 text-sm font-medium text-ink underline underline-offset-4" onClick={onRelease}>
+          {t('owner.releaseTakeOver')}
+        </button>
+      )}
     </li>
   )
 }

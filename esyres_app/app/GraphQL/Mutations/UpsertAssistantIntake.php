@@ -26,6 +26,9 @@ final class UpsertAssistantIntake
 
         $token = isset($input['token']) && is_string($input['token']) ? $input['token'] : '';
         $row = $this->existing($salon->id, $token);
+        if ($row !== null && $row->takenOver()) {
+            throw new ClientError('INTAKE_TAKEN_OVER');
+        }
         if ($row === null) {
             $row = new AssistantIntake;
             $row->salon_id = $salon->id;
@@ -60,7 +63,7 @@ final class UpsertAssistantIntake
             return null;
         }
 
-        return $row;
+        return $row->load('salon');
     }
 
     /**

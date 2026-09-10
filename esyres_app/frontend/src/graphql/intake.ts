@@ -11,6 +11,7 @@ export const ASSISTANT_INTAKE_QUERY = gql`
       workerConfirmed
       preferredDate
       preferredTime
+      takenOver
     }
   }
 `
@@ -26,6 +27,7 @@ export const UPSERT_ASSISTANT_INTAKE_MUTATION = gql`
       workerConfirmed
       preferredDate
       preferredTime
+      takenOver
     }
   }
 `
@@ -41,6 +43,7 @@ export const IN_FLIGHT_INTAKES_QUERY = gql`
       workerConfirmed
       preferredDate
       preferredTime
+      takenOver
     }
   }
 `
@@ -48,6 +51,34 @@ export const IN_FLIGHT_INTAKES_QUERY = gql`
 export const IN_FLIGHT_INTAKE_COUNT_QUERY = gql`
   query InFlightIntakeCount($salonId: ID!) {
     inFlightIntakeCount(salonId: $salonId)
+  }
+`
+
+export const TAKE_OVER_INTAKE_MUTATION = gql`
+  mutation TakeOverAssistantIntake($id: ID!) {
+    takeOverAssistantIntake(id: $id) {
+      id
+      takenOver
+    }
+  }
+`
+
+export const RELEASE_INTAKE_MUTATION = gql`
+  mutation ReleaseAssistantIntake($id: ID!) {
+    releaseAssistantIntake(id: $id) {
+      id
+      takenOver
+    }
+  }
+`
+
+export const UPDATE_SALON_DND_MUTATION = gql`
+  mutation UpdateSalonDnd($salonId: ID!, $dnd: Boolean!) {
+    updateSalonDnd(salonId: $salonId, dnd: $dnd) {
+      id
+      dnd
+      takeoverAllowed
+    }
   }
 `
 
@@ -60,6 +91,7 @@ export type AssistantIntakeRow = {
   workerConfirmed: boolean
   preferredDate: string | null
   preferredTime: string | null
+  takenOver: boolean
 }
 
 export type InFlightIntakeRow = {
@@ -71,6 +103,7 @@ export type InFlightIntakeRow = {
   workerConfirmed: boolean
   preferredDate: string | null
   preferredTime: string | null
+  takenOver: boolean
 }
 
 export type AssistantIntakeData = {
