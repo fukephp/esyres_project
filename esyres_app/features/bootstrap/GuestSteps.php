@@ -524,6 +524,7 @@ trait GuestSteps
      */
     public function iUpsertTheAssistantIntakeAsAGuest(): void
     {
+        $this->iFetchTheCsrfCookie();
         $this->postUpsertIntake($this->intakeToken);
     }
 
@@ -1617,6 +1618,7 @@ mutation UpsertIntake($input: UpsertAssistantIntakeInput!) {
     workerConfirmed
     preferredDate
     preferredTime
+    takenOver
   }
 }
 GQL;
@@ -1634,6 +1636,7 @@ query Intake($token: String!) {
     workerConfirmed
     preferredDate
     preferredTime
+    takenOver
   }
 }
 GQL;

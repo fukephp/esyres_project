@@ -103,6 +103,8 @@ export const OWNER_SALON_QUERY = gql`
         breakStartsAt
         breakEndsAt
       }
+      dnd
+      takeoverAllowed
       services {
         id
         name
@@ -206,6 +208,8 @@ export type OwnerSalonData = {
       breakStartsAt: string | null
       breakEndsAt: string | null
     }[]
+    dnd: boolean
+    takeoverAllowed: boolean
     services: { id: string; name: string }[]
   } | null
 }

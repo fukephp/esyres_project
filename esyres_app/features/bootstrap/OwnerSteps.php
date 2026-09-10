@@ -989,6 +989,7 @@ query InFlight($salonId: ID!, $limit: Int = 20, $offset: Int = 0) {
     customerName
     serviceIds
     updatedAt
+    takenOver
   }
 }
 GQL;

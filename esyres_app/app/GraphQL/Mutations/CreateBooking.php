@@ -40,6 +40,7 @@ final class CreateBooking
             throw new ClientError('INVALID_SERVICES');
         }
         $this->assertOpenWeekday($salon, $input['preferredDate']);
+        $this->assertIntakeNotTakenOver($salon->id, $input['intakeToken'] ?? null);
 
         $services = $this->services($salon, $input['serviceIds']);
         $workerId = $this->workerId($salon, $input['workerId'] ?? null);
@@ -155,5 +156,20 @@ final class CreateBooking
         }
         $row->booking_id = $bookingId;
         $row->save();
+    }
+
+    private function assertIntakeNotTakenOver(int $salonId, mixed $token): void
+    {
+        if (! is_string($token) || $token === '' || ! Str::isUuid($token)) {
+            return;
+        }
+        $row = AssistantIntake::query()
+            ->with('salon')
+            ->where('salon_id', $salonId)
+            ->where('token', $token)
+            ->first();
+        if ($row !== null && $row->isInFlight() && $row->takenOver()) {
+            throw new ClientError('INTAKE_TAKEN_OVER');
+        }
     }
 }

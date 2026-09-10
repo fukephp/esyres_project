@@ -36,8 +36,22 @@ export function intakeSnapshotChanged(prev: IntakeSnapshot, next: IntakeSnapshot
   return JSON.stringify(prev) !== JSON.stringify(next)
 }
 
-export function shouldUpsertIntake(prev: IntakeSnapshot, next: IntakeSnapshot): boolean {
-  return intakeSnapshotChanged(prev, next) && !isEmptyIntakeSnapshot(next)
+export function shouldUpsertIntake(prev: IntakeSnapshot, next: IntakeSnapshot, waiting = false): boolean {
+  return !waiting && intakeSnapshotChanged(prev, next) && !isEmptyIntakeSnapshot(next)
+}
+
+export function intakeWaiting(takenOver: boolean): boolean {
+  return takenOver
+}
+
+export type TakeoverRowChrome = 'takeover' | 'release' | 'hidden'
+
+export function takeoverRowChrome(input: { takeoverAllowed: boolean; takenOver: boolean }): TakeoverRowChrome {
+  if (!input.takeoverAllowed) {
+    return 'hidden'
+  }
+
+  return input.takenOver ? 'release' : 'takeover'
 }
 
 export function shouldRestoreIntake(row: IntakeSnapshot | null): boolean {

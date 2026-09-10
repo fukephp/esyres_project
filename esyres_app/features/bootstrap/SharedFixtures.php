@@ -286,6 +286,159 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that intake is taken over
+     */
+    public function thatIntakeIsTakenOver(): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->intake->taken_over_at = now();
+        $this->intake->updated_at = now();
+        $this->intake->save();
+    }
+
+    /**
+     * @Given the salon dnd is on
+     */
+    public function theSalonDndIsOn(): void
+    {
+        $this->salon->dnd = true;
+        $this->salon->save();
+    }
+
+    /**
+     * @When I query salon takeover fields as a guest
+     */
+    public function iQuerySalonTakeoverFieldsAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonTakeoverQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I take over the intake as a guest
+     */
+    public function iTakeOverTheIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->graphql($this->takeOverIntakeMutation(), ['id' => (string) $this->intake->id]);
+    }
+
+    /**
+     * @When I release the intake as a guest
+     */
+    public function iReleaseTheIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->graphql($this->releaseIntakeMutation(), ['id' => (string) $this->intake->id]);
+    }
+
+    /**
+     * @When I set salon dnd to :dnd as a guest
+     */
+    public function iSetSalonDndToAsAGuest(string $dnd): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->updateSalonDndMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'dnd' => $dnd === 'true',
+        ]);
+    }
+
+    /**
+     * @When I take over the intake
+     */
+    public function iTakeOverTheIntake(): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->graphql($this->takeOverIntakeMutation(), ['id' => (string) $this->intake->id]);
+        $this->intake = AssistantIntake::query()->find($this->intake->id);
+    }
+
+    /**
+     * @When I take over an unknown intake
+     */
+    public function iTakeOverAnUnknownIntake(): void
+    {
+        $this->graphql($this->takeOverIntakeMutation(), ['id' => '999999']);
+    }
+
+    /**
+     * @When I release the intake
+     */
+    public function iReleaseTheIntake(): void
+    {
+        if ($this->intake === null) {
+            throw new RuntimeException('Intake fixture is missing');
+        }
+        $this->graphql($this->releaseIntakeMutation(), ['id' => (string) $this->intake->id]);
+        $this->intake = AssistantIntake::query()->find($this->intake->id);
+    }
+
+    /**
+     * @When I set salon dnd to :dnd
+     */
+    public function iSetSalonDndTo(string $dnd): void
+    {
+        $this->graphql($this->updateSalonDndMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'dnd' => $dnd === 'true',
+        ]);
+        $this->salon = Salon::query()->find($this->salon->id);
+    }
+
+    /**
+     * @When I query salon takeover fields
+     */
+    public function iQuerySalonTakeoverFields(): void
+    {
+        $this->graphql($this->salonTakeoverQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @Then the intake takenOver is :flag
+     */
+    public function theIntakeTakenOverIs(string $flag): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = $flag === 'true';
+        $row = $this->graphql['data']['takeOverAssistantIntake']
+            ?? $this->graphql['data']['releaseAssistantIntake']
+            ?? $this->graphql['data']['upsertAssistantIntake']
+            ?? $this->graphql['data']['assistantIntake']
+            ?? ($this->graphql['data']['inFlightIntakes'][0] ?? null);
+        $this->assertNotNull($row);
+        $this->assertSame($expected, $row['takenOver']);
+    }
+
+    /**
+     * @Then salon dnd is :flag
+     */
+    public function salonDndIs(string $flag): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($flag === 'true', $this->graphql['data']['salon']['dnd'] ?? $this->graphql['data']['updateSalonDnd']['dnd']);
+    }
+
+    /**
+     * @Then takeoverAllowed is :flag
+     */
+    public function takeoverAllowedIs(string $flag): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($flag === 'true', $this->graphql['data']['salon']['takeoverAllowed'] ?? $this->graphql['data']['updateSalonDnd']['takeoverAllowed']);
+    }
+
+    /**
      * @Given the salon has a worker:
      */
     public function theSalonHasAWorker(PyStringNode $payload): void
@@ -497,6 +650,58 @@ mutation Login($email: String!, $password: String!) {
     id
     email
     emailVerified
+  }
+}
+GQL;
+    }
+
+    private function takeOverIntakeMutation(): string
+    {
+        return <<<'GQL'
+mutation TakeOver($id: ID!) {
+  takeOverAssistantIntake(id: $id) {
+    id
+    takenOver
+    updatedAt
+  }
+}
+GQL;
+    }
+
+    private function releaseIntakeMutation(): string
+    {
+        return <<<'GQL'
+mutation Release($id: ID!) {
+  releaseAssistantIntake(id: $id) {
+    id
+    takenOver
+    updatedAt
+  }
+}
+GQL;
+    }
+
+    private function updateSalonDndMutation(): string
+    {
+        return <<<'GQL'
+mutation Dnd($salonId: ID!, $dnd: Boolean!) {
+  updateSalonDnd(salonId: $salonId, dnd: $dnd) {
+    id
+    dnd
+    takeoverAllowed
+  }
+}
+GQL;
+    }
+
+    private function salonTakeoverQuery(): string
+    {
+        return <<<'GQL'
+query SalonTakeover($id: ID!) {
+  salon(id: $id) {
+    id
+    dnd
+    takeoverAllowed
   }
 }
 GQL;

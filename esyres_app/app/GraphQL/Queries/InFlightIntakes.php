@@ -21,7 +21,7 @@ final class InFlightIntakes
 
         return AssistantIntake::query()
             ->inFlight()
-            ->with('customer')
+            ->with(['customer', 'salon'])
             ->where('salon_id', $salon->id)
             ->orderByDesc('updated_at')
             ->orderByDesc('id')

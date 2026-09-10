@@ -68,6 +68,18 @@ _Avoid_: wizard (as a separate product), NLU flow, conversation inbox
 One of at most three coarse preferred clocks the assistant offers from working hours and that day’s busy-level. Not a live slot, not a hold, and not the picker’s native time control.
 _Avoid_: slot offer, free slot, availability chip, recommended slot
 
+**Take over**:
+The owner’s optional pause of one in-flight scripted intake. The guest waits on that intake. Not live owner messages, not a ping, and not the owner sending the request.
+_Avoid_: live chat, owner composer, takeover thread, handoff (as a worker)
+
+**After hours**:
+Right now outside that salon’s weekly working hours, including a closed weekday and a break. Not a live owner shift calendar.
+_Avoid_: owner offline, shift calendar, closed (as the salon forever)
+
+**DND**:
+A per-salon setting that turns take-over off. Not after hours and not a live owner shift calendar.
+_Avoid_: quiet hours, owner offline, do-not-disturb (as a user-global flag)
+
 ## Bookings
 
 **My Bookings**:

@@ -112,3 +112,47 @@ Feature: Guest assistant intake persistence
     When I log in as "ana@example.com" with password "secret-pass"
     And I create a booking on "2026-08-31" at "10:00" with the salon services and an unknown intake token
     Then the booking status is "REQUESTED"
+
+  Scenario: Taken over intake rejects upsert and chat send
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And the salon has an in-flight intake
+    And that intake is taken over
+    When I upsert the assistant intake as a guest
+    Then the GraphQL error code is "INTAKE_TAKEN_OVER"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the GraphQL error code is "INTAKE_TAKEN_OVER"
+    When I create a booking on "2026-08-31" at "10:00" with the salon services
+    Then the booking status is "REQUESTED"
+
+  Scenario: Guest intake takenOver is true while paused
+    Given the salon has an in-flight intake
+    And that intake is taken over
+    When I query the assistant intake as a guest
+    Then the intake takenOver is true
+
+  Scenario: After hours guest can finish even if the flag is set
+    Given the salon has an in-flight intake
+    And that intake is taken over
+    And the salon is open saturday from "10:00" to "17:00"
+    When I query the assistant intake as a guest
+    Then the intake takenOver is false
+    When I upsert the assistant intake as a guest
+    Then the intake token is a uuid
+
+  Scenario: DND guest can finish even if the flag is set
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And the salon has an in-flight intake
+    And that intake is taken over
+    And the salon dnd is on
+    When I query the assistant intake as a guest
+    Then the intake takenOver is false
+    When I upsert the assistant intake as a guest
+    Then the intake token is a uuid
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+
+  Scenario: Guest cannot read salon dnd
+    When I query salon takeover fields as a guest
+    Then the GraphQL error code is "UNAUTHENTICATED"

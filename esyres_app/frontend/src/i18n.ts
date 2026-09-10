@@ -55,6 +55,7 @@ void i18n.use(initReactI18next).init({
           time: 'Evo vremena koja nam odgovaraju.',
           otherTime: 'Drugo vrijeme',
           send: 'Ako ti ovo odgovara, pošalji zahtjev.',
+          wait: 'Sačekaj, javit ćemo ti se.',
         },
         discovery: {
           nearby: 'Saloni u blizini',
@@ -116,6 +117,9 @@ void i18n.use(initReactI18next).init({
           title: 'Zahtjevi',
           chat: 'Chat',
           chatsEmpty: 'Nema razgovora.',
+          takeOver: 'Preuzmi',
+          releaseTakeOver: 'Vrati asistentu',
+          dnd: 'Ne uznemiravaj',
           chatStep: {
             services: 'Usluge',
             worker: 'Radnik',
