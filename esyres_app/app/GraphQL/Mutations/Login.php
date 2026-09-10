@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Exceptions\ClientError;
 use App\Models\User;
+use App\Qr\ReconcileQrHold;
 use Illuminate\Support\Facades\Auth;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -22,6 +23,8 @@ final class Login
 
         $user = Auth::user();
         assert($user instanceof User);
+
+        app(ReconcileQrHold::class)->fromRequest($user, $context->request());
 
         return $user;
     }

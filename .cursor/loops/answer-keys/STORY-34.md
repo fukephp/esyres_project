@@ -13,8 +13,8 @@
 | Goal (one sentence) | Scanning `GET /qr/{salonId}` sets `esyres_qr` (~7 days, last salon wins); when a session user has both verification timestamps, silently favorite that salon, append a `qr_scans` row, clear the cookie; guest browse stays without a login wall. |
 | Branch name | `story/STORY-34-qr-reconnect` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-10 |
 
 ## Pass/fail — product
 

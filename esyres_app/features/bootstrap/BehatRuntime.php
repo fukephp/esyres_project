@@ -62,6 +62,9 @@ trait BehatRuntime
 
     protected ?string $lastLocation = null;
 
+    /** @var list<\Symfony\Component\HttpFoundation\Cookie> */
+    protected array $lastSetCookies = [];
+
     protected ?string $ownerRespondedAt = null;
 
     protected ?int $occupancyPercent = null;
@@ -87,6 +90,7 @@ trait BehatRuntime
         $this->verifyUrl = null;
         $this->verifyUser = null;
         $this->lastLocation = null;
+        $this->lastSetCookies = [];
         $this->ownerRespondedAt = null;
         $this->occupancyPercent = null;
 
@@ -194,7 +198,8 @@ trait BehatRuntime
 
     protected function rememberCookies(\Illuminate\Testing\TestResponse $response): void
     {
-        foreach ($response->headers->getCookies() as $cookie) {
+        $this->lastSetCookies = $response->headers->getCookies();
+        foreach ($this->lastSetCookies as $cookie) {
             $this->withCookie($cookie->getName(), $cookie->getValue());
         }
     }

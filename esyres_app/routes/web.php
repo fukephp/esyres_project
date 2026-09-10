@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/qr/{salon}', QrController::class)->name('qr.hold');
 
 Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware('signed')

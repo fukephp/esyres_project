@@ -5,6 +5,7 @@ namespace App\GraphQL\Mutations;
 use App\Exceptions\ClientError;
 use App\Models\User;
 use App\Otp\PhoneOtp;
+use App\Qr\ReconcileQrHold;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class VerifyPhoneOtp
@@ -20,6 +21,7 @@ final class VerifyPhoneOtp
         }
 
         app(PhoneOtp::class)->verify($user, $args['code']);
+        app(ReconcileQrHold::class)->fromRequest($user->fresh(), $context->request());
 
         return true;
     }
