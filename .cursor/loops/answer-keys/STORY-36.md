@@ -13,8 +13,8 @@
 | Goal (one sentence) | A verified owner can open `/owner/stats` for the selected salon and see last-7-day bookings count, a 7-day busy-percent strip, busiest start-hours, cancellation rate, and late-cancel count; customers never see this screen. |
 | Branch name | `cursor/story-36-basic-stats-ff6a` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-10 |
 
 ## Pass/fail — product
 
