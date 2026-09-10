@@ -214,6 +214,27 @@ trait SharedFixtures
     }
 
     /**
+     * @Given that booking is declined
+     */
+    public function thatBookingIsDeclined(): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
+     * @Given that booking is declined with reason :reason
+     */
+    public function thatBookingIsDeclinedWithReason(string $reason): void
+    {
+        $this->booking->status = Booking::DECLINED;
+        $this->booking->decline_reason = $reason;
+        $this->booking->save();
+        Carbon::setTestNow(now()->addMinute());
+    }
+
+    /**
      * @Given the salon is open :weekday from :opens to :closes
      */
     public function theSalonIsOpenFromTo(string $weekday, string $opens, string $closes): void
