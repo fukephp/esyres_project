@@ -13,8 +13,8 @@
 | Goal (one sentence) | Owner can mark a past confirmed booking as a no-show; cancel and no-show increment salon + customer counters; `owner_responded_at` and verify timestamps stay as they are; no badge chips. |
 | Branch name | `cursor/story-35-trust-data-capture-1169` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-10 |
 
 ## Pass/fail — product
 

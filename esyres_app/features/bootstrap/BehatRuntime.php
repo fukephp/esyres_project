@@ -70,6 +70,12 @@ trait BehatRuntime
 
     protected ?string $rememberedHourStamp = null;
 
+    protected ?string $rememberedNoShowAt = null;
+
+    protected ?string $rememberedEmailVerifiedAt = null;
+
+    protected ?string $rememberedPhoneVerifiedAt = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -95,6 +101,9 @@ trait BehatRuntime
         $this->occupancyPercent = null;
         $this->rememberedDayStamp = null;
         $this->rememberedHourStamp = null;
+        $this->rememberedNoShowAt = null;
+        $this->rememberedEmailVerifiedAt = null;
+        $this->rememberedPhoneVerifiedAt = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();

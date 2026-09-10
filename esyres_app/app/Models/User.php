@@ -28,6 +28,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'cancel_count' => 'integer',
+            'late_cancel_count' => 'integer',
+            'no_show_count' => 'integer',
         ];
     }
 
