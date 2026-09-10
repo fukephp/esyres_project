@@ -44,19 +44,21 @@ An owner of the selected salon can open a Basic Stats screen and see bookings pe
 - Day-level busy percent **formula** is `Occupancy::percent` unchanged. Customer UI still renders only the enum. Owner stats is the first place the integer percent is shown.
 - Late-ness stays the STORY-30 snapshot (`late_cancel`). Do not recompute from current notice hours (`docs/adr/0016`).
 - Stack: Lighthouse `/graphql`, Sanctum cookies, Behat + Vitest/typecheck/build. No REST. No salon/user counter increment this PR (STORY-35).
+- **Window (2026-09-10):** last 7 Sarajevo calendar days inclusive of today (`today−6` … `today`). No week picker.
+- **Bookings per week (2026-09-10):** count rows with `preferred_date` in that window and status `confirmed` or `cancelled`. Not `requested` / `time_proposed` / `declined`.
+- **Cancellation rate (2026-09-10):** integer percent `cancelled / (confirmed + cancelled)` in that same window and status set. Denominator 0 → 0. Separate integer `lateCancels` = rows with `late_cancel` true. Do not recompute late.
+- **Query (from owner pattern):** dedicated `salonStats(salonId: ID!): SalonStats!` with `OwnerAccess`. Do not hang these fields on public `Salon` (guest already queries `salon`).
+- **Empty (from chats pattern):** still render the screen. Zeros are valid. No empty-state illustration. One Bosnian line when `bookingsCount` is 0.
 
 ## Open decisions
 
-- **Window** — which Sarajevo days do “per week” / rate / busiest cover? (picker vs fixed)
-- **Bookings-per-week count** — which statuses, keyed on which date column
-- **Cancellation rate** — numerator / denominator; whether late is a second number
+- **Days strip** — 7 dates of booking count + busy percent vs today-only percent; how “busiest days” is derived
+- **Busiest hours** — start-hour counts vs occupied minutes; all non-zero hours vs top N
 
 ## Not yet specified
 
-- Busiest hours/days: bucket size (hour vs 15-minute), which clock (preferred vs occupying start), ranked list length — waits on window + status set
-- Which days list day-level busy percent (today only vs every day in the window) — waits on window
-- GraphQL payload shape (`salonStats(salonId)` vs fields on `Salon`) — waits on the three metric definitions
-- Empty / zero-denominator copy
+- Exact GraphQL field names / types (waits on days + hours)
+- Bosnian labels for the four metrics (waits on payload)
 
 ## Out of scope
 
