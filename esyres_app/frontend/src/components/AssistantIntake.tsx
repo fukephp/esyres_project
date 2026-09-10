@@ -15,6 +15,10 @@ import {
   formatAssistantHoursLine,
   type AssistantDayHours,
 } from '../lib/assistant'
+import {
+  pingChrome,
+  unknownChipChrome,
+} from '../lib/intake'
 import type { BusyLevel } from '../lib/busyToken'
 import { formatFeninga } from '../lib/format'
 
@@ -44,6 +48,10 @@ type Props = {
   error: string | null
   busy: boolean
   waiting: boolean
+  unknownShown: boolean
+  pinged: boolean
+  onUnknown: () => void
+  onPing: () => void
   needLogin: boolean
   needEmail: boolean
   needPhone: boolean
@@ -81,6 +89,10 @@ export function AssistantIntake({
   error,
   busy,
   waiting,
+  unknownShown,
+  pinged,
+  onUnknown,
+  onPing,
   needLogin,
   needEmail,
   needPhone,
@@ -97,6 +109,8 @@ export function AssistantIntake({
   })
   const canSend = assistantCanSend(selected, preferredDate, preferredTime)
   const chrome = assistantSendChrome({ needLogin, needEmail, needPhone })
+  const escapeChrome = unknownChipChrome({ waiting, sent: false })
+  const pingUi = pingChrome({ waiting, unknownShown, pinged })
   const chosen = services.filter((s) => selected.includes(s.id))
   const pickedWorker =
     workerChoice === ''
@@ -243,6 +257,18 @@ export function AssistantIntake({
       )}
 
       {step === 'send' && <p className="text-sm text-ink">{t('assistant.send')}</p>}
+      {escapeChrome === 'shown' && (
+        <button type="button" className={chipIdle} onClick={onUnknown}>
+          {t('assistant.other')}
+        </button>
+      )}
+      {(unknownShown || pinged) && !waiting && <p className="text-sm text-ink">{t('assistant.unknown')}</p>}
+      {pingUi === 'cta' && (
+        <button type="button" className="text-sm font-medium text-ink underline underline-offset-4" onClick={onPing}>
+          {t('assistant.ping')}
+        </button>
+      )}
+      {pingUi === 'done' && <p className="text-sm text-muted">{t('assistant.pinged')}</p>}
       {error && <p className="text-sm text-busy-busy">{error}</p>}
       {step === 'send' && chrome === 'submit' && (
         <button

@@ -56,6 +56,10 @@ void i18n.use(initReactI18next).init({
           otherTime: 'Drugo vrijeme',
           send: 'Ako ti ovo odgovara, pošalji zahtjev.',
           wait: 'Sačekaj, javit ćemo ti se.',
+          other: 'Nešto drugo?',
+          unknown: 'Ne znam. To nemam u podacima.',
+          ping: 'Obavijesti salon',
+          pinged: 'Javili smo salonu. Možeš nastaviti.',
         },
         discovery: {
           nearby: 'Saloni u blizini',
@@ -117,6 +121,7 @@ void i18n.use(initReactI18next).init({
           title: 'Zahtjevi',
           chat: 'Chat',
           chatsEmpty: 'Nema razgovora.',
+          ping: 'Pitanje',
           takeOver: 'Preuzmi',
           releaseTakeOver: 'Vrati asistentu',
           dnd: 'Ne uznemiravaj',

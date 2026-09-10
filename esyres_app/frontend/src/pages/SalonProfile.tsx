@@ -10,8 +10,10 @@ import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import {
   ASSISTANT_INTAKE_QUERY,
+  PING_ASSISTANT_INTAKE_MUTATION,
   UPSERT_ASSISTANT_INTAKE_MUTATION,
   type AssistantIntakeData,
+  type PingAssistantIntakeData,
   type UpsertAssistantIntakeData,
 } from '../graphql/intake'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
@@ -121,6 +123,8 @@ export function SalonProfile() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [intakeToken, setIntakeToken] = useState<string | null>(() => (id ? readIntakeToken(id) : null))
+  const [unknownShown, setUnknownShown] = useState(false)
+  const [pinged, setPinged] = useState(false)
   const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
   const restored = useRef(false)
   const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
@@ -129,16 +133,19 @@ export function SalonProfile() {
     fetchPolicy: 'network-only',
   })
   const [upsertIntake] = useMutation<UpsertAssistantIntakeData>(UPSERT_ASSISTANT_INTAKE_MUTATION)
+  const [pingIntake] = useMutation<PingAssistantIntakeData>(PING_ASSISTANT_INTAKE_MUTATION)
 
   useEffect(() => {
     restored.current = false
     lastSnapshot.current = emptyIntakeSnapshot()
     setIntakeToken(id ? readIntakeToken(id) : null)
+    setUnknownShown(false)
+    setPinged(false)
   }, [id])
 
   useEffect(() => {
     const row = savedIntake?.assistantIntake ?? null
-    if (row === null || restored.current || !shouldRestoreIntake(intakeSnapshotFromRow(row))) {
+    if (row === null || restored.current || !shouldRestoreIntake(intakeSnapshotFromRow(row), row.pinged)) {
       return
     }
     restored.current = true
@@ -149,6 +156,8 @@ export function SalonProfile() {
     setChatWorkerConfirmed(snapshot.workerConfirmed)
     setChatDate(snapshot.preferredDate)
     setChatTime(snapshot.preferredTime)
+    setPinged(row.pinged)
+    setUnknownShown(row.pinged)
     setMode('chat')
   }, [savedIntake])
 
@@ -274,6 +283,8 @@ export function SalonProfile() {
         clearIntakeToken(id)
         setIntakeToken(null)
         lastSnapshot.current = emptyIntakeSnapshot()
+        setUnknownShown(false)
+        setPinged(false)
       }
     } catch (err) {
       const code = graphqlErrorCode(err)
@@ -409,6 +420,27 @@ export function SalonProfile() {
       await send(input)
     } finally {
       setBusy(false)
+    }
+  }
+
+  async function onPing() {
+    if (!id || waiting || pinged) {
+      return
+    }
+    try {
+      const result = await pingIntake({
+        variables: { salonId: id, token: intakeToken },
+      })
+      const token = result.data?.pingAssistantIntake.token
+      if (typeof token === 'string') {
+        writeIntakeToken(id, token)
+        setIntakeToken(token)
+      }
+      setPinged(true)
+    } catch (err) {
+      if (graphqlErrorCode(err) === 'INTAKE_TAKEN_OVER') {
+        void refetchIntake()
+      }
     }
   }
 
@@ -636,6 +668,10 @@ export function SalonProfile() {
           error={error}
           busy={busy}
           waiting={waiting}
+          unknownShown={unknownShown}
+          pinged={pinged}
+          onUnknown={() => setUnknownShown(true)}
+          onPing={() => void onPing()}
           needLogin={needLogin}
           needEmail={needEmail}
           needPhone={needPhone}

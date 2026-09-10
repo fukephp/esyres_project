@@ -10,6 +10,9 @@ import {
   shouldRestoreIntake,
   shouldUpsertIntake,
   takeoverRowChrome,
+  unknownChipChrome,
+  pingChrome,
+  intakePingMark,
   withIntakeToken,
 } from './intake'
 
@@ -48,6 +51,31 @@ test('restore only when a snapshot exists', () => {
   expect(shouldRestoreIntake(null)).toBe(false)
   expect(shouldRestoreIntake(empty)).toBe(false)
   expect(shouldRestoreIntake({ ...empty, serviceIds: ['1'] })).toBe(true)
+})
+
+test('pinged empty snapshot still restores', () => {
+  expect(shouldRestoreIntake(empty, true)).toBe(true)
+  expect(shouldRestoreIntake(null, true)).toBe(true)
+})
+
+test('escape chip hides when waiting or sent', () => {
+  expect(unknownChipChrome({ waiting: false, sent: false })).toBe('shown')
+  expect(unknownChipChrome({ waiting: true, sent: false })).toBe('hidden')
+  expect(unknownChipChrome({ waiting: false, sent: true })).toBe('hidden')
+})
+
+test('ping chrome follows unknown then pinged then wait', () => {
+  expect(pingChrome({ waiting: false, unknownShown: false, pinged: false })).toBe('hidden')
+  expect(pingChrome({ waiting: false, unknownShown: true, pinged: false })).toBe('cta')
+  expect(pingChrome({ waiting: false, unknownShown: true, pinged: true })).toBe('done')
+  expect(pingChrome({ waiting: false, unknownShown: false, pinged: true })).toBe('done')
+  expect(pingChrome({ waiting: true, unknownShown: true, pinged: false })).toBe('hidden')
+  expect(pingChrome({ waiting: true, unknownShown: false, pinged: true })).toBe('hidden')
+})
+
+test('owner ping mark is on iff pinged', () => {
+  expect(intakePingMark(false)).toBe(false)
+  expect(intakePingMark(true)).toBe(true)
 })
 
 test('progress line prefers service names then the step', () => {
@@ -94,5 +122,14 @@ test('take over copy is Bosnian', async () => {
   expect(i18n.t('owner.releaseTakeOver')).toBe('Vrati asistentu')
   expect(i18n.t('owner.dnd')).toBe('Ne uznemiravaj')
   expect(i18n.t('assistant.wait')).toBe('Sačekaj, javit ćemo ti se.')
+})
+
+test('unknown and ping copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('assistant.other')).toBe('Nešto drugo?')
+  expect(i18n.t('assistant.unknown')).toBe('Ne znam. To nemam u podacima.')
+  expect(i18n.t('assistant.ping')).toBe('Obavijesti salon')
+  expect(i18n.t('assistant.pinged')).toBe('Javili smo salonu. Možeš nastaviti.')
+  expect(i18n.t('owner.ping')).toBe('Pitanje')
 })
 

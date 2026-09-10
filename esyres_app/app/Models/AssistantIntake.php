@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
-#[Fillable(['salon_id', 'customer_id', 'token', 'service_ids', 'worker_id', 'worker_confirmed', 'preferred_date', 'preferred_time', 'booking_id', 'taken_over_at'])]
+#[Fillable(['salon_id', 'customer_id', 'token', 'service_ids', 'worker_id', 'worker_confirmed', 'preferred_date', 'preferred_time', 'booking_id', 'taken_over_at', 'pinged_at'])]
 class AssistantIntake extends Model
 {
     /** @use HasFactory<AssistantIntakeFactory> */
@@ -34,6 +34,7 @@ class AssistantIntake extends Model
             'service_ids' => 'array',
             'worker_confirmed' => 'boolean',
             'taken_over_at' => 'datetime',
+            'pinged_at' => 'datetime',
         ];
     }
 
@@ -116,5 +117,10 @@ class AssistantIntake extends Model
         }
 
         return $this->salon->takeoverAllowed();
+    }
+
+    public function pinged(): bool
+    {
+        return $this->pinged_at !== null;
     }
 }

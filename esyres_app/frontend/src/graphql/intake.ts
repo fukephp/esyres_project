@@ -12,6 +12,7 @@ export const ASSISTANT_INTAKE_QUERY = gql`
       preferredDate
       preferredTime
       takenOver
+      pinged
     }
   }
 `
@@ -28,6 +29,7 @@ export const UPSERT_ASSISTANT_INTAKE_MUTATION = gql`
       preferredDate
       preferredTime
       takenOver
+      pinged
     }
   }
 `
@@ -44,6 +46,7 @@ export const IN_FLIGHT_INTAKES_QUERY = gql`
       preferredDate
       preferredTime
       takenOver
+      pinged
     }
   }
 `
@@ -82,6 +85,23 @@ export const UPDATE_SALON_DND_MUTATION = gql`
   }
 `
 
+export const PING_ASSISTANT_INTAKE_MUTATION = gql`
+  mutation PingAssistantIntake($salonId: ID!, $token: String) {
+    pingAssistantIntake(salonId: $salonId, token: $token) {
+      id
+      token
+      customerName
+      serviceIds
+      workerId
+      workerConfirmed
+      preferredDate
+      preferredTime
+      takenOver
+      pinged
+    }
+  }
+`
+
 export type AssistantIntakeRow = {
   id: string
   token: string
@@ -92,6 +112,7 @@ export type AssistantIntakeRow = {
   preferredDate: string | null
   preferredTime: string | null
   takenOver: boolean
+  pinged: boolean
 }
 
 export type InFlightIntakeRow = {
@@ -104,6 +125,7 @@ export type InFlightIntakeRow = {
   preferredDate: string | null
   preferredTime: string | null
   takenOver: boolean
+  pinged: boolean
 }
 
 export type AssistantIntakeData = {
@@ -112,6 +134,10 @@ export type AssistantIntakeData = {
 
 export type UpsertAssistantIntakeData = {
   upsertAssistantIntake: AssistantIntakeRow
+}
+
+export type PingAssistantIntakeData = {
+  pingAssistantIntake: AssistantIntakeRow
 }
 
 export type InFlightIntakesData = {
