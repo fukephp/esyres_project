@@ -97,6 +97,7 @@ void i18n.use(initReactI18next).init({
             TIME_PROPOSED: 'Predloženo vrijeme',
             CONFIRMED: 'Potvrđeno',
             DECLINED: 'Odbijeno',
+            CANCELLED: 'Otkazano',
           },
           confirm: 'Prihvati',
           reject: 'Odbi',
@@ -106,6 +107,9 @@ void i18n.use(initReactI18next).init({
           askSend: 'Pošalji',
           reschedule: 'Promijeni termin',
           reschedulePending: 'Premještaj u toku. Hvala na strpljenju.',
+          cancelBooking: 'Otkaži',
+          cancelConfirm: 'Potvrdi',
+          cancelLate: 'Kasniš s otkazivanjem. Termin se ipak može otkazati.',
           respondError: {
             NOT_TIME_PROPOSED: 'Predlog više nije aktivan.',
             EMAIL_UNVERIFIED: 'Potvrdi email prije odgovora.',
@@ -129,6 +133,14 @@ void i18n.use(initReactI18next).init({
             INVALID_TIME: 'Neispravan datum ili vrijeme.',
             FORBIDDEN: 'Zahtjev nije tvoj.',
             fallback: 'Premještaj nije poslan.',
+          },
+          cancelError: {
+            NOT_CONFIRMED: 'Termin nije potvrđen.',
+            PAST_START: 'Termin je već počeo.',
+            EMAIL_UNVERIFIED: 'Potvrdi email prije odgovora.',
+            PHONE_UNVERIFIED: 'Potvrdi telefon prije odgovora.',
+            FORBIDDEN: 'Zahtjev nije tvoj.',
+            fallback: 'Otkazivanje nije poslano.',
           },
         },
         owner: {

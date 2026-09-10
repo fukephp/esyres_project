@@ -141,3 +141,12 @@ test('reschedule copy is Bosnian', async () => {
   expect(i18n.t('owner.keepOriginal')).toBe('Zadrži stari')
 })
 
+test('cancel copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('bookings.cancelBooking')).toBe('Otkaži')
+  expect(i18n.t('bookings.cancelConfirm')).toBe('Potvrdi')
+  expect(i18n.t('bookings.cancelLate')).toBe('Kasniš s otkazivanjem. Termin se ipak može otkazati.')
+  expect(i18n.t('bookings.status.CANCELLED')).toBe('Otkazano')
+  expect(i18n.t('bookings.cancel')).toBe('Odustani')
+})
+

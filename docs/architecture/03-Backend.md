@@ -23,8 +23,8 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 - Lists: limit/offset with a capped `perPage`.
 - Photos: Laravel Storage (local `public` disk). Upload via GraphQL multipart. Swap disk to S3-compatible later. No Spatie.
 - Busy-level is computed on the server (`LOW | MEDIUM | HIGH` + percent). Thresholds remain product placeholders.
-- Overlap: `time_proposed` and `confirmed` occupy `[startsAt, startsAt + duration)` on a worker. `requested` does not occupy a clock slot. `acceptPreferredTime` sets `confirmed` directly when the owner accepts the guest's preferred time.
-- Expire job: placeholder TTLs in config; status becomes `declined` with reason `expired` (no fifth status).
+- Overlap: `time_proposed` and `confirmed` occupy `[startsAt, startsAt + duration)` on a worker. `requested` does not occupy a clock slot. `cancelled` does not occupy. `acceptPreferredTime` sets `confirmed` directly when the owner accepts the guest's preferred time.
+- Expire job: placeholder TTLs in config; status becomes `declined` with reason `expired` (no fifth status for expire). Customer cancel of a confirmed booking is `cancelled` (see `docs/adr/0016-cancel-fifth-status.md`).
 
 ## Backend testing (Behat)
 

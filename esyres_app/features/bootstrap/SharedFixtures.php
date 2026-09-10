@@ -1,5 +1,6 @@
 <?php
 
+use App\BusyLevel\Occupancy;
 use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\BookingService;
@@ -104,6 +105,43 @@ trait SharedFixtures
     {
         $this->booking->worker_id = $this->worker->id;
         $this->booking->save();
+    }
+
+    /**
+     * @Given that booking is cancelled
+     */
+    public function thatBookingIsCancelled(): void
+    {
+        $this->booking->status = Booking::CANCELLED;
+        $this->booking->cancelled_at = now();
+        $this->booking->save();
+    }
+
+    /**
+     * @Given the salon cancellation notice hours is :hours
+     */
+    public function theSalonCancellationNoticeHoursIs(string $hours): void
+    {
+        $this->salon->cancellation_notice_hours = (int) $hours;
+        $this->salon->save();
+    }
+
+    /**
+     * @When I remember occupancy percent for :date
+     */
+    public function iRememberOccupancyPercentFor(string $date): void
+    {
+        $this->occupancyPercent = Occupancy::percent($this->salon->fresh(), $date);
+    }
+
+    /**
+     * @Then occupancy percent for :date is lower
+     */
+    public function occupancyPercentForIsLower(string $date): void
+    {
+        $this->assertNotNull($this->occupancyPercent);
+        $now = Occupancy::percent($this->salon->fresh(), $date);
+        $this->assertLessThan($this->occupancyPercent, $now);
     }
 
     /**

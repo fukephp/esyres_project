@@ -211,6 +211,45 @@ trait OwnerSteps
     }
 
     /**
+     * @When I subscribe to booking cancelled
+     */
+    public function iSubscribeToBookingCancelled(): void
+    {
+        $this->graphql($this->bookingCancelledSubscription(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking cancelled as a guest
+     */
+    public function iSubscribeToBookingCancelledAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iSubscribeToBookingCancelled();
+    }
+
+    /**
+     * @When I subscribe to booking cancelled for the other salon
+     */
+    public function iSubscribeToBookingCancelledForTheOtherSalon(): void
+    {
+        $this->graphql($this->bookingCancelledSubscription(), [
+            'salonId' => (string) $this->otherSalon->id,
+        ]);
+    }
+
+    /**
+     * @When I subscribe to booking cancelled for salon id :id
+     */
+    public function iSubscribeToBookingCancelledForSalonId(string $id): void
+    {
+        $this->graphql($this->bookingCancelledSubscription(), [
+            'salonId' => $id,
+        ]);
+    }
+
+    /**
      * @When I decline the booking
      */
     public function iDeclineTheBooking(): void
@@ -973,6 +1012,18 @@ GQL, ['id' => (string) $this->salon->id]);
         return <<<'GQL'
 subscription BookingRescheduled($salonId: ID!) {
   bookingRescheduled(salonId: $salonId) {
+    id
+    status
+  }
+}
+GQL;
+    }
+
+    private function bookingCancelledSubscription(): string
+    {
+        return <<<'GQL'
+subscription BookingCancelled($salonId: ID!) {
+  bookingCancelled(salonId: $salonId) {
     id
     status
   }

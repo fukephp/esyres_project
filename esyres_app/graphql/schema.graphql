@@ -83,6 +83,7 @@ enum BookingStatus {
     CONFIRMED
     TIME_PROPOSED
     DECLINED
+    CANCELLED
 }
 
 type BookingService {
@@ -108,6 +109,9 @@ type Booking {
     rescheduleDate: String @method(name: "rescheduleDateString")
     rescheduleStartsAt: String @method(name: "rescheduleStartsAtIso")
     reschedulePending: Boolean! @method(name: "reschedulePending")
+    lateToCancel: Boolean! @method(name: "lateToCancel")
+    cancelledAt: String @method(name: "cancelledAtIso")
+    lateCancel: Boolean! @method(name: "lateCancel")
 }
 
 input CreateBookingInput {
@@ -206,9 +210,11 @@ type Mutation {
     requestReschedule(bookingId: ID!, preferredDate: String!, preferredTime: String!): Booking!
     acceptReschedule(bookingId: ID!): Booking!
     dismissReschedule(bookingId: ID!): Booking!
+    cancelBooking(bookingId: ID!): Booking!
 }
 
 type Subscription {
     bookingCustomerResponded(salonId: ID!): Booking
     bookingRescheduled(salonId: ID!): Booking
+    bookingCancelled(salonId: ID!): Booking
 }

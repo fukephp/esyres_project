@@ -1,0 +1,3 @@
+# Cancel of a confirmed booking is a fifth status
+
+Expire maps to `declined` so a request that died never booked does not need its own status (`docs/architecture/08-Decisions.md` #27). Cancel is different: the customer ends a **confirmed** booking that already occupied a worker range. Reusing `declined` would collapse owner decline, customer reject, expire, and cancel into one status and contradict the glossary (a declined booking is not a cancelled confirmed booking). Status becomes `cancelled`. It does not occupy. Late-ness is snapshotted on that row so later stats do not depend on the salon’s current notice hours.

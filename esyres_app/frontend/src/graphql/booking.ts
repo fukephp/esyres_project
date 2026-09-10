@@ -38,6 +38,9 @@ export const MY_BOOKINGS_QUERY = gql`
       rescheduleDate
       rescheduleStartsAt
       reschedulePending
+      lateToCancel
+      lateCancel
+      cancelledAt
       salon {
         id
         name
@@ -61,7 +64,7 @@ export type CreateBookingInput = {
 
 export type MyBooking = {
   id: string
-  status: 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED'
+  status: 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED' | 'CANCELLED'
   preferredDate: string
   preferredStartsAt: string
   durationMinutes: number
@@ -72,6 +75,9 @@ export type MyBooking = {
   rescheduleDate: string | null
   rescheduleStartsAt: string | null
   reschedulePending: boolean
+  lateToCancel: boolean
+  lateCancel: boolean
+  cancelledAt: string | null
   salon: { id: string; name: string }
   services: { name: string; durationMinutes: number }[]
 }
@@ -112,6 +118,19 @@ export const REQUEST_RESCHEDULE_MUTATION = gql`
     requestReschedule(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
       id
       status
+      reschedulePending
+    }
+  }
+`
+
+export const CANCEL_BOOKING_MUTATION = gql`
+  mutation CancelBooking($bookingId: ID!) {
+    cancelBooking(bookingId: $bookingId) {
+      id
+      status
+      lateCancel
+      lateToCancel
+      cancelledAt
       reschedulePending
     }
   }

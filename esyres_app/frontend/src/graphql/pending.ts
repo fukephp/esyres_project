@@ -153,6 +153,15 @@ export const BOOKING_RESCHEDULED_SUBSCRIPTION = gql`
   }
 `
 
+export const BOOKING_CANCELLED_SUBSCRIPTION = gql`
+  subscription BookingCancelled($salonId: ID!) {
+    bookingCancelled(salonId: $salonId) {
+      id
+      status
+    }
+  }
+`
+
 export const ACCEPT_RESCHEDULE_MUTATION = gql`
   mutation AcceptReschedule($bookingId: ID!) {
     acceptReschedule(bookingId: $bookingId) {

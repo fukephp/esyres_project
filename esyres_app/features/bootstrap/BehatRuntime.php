@@ -61,6 +61,8 @@ trait BehatRuntime
 
     protected ?string $ownerRespondedAt = null;
 
+    protected ?int $occupancyPercent = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -83,6 +85,7 @@ trait BehatRuntime
         $this->verifyUser = null;
         $this->lastLocation = null;
         $this->ownerRespondedAt = null;
+        $this->occupancyPercent = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();
@@ -214,6 +217,13 @@ trait BehatRuntime
     {
         if ($value === null) {
             throw new RuntimeException('Expected not null');
+        }
+    }
+
+    protected function assertLessThan(int $expected, int $actual): void
+    {
+        if ($actual >= $expected) {
+            throw new RuntimeException("Expected {$actual} < {$expected}");
         }
     }
 

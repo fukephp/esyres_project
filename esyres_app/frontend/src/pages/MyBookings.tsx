@@ -8,6 +8,7 @@ import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ASK_OTHER_TIME_MUTATION,
+  CANCEL_BOOKING_MUTATION,
   CONFIRM_PROPOSED_TIME_MUTATION,
   MY_BOOKINGS_QUERY,
   REJECT_PROPOSED_TIME_MUTATION,
@@ -18,6 +19,8 @@ import {
 import {
   bookingClock,
   bookingStatusKey,
+  cancelChrome,
+  cancelErrorKey,
   graphqlErrorCode,
   rescheduleChrome,
   rescheduleErrorKey,
@@ -25,7 +28,7 @@ import {
 } from '../lib/booking'
 import { formatSarajevoDateTime } from '../lib/format'
 
-type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' } | null
+type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' | 'cancel' } | null
 
 function VerifyBanner() {
   const { t } = useTranslation()
@@ -53,8 +56,10 @@ function BookingRow({
   onRejectOpen,
   onAskOpen,
   onRescheduleOpen,
+  onCancelOpen,
   onRejectConfirm,
   onAskSend,
+  onCancelConfirm,
   onCancel,
   onAskDate,
   onAskTime,
@@ -69,8 +74,10 @@ function BookingRow({
   onRejectOpen: () => void
   onAskOpen: () => void
   onRescheduleOpen: () => void
+  onCancelOpen: () => void
   onRejectConfirm: () => void
   onAskSend: () => void
+  onCancelConfirm: () => void
   onCancel: () => void
   onAskDate: (value: string) => void
   onAskTime: (value: string) => void
@@ -82,10 +89,17 @@ function BookingRow({
     confirmed: row.status === 'CONFIRMED',
     pending: row.reschedulePending,
   })
+  const canCancel =
+    cancelChrome({
+      confirmed: row.status === 'CONFIRMED',
+      startsAt: row.preferredStartsAt,
+      now: Date.now(),
+    }) === 'show'
   const open = expand !== null && expand.id === row.id
   const rejectOpen = open && expand.mode === 'reject'
   const askOpen = open && expand.mode === 'ask'
   const rescheduleOpen = open && expand.mode === 'reschedule'
+  const cancelOpen = open && expand.mode === 'cancel'
 
   return (
     <li className="rounded-lg border border-hairline px-4 py-3">
@@ -126,6 +140,28 @@ function BookingRow({
             className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
             {t('bookings.reschedule')}
+          </button>
+          {canCancel ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onCancelOpen}
+              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            >
+              {t('bookings.cancelBooking')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {chrome === 'pending' && canCancel && !open ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onCancelOpen}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('bookings.cancelBooking')}
           </button>
         </div>
       ) : null}
@@ -220,6 +256,29 @@ function BookingRow({
           </div>
         </div>
       ) : null}
+      {cancelOpen ? (
+        <div className="mt-3 space-y-2">
+          {row.lateToCancel ? <p className="text-sm text-body">{t('bookings.cancelLate')}</p> : null}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onCancelConfirm}
+              className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            >
+              {t('bookings.cancelConfirm')}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onCancel}
+              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            >
+              {t('bookings.cancel')}
+            </button>
+          </div>
+        </div>
+      ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
     </li>
   )
@@ -237,6 +296,7 @@ export function MyBookings() {
   const [rejectProposed] = useMutation(REJECT_PROPOSED_TIME_MUTATION)
   const [askOther] = useMutation(ASK_OTHER_TIME_MUTATION)
   const [requestReschedule] = useMutation(REQUEST_RESCHEDULE_MUTATION)
+  const [cancelBooking] = useMutation(CANCEL_BOOKING_MUTATION)
   const [expand, setExpand] = useState<Expand>(null)
   const [askDate, setAskDate] = useState('')
   const [askTime, setAskTime] = useState('')
@@ -271,9 +331,11 @@ export function MyBookings() {
       setErrors((prev) => ({
         ...prev,
         [id]: t(
-          expand?.mode === 'reschedule'
-            ? `bookings.rescheduleError.${rescheduleErrorKey(graphqlErrorCode(error))}`
-            : `bookings.respondError.${respondErrorKey(graphqlErrorCode(error))}`,
+          expand?.mode === 'cancel'
+            ? `bookings.cancelError.${cancelErrorKey(graphqlErrorCode(error))}`
+            : expand?.mode === 'reschedule'
+              ? `bookings.rescheduleError.${rescheduleErrorKey(graphqlErrorCode(error))}`
+              : `bookings.respondError.${respondErrorKey(graphqlErrorCode(error))}`,
         ),
       }))
     } finally {
@@ -341,6 +403,7 @@ export function MyBookings() {
               onRejectOpen={() => onExpand({ id: row.id, mode: 'reject' })}
               onAskOpen={() => onExpand({ id: row.id, mode: 'ask' })}
               onRescheduleOpen={() => onExpand({ id: row.id, mode: 'reschedule' })}
+              onCancelOpen={() => onExpand({ id: row.id, mode: 'cancel' })}
               onRejectConfirm={() => void run(row.id, () => rejectProposed({ variables: { bookingId: row.id } }))}
               onAskSend={() =>
                 void run(row.id, () => {
@@ -354,6 +417,7 @@ export function MyBookings() {
                     : askOther({ variables })
                 })
               }
+              onCancelConfirm={() => void run(row.id, () => cancelBooking({ variables: { bookingId: row.id } }))}
               onCancel={() => onExpand(null)}
               onAskDate={setAskDate}
               onAskTime={setAskTime}
