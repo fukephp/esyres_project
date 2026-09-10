@@ -250,6 +250,14 @@ _Avoid_: like, save, follow, wishlist
 The owner-side fact that this customer physically scanned that salon’s QR and then verified. Not a remote favorite and not a completed booking.
 _Avoid_: check-in, walk-in, stamp, Regular (the badge)
 
+**QR scan**:
+A physical hit of the salon’s counter sticker. Not an Instagram-bio or organic profile visit, not a QR visit, and not a booking.
+_Avoid_: profile view, page view, check-in, unique visitor
+
+**QR conversion**:
+The owner-visible share of QR scans that became QR visits. Not request→confirmed and not a trust badge.
+_Avoid_: booking conversion, sticker ROI, Regular (the badge)
+
 ## Signals
 
 **Busy-level**:

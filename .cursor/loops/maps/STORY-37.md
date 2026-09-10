@@ -21,11 +21,11 @@ Owner of the selected salon sees how many people scanned that salon’s QR stick
 
 ## Notes
 
-- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03, 05, 06, 07), `docs/architecture/` (03, 04, 05, 06, 08 #10 #22 #25), `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, `docs/stories/STORY-37.md` plus STORY-34 / 36 / 04, `docs/glossary.md` (**QR hold**, **QR reconnect**, **QR visit**, **Favorite**)
+- Consult: `.cursor/CONTEXT.md`, `docs/mvp/` (03, 05, 06, 07), `docs/architecture/` (03, 04, 05, 06, 08 #10 #22 #25), `docs/adr/0019-qr-sticker-is-not-salon-profile.md`, `docs/adr/0020-qr-reconnect-requires-timestamps.md`, `docs/stories/STORY-37.md` plus STORY-34 / 36 / 04, `docs/glossary.md` (**QR hold**, **QR reconnect**, **QR visit**, **QR scan**, **QR conversion**, **Favorite**)
 - Skills: grill-with-docs (app code exists); custom-feature-skills; playbook plan-gate until this map compiles
 - Code today (`esyres_app/`): STORY-34 shipped. `GET /qr/{salonId}` sets `esyres_qr` (or reconciles immediately if both timestamps) and 302s to `/salon/{id}`. Organic `/salon/:id` does not set the cookie. `qr_scans` is append-only `(user_id, salon_id)` **at reconnect only** — one row per successful QR visit, not an anonymous hit. `qrScans(salonId, limit, offset)` is owner `OwnerAccess` + `ListPage` (default 20, max 50), newest first. No totals. No `/owner/stats`. `OwnerNav` is queue + chats. `/owner` home is queue + panel. SPA has no QR/stats chrome. STORY-34 key/map explicitly left **anonymous scan-hit counter** and **conversion stats UI** to this story.
 - Story AC: scan count + converted-visit count (reconcile at verification) for the selected salon; use STORY-34 capture; no badge display.
-- Tension: if this PR only reads `qr_scans`, scan count = converted count (always 100%). STORY-37 AC and `docs/mvp/05` want scan → verified-visit conversion. Cookie hold is not a countable history (last salon wins, ~7 day TTL, never persisted).
+- Round 1 (2026-09-10): persist anonymous sticker hits; `/owner/stats` QR block; all-time counts + percent.
 - Epic 9 / `docs/mvp/03`: QR stats live on the owner **Basic Stats** screen. STORY-36 out-of-scopes QR conversion and is unbuilt.
 - Standing preferences:
   - One story → one PR; do not reopen STORY-34 cookie / favorite / visited meaning
@@ -45,19 +45,21 @@ Owner of the selected salon sees how many people scanned that salon’s QR stick
 - Existing `qrScans` list stays the visit log. Stats need an aggregate (or equivalent) — the list cannot be the total.
 - Stack: Lighthouse `/graphql`, Sanctum cookies, `OwnerAccess`, Behat, Vitest/typecheck/build. Bosnian-first. Design 2 owner dense.
 - No Pest, Playwright, GraphQL codegen, `vite-plugin-pwa` this PR.
+- **Hits (2026-09-10):** Persist a QR scan on each successful `GET /qr/{existing salon}`. Converted visits = `COUNT(qr_scans)` for that salon. Missing salon: no hit (existing 302 `/`). Organic `/salon/:id` still does not count.
+- **Surface (2026-09-10):** `/owner/stats` QR block only this PR. Owner nav link. `?salon=` like chats (omit or bad id → first owned). `/owner` home stays queue + panel. STORY-36 adds the other Basic Stats cards later.
+- **Window (2026-09-10):** All-time for the selected salon. Two integers (QR scans, QR visits) plus integer percent. `0` scans → percent `0`. No date picker.
 
 ## Open decisions
 
-- **Anonymous hit counter:** STORY-34 deferred it here. (A) Persist each successful `GET /qr/{existing}` as a scan hit; converted = `qr_scans` count for that salon. (B) Do not persist hits; both owner numbers are `COUNT(qr_scans)` (conversion always 100%). (C) Something else (e.g. unique customers).
-- **Owner surface:** New `/owner/stats` with a QR block only (STORY-36 fills the rest later); a QR block on `/owner` home; or wait for STORY-36.
-- **Window and rate:** All-time vs rolling week/month; two counts only vs also a percent.
+- **Hit uniqueness:** every successful `GET /qr/{existing}` vs one hit per cookie/salon (or unique people).
+- **GraphQL:** aggregate query/type names, who computes the percent, rounding.
+- **Copy + zero:** Bosnian nav/labels; `0` / `0%` vs empty-state copy.
+- **Block contents:** two counts + percent only, or also the existing `qrScans` visit log.
 
 ## Not yet specified
 
-- Hit uniqueness (every `GET /qr` vs one hit per cookie/salon) — only if anonymous hits are in
-- GraphQL field names / type shape
-- Bosnian copy for the numbers (and rate, if shown)
-- Zero-scan empty copy vs literal `0`
+- Table/column names (implementer after uniqueness)
+- Exact percent rounding if GraphQL locks “integer percent” without a rule
 
 ## Out of scope
 
