@@ -12,6 +12,8 @@ import {
   ownerDateFromSearch,
   ownerQueuePath,
   ownerChatPath,
+  ownerStatsPath,
+  statsHourLabel,
   ownerSalonFromSearch,
   panelCells,
   proposeErrorKey,
@@ -187,6 +189,18 @@ test('owner chat path is not home and omits first-owned salon', () => {
   expect(ownerChatPath()).toBe('/owner/chats')
   expect(ownerChatPath('1', '1')).toBe('/owner/chats')
   expect(ownerChatPath('2', '1')).toBe('/owner/chats?salon=2')
+})
+
+test('owner stats path is not home and omits first-owned salon', () => {
+  expect(ownerStatsPath()).toBe('/owner/stats')
+  expect(ownerStatsPath('1', '1')).toBe('/owner/stats')
+  expect(ownerStatsPath('2', '1')).toBe('/owner/stats?salon=2')
+})
+
+test('stats hour label is HH:00', () => {
+  expect(statsHourLabel(0)).toBe('00:00')
+  expect(statsHourLabel(9)).toBe('09:00')
+  expect(statsHourLabel(14)).toBe('14:00')
 })
 
 test('assistant origin chip shows only when intake is present', () => {

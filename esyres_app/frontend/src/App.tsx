@@ -7,6 +7,7 @@ import { SalonProfile } from './pages/SalonProfile'
 
 const OwnerHome = lazy(() => import('./pages/OwnerHome').then((m) => ({ default: m.OwnerHome })))
 const OwnerChats = lazy(() => import('./pages/OwnerChats').then((m) => ({ default: m.OwnerChats })))
+const OwnerStats = lazy(() => import('./pages/OwnerStats').then((m) => ({ default: m.OwnerStats })))
 const OwnerRequestDetail = lazy(() =>
   import('./pages/OwnerRequestDetail').then((m) => ({ default: m.OwnerRequestDetail })),
 )
@@ -31,6 +32,14 @@ export default function App() {
           element={
             <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
               <OwnerChats />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/owner/stats"
+          element={
+            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
+              <OwnerStats />
             </Suspense>
           }
         />
