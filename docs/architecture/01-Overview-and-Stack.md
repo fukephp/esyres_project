@@ -24,7 +24,7 @@ Same origin: Nginx serves the SPA at `/`, GraphQL at `/graphql`, Reverb on the s
 One git repo. Application code is not at the git root.
 
 - `esyres_app/` — Laravel (`artisan`, `composer.json`, `app/`)
-- `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`). Typed `/` first paint is the company pitch; then discovery home on the same URL.
+- `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`). Typed `/` is the homepage; discovery home is a named route.
 - `esyres_app/docker-compose.yml` — slim `php` + `vite` + `mysql` (full service list later)
 - `docs/mvp/` — product
 - `docs/architecture/` — this set
@@ -35,4 +35,4 @@ Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet/Google Maps SDK,
 
 ## Related product overrides
 
-Auth, owner invite, salon switcher, per-service duration, preferred time, “ask for a different day or time”, the scripted salon booking assistant, and the in-PWA company pitch (no sibling marketing site) were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md). Assistant v1 does not add a stack component (no LLM, no WhatsApp).
+Auth, owner invite, salon switcher, per-service duration, preferred time, “ask for a different day or time”, the scripted salon booking assistant, and the in-PWA homepage (no sibling marketing site; discovery on a named route) were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md). Assistant v1 does not add a stack component (no LLM, no WhatsApp).

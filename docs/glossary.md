@@ -34,12 +34,12 @@ _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
 
-**Company pitch**:
-The one-screen first paint on typed `/` that explains Esyres before discovery home. Bosnian. Not a login wall, not the salon list, and not a separate company site. The salon profile and the QR sticker path never show it.
-_Avoid_: landing, marketing site, homepage wall, welcome tour
+**Homepage**:
+The permanent guest page at `/`: homepage-only header, existing hero, simple footer. Bosnian. Always this page — not a one-shot overlay, not discovery home, not a login wall, and not a sibling company site. The salon profile and the QR sticker path never show it. Header login and register are dedicated routes; a signed-in header shows email and logout.
+_Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour
 
 **Discovery home**:
-The guest salon list on `/` after the company pitch, or when the guest has already seen it. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the company pitch, and not a separate search page.
+The guest salon list on its own named route, not on `/`. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a search page.
 _Avoid_: homepage wall, feed, marketplace index, landing
 
 **Discovery filter**:
@@ -51,7 +51,7 @@ The discovery list sorted by distance from the guest’s current location. Only 
 _Avoid_: near me map, radius search, geo grid
 
 **Popular in Sarajevo**:
-The discovery list when location is denied or unavailable, so `/` is never blank. Not a ranking of bookings or trust badges.
+The discovery list when location is denied or unavailable, so discovery home is never blank. Not a ranking of bookings or trust badges.
 _Avoid_: trending, featured, curated homepage, popular ranking
 
 ## Request paths
