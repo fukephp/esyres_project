@@ -13,8 +13,8 @@
 | Goal (one sentence) | Typed `/` is always the Bosnian homepage (header + existing hero + footer); Pronađi salon goes to `/salons` where discovery and geolocation mount; no persist-seen. |
 | Branch name | `cursor/story-40-homepage-salons-1359` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-11 |
 
 ## Pass/fail — product
 

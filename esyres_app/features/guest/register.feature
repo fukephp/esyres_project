@@ -12,6 +12,7 @@ Feature: Customer email and password account
     Then register succeeds for "ana@example.com"
     When I query me
     Then me email is "ana@example.com"
+    And me name is "ana"
     And me email is not verified
     And the customer has no phone
     And the customer name is "ana"

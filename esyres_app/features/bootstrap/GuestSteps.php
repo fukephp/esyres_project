@@ -97,6 +97,15 @@ trait GuestSteps
     }
 
     /**
+     * @Then me name is :name
+     */
+    public function meNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['me']['name']);
+    }
+
+    /**
      * @Then me email is not verified
      */
     public function meEmailIsNotVerified(): void
@@ -1795,6 +1804,7 @@ GQL;
 query Me {
   me {
     id
+    name
     email
     emailVerified
     phone
