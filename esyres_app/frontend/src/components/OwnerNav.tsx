@@ -9,21 +9,17 @@ type Props = {
   date?: string
   badge: number | null
   active: 'queue' | 'chats' | 'stats'
-  tone: 'dark' | 'light'
 }
 
-export function OwnerNav({ salonId, firstOwnedId, date, badge, active, tone }: Props) {
+export function OwnerNav({ salonId, firstOwnedId, date, badge, active }: Props) {
   const { t } = useTranslation()
   const today = sarajevoToday()
   const queue = ownerQueuePath(date ?? today, today, salonId, firstOwnedId)
   const chats = ownerChatPath(salonId, firstOwnedId)
   const stats = ownerStatsPath(salonId, firstOwnedId)
-  const idle = tone === 'dark' ? 'text-on-dark/70' : 'text-body'
-  const on = tone === 'dark' ? 'font-semibold text-on-dark' : 'font-semibold text-ink'
-  const badgeClass =
-    tone === 'dark'
-      ? 'bg-canvas text-ink'
-      : 'bg-ink text-canvas'
+  const idle = 'text-body'
+  const on = 'font-semibold text-ink'
+  const badgeClass = 'bg-ink text-canvas'
 
   return (
     <nav className="mt-6 flex flex-col gap-2 text-sm">

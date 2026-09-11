@@ -115,14 +115,13 @@ export function OwnerChats() {
 
   return (
     <div className="min-h-svh md:flex">
-      <aside className="hidden bg-surface-dark px-5 py-8 text-on-dark md:flex md:w-56 md:shrink-0 md:flex-col">
+      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         <Switcher salons={salons} salon={salon} onSalon={onSalon} />
         <OwnerNav
           salonId={salon.id}
           firstOwnedId={firstOwnedId}
           badge={badge}
           active="chats"
-          tone="dark"
         />
       </aside>
       <main className="flex-1 px-5 py-8">
@@ -134,7 +133,6 @@ export function OwnerChats() {
             firstOwnedId={firstOwnedId}
             badge={badge}
             active="chats"
-            tone="light"
           />
         </div>
         <label className="mt-6 flex items-center gap-2 text-sm text-body">
@@ -188,7 +186,7 @@ function Switcher({
         <select
           value={salon.id}
           onChange={(e) => onSalon(e.target.value)}
-          className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink md:border-white/20 md:bg-surface-dark md:text-on-dark"
+          className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
         >
           {salons.map((row) => (
             <option key={row.id} value={row.id}>

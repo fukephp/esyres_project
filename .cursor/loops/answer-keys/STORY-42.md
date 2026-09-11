@@ -13,8 +13,8 @@
 | Goal (one sentence) | Design 1 is the only pack (busy/cell tokens live there; `refs/design-2` is gone), and `/owner` uses Cal light chrome while staying a dense queue + 15-minute grid. |
 | Branch name | `cursor/story-42-one-design-1-4e7b` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-11 |
 
 ## Pass/fail — product
 
