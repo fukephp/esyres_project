@@ -18,25 +18,25 @@
 
 ## Pass/fail — product
 
-- [ ] `isHomepagePath(path)` is true only for `/` and `''`. `isDiscoveryHomePath(path)` is true only for `/salons`. `/salon/:id`, `/bookings`, `/owner`, `/owner/stats`, `/welcome`, `/create-salon` are neither — verify: Vitest (`esyres_app/frontend/src/lib/homepage.ts`)
-- [ ] `homepageDisplayName({ name, email })` returns trimmed `name` when non-empty, else `email`. Empty / whitespace name falls back to email — verify: Vitest
-- [ ] `DISCOVERY_HREF` is `/salons`. `CREATE_SALON_HREF` is `/create-salon`. Pronađi salon is a `Link`/`navigate` to `DISCOVERY_HREF`, not a localStorage write — verify: Vitest + `Homepage` CTA `to`/`href`
-- [ ] i18n `bs`: existing `pitch.h1` / `pitch.support` / `pitch.step1`–`step3` / `pitch.cta` / `pitch.brand` unchanged. New: `home.getPanel` `Imaš salon? Otvori panel`; `home.logout` `Odjava`; `home.footerCity` `Sarajevo`; `home.footerLine` `Termini bez jurnjave.` Header Prijava/Registracija reuse `auth.login` / `auth.register` — verify: Vitest
-- [ ] `HomeGate.tsx`, `companyPitch.ts`, `companyPitch.test.ts`, and `esyres.companyPitchSeen` are gone. Leftover localStorage does not change `/` — verify: `test ! -f frontend/src/pages/HomeGate.tsx`; `test ! -f frontend/src/lib/companyPitch.ts`; grep `companyPitchSeen` empty under `esyres_app/frontend/`
-- [ ] `App.tsx`: `/` → `Homepage` (header + hero + footer only). `/salons` → `DiscoveryHome` (and `useGeo`). Catch-all `*` still `Navigate` to `/`. No `/welcome`. `/create-salon` is **not** registered this PR — verify: `App.tsx`; `test ! -d marketing`
-- [ ] GraphQL `User.name: String!`; `me { name }` after register `"ana@example.com"` is `"ana"` — verify: Behat (`features/guest/register.feature` + `meQuery` selects `name`)
-- [ ] Logged-in header shows `homepageDisplayName` + Odjava; guest header shows Prijava, Registracija, Get your panel (`CREATE_SALON_HREF`). Opening AuthShell does not unmount hero or Pronađi salon. After login/logout stay on `/`. `me.salons.length > 0` does not navigate to `/owner` — verify: Vitest (`homepageChrome` guest vs session helpers) + `Homepage.tsx` has no `navigate('/owner')`
-- [ ] `/salons` has mark+wordmark `Link` to `/`. That row is not the homepage header (no Prijava, no Get your panel, no homepage footer). `/salon/:id` does not add that home link — verify: Vitest i18n/brand on discovery helper + `DiscoveryHome.tsx` has `Link to="/"`; `SalonProfile.tsx` has none
+- [x] `isHomepagePath(path)` is true only for `/` and `''`. `isDiscoveryHomePath(path)` is true only for `/salons`. `/salon/:id`, `/bookings`, `/owner`, `/owner/stats`, `/welcome`, `/create-salon` are neither — verify: Vitest (`esyres_app/frontend/src/lib/homepage.ts`)
+- [x] `homepageDisplayName({ name, email })` returns trimmed `name` when non-empty, else `email`. Empty / whitespace name falls back to email — verify: Vitest
+- [x] `DISCOVERY_HREF` is `/salons`. `CREATE_SALON_HREF` is `/create-salon`. Pronađi salon is a `Link`/`navigate` to `DISCOVERY_HREF`, not a localStorage write — verify: Vitest + `Homepage` CTA `to`/`href`
+- [x] i18n `bs`: existing `pitch.h1` / `pitch.support` / `pitch.step1`–`step3` / `pitch.cta` / `pitch.brand` unchanged. New: `home.getPanel` `Imaš salon? Otvori panel`; `home.logout` `Odjava`; `home.footerCity` `Sarajevo`; `home.footerLine` `Termini bez jurnjave.` Header Prijava/Registracija reuse `auth.login` / `auth.register` — verify: Vitest
+- [x] `HomeGate.tsx`, `companyPitch.ts`, `companyPitch.test.ts`, and `esyres.companyPitchSeen` are gone. Leftover localStorage does not change `/` — verify: `test ! -f frontend/src/pages/HomeGate.tsx`; `test ! -f frontend/src/lib/companyPitch.ts`; grep `companyPitchSeen` empty under `esyres_app/frontend/`
+- [x] `App.tsx`: `/` → `Homepage` (header + hero + footer only). `/salons` → `DiscoveryHome` (and `useGeo`). Catch-all `*` still `Navigate` to `/`. No `/welcome`. `/create-salon` is **not** registered this PR — verify: `App.tsx`; `test ! -d marketing`
+- [x] GraphQL `User.name: String!`; `me { name }` after register `"ana@example.com"` is `"ana"` — verify: Behat (`features/guest/register.feature` + `meQuery` selects `name`)
+- [x] Logged-in header shows `homepageDisplayName` + Odjava; guest header shows Prijava, Registracija, Get your panel (`CREATE_SALON_HREF`). Opening AuthShell does not unmount hero or Pronađi salon. After login/logout stay on `/`. `me.salons.length > 0` does not navigate to `/owner` — verify: Vitest (`homepageChrome` guest vs session helpers) + `Homepage.tsx` has no `navigate('/owner')`
+- [x] `/salons` has mark+wordmark `Link` to `/`. That row is not the homepage header (no Prijava, no Get your panel, no homepage footer). `/salon/:id` does not add that home link — verify: Vitest i18n/brand on discovery helper + `DiscoveryHome.tsx` has `Link to="/"`; `SalonProfile.tsx` has none
 - [ ] One-screen Design 1 on `/` (white canvas, black CTA, Cal Sans display or Inter 600 fallback, light footer). After Pronađi salon, `/salons` is today’s discovery list. `/salon/:id` and `/owner` unchanged this PR — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/04-Frontend.md` (`/` homepage, `/salons` discovery), `08-Decisions.md` #41 #15, `docs/adr/0027-homepage-not-pitch-gate.md`, `docs/adr/0024-company-pitch-in-pwa.md` (no sibling marketing site still holds).
 
-- [ ] Homepage IA (header + hero + footer) is scoped to `/` only. Discovery, salon, `/owner` do not get that chrome. One React PWA; no `/welcome`; `esyres_app/marketing/` stays gone — verify: routes; `test ! -d marketing`; no homepage footer import on salon/owner
-- [ ] `GET /qr/{id}` stays Laravel 302. Valid salon → `/salon/:id`. Missing salon → `SpaUrl::home()` (`/`) which is now the homepage. Do not change `QrController` — verify: `QrController.php` / `SpaUrl.php` unchanged this PR
-- [ ] `User.name` is the existing Eloquent column (non-null string). No migration. No `createSalon` mutation, listed-salon filter, Design-2 delete, or owner restyle — verify: no new migration; schema `name` on `User`; no `createSalon` in this PR
-- [ ] No Playwright, RTL, Pest, GraphQL codegen, `vite-plugin-pwa` this PR. Behat flags CLI-only; do not change `behat.yml` — verify: `esyres_app/frontend/package.json`; no `pestphp`
+- [x] Homepage IA (header + hero + footer) is scoped to `/` only. Discovery, salon, `/owner` do not get that chrome. One React PWA; no `/welcome`; `esyres_app/marketing/` stays gone — verify: routes; `test ! -d marketing`; no homepage footer import on salon/owner
+- [x] `GET /qr/{id}` stays Laravel 302. Valid salon → `/salon/:id`. Missing salon → `SpaUrl::home()` (`/`) which is now the homepage. Do not change `QrController` — verify: `QrController.php` / `SpaUrl.php` unchanged this PR
+- [x] `User.name` is the existing Eloquent column (non-null string). No migration. No `createSalon` mutation, listed-salon filter, Design-2 delete, or owner restyle — verify: no new migration; schema `name` on `User`; no `createSalon` in this PR
+- [x] No Playwright, RTL, Pest, GraphQL codegen, `vite-plugin-pwa` this PR. Behat flags CLI-only; do not change `behat.yml` — verify: `esyres_app/frontend/package.json`; no `pestphp`
 
 ## Verify commands
 
@@ -55,6 +55,8 @@ test ! -d marketing
 test ! -f frontend/src/pages/HomeGate.tsx
 test ! -f frontend/src/lib/companyPitch.ts
 ```
+
+**This PR (2026-09-11):** Docker missing. Host PHP 8.3 + host MySQL (`esyres_test`, `DB_HOST=127.0.0.1`). Passed: `php artisan --version`; `vendor/bin/behat --format=progress --stop-on-failure` (433 scenarios); frontend `typecheck` / `test` / `build`; file-absence gates.
 
 ## Out of scope
 
