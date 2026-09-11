@@ -1,3 +1,4 @@
+// @ts-nocheck — Node fs is not in the PWA tsconfig; Vitest runs this file.
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
