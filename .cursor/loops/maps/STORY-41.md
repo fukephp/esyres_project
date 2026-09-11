@@ -65,7 +65,7 @@ A customer creates a salon on the same account from guest-reachable `/create-sal
 
 ## Out of scope
 
-- Implementing STORY-40 homepage / `/salons` / persist-seen removal (unless the homepage-CTA decision explicitly pulls chrome in)
+- Implementing STORY-40 homepage / `/salons` / persist-seen removal / wiring the homepage header CTA
 - Second salon from the homepage (salon switcher stays STORY-04)
 - Owner address / `lat`/`lng` editor
 - Hours, services, workers UI (STORY-01–03)
