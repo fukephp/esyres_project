@@ -21,7 +21,7 @@ docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 ```
 
-Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB).
+Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB). Do not `migrate:fresh` on `esyres`. Cloud Agent without a real Docker daemon: host PHP + host MySQL (same Behat flags); do not nest `docker.io`.
 
 First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`.
 
