@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-41 |
 | Source | `docs/stories/STORY-41.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-41.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-41.md` |
 
 ## Destination
 
@@ -50,17 +50,18 @@ A customer creates a salon on the same account from guest-reachable `/create-sal
 - **Discovery Behat:** scenarios that expect a salon in Nearby/Popular must fixture one open weekday + one service. Add coverage: closed+service omitted; open+no service omitted; open+service listed; unlisted still in `salon(id)`. `"Hidden"` stays off Nearby (no coords) and off Popular (unlisted).
 - **Stack:** existing Lighthouse `/graphql`, Sanctum cookies, i18next `bs`, Vitest helpers. No Pest, Playwright, codegen, REST, sibling marketing site.
 - **OOS stays OOS:** second salon from homepage (STORY-04), address editor, hours/services/workers UI (STORY-01–03), Design-2 delete / owner light nav (STORY-42), public pricing, invite-email onboarding UI.
+- **Homepage CTA (2026-09-11):** Option B. This PR does **not** build STORY-40 homepage IA. Cover already-owner vs not with helper `ownerPanelCta(ownsSalon)` → `{ href: '/owner', kind: 'panel' }` vs `{ href: '/create-salon', kind: 'create' }`. i18n `home.panel` = `Panel`. STORY-40 wires the header and drafts Get your panel copy. `/create-salon` is reachable by URL.
+- **Second salon API (2026-09-11):** `createSalon` **allows** another row (multi-own stays). Only `/create-salon` UI redirects when `me.salons.length > 0`. No `ALREADY_OWNS`.
+- **`/owner` empty (2026-09-11):** `OwnerHome` not-owner state keeps `owner.notOwner` and adds one link to `/create-salon`, copy `Napravi salon`. Not a form on `/owner`. Other owner routes keep the paragraph only.
+- **Copy (2026-09-11):** i18n `bs`, informal *ti*. `pitch.brand` / create-salon brand `Esyres`; `createSalon.name` `Ime salona`; `createSalon.submit` `Otvori panel`; `createSalon.INVALID_NAME` `Unesi ime salona.`; `home.panel` `Panel`; `owner.createSalon` `Napravi salon`. Reuse AuthShell + EmailVerifyPanel copy.
 
 ## Open decisions
 
-- **Homepage Panel CTA vs unimplemented STORY-40:** `/` has no Get your panel slot yet. STORY-41 AC still wants already-owner → Panel `/owner`. Choose: pause until STORY-40; ship create-salon + listed now and cover Panel vs Get your panel with a Vitest helper STORY-40 will wire; or pull STORY-40 homepage chrome into this PR.
-- **Second salon at the API:** UI blocks a second create from `/create-salon`. Should `createSalon` still insert another `salons` row (model already allows multi-own / STORY-04), or reject?
-- **`/owner` not-owner dead end:** today `Nisi vlasnik salona.` with no link. Add a single link to `/create-salon`, or leave `/owner` copy unchanged this PR?
-- **Create-salon copy:** lock Bosnian strings now, or implementer-draft (STORY-40 pattern)?
+<!-- empty -->
 
 ## Not yet specified
 
-<!-- empty — remaining questions are sharp enough to grill -->
+<!-- empty -->
 
 ## Out of scope
 
