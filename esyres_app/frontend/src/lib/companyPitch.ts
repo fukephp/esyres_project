@@ -14,3 +14,7 @@ export function shouldShowCompanyPitch(path: string, seen: boolean): boolean {
   }
   return path === '/' || path === ''
 }
+
+export function homeSurface(path: string, seen: boolean): 'pitch' | 'discovery' {
+  return shouldShowCompanyPitch(path, seen) ? 'pitch' : 'discovery'
+}

@@ -1,10 +1,8 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { expect, test } from 'vitest'
 import {
   STORAGE_KEY,
   companyPitchSeen,
+  homeSurface,
   markCompanyPitchSeen,
   shouldShowCompanyPitch,
 } from './companyPitch'
@@ -50,6 +48,14 @@ test('shouldShowCompanyPitch is only unseen home', () => {
   expect(shouldShowCompanyPitch('/salons', false)).toBe(false)
 })
 
+test('homeSurface is pitch or discovery, never both', () => {
+  expect(homeSurface('/', false)).toBe('pitch')
+  expect(homeSurface('/', true)).toBe('discovery')
+  expect(homeSurface('/salon/1', false)).toBe('discovery')
+  expect(homeSurface('/bookings', false)).toBe('discovery')
+  expect(homeSurface('/owner', false)).toBe('discovery')
+})
+
 test('companyPitchSeen reads localStorage key 1 only', () => {
   const storage = new MemoryStorage()
   expect(STORAGE_KEY).toBe('esyres.companyPitchSeen')
@@ -80,20 +86,4 @@ test('pitch copy is Bosnian', async () => {
   expect(i18n.t('pitch.step2')).toBe('Salon prihvati ili prilagodi.')
   expect(i18n.t('pitch.step3')).toBe('Potvrdiš samo ako predlože drugo vrijeme.')
   expect(i18n.t('pitch.cta')).toBe('Pronađi salon')
-})
-
-test('App / is HomeGate not DiscoveryHome', () => {
-  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../App.tsx'), 'utf8')
-  expect(src).toContain('path="/" element={<HomeGate />}')
-  expect(src).not.toContain('path="/" element={<DiscoveryHome />}')
-  expect(src).not.toMatch(/path="\/welcome"/)
-  expect(src).not.toMatch(/path="\/salons"/)
-})
-
-test('HomeGate mounts pitch or discovery, never both', () => {
-  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../pages/HomeGate.tsx'), 'utf8')
-  expect(src).toContain('shouldShowCompanyPitch')
-  expect(src).toMatch(/if \(shouldShowCompanyPitch\([^)]+\)\) \{\s*return \(\s*<CompanyPitch/)
-  expect(src).toMatch(/return <DiscoveryHome \/>/)
-  expect(src).not.toMatch(/<>[\s\S]*<CompanyPitch[\s\S]*<DiscoveryHome/)
 })

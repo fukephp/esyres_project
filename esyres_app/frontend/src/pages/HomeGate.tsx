@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { companyPitchSeen, markCompanyPitchSeen, shouldShowCompanyPitch } from '../lib/companyPitch'
+import { homeSurface, companyPitchSeen, markCompanyPitchSeen } from '../lib/companyPitch'
 import { CompanyPitch } from './CompanyPitch'
 import { DiscoveryHome } from './DiscoveryHome'
 
@@ -8,7 +8,7 @@ export function HomeGate() {
   const { pathname } = useLocation()
   const [seen, setSeen] = useState(() => companyPitchSeen(window.localStorage))
 
-  if (shouldShowCompanyPitch(pathname, seen)) {
+  if (homeSurface(pathname, seen) === 'pitch') {
     return (
       <CompanyPitch
         onContinue={() => {
