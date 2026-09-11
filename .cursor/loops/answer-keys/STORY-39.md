@@ -13,8 +13,8 @@
 | Goal (one sentence) | A guest who typed `/` sees one Bosnian Design 1 pitch once, taps **Pronađi salon**, then sees today’s discovery home on the same `/`; `esyres_app/marketing/` is gone. |
 | Branch name | `cursor/story-39-eb9a` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-11 |
 
 ## Pass/fail — product
 

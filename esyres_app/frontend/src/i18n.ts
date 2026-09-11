@@ -69,6 +69,16 @@ void i18n.use(initReactI18next).init({
           emptyFiltered: 'Nema rezultata.',
           searchPlaceholder: 'Ime salona',
         },
+        pitch: {
+          brand: 'Esyres',
+          h1: 'Rezervacije bez jurnjave za terminom',
+          support:
+            'Odabereš dan i željeno vrijeme. Salon prihvati ili predloži drugo. Potvrdiš samo kad predlože drugačije vrijeme.',
+          step1: 'Odaberi dan i željeno vrijeme.',
+          step2: 'Salon prihvati ili prilagodi.',
+          step3: 'Potvrdiš samo ako predlože drugo vrijeme.',
+          cta: 'Pronađi salon',
+        },
         auth: {
           login: 'Prijava',
           register: 'Registracija',
