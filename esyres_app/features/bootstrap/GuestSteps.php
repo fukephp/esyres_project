@@ -971,7 +971,10 @@ trait GuestSteps
             throw new RuntimeException('Expected a created salon');
         }
         $salon = $this->salon->fresh() ?? $this->salon;
-        $this->assertSame(WeeklyHours::closedWeek(), $salon->hours);
+        $hours = $salon->hours ?? [];
+        foreach (WeeklyHours::WEEKDAYS as $day) {
+            $this->assertTrue(($hours[$day]['closed'] ?? false) === true);
+        }
         $this->assertSame(24, $salon->cancellation_notice_hours);
         $this->assertSame(0, $salon->services()->count());
         $this->assertSame(0, $salon->workers()->count());

@@ -18,24 +18,24 @@
 
 ## Pass/fail — product
 
-- [ ] `createSalonSurface(me)` is `auth` when `me` is null; `redirect-owner` when `me.salons.length > 0` (even if email unverified); `verify` when signed-in, no salons, `emailVerified` false; `form` when signed-in, verified, no salons — verify: Vitest
-- [ ] `ownerPanelCta(ownsSalon)` is `{ href: '/create-salon', kind: 'create' }` when false and `{ href: '/owner', kind: 'panel' }` when true — verify: Vitest
-- [ ] i18n `bs`: `createSalon.name` `Ime salona`; `createSalon.submit` `Otvori panel`; `createSalon.INVALID_NAME` `Unesi ime salona.`; `home.panel` `Panel`; `owner.createSalon` `Napravi salon`; brand on the page is `pitch.brand` `Esyres` — verify: Vitest
-- [ ] `CREATE_SALON_PATH` is `/create-salon`; `App.tsx` uses that constant as a route (not `/signup`, not under `/owner`) before the `*` catch-all; `/` stays `HomeGate`; no `/salons` this PR — verify: Vitest (`CREATE_SALON_PATH`) + `App.tsx` imports it
-- [ ] GraphQL `createSalon(name)` as a verified session user: same `users` row as `owner_id`; stored name is trimmed; hours closed all seven weekdays; `cancellation_notice_hours` 24; empty services; empty workers; `address`/`lat`/`lng` null — verify: Behat
-- [ ] `createSalon` guest → `UNAUTHENTICATED`; signed-in unverified (Behat `APP_ENV=testing`, not local skip) → `EMAIL_UNVERIFIED`; empty or whitespace name → `INVALID_NAME`; user who already owns a salon can still create another via the mutation — verify: Behat
-- [ ] Nearby and Popular omit a salon until it has ≥1 weekday with `closed: false` **and** ≥1 service. Nearby still requires `lat`/`lng`. Unlisted `salon(id)` still returns the row (not `UNAUTHENTICATED`/`FORBIDDEN`). Popular does not include factory-default `"Hidden"` — verify: Behat (`features/guest/salon_discovery.feature` plus listed/unlisted cases)
-- [ ] No `/signup`, waitlist, or Formspree — verify: `rg -n 'formspree|/signup|waitlist' esyres_app/frontend esyres_app/routes esyres_app/graphql` exits 1 (no matches)
+- [x] `createSalonSurface(me)` is `auth` when `me` is null; `redirect-owner` when `me.salons.length > 0` (even if email unverified); `verify` when signed-in, no salons, `emailVerified` false; `form` when signed-in, verified, no salons — verify: Vitest
+- [x] `ownerPanelCta(ownsSalon)` is `{ href: '/create-salon', kind: 'create' }` when false and `{ href: '/owner', kind: 'panel' }` when true — verify: Vitest
+- [x] i18n `bs`: `createSalon.name` `Ime salona`; `createSalon.submit` `Otvori panel`; `createSalon.INVALID_NAME` `Unesi ime salona.`; `home.panel` `Panel`; `owner.createSalon` `Napravi salon`; brand on the page is `pitch.brand` `Esyres` — verify: Vitest
+- [x] `CREATE_SALON_PATH` is `/create-salon`; `App.tsx` uses that constant as a route (not `/signup`, not under `/owner`) before the `*` catch-all; `/` stays `HomeGate`; no `/salons` this PR — verify: Vitest (`CREATE_SALON_PATH`) + `App.tsx` imports it
+- [x] GraphQL `createSalon(name)` as a verified session user: same `users` row as `owner_id`; stored name is trimmed; hours closed all seven weekdays; `cancellation_notice_hours` 24; empty services; empty workers; `address`/`lat`/`lng` null — verify: Behat
+- [x] `createSalon` guest → `UNAUTHENTICATED`; signed-in unverified (Behat `APP_ENV=testing`, not local skip) → `EMAIL_UNVERIFIED`; empty or whitespace name → `INVALID_NAME`; user who already owns a salon can still create another via the mutation — verify: Behat
+- [x] Nearby and Popular omit a salon until it has ≥1 weekday with `closed: false` **and** ≥1 service. Nearby still requires `lat`/`lng`. Unlisted `salon(id)` still returns the row (not `UNAUTHENTICATED`/`FORBIDDEN`). Popular does not include factory-default `"Hidden"` — verify: Behat (`features/guest/salon_discovery.feature` plus listed/unlisted cases)
+- [x] No `/signup`, waitlist, or Formspree — verify: `rg -n 'formspree|/signup|waitlist' esyres_app/frontend esyres_app/routes esyres_app/graphql` exits 1 (no matches)
 - [ ] Sparse Design-1 on `/create-salon` (brand link to `/`, name field, black `rounded-md` CTA; no homepage header/footer, no feature grid, no owner-panel chrome) — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/03-Backend.md` (Epic 7 `createSalon`), `04-Frontend.md` (`/create-salon`), `05-Data-Model.md`, `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #7 #43, `docs/adr/0025-self-serve-create-salon.md`, `docs/adr/0028-listed-salon-on-discovery.md`.
 
-- [ ] Lighthouse `/graphql` mutation only; no REST create-salon resource — verify: Behat hits `/graphql`; no new web.php create route
-- [ ] Sanctum session + existing `OwnerAccess::user` codes (`UNAUTHENTICATED` / `EMAIL_UNVERIFIED`); local `hasVerifiedEmail` skip unchanged — verify: Behat; `User::hasVerifiedEmail` untouched
-- [ ] Listed filter is shared by `salonsNearby` and `popularInSarajevo` (one helper/scope). No geocoding. `salon(id)` unfiltered — verify: Behat + both query classes call the helper
-- [ ] No STORY-40 homepage/`/salons`/HomeGate removal. No STORY-42 Design-2 delete. No Pest, Playwright, GraphQL codegen this PR — verify: `HomeGate` still on `/`; `refs/design-2` still present; `esyres_app/frontend/package.json` (no Playwright/RTL added)
+- [x] Lighthouse `/graphql` mutation only; no REST create-salon resource — verify: Behat hits `/graphql`; no new web.php create route
+- [x] Sanctum session + existing `OwnerAccess::user` codes (`UNAUTHENTICATED` / `EMAIL_UNVERIFIED`); local `hasVerifiedEmail` skip unchanged — verify: Behat; `User::hasVerifiedEmail` untouched
+- [x] Listed filter is shared by `salonsNearby` and `popularInSarajevo` (one helper/scope). No geocoding. `salon(id)` unfiltered — verify: Behat + both query classes call the helper
+- [x] No STORY-40 homepage/`/salons`/HomeGate removal. No STORY-42 Design-2 delete. No Pest, Playwright, GraphQL codegen this PR — verify: `HomeGate` still on `/`; `refs/design-2` still present; `esyres_app/frontend/package.json` (no Playwright/RTL added)
 
 ## Verify commands
 
@@ -52,14 +52,22 @@ docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 ```
 
-If Compose Behat is nested-Docker slow, equivalent host gate (still `esyres_test` only):
+Cloud Agent verify (2026-09-11): Docker missing. Host PHP 8.3 + host MySQL, `.env.behat` / `esyres_test` only (no `esyres` DB). Hostname `mysql` mapped to 127.0.0.1 for this VM. Frontend via host `npm` from `esyres_app/frontend/`.
+
+Passed:
 
 ```text
 php artisan --version
 vendor/bin/behat --format=progress --stop-on-failure
 ```
 
-Frontend may run via Compose `vite` exec or host `npm` from `esyres_app/frontend/` — same scripts, exit 0.
+From `esyres_app/frontend/`:
+
+```text
+npm run typecheck
+npm run test
+npm run build
+```
 
 ## Out of scope
 
