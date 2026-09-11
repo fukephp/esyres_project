@@ -2,10 +2,12 @@
 
 use App\Models\AssistantIntake;
 use App\Models\Booking;
+use App\Models\Salon;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\Notifications\VerifyEmail;
+use App\SalonHours\WeeklyHours;
 use App\Sms\FakeSmsGateway;
 use App\Sms\SmsGateway;
 use Behat\Gherkin\Node\PyStringNode;
@@ -938,6 +940,79 @@ trait GuestSteps
         $this->assertSame($level, $this->graphql['data']['salon']['busyLevel']);
     }
 
+    /**
+     * @When I create a salon named :name as a guest
+     */
+    public function iCreateASalonNamedAsAGuest(string $name): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->createSalonMutation(), ['name' => $name]);
+    }
+
+    /**
+     * @When I create a salon named :name
+     */
+    public function iCreateASalonNamed(string $name): void
+    {
+        $this->graphql($this->createSalonMutation(), ['name' => $name]);
+    }
+
+    /**
+     * @Then createSalon name is :name
+     */
+    public function createSalonNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['createSalon']['name']);
+        $id = $this->graphql['data']['createSalon']['id'] ?? null;
+        if (! is_string($id) && ! is_int($id)) {
+            throw new RuntimeException('Expected createSalon id, got '.json_encode($this->graphql));
+        }
+        $this->salon = Salon::query()->find($id);
+    }
+
+    /**
+     * @Then the created salon has provisioned defaults
+     */
+    public function theCreatedSalonHasProvisionedDefaults(): void
+    {
+        if ($this->salon === null) {
+            throw new RuntimeException('Expected a created salon');
+        }
+        $salon = $this->salon->fresh() ?? $this->salon;
+        $hours = $salon->hours ?? [];
+        foreach (WeeklyHours::WEEKDAYS as $day) {
+            $this->assertTrue(($hours[$day]['closed'] ?? false) === true);
+        }
+        $this->assertSame(24, $salon->cancellation_notice_hours);
+        $this->assertSame(0, $salon->services()->count());
+        $this->assertSame(0, $salon->workers()->count());
+        $this->assertSame(null, $salon->address);
+        $this->assertSame(null, $salon->lat);
+        $this->assertSame(null, $salon->lng);
+    }
+
+    /**
+     * @Then the created salon is owned by :email
+     */
+    public function theCreatedSalonIsOwnedBy(string $email): void
+    {
+        if ($this->salon === null || $this->user === null) {
+            throw new RuntimeException('Expected a created salon and session user');
+        }
+        $salon = $this->salon->fresh() ?? $this->salon;
+        $this->assertSame($this->user->id, $salon->owner_id);
+        $this->assertSame($email, $this->user->email);
+    }
+
+    /**
+     * @Then the customer owns :count salons
+     */
+    public function theCustomerOwnsSalons(string $count): void
+    {
+        $this->assertSame((int) $count, $this->customer()->salons()->count());
+    }
+
     private function customer(): User
     {
         if ($this->user === null) {
@@ -1077,6 +1152,18 @@ GQL;
         }
 
         return $ids;
+    }
+
+    private function createSalonMutation(): string
+    {
+        return <<<'GQL'
+mutation CreateSalon($name: String!) {
+  createSalon(name: $name) {
+    id
+    name
+  }
+}
+GQL;
     }
 
     private function salonsNearbyQuery(): string

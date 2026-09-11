@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import i18n from './i18n'
+import { CREATE_SALON_PATH } from './lib/createSalon'
+import { CreateSalon } from './pages/CreateSalon'
 import { DiscoveryHome } from './pages/DiscoveryHome'
 import { Homepage } from './pages/Homepage'
 import { MyBookings } from './pages/MyBookings'
@@ -19,6 +21,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/salons" element={<DiscoveryHome />} />
+        <Route path={CREATE_SALON_PATH} element={<CreateSalon />} />
         <Route path="/salon/:id" element={<SalonProfile />} />
         <Route path="/bookings" element={<MyBookings />} />
         <Route

@@ -79,7 +79,13 @@ void i18n.use(initReactI18next).init({
           step3: 'Potvrdiš samo ako predlože drugo vrijeme.',
           cta: 'Pronađi salon',
         },
+        createSalon: {
+          name: 'Ime salona',
+          submit: 'Otvori panel',
+          INVALID_NAME: 'Unesi ime salona.',
+        },
         home: {
+          panel: 'Panel',
           getPanel: 'Imaš salon? Otvori panel',
           logout: 'Odjava',
           footerCity: 'Sarajevo',
@@ -188,6 +194,7 @@ void i18n.use(initReactI18next).init({
           date: 'Datum',
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',
+          createSalon: 'Napravi salon',
           noWorkers: 'Nema radnika.',
           closedDay: 'Zatvoreno ovaj dan.',
           soon: 'Uskoro',

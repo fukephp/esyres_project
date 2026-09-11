@@ -3,6 +3,7 @@
 namespace App\GraphQL\Queries;
 
 use App\Discovery\Coordinates;
+use App\Discovery\ListedSalon;
 use App\Discovery\ListFilter;
 use App\Discovery\ListPage;
 use App\Models\Salon;
@@ -23,6 +24,7 @@ final class SalonsNearby
         $query = Salon::query()
             ->whereNotNull('lat')
             ->whereNotNull('lng');
+        ListedSalon::constrain($query);
         ListFilter::apply($query, $args['category'] ?? null, $args['name'] ?? null);
 
         return $query

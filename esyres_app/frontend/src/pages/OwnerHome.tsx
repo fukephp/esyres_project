@@ -31,6 +31,7 @@ import {
   type PendingBookingsData,
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
+import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
 import { chatBadgeCount } from '../lib/intake'
 import { useOwnerPush } from '../lib/push'
@@ -288,6 +289,12 @@ export function OwnerHome() {
       <main className="mx-auto max-w-md px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
         <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
+        <Link
+          to={CREATE_SALON_PATH}
+          className="mt-4 inline-block text-sm font-semibold text-ink"
+        >
+          {t('owner.createSalon')}
+        </Link>
       </main>
     )
   }

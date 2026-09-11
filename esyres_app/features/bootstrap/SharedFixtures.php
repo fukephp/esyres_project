@@ -663,6 +663,25 @@ trait SharedFixtures
     }
 
     /**
+     * @Given the salon is listed
+     */
+    public function theSalonIsListed(): void
+    {
+        $this->theSalonIsOpenFromTo('saturday', '09:00', '17:00');
+        if ($this->salon->services()->exists()) {
+            return;
+        }
+        $this->service = Service::factory()->create([
+            'salon_id' => $this->salon->id,
+            'name' => 'Šišanje',
+            'category' => 'HAIR',
+            'duration_minutes' => 30,
+            'price_feninga' => 2500,
+        ]);
+        $this->services[] = $this->service;
+    }
+
+    /**
      * @Given the salon is at lat :lat lng :lng
      */
     public function theSalonIsAt(string $lat, string $lng): void

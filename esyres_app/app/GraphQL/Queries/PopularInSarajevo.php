@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Queries;
 
+use App\Discovery\ListedSalon;
 use App\Discovery\ListFilter;
 use App\Discovery\ListPage;
 use App\Models\Salon;
@@ -20,6 +21,7 @@ final class PopularInSarajevo
 
         // ponytail: id order until Booking exists for a real popularity ranking
         $query = Salon::query();
+        ListedSalon::constrain($query);
         ListFilter::apply($query, $args['category'] ?? null, $args['name'] ?? null);
 
         return $query
