@@ -12,6 +12,8 @@ Adapted from [mattpocock/skills grilling](https://github.com/mattpocock/skills/b
 
 Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
 
+**Diverge prefix (wrappers only).** [grill-me](../grill-me/SKILL.md) and [grill-with-docs](../grill-with-docs/SKILL.md) may run [diverge](../diverge/SKILL.md) **before** round 1 on a product MVP breakdown or a new story/feature not already in `docs/stories/`. If they did, round 1 is **cluster-pick** (below), then later rounds lock as usual. **Never** run diverge yourself when grilling is a subroutine (story-loop maps, what-next, coding). There is no `/diverge` command.
+
 Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
 
 Format a round like so:
@@ -27,6 +29,8 @@ Format a round like so:
 
 ➡️ <your recommended answer>
 ```
+
+**Cluster-pick (round 1 only after diverge).** Ask which angles/clusters to keep. Recommended answer names the ★ non-obvious viable pick **and** the safe default as contrast; drop traps. Do not lock epics, stack, or `STORY-xx` cuts in this round. After the user answers, later rounds use the normal format above.
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 

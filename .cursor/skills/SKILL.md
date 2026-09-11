@@ -12,6 +12,7 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 | Skill | When to use |
 |-------|-------------|
 | [grilling](grilling/SKILL.md) | **Default** interview engine (rounds/frontier); auto before locking a plan |
+| [diverge](diverge/SKILL.md) | Isolated option-space before a product MVP or new-story grill (wrappers only; no slash command) |
 | [grill-me](grill-me/SKILL.md) | User-invoked grilling; persist at end of topic (`/grill-me`) |
 | [grill-with-docs](grill-with-docs/SKILL.md) | User-invoked grilling against a **codebase**; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`) |
 | [domain-modeling](domain-modeling/SKILL.md) | Glossary + ADRs as terms/decisions lock (loaded by grill-with-docs) |
