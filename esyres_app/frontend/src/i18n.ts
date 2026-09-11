@@ -86,6 +86,10 @@ void i18n.use(initReactI18next).init({
         },
         home: {
           panel: 'Panel',
+          getPanel: 'Imaš salon? Otvori panel',
+          logout: 'Odjava',
+          footerCity: 'Sarajevo',
+          footerLine: 'Termini bez jurnjave.',
         },
         auth: {
           login: 'Prijava',

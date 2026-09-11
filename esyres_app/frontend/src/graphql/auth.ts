@@ -4,6 +4,7 @@ export const ME_QUERY = gql`
   query Me {
     me {
       id
+      name
       email
       emailVerified
       phone
@@ -20,6 +21,7 @@ export const LOGIN_MUTATION = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       id
+      name
       email
       emailVerified
       phone
@@ -32,6 +34,7 @@ export const REGISTER_MUTATION = gql`
   mutation Register($email: String!, $password: String!, $phone: String) {
     register(email: $email, password: $password, phone: $phone) {
       id
+      name
       email
       emailVerified
       phone
@@ -76,6 +79,7 @@ export const VERIFY_PHONE_OTP = gql`
 export type MeData = {
   me: {
     id: string
+    name: string
     email: string
     emailVerified: boolean
     phone: string | null
