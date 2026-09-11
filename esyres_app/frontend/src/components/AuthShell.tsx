@@ -29,14 +29,16 @@ function authMessage(code: string | null, t: (key: string) => string): string {
 export function AuthShell({
   onAuthenticated,
   allowRegister = true,
+  initialMode = 'login',
 }: {
   onAuthenticated: () => void | Promise<unknown>
   allowRegister?: boolean
+  initialMode?: 'login' | 'register'
 }) {
   const { t } = useTranslation()
   const [login] = useMutation(LOGIN_MUTATION, { refetchQueries: ['Me'] })
   const [register] = useMutation(REGISTER_MUTATION, { refetchQueries: ['Me'] })
-  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')

@@ -79,6 +79,12 @@ void i18n.use(initReactI18next).init({
           step3: 'Potvrdiš samo ako predlože drugo vrijeme.',
           cta: 'Pronađi salon',
         },
+        home: {
+          getPanel: 'Imaš salon? Otvori panel',
+          logout: 'Odjava',
+          footerCity: 'Sarajevo',
+          footerLine: 'Termini bez jurnjave.',
+        },
         auth: {
           login: 'Prijava',
           register: 'Registracija',
