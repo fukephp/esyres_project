@@ -14,7 +14,7 @@ Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal 
 |--------|--------|------|
 | **Design 1** | Homepage on `/`, discovery, salon, owner | [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md) (Cal-adapted; provenance [designmd.co/d/cal](https://www.designmd.co/d/cal)) |
 
-Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste. See `docs/adr/0026-one-design-1-pack.md`. STORY-42 moves busy/cell tokens into Design 1 and deletes `refs/design-2`.
+Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste. See `docs/adr/0026-one-design-1-pack.md`. Busy/cell tokens live in Design 1.
 
 ## Which file to read
 

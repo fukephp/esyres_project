@@ -11,5 +11,5 @@ Before generating or changing visual UI:
 1. Read root `DESIGN.md` (one Cal pack).
 2. Open [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX.
 
-- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage; owner keeps a dense panel with light chrome. Busy/cell tokens move into Design 1 in STORY-42; do not keep a second pack.
+- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage; owner keeps a dense panel with light chrome. Busy/cell tokens live in Design 1; do not keep a second pack.
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

@@ -33,6 +33,14 @@ colors:
   badge-pink: "#ec4899"
   badge-violet: "#8b5cf6"
   badge-emerald: "#34d399"
+  busy-free: "#22C55E"
+  busy-moderate: "#EAB308"
+  busy-busy: "#EF4444"
+  cell-free: "#86EFAC"
+  cell-pending: "#FCD34D"
+  cell-proposed: "#93C5FD"
+  cell-booked: "#1A1A1A"
+  cell-off: "#D6D3D1"
 typography:
   display-xl:
     fontFamily: "Cal Sans, Inter, sans-serif"
@@ -151,6 +159,10 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.nav-link}"
     height: 64px
+  owner-nav:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    typography: "{typography.nav-link}"
   hero-band:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -188,7 +200,7 @@ The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black pri
 
 Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Homepage IA stays on `/` only.** Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav). Busy/cell tokens move here in STORY-42.
+**Homepage IA stays on `/` only.** Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav). Busy-badge and panel cell tokens live in this pack.
 
 ### Locked homepage IA
 
@@ -223,6 +235,28 @@ No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carous
 - **Ink** (#111111), **Body** (#374151), **Muted** (#6b7280), **Muted soft** (#898989).
 - **On primary / on dark** (#ffffff); **On dark soft** (#a1a1aa) reserved if a later Design 1 surface needs dark text.
 
+### Status (not brand chrome)
+
+Customer day busy stays 🟢 / 🟡 / 🔴. Owner cells use distinct tokens. Never encode status with `{colors.brand-accent}` or badge pastels.
+
+**Customer busy badge**
+
+| State | Token | Hex |
+|--------|--------|-----|
+| Free / light | `busy-free` | `#22C55E` |
+| Moderate | `busy-moderate` | `#EAB308` |
+| Busy | `busy-busy` | `#EF4444` |
+
+**Owner availability cells**
+
+| State | Token | Hex |
+|--------|--------|-----|
+| Free | `cell-free` | `#86EFAC` |
+| Pending | `cell-pending` | `#FCD34D` |
+| Proposed | `cell-proposed` | `#93C5FD` |
+| Booked | `cell-booked` | `#1A1A1A` (light label) |
+| Off | `cell-off` | `#D6D3D1` |
+
 ## Typography
 
 **Cal Sans** for display + wordmark (weight 600, negative letter-spacing). **Inter** for body, buttons, nav, captions. Never put body in Cal Sans; never put display headlines in Inter. Display weight stays 600.
@@ -246,6 +280,22 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 - Safe margins: ~48–64px desktop, ~20–24px mobile.
 - First viewport: brand **Esyres** + homepage header + one H1 + one support line + three how-it-works lines + Pronađi salon. No stats strip, no mock.
 
+### Customer (sparse)
+
+- No dark sidebar, no right schedule rail, no KPI card grids, no charts.
+- White canvas; primary black CTAs; hairline borders; at most one soft surface block when it aids the funnel.
+- Discovery and salon keep this sparse layout. Do not restyle them as homepage header/hero/footer.
+
+### Owner (dense)
+
+Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from the former `panel-ref.jpg`):
+
+1. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
+2. **Main** — pending-request queue + Worker Availability Panel (15-minute grid) on white / `{colors.surface-card}`; primary CTAs.
+3. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
+
+Phone: collapse nav; stack queue above availability.
+
 ## Elevation & Depth
 
 Flat white bands; soft hairline borders; card surfaces via `{colors.surface-card}` (prefer color block over heavy shadow). Hero mock may use a faint drop (`0 1px 2px rgba(0,0,0,0.05)` / `0 4px 12px rgba(0,0,0,0.08)`). No glassmorphism, glow stacks, or neumorphism.
@@ -261,6 +311,8 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 **Secondary button** — white fill, ink text, 1px hairline.
 
 **Top nav** — homepage only: wordmark, Prijava/Registracija, Get your panel / Panel. Not on `/salons` or `/salon/:id`.
+
+**Owner nav** — dense panel left rail: `{colors.canvas}` floor, ink links, hairline edge. Not `{colors.surface-dark}`. Not a marketing hero/footer.
 
 **Hero mock / product mockup card** — not used on the MVP homepage.
 

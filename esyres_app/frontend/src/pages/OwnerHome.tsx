@@ -303,14 +303,14 @@ export function OwnerHome() {
 
   return (
     <div className="min-h-svh md:flex">
-      <aside className="hidden bg-surface-dark px-5 py-8 text-on-dark md:flex md:w-56 md:shrink-0 md:flex-col">
+      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         {salons.length > 1 ? (
           <label className="block text-sm">
             {t('owner.salon')}
             <select
               value={salon.id}
               onChange={(e) => onSalon(e.target.value)}
-              className="mt-1 w-full rounded-md border border-white/20 bg-surface-dark px-2 py-1.5 text-sm text-on-dark"
+              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
             >
               {salons.map((row) => (
                 <option key={row.id} value={row.id}>
@@ -328,7 +328,6 @@ export function OwnerHome() {
           date={date}
           badge={badge}
           active="queue"
-          tone="dark"
         />
       </aside>
       <main className="flex-1 px-5 py-8">
@@ -358,7 +357,6 @@ export function OwnerHome() {
             date={date}
             badge={badge}
             active="queue"
-            tone="light"
           />
         </div>
         <label className="mt-6 block max-w-xs text-sm text-body">

@@ -19,7 +19,7 @@
   --color-busy-moderate: #eab308;
   --color-busy-busy: #ef4444;
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
 html {

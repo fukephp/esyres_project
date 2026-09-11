@@ -203,7 +203,7 @@ export function OwnerRequestDetail() {
 
   return (
     <div className="min-h-svh md:flex">
-      <aside className="hidden bg-surface-dark px-5 py-8 text-on-dark md:flex md:w-56 md:shrink-0 md:flex-col">
+      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         <p className="text-sm font-semibold">{booking?.salon.name ?? ''}</p>
         <p className="mt-6 text-sm font-medium">{t('owner.title')}</p>
       </aside>

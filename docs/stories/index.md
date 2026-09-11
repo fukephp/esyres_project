@@ -64,4 +64,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-39 | Company pitch on `/` (superseded by STORY-40) | 1 | `STORY-39` | STORY-05 |
 | STORY-40 | Homepage on `/`; discovery at `/salons` | 1 | `STORY-40` | STORY-05, STORY-10, STORY-39 |
 | STORY-41 | Create salon and listed discovery | 7 | — | STORY-01, STORY-11, STORY-40 |
-| STORY-42 | One Design 1 pack; owner Cal chrome | 3 | — | STORY-13, STORY-40 |
+| STORY-42 | One Design 1 pack; owner Cal chrome | 3 | `STORY-42` | STORY-13, STORY-40 |
