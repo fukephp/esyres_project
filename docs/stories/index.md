@@ -61,4 +61,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-36 | Basic stats | 9 | — | STORY-14 |
 | STORY-37 | QR conversion stats | 9 | — | STORY-34 |
 | STORY-38 | Local demo seed | 7 | — | STORY-03, STORY-04, STORY-05, STORY-13, STORY-15, STORY-18 |
-| STORY-39 | Company pitch on `/` | 1 | — | STORY-05 |
+| STORY-39 | Company pitch on `/` | 1 | `STORY-39` | STORY-05 |
