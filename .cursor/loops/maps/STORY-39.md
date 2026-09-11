@@ -12,8 +12,8 @@
 |-------|--------|
 | Story ID | STORY-39 |
 | Source | `docs/stories/STORY-39.md` |
-| Status | draft |
-| Answer key path | `.cursor/loops/answer-keys/STORY-39.md` (after compile) |
+| Status | compiled |
+| Answer key path | `.cursor/loops/answer-keys/STORY-39.md` |
 
 ## Destination
 
@@ -24,7 +24,7 @@ A guest who typed `/` sees one Bosnian Design 1 company-pitch screen, taps one C
 - Consult: `.cursor/CONTEXT.md`, `docs/stories/STORY-39.md`, `docs/adr/0024-company-pitch-in-pwa.md`, `docs/glossary.md` (**Company pitch**, **Discovery home**), `docs/mvp/` (01, 03, 04, 06), `docs/architecture/` (01, 04, 07, 08), `DESIGN.md`, `refs/design-1/DESIGN.md`, `refs/design-2/DESIGN.md`
 - Skills: grill-with-docs (app code exists; subroutine — no diverge); custom-feature-skills; playbook plan-gate until this map compiles. Do not run `landing-page` unless the user explicitly asks for pitch copy/layout beyond this story.
 - Code today (`esyres_app/`): `/` mounts `DiscoveryHome` immediately (`useGeo` on mount). No pitch component, no `localStorage`. `esyres_app/marketing/` still exists (English long-scroll + owner waitlist). README/CONTEXT already dropped the marketing `build`. Laravel `GET /qr/{salon}` 302s to `/salon/:id` (missing salon → `SpaUrl::home()`). Catch-all `*` → `/`. Vitest is helper-only (no RTL/Playwright this PR).
-- Story AC: one-screen pitch; persist “seen” in the browser; auth does not skip; discovery/geo unmounted until CTA or stored seen; delete marketing; no `/welcome` / `/salons`.
+- Round 1 (2026-09-11): copy set, `localStorage` `esyres.companyPitchSeen`=`1`, unknown QR keeps 302 `/`.
 - Standing preferences:
   - One story → one PR; do not rewrite historical `MKT-*` keys
   - Do not invent a second Vite app or restore `marketing/`
@@ -43,16 +43,17 @@ A guest who typed `/` sees one Bosnian Design 1 company-pitch screen, taps one C
 - **Delete:** Remove `esyres_app/marketing/`. Local verify stays the README list (no marketing `build`). Move any pitch assets (mark, Cal Sans) into the PWA first.
 - **Stack:** Existing Vite React PWA, i18next `bs`, React Router, Vitest helpers. No Playwright, RTL, Pest, GraphQL codegen, or new REST this PR.
 - **Out of inventory:** Do not rewrite historical `MKT-*` loop keys. Do not strip stale marketing verify lines from old keys in this PR unless a file this story already touches.
+- **Copy (2026-09-11):** i18n `pitch.*`, informal *ti*, no “Kako radi” heading. H1 `Rezervacije bez jurnjave za terminom`. Support `Odabereš dan i željeno vrijeme. Salon prihvati ili predloži drugo. Potvrdiš samo kad predlože drugačije vrijeme.` Lines: `Odaberi dan i željeno vrijeme.` / `Salon prihvati ili prilagodi.` / `Potvrdiš samo ako predlože drugo vrijeme.` CTA `Pronađi salon`.
+- **Seen (2026-09-11):** `localStorage` key `esyres.companyPitchSeen`, value `1`. Synchronous read before paint. Not a cookie, not `sessionStorage`. Auth/session is ignored.
+- **Unknown QR (2026-09-11):** Keep missing-salon `GET /qr/{id}` 302 to `SpaUrl::home()` (`/`). Dead sticker becomes typed-home (pitch gate). No skip flag. Valid QR still 302s to `/salon/:id`.
 
 ## Open decisions
 
-- **Copy:** Exact Bosnian H1, support line, three how-it-works lines, and guest CTA label (meaning is locked; strings are not).
-- **Seen storage:** Browser API + key + value used for “seen” (must survive reload; must vanish when the guest clears site data; must not be the Sanctum session).
-- **Unknown QR → `/`:** Missing-salon `GET /qr/{id}` currently 302s to `SpaUrl::home()` (`/`). After this story that URL is the pitch gate. Keep that 302, or send unknown QR somewhere that never hits the pitch?
+<!-- empty -->
 
 ## Not yet specified
 
-<!-- empty — remaining product questions are in Open decisions -->
+<!-- empty -->
 
 ## Out of scope
 
