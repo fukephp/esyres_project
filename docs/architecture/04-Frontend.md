@@ -44,4 +44,4 @@ Typed `/` is the Bosnian homepage (homepage-only header, existing hero, simple f
 
 ## Discovery
 
-Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. No map SDK. Salon `lat`/`lng` is stored when the salon is provisioned. Geolocation runs only after discovery home mounts (`/salons`, not `/`).
+Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. Both return **listed** salons only. No map SDK. Salon `lat`/`lng` is set on `createSalon` (and still on founder seed). Geolocation runs only after discovery home mounts (`/salons`, not `/`). See `docs/adr/0027-listed-salons-on-discovery.md`.

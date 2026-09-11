@@ -13,7 +13,7 @@ A user who owns at least one salon. The same person can also be a customer. A cu
 _Avoid_: merchant, vendor, admin, staff login, invite-only owner
 
 **Get your panel**:
-The homepage control that opens the owner door: create a salon if they have none, or the owner panel if they already own one. Not customer register and not a waitlist.
+The homepage control that opens the owner door. Logged out or unverified, that door is still the owner panel. With no salon they create one there; with one or more they get the panel (and can create another from the panel). Not customer register and not a waitlist.
 _Avoid_: Register salon (as a second account type), owner waitlist, Sign up your salon
 
 **Salon**:
@@ -42,8 +42,12 @@ _Avoid_: unassigned, any stylist, empty worker, default worker
 The permanent guest page at `/`: homepage-only header, existing hero, simple footer. Bosnian. Always this page — not a one-shot overlay, not discovery home, not a login wall, and not a sibling company site. The salon profile and the QR sticker path never show it. Header login and register are dedicated routes; a signed-in header shows email and logout.
 _Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour
 
+**Listed**:
+A salon that appears on discovery home. It is listed when it has at least one open weekday, one service, and one worker. Existing but empty shops are not listed. Not a publish flag.
+_Avoid_: published, live, active salon, indexed
+
 **Discovery home**:
-The guest salon list on `/salons`, not on `/`. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a search page.
+The guest list of listed salons on `/salons`, not on `/`. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a search page.
 _Avoid_: homepage wall, feed, marketplace index, landing
 
 **Discovery filter**:
