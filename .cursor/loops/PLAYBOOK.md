@@ -110,7 +110,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 ## Gates
 
 1. **Plan gate** — fog cleared (map or sharp path); answer key approved by you; agent does not invent the key mid-run.
-2. **Machine gate** — every verify command in the answer key exits 0 (plus at most 1–2 named human-only product checks). Behat: `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` from `esyres_app/` (same flags on `--suite owner|guest`). CLI flags only; do not change `behat.yml`. A green run still means the full selected suite passed.
+2. **Machine gate** — every verify command in the answer key exits 0 (plus at most 1–2 named human-only product checks). Behat: `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` from `esyres_app/` (same flags on `--suite owner|guest`). CLI flags only; do not change `behat.yml`. A green run still means the full selected suite passed. Cloud Agent: if Docker is missing or nested, use host PHP + host MySQL (STORY-36), still `esyres_test` only — do not apt-install dockerd. Do not `migrate:fresh` or seed `esyres`.
 3. **Checker gate** — Bugbot on the PR (lightweight second opinion). Nits stay on the PR; key conflicts escalate to you.
 4. **Merge gate** — you review and merge (for UI stories: look at the running app).
 

@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import i18n from './i18n'
-import { DiscoveryHome } from './pages/DiscoveryHome'
+import { HomeGate } from './pages/HomeGate'
 import { MyBookings } from './pages/MyBookings'
 import { SalonProfile } from './pages/SalonProfile'
 
@@ -16,7 +16,7 @@ export default function App() {
   return (
     <div className="min-h-svh bg-canvas">
       <Routes>
-        <Route path="/" element={<DiscoveryHome />} />
+        <Route path="/" element={<HomeGate />} />
         <Route path="/salon/:id" element={<SalonProfile />} />
         <Route path="/bookings" element={<MyBookings />} />
         <Route

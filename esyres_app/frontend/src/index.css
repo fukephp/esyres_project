@@ -32,3 +32,17 @@ html {
   font-family: var(--font-display);
   letter-spacing: -0.04em;
 }
+
+@font-face {
+  font-family: "Cal Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url("/fonts/CalSansVF.woff2") format("woff2");
+}
+
+.company-pitch .pitch-display {
+  font-family: "Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
