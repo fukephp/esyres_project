@@ -1,6 +1,6 @@
 # Esyres app (Laravel + PWA)
 
-Application root. Marketing site is `marketing/` (sibling — not under `public/`, not in the PWA). Product PWA is `frontend/` (not Laravel `resources/js`).
+Application root. Product PWA is `frontend/` (not Laravel `resources/js`). There is no sibling marketing site; the company pitch lives in the PWA on typed `/`.
 
 Slim Docker Compose (`php` + `vite` + `mysql` + `reverb`) is the local stack. Remaining services (nginx, redis, worker, mailpit) are later — see `docs/architecture/07-Docker-and-Local-Dev.md`.
 
@@ -19,12 +19,11 @@ docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure 
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
-docker compose exec -T --workdir /app/marketing vite npm run build
 ```
 
 Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB).
 
-First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`. Marketing: `docker compose exec -T --workdir /app/marketing vite npm install`.
+First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`.
 
 If `up` fails on 5173 or 8000, stop leftover `php-run-*` / `node-run-*` one-offs first. Reuse those ports; do not publish 5174/8001. Reverb is :8080.
 

@@ -4,7 +4,8 @@
 
 ## Customer-Facing (MVP)
 
-- **Discovery/Home** — no login required; geolocation-based "salons near you," falling back to "Popular in Sarajevo"; search/filter by service type and name.
+- **Company pitch** — typed `/` first paint is one Bosnian screen (hero + three how-it-works lines + one guest CTA) before discovery home on the same URL. Not a login wall. `/salon/:id` and the QR sticker skip it. No separate marketing site, no owner waitlist.
+- **Discovery/Home** — no login required; geolocation-based "salons near you," falling back to "Popular in Sarajevo"; search/filter by service type and name. Mounts only after the company pitch (or when the guest has already seen it).
 - **Salon Profile** — photos, address, working hours, service list with prices/durations, and a busy-level badge (🟢/🟡/🔴 — see below). Optional link-out to maps; no in-app map SDK.
 - **Busy-Level Indicator** — coarse signal of how booked a day is, shown instead of a detailed time grid. Deliberately hides per-slot scheduling detail from customers.
 - **Service Selection** — multi-select, durations/prices stack automatically.
@@ -52,3 +53,4 @@
 - Worker self-service login.
 - Buffer time between bookings, per-worker off/vacation days / hourly shifts.
 - Chain multi-location (shared workers/services across sites), receptionist/manager roles, waitlists, gift cards, group bookings, package deals.
+- Public owner waitlist / Formspree / `/invite`, public pricing page, Awwwards/GSAP company site, sibling `marketing/` Vite app.

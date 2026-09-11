@@ -3,7 +3,7 @@
 *High-level groupings of the MVP feature set. Each maps to a chunk of work that could reasonably be built and demoed as a unit. Architecture/data-model breakdown is intentionally excluded — product scope only.*
 
 ## Epic 1 — Salon Discovery & Profile Browsing
-Guest-accessible discovery flow: location-based "near you" with "Popular in Sarajevo" fallback, search/filter, salon profile page with services, prices, and busy-level badge.
+Guest-accessible discovery flow: one-screen company pitch on typed `/` (then live discovery on the same URL), location-based "near you" with "Popular in Sarajevo" fallback, search/filter, salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the pitch.
 
 ## Epic 2 — Booking Request Flow (Customer)
 Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account, verified email + phone OTP at request submit, pending state.

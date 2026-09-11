@@ -6,7 +6,7 @@ description: >-
   Same Cal design system as Design 1 (https://www.designmd.co/d/cal):
   white canvas, black primary CTAs, Cal Sans + Inter, soft ~8–12px radius.
   Separate pack by surface/composition (sparse customer / dense owner), not
-  by palette. Do not apply marketing IA to product routes.
+  by palette. Do not apply Design 1 company-pitch IA to discovery, salon, or `/owner`.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -161,13 +161,13 @@ components:
 
 Design 2 is the **product PWA** look — customer funnel, owner tools, and (Phase 2) worker UI. It locks **tokens + composition rules**, not a 1:1 clone of any reference dashboard.
 
-**Provenance:** Same visual system as Design 1, adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Brand/surface/type/radius tokens match Design 1 (self-contained here so this pack reads alone). Packs stay separate by **surface and composition** — marketing IA vs product chrome — not by palette.
+**Provenance:** Same visual system as Design 1, adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Brand/surface/type/radius tokens match Design 1 (self-contained here so this pack reads alone). Packs stay separate by **surface and composition** — company-pitch IA vs product chrome — not by palette.
 
 Reference in this folder:
 
 - **`panel-ref.jpg`** — **owner panel skeleton / density only** (left nav, main queue + availability, optional rail). Ignore cream/pastel/serif/medical IA, KPI charts, patient panels, and required mini-calendar from the image. Visual truth is the tokens in this file.
 
-**Do not apply Design 2 to the Esyres marketing site.** Marketing uses [`refs/design-1/DESIGN.md`](../design-1/DESIGN.md). Do not apply marketing long-scroll/hero IA to product routes.
+**Do not apply Design 2 to the company pitch.** The pitch uses [`refs/design-1/DESIGN.md`](../design-1/DESIGN.md). Do not apply Design 1 one-screen/long-scroll IA to discovery, salon, or `/owner`.
 
 Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste. Copy is Bosnian-first; prices in KM.
 
@@ -214,7 +214,7 @@ Same tokens and chrome family as owner when built. Not MVP — do not invent wor
 - **UI chrome / body / nav / buttons / labels:** Inter — body 400, labels/buttons 600.
 - Never put body in Cal Sans; never put dense panel chrome in a decorative serif.
 - Hierarchy: one title or H1 → short support → primary action.
-- Self-host Cal Sans (same as marketing). Load Inter via CDN or self-host. If Cal Sans is unavailable, Inter 600 with ≈ -0.04em tracking is the fallback.
+- Self-host Cal Sans (same as Design 1). Load Inter via CDN or self-host. If Cal Sans is unavailable, Inter 600 with ≈ -0.04em tracking is the fallback.
 
 ## COLOR + MATERIAL
 
@@ -269,7 +269,7 @@ CTA    PRIMARY #111111
 ```
 
 - Change one variable at a time when iterating variants.
-- Product routes (`/`, salon pages, `/owner`) never inherit marketing long-scroll, hero bands, or dark-footer page endings.
+- Discovery, salon pages, and `/owner` never inherit Design 1 long-scroll, feature grids, or dark-footer page endings. Typed `/` first paint is the company pitch (Design 1 one-screen); after the CTA this pack applies.
 
 ## NEGATIVE PROMPT
 
@@ -282,7 +282,7 @@ CTA    PRIMARY #111111
 - No logos/watermarks from reference sites.
 - No purple-on-white SaaS default; no terracotta-serif cream cliché.
 - Do not invent colors outside this file — extend tokens here first.
-- Do not apply Design 1 marketing IA (hero, feature grids, dark footer page close) on product screens.
+- Do not apply Design 1 company-pitch IA (long-scroll, feature grids, dark footer, product mock) on discovery, salon, or `/owner`.
 
 ## Tailwind (later)
 
@@ -300,7 +300,7 @@ When `esyres_app` PWA theme exists, expose these as CSS variables / Tailwind the
 
 **Don't**
 
-- Do not apply this pack to the marketing site.
+- Do not apply this pack to the company pitch (Design 1).
 - Do not clone the reference image’s medical dashboard IA or its cream/pastel look.
 - Do not build worker UI in MVP.
-- Do not put marketing long-scroll/hero composition on product routes.
+- Do not put Design 1 long-scroll/hero composition on discovery, salon, or `/owner`.

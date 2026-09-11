@@ -1,6 +1,6 @@
 # Docker and local dev
 
-Slim Compose lives at `esyres_app/docker-compose.yml`: **php** (8.3, Composer, Artisan, Behat, `artisan serve` on :8000), **vite** (Node 22, PWA `npm run dev` on :5173, `exec` for frontend + marketing npm), **mysql** (app DB + dedicated Behat test DB), and **reverb** (same PHP image, `php artisan reverb:start` on :8080). Run `docker compose up -d` then `docker compose exec -T` from `esyres_app/`. Never `docker compose run` for verify or servers. Not Laravel Sail.
+Slim Compose lives at `esyres_app/docker-compose.yml`: **php** (8.3, Composer, Artisan, Behat, `artisan serve` on :8000), **vite** (Node 22, PWA `npm run dev` on :5173, `exec` for frontend npm), **mysql** (app DB + dedicated Behat test DB), and **reverb** (same PHP image, `php artisan reverb:start` on :8080). Run `docker compose up -d` then `docker compose exec -T` from `esyres_app/`. Never `docker compose run` for verify or servers. Not Laravel Sail.
 
 The rest of the one-origin stack is still not in this compose:
 

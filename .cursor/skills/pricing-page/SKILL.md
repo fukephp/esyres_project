@@ -3,7 +3,7 @@ name: pricing-page
 description: >-
   Design a high-converting marketing pricing page (plans, copy, FAQs).
   Use when the user asks for a marketing pricing page. Do not invent public
-  pricing if docs say otherwise. Do not scaffold a marketing site unless asked.
+  pricing — Esyres MVP has none. Do not scaffold a marketing site.
 ---
 
 # Pricing Page (High‑Conversion) — Web Design Skill
@@ -12,7 +12,7 @@ description: >-
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-Use when the user asks for a marketing pricing page or marketing site pricing. Do not invent or scaffold public pricing if `docs/mvp/` says otherwise. Do not add a `marketing/` folder unless asked.
+Use when the user asks for a marketing pricing page. Do not invent or scaffold public pricing — `docs/mvp/` has none at MVP. Do not add a `marketing/` folder. There is no pricing surface in the PWA.
 
 Design a pricing page that helps visitors **choose** and feel good about it.
 Your job is not to “show prices.”

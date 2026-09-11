@@ -35,6 +35,10 @@ Not a WhatsApp auto-book product and not an LLM in v1. Esyres stays a two-sided 
 
 The YouTube “Claude + WhatsApp” pattern is a conversation-shape guideline (acknowledge, short questions, close to a request) only — not GoHighLevel, not auto-confirm, not per-appointment agency pricing.
 
+### Company pitch in the PWA, not a sibling marketing site (decided)
+
+Typed `/` first paint is one Bosnian Design 1 screen (hero + three how-it-works lines + guest CTA), then discovery home on the same URL. Once per browser after the CTA. Do not mount discovery until then. `/salon/:id` and `GET /qr/{id}` never show the pitch. Delete `esyres_app/marketing/`. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. No Design 1 composition on salon or `/owner`.
+
 ## Part 2 — Consolidated Open Questions (from existing docs)
 
 **Pricing & Business**

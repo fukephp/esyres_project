@@ -22,7 +22,7 @@ This keeps the customer experience light (state a preference, no slot hunting) w
 
 - Solve the two-sided cold-start problem in Sarajevo before expanding to Bosnia and Herzegovina more broadly.
 - Win trust against Booksy (regional incumbent) through Bosnian-first UI, KM pricing, a genuinely free MVP tier, and founder-led onboarding.
-- Preserve the QR-code / Instagram-bio-link → browse → request funnel as the core acquisition mechanic — every product decision is evaluated against whether it protects this path.
+- Preserve the QR-code / Instagram-bio-link → browse → request funnel as the core acquisition mechanic — every product decision is evaluated against whether it protects this path. Typed `/` may show a one-screen company pitch once; that path never sits in front of `/salon/:id` or the QR sticker.
 - Build a real, usable product for the first 15–20 founder-onboarded salons before thinking about monetization.
 
 ## Product Goals
@@ -30,6 +30,7 @@ This keeps the customer experience light (state a preference, no slot hunting) w
 - Replace phone tag and Instagram DM waiting with a structured request-and-propose flow.
 - Give owners one shared workspace (Worker Availability Panel) to manage all incoming requests and worker schedules without needing per-worker logins. Owner habit stays this panel; the in-PWA assistant fills it 24/7 so opening the app is worth it.
 - Capture the data needed for trust signals (verification, response speed, reliability) from day one, even where the UI to display it is a later phase.
+- A guest who typed `/` sees a short Bosnian company pitch, then the live salon list in the same PWA — no separate marketing site.
 
 ## Explicit Non-Goals (for now)
 
@@ -38,7 +39,8 @@ This keeps the customer experience light (state a preference, no slot hunting) w
 - Worker self-service logins.
 - Reviews/ratings system.
 - Viber/WhatsApp / Instagram DM messaging, referral incentives, badge display UI — all Phase 2. In-PWA scripted salon-profile chat is MVP (after the picker/panel loop exists); it is not those channels.
+- A separate marketing Vite app, public owner waitlist / Formspree, public pricing page, and Awwwards/GSAP motion on product screens.
 
 ## Note on Architecture
 
-Stack, data model, and Docker live in `docs/architecture/`. These files remain product scope. If a grilled decision changed product behavior (auth, salon switcher, durations, ask-other-day-or-time, preferred time, salon booking assistant), this set was updated to match.
+Stack, data model, and Docker live in `docs/architecture/`. These files remain product scope. If a grilled decision changed product behavior (auth, salon switcher, durations, ask-other-day-or-time, preferred time, salon booking assistant, company pitch on `/`), this set was updated to match.

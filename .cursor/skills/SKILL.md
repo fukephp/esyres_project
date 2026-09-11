@@ -29,8 +29,8 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 |-------|-------------|
 | [tailwindcss](tailwindcss/SKILL.md) | Tailwind classes, layout, theming |
 | [design-first-ui-prompting](design-first-ui-prompting/SKILL.md) | Spec-driven UI prompts before generating screens |
-| [landing-page](landing-page/SKILL.md) | Marketing landing pages (when the user asks) |
-| [pricing-page](pricing-page/SKILL.md) | Marketing pricing pages (when the user asks) |
-| [build-awwwards-quality-sites](build-awwwards-quality-sites/SKILL.md) | Marketing polish / motion-rich sites (when the user asks) |
+| [landing-page](landing-page/SKILL.md) | Company pitch on `/` (when the user asks) |
+| [pricing-page](pricing-page/SKILL.md) | Not MVP — no public pricing |
+| [build-awwwards-quality-sites](build-awwwards-quality-sites/SKILL.md) | Pitch polish / motion (only when the user asks) |
 
 Do not invent a parallel workflow. If the task is a slash command (`/generate-docs`, `/run-tests`, `/scaffold-project`, `/sync-framework`, `/story-loop`, `/what-next`, `/grill-me`, `/grill-with-docs`), use `.cursor/commands/` instead.

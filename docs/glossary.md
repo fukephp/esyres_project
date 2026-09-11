@@ -34,8 +34,12 @@ _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
 
+**Company pitch**:
+The one-screen first paint on typed `/` that explains Esyres before discovery home. Bosnian. Not a login wall, not the salon list, and not a separate company site. The salon profile and the QR sticker path never show it.
+_Avoid_: landing, marketing site, homepage wall, welcome tour
+
 **Discovery home**:
-The guest `/` list of salons. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile and not a separate search page.
+The guest salon list on `/` after the company pitch, or when the guest has already seen it. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the company pitch, and not a separate search page.
 _Avoid_: homepage wall, feed, marketplace index, landing
 
 **Discovery filter**:

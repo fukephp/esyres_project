@@ -2,10 +2,10 @@
 version: alpha
 name: Esyres Marketing Landing
 description: >-
-  Design 1 — Esyres-the-company marketing site (landing, later pricing).
+  Design 1 — Esyres company pitch on typed `/` (one screen, then discovery).
   Visual system adapted from Cal.com DESIGN.md (https://www.designmd.co/d/cal):
-  white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards,
-  product UI fragments in-card, dark footer. Do not apply to the product PWA.
+  white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards.
+  Do not apply this composition to discovery, salon, or `/owner`.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -180,23 +180,25 @@ components:
 
 ## Overview
 
-Design 1 is the **Esyres-the-company marketing site** — landing first, pricing later. Implementation lives in [`esyres_app/marketing/`](../../esyres_app/marketing/) (Vite + HTML/CSS), sibling under the Laravel root — not under `public/`, not in the PWA bundle.
+Design 1 is the **company pitch** — one Bosnian screen on typed `/` before discovery home in the same PWA. Implementation lives in [`esyres_app/frontend/`](../../esyres_app/frontend/). There is no sibling `esyres_app/marketing/` site.
 
-**Provenance:** Visual system adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Tokens, type roles, radius, whitespace, in-card product UI, and dark footer follow that system. Product framing and page IA are Esyres-specific.
+**Provenance:** Visual system adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Tokens, type roles, radius, and whitespace follow that system. Product framing and page IA are Esyres-specific.
 
-The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black primary CTAs (`{colors.primary}`), **Cal Sans** display + **Inter** body, `{colors.surface-card}` (#f5f5f5) cards holding **static HTML/CSS product UI mocks** of the Esyres request flow (guest picks day+time → owner accepts or adjusts → guest confirms when counter-proposed). Brand voltage comes from Cal Sans headlines and monochrome product chrome in-card — not illustration, not accent color.
+The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black primary CTAs (`{colors.primary}`), **Cal Sans** display + **Inter** body. Brand voltage comes from Cal Sans headlines and monochrome chrome — not illustration, not accent color.
 
-Copy for this marketing site is **English** until localization lands. Do not invent Bosnian strings in Design 1 files for this phase.
+Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Do not apply Design 1 to the product PWA.**
+**Do not apply Design 1 composition to discovery home, salon profile, or `/owner`.** After the guest CTA, those routes use [`refs/design-2/DESIGN.md`](../design-2/DESIGN.md).
 
-### Locked marketing IA
+### Locked company-pitch IA
 
-1. **Top nav** — logo/wordmark left; links + primary CTA right.
-2. **Hero** — H1 + support + CTAs left; request-flow mock in `{component.hero-app-mockup-card}` right.
-3. **How it works** — three steps (day+time → accept/adjust → confirm when adjusted) with monochrome product-UI-in-card.
-4. **Why Esyres** — short 2–3 feature cards on `{colors.surface-card}`.
-5. **Dark footer** — contact + secondary CTA on `{colors.surface-dark}`.
+One screen only:
+
+1. **Hero** — H1 + one support line.
+2. **How it works** — three short lines (pick day and preferred time; salon accepts or adjusts; you confirm only when they propose a different time).
+3. **One guest CTA** — reveals discovery home on the same `/`.
+
+No top-nav marketing links, long-scroll, feature grid, dark footer, in-card product mock, or owner CTA.
 
 No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carousels.
 
@@ -213,13 +215,13 @@ No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carous
 - **Canvas** (#ffffff): Page floor.
 - **Surface soft** (#f8f9fa): Soft dividers.
 - **Surface card** (#f5f5f5): Feature cards, mock internals.
-- **Surface dark** (#101010): Footer only (scarce dark signal).
+- **Surface dark** (#101010): unused on the MVP company pitch (no dark footer).
 - **Hairline** (#e5e7eb): 1px borders on light surfaces.
 
 ### Text
 
 - **Ink** (#111111), **Body** (#374151), **Muted** (#6b7280), **Muted soft** (#898989).
-- **On primary / on dark** (#ffffff); **On dark soft** (#a1a1aa) for footer body.
+- **On primary / on dark** (#ffffff); **On dark soft** (#a1a1aa) reserved if a later Design 1 surface needs dark text.
 
 ## Typography
 
@@ -239,11 +241,10 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 ## Layout
 
-- Max content width ~1200px; section vertical rhythm `{spacing.section}` (96px).
-- Hero: ~7/5 split (copy | mock) on desktop; stack on mobile.
-- Feature grids: 3-up desktop → 1-up mobile.
+- Max content width ~1200px; the pitch is one viewport, not a long-scroll of `{spacing.section}` bands.
+- Stack on mobile; modest two-column only if the three how-it-works lines need it on desktop.
 - Safe margins: ~48–64px desktop, ~20–24px mobile.
-- First viewport: brand **Esyres** + one H1 + one support line + one CTA group + one dominant request-flow mock. No stats strip, no floating badges on the mock.
+- First (and only) viewport: brand **Esyres** + one H1 + one support line + three how-it-works lines + one guest CTA. No stats strip, no mock, no second CTA.
 
 ## Elevation & Depth
 
@@ -259,36 +260,36 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — 64px, canvas background, logo left, links + CTA right.
+**Top nav** — optional wordmark only; no marketing link row, no owner CTA.
 
-**Hero mock / product mockup card** — white or light card with hairline; contains static monochrome HTML/CSS of day pick → time propose → confirm. English labels in mocks for this phase.
+**Hero mock / product mockup card** — not used on the MVP company pitch.
 
-**Feature card** — `{colors.surface-card}`, 12px radius, 32px padding; title + short body.
+**Feature card** — not used on the MVP company pitch.
 
-**Footer** — `{colors.surface-dark}`; only dark surface on the page.
+**Footer** — not used on the MVP company pitch (no dark page ending).
 
 ## Do's and Don'ts
 
 **Do**
 
-- Read this file (and the Cal provenance URL) before generating marketing UI.
-- Keep English marketing copy until localization; Esyres offer: guest picks preferred day and time, owner accepts or adjusts, guest confirms when counter-proposed.
-- Embed product UI mocks in cards; keep mocks monochrome Cal chrome.
-- End pages with the dark footer.
-- Use gated skills (`landing-page`, `pricing-page`, `build-awwwards-quality-sites`) only on explicit marketing triggers.
+- Read this file (and the Cal provenance URL) before generating the company pitch.
+- Keep Bosnian-first copy; Esyres offer: guest picks preferred day and time, owner accepts or adjusts, guest confirms when counter-proposed.
+- Use gated skills (`landing-page`) only on explicit company-pitch / Esyres-landing triggers. `pricing-page` is unused (no public pricing). `build-awwwards-quality-sites` only if the user asks for pitch polish.
 
 **Don't**
 
-- Do not apply this look to the product PWA or salon app pages.
+- Do not apply this composition to discovery home, salon profile, or `/owner`.
+- Do not scaffold `esyres_app/marketing/` or a second Vite app.
 - Do not use pixel art, isometric salon illustrations, magenta/cobalt palettes, mega-bento shells, or screenshot JPG refs.
 - Do not use Unsplash photos, glassmorphism, neon glow, or Cal.com “schedule meetings” copy.
 - Do not put accent blue or badge pastels on primary CTAs.
 - Do not invent colors outside this file — extend tokens here first.
-- Do not put stats pills or feature cards in the first viewport.
+- Do not put a feature grid, product mock, owner waitlist CTA, login wall, or dark footer on the pitch.
+- Do not ship a long-scroll company site.
 
 ## Responsive
 
-- Mobile &lt; 768px: hero stacks; h1 scales down (~32px); grids 1-up; nav may collapse.
-- Tablet 768–1024px: feature cards 2-up.
-- Desktop ≥ 1024px: full nav; 3-up features; hero 7/5.
+- Mobile &lt; 768px: stack; h1 scales down (~32px).
+- Tablet 768–1024px: still one column.
+- Desktop ≥ 1024px: one screen; no 3-up feature row.
 - Wide &gt; 1440px: same layout, more outer margin; content max 1200px.

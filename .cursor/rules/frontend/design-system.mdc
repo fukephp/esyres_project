@@ -8,10 +8,10 @@ alwaysApply: false
 
 Before generating or changing visual UI:
 
-1. Read root `DESIGN.md` (index — two packs, shared Cal system; do not mix marketing IA with product chrome).
+1. Read root `DESIGN.md` (index — two packs, shared Cal system; do not mix company-pitch IA with product chrome).
 2. Open the matching source:
-   - **Marketing landing** → `refs/design-1/DESIGN.md`
-   - **Product PWA** (customer / owner / worker) → `refs/design-2/DESIGN.md` (also `panel-ref.jpg` for owner skeleton), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
+   - **Company pitch** on typed `/` → `refs/design-1/DESIGN.md`
+   - **Discovery / salon / owner** → `refs/design-2/DESIGN.md` (also `panel-ref.jpg` for owner skeleton), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
 
-- Design 1 is locked (Cal-based clean SaaS marketing — white canvas, black CTAs, Cal Sans + Inter). Design 2 is locked (same Cal tokens + role composition; owner dark nav; not a dashboard IA clone).
+- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter; MVP is one screen, not a long-scroll site). Design 2 is locked (same Cal tokens + role composition; owner dark nav; not a dashboard IA clone).
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

@@ -16,7 +16,7 @@ Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright 
 
 - Prefer `docs/mvp/` UI goals, root `DESIGN.md`, and `refs/` packs over ARTICLE.md advice that conflicts.
 - Match product surfaces to product constraints; do not turn app screens into agency landings unless asked.
-- Cinematic / Awwwards / conversion-landing style: only when the user explicitly asks for marketing site, landing, pricing page, or marketing polish.
+- Cinematic / Awwwards / conversion-landing style: only when the user explicitly asks for company-pitch polish on `/`.
 
 This skill is for **design-first prompting**: turn fuzzy ideas into a tight spec that produces consistent UI.
 

@@ -1,10 +1,10 @@
 ---
 name: build-awwwards-quality-sites
 description: >-
-  Art-direct a motion-rich marketing site (Awwwards-quality, GSAP, optional
-  Three.js). Use when the user explicitly asks for marketing polish or an
-  Awwwards-style site. Do not add heavy motion stacks to product app screens
-  unless asked. Do not scaffold a marketing site unless asked.
+  Art-direct a motion-rich company pitch (Awwwards-quality, GSAP, optional
+  Three.js). Use when the user explicitly asks for pitch polish or an
+  Awwwards-style treatment. Do not add heavy motion stacks to discovery,
+  salon, or `/owner` unless asked. Do not scaffold a marketing site.
 ---
 
 # Build Awwwards-Quality Sites
@@ -13,7 +13,7 @@ description: >-
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-Use when the user explicitly asks for marketing polish, marketing site, or Awwwards-style work. Prefer product constraints in `docs/mvp/` and `docs/architecture/` for app screens — do not add GSAP, Three.js, or WebGL to the product app unless the user asks. Do not scaffold a marketing site or add a `marketing/` folder unless asked.
+Use when the user explicitly asks for company-pitch polish, Esyres landing polish, or Awwwards-style work on typed `/`. Prefer product constraints in `docs/mvp/` and `docs/architecture/` for discovery, salon, and `/owner` — do not add GSAP, Three.js, or WebGL there unless the user asks. Do not scaffold a marketing site or add a `marketing/` folder. STORY-39 ships the pitch without this stack.
 
 Build a cohesive, memorable site whose visual idea, media, typography, and motion tell the same story. Treat “Awwwards quality” as an acceptance bar, never as an award or recognition claim.
 

@@ -4,14 +4,14 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 
 ## Routing
 
-- `/` — customer: discover, salon, request (picker or scripted salon-profile chat), bookings, favorites
-- Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Records a QR scan (`qr_hits`), sets the hold cookie, and 302s to `/salon/:id`. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie or record a scan.
+- `/` — customer: company pitch on first paint, then discovery home on the same URL (nearby / Popular, filter, salon, request via picker or scripted salon-profile chat, bookings, favorites). Do not mount discovery (no geolocation) until the guest taps through or has already seen the pitch. `/salon/:id` never shows the pitch.
+- Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Records a QR scan (`qr_hits`), sets the hold cookie, and 302s to `/salon/:id`. Never shows the company pitch. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie or record a scan.
 - `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route.
 - `/owner` — owner: inbox, worker panel (home), in-flight chat tab (`/owner/chats`, list + optional Take over / Release + DND toggle), settings, Basic Stats (`/owner/stats`: last-7-day bookings + all-time QR scan/visit/conversion; `?salon=` like chats; nav `Statistika`); **salon switcher** when the user owns more than one salon
 
 Owner chunks (including `@dnd-kit`) are lazy-loaded so the customer first paint does not ship the grid.
 
-Customer browse has no login wall. Login/register appears at request submit, My Bookings, and owner routes.
+Customer browse has no login wall. The company pitch is not a login wall. Login/register appears at request submit, My Bookings, and owner routes.
 
 ## Libraries (MVP)
 
@@ -25,7 +25,7 @@ Customer browse has no login wall. Login/register appears at request submit, My 
 
 ## Explicitly not added
 
-Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
+Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client, a sibling marketing Vite app.
 
 ## UX constraints (from product rules)
 
@@ -38,6 +38,10 @@ Next.js, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client.
 - `/owner` is a lazy pending queue + Worker Availability Panel for one salon-day (login only; Prihvati on named-worker rows via `acceptPreferredTime`; drag onto a free cell calls `proposeTime`; Odbi on every pending row via two-step `declineBooking`; Predloži opens `/owner/requests/:id`). In-progress reschedules appear on the **new** preferred day, tagged `Premještaj`; Prihvati calls `acceptReschedule`; `Zadrži stari` dismisses (original stays); not draggable and no propose/decline. Salon context is `?salon=` when the owner has more than one salon; omit or a bad id → first owned (`id` ASC). `/owner` subscribes to `bookingCustomerResponded`, `bookingRescheduled`, and `bookingCancelled` and refetches queue + occupying; no `pollInterval`. `/owner/chats` is a lazy list of in-flight `AssistantIntake` rows (badge = 24h count, hide at 0); refetch list/count/salon on mount and after Take over / Release / DND; row `Preuzmi` / `Vrati asistentu` when `takeoverAllowed`; pinged rows show `Pitanje`; DND toggle on the tab; no `/owner/chats/:id`, no owner messages, no new subscription. Guest chat on `/salon/:id` refetches `assistantIntake` on mount and window focus; when `takenOver` the chips/send hide and wait copy shows. Chat can say it does not know via `Nešto drugo?` and optionally ping with `Obavijesti salon` (guest does not wait). `/owner/requests/:id` is Request Detail (lazy owner route): form `proposeTime`, Prihvati, Odbi; assistant-originated rows show an `Asistent` chip and a collapsed labeled transcript from the converted intake. Queue rows show the same chip. `/owner/stats` is a lazy Basic Stats screen for the selected salon (`salonStats` last 7 Sarajevo days plus all-time `salonQrStats` scan/visit/percent; `OwnerNav`; `?salon=` same as chats; not home; no `qrScans` list). No `/owner` link on customer pages.
 - `/bookings` lists the session customer’s bookings (flat status labels). `TIME_PROPOSED` rows expose confirm / reject / ask-other-time; `CONFIRMED` rows expose reschedule (day+time overlay; original clock stays the main time; in-progress copy while overlay is set) and cancel (two-step; late warning, not a hard block). No `/booking/:id`. Logged-out AuthShell, verify banners, and email/phone panels stay on this route.
 
+## Company pitch
+
+Typed `/` first paint is one Bosnian Design 1 screen (hero + three how-it-works lines + one guest CTA). After the CTA, persist “seen” in the browser; later `/` is discovery home. Auth does not skip it. `/salon/:id` and `GET /qr/{salonId}` never show it. No second Vite app, no `/welcome`, no owner waitlist.
+
 ## Discovery
 
-Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. No map SDK. Salon `lat`/`lng` is stored when the salon is provisioned.
+Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. No map SDK. Salon `lat`/`lng` is stored when the salon is provisioned. Geolocation runs only after discovery home mounts.

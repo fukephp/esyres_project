@@ -53,7 +53,6 @@ docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
-docker compose exec -T --workdir /app/marketing vite npm run build
 ```
 
 ## Out of scope
