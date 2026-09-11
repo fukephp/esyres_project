@@ -18,33 +18,41 @@
 
 ## Pass/fail — product
 
-- [ ] `shouldShowCompanyPitch(path, seen)` is true only for `/` (or `""`) when `seen` is false; `/salon/:id`, `/bookings`, `/owner`, and any other path are false even when unseen — verify: Vitest
-- [ ] `companyPitchSeen` / `markCompanyPitchSeen` use `localStorage` key `esyres.companyPitchSeen` value `1`; missing, empty, or other values are unseen; mark writes `1`; helper does not read cookies or session — verify: Vitest (mock `Storage`)
-- [ ] i18n `bs` strings: `pitch.brand` `Esyres`; `pitch.h1` `Rezervacije bez jurnjave za terminom`; `pitch.support` `Odabereš dan i željeno vrijeme. Salon prihvati ili predloži drugo. Potvrdiš samo kad predlože drugačije vrijeme.`; `pitch.step1` `Odaberi dan i željeno vrijeme.`; `pitch.step2` `Salon prihvati ili prilagodi.`; `pitch.step3` `Potvrdiš samo ako predlože drugo vrijeme.`; `pitch.cta` `Pronađi salon` — verify: Vitest
-- [ ] `/` first paint with no stored seen renders the pitch only (brand + H1 + support + three steps + one CTA). CTA writes seen and then mounts `DiscoveryHome` on the same `/` (no `/welcome`, no `/salons`, no navigation). `DiscoveryHome` (and `useGeo`) does not mount while the pitch is showing — verify: Vitest of helpers + `App.tsx` `/` element is a gate that renders pitch **or** `DiscoveryHome`, never both
-- [ ] `esyres_app/marketing/` does not exist — verify: `test ! -d marketing` from `esyres_app/`
+- [x] `shouldShowCompanyPitch(path, seen)` is true only for `/` (or `""`) when `seen` is false; `/salon/:id`, `/bookings`, `/owner`, and any other path are false even when unseen — verify: Vitest
+- [x] `companyPitchSeen` / `markCompanyPitchSeen` use `localStorage` key `esyres.companyPitchSeen` value `1`; missing, empty, or other values are unseen; mark writes `1`; helper does not read cookies or session — verify: Vitest (mock `Storage`)
+- [x] i18n `bs` strings: `pitch.brand` `Esyres`; `pitch.h1` `Rezervacije bez jurnjave za terminom`; `pitch.support` `Odabereš dan i željeno vrijeme. Salon prihvati ili predloži drugo. Potvrdiš samo kad predlože drugačije vrijeme.`; `pitch.step1` `Odaberi dan i željeno vrijeme.`; `pitch.step2` `Salon prihvati ili prilagodi.`; `pitch.step3` `Potvrdiš samo ako predlože drugo vrijeme.`; `pitch.cta` `Pronađi salon` — verify: Vitest
+- [x] `/` first paint with no stored seen renders the pitch only (brand + H1 + support + three steps + one CTA). CTA writes seen and then mounts `DiscoveryHome` on the same `/` (no `/welcome`, no `/salons`, no navigation). `DiscoveryHome` (and `useGeo`) does not mount while the pitch is showing — verify: Vitest (`homeSurface` pitch vs discovery) + `HomeGate` / `App.tsx` `/` is `HomeGate`
+- [x] `esyres_app/marketing/` does not exist — verify: `test ! -d marketing` from `esyres_app/`
 - [ ] One-screen Design 1 Cal look on unseen `/` (white canvas, black CTA, Cal Sans display or Inter 600 fallback); after CTA, discovery is Design 2 as today; `/salon/:id` and `/owner` unchanged — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/01-Overview-and-Stack.md`, `04-Frontend.md`, `07-Docker-and-Local-Dev.md`, `08-Decisions.md` #36 #41, `docs/adr/0024-company-pitch-in-pwa.md`.
 
-- [ ] Company pitch lives in `esyres_app/frontend/` (one React PWA). No sibling marketing Vite app. No `/welcome`. Verify commands do not run a marketing `build` — verify: `test ! -d marketing`; README/CONTEXT verify lists have no marketing `build`
-- [ ] `GET /qr/{id}` stays Laravel 302 (not a React route). Valid salon still 302s to `/salon/:id`. Missing salon still 302s to `SpaUrl::home()` (`/`) with no skip flag. Pitch is never rendered by `QrController` — verify: `QrController` unchanged; existing Behat QR features stay green
-- [ ] Design 1 composition (hero + three lines + one guest CTA) is scoped to the pitch surface only. Discovery, salon, `/owner` stay Design 2. i18next `bs` only. No Playwright, RTL, Pest, GraphQL codegen this PR — verify: pitch CSS/class scoped; `esyres_app/frontend/package.json`; no `pestphp`
+- [x] Company pitch lives in `esyres_app/frontend/` (one React PWA). No sibling marketing Vite app. No `/welcome`. Verify commands do not run a marketing `build` — verify: `test ! -d marketing`; README/CONTEXT verify lists have no marketing `build`
+- [x] `GET /qr/{id}` stays Laravel 302 (not a React route). Valid salon still 302s to `/salon/:id`. Missing salon still 302s to `SpaUrl::home()` (`/`) with no skip flag. Pitch is never rendered by `QrController` — verify: `QrController` unchanged this PR. **Behat QR suite skipped 2026-09-11 (human: do not run nested-Docker Behat on this PR).**
+- [x] Design 1 composition (hero + three lines + one guest CTA) is scoped to the pitch surface only. Discovery, salon, `/owner` stay Design 2. i18next `bs` only. No Playwright, RTL, Pest, GraphQL codegen this PR — verify: pitch CSS/class scoped; `esyres_app/frontend/package.json`; no `pestphp`
 
 ## Verify commands
 
-Run from `esyres_app/` (app root in CONTEXT). Stack must be up (`docker compose up -d`). Every command must exit 0.
+Run from `esyres_app/` (app root in CONTEXT). Stack must be up (`docker compose up -d`). Every command must exit 0 before the loop may open a ready PR.
+
+**This PR (2026-09-11):** Behat skipped by human. Nested Compose Behat was ~3h and not a STORY-39 gate. Do not apt-install dockerd on Cloud; next loop = host PHP + host MySQL (`esyres_test` only) if Docker is missing.
+
+Passed:
 
 ```text
-docker compose up -d
 docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 test ! -d marketing
+```
+
+Skipped:
+
+```text
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
 ```
 
 ## Out of scope
