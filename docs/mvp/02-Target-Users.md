@@ -33,7 +33,7 @@ Owners of make-up, hairdresser, or massage salons in Sarajevo — solo operators
 - Simple management of services, prices, working hours, and worker schedules
 - A concrete, visible time-saving reason to promote the app to their own customers (guests write, you accept or drag-to-propose)
 
-**Note on scope:** owners are the only side with a real "backend" — dashboard-style complexity (Worker Availability Panel, stats, settings, salon switcher, optional chat tab for in-flight conversations) belongs here, deliberately kept off the customer surface. Home after login is still the pending queue + panel; chat is a tab with a badge, not the default screen. Owner accounts are founder-provisioned (invite-only) at MVP. The assistant does not give workers a login.
+**Note on scope:** owners are the only side with a real "backend" — dashboard-style complexity (Worker Availability Panel, stats, settings, salon switcher, optional chat tab for in-flight conversations) belongs here, deliberately kept off the customer surface. Home after login is still the pending queue + panel; chat is a tab with a badge, not the default screen. A customer becomes an owner by creating a salon on the same account. The assistant does not give workers a login.
 
 ## 3. Workers/Stylists (not a login-holding user at MVP)
 

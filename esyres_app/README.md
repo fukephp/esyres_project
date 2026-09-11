@@ -1,6 +1,6 @@
 # Esyres app (Laravel + PWA)
 
-Application root. Product PWA is `frontend/` (not Laravel `resources/js`). There is no sibling marketing site; the company pitch lives in the PWA on typed `/`.
+Application root. Product PWA is `frontend/` (not Laravel `resources/js`). There is no sibling marketing site; the homepage lives in the PWA on typed `/`.
 
 Slim Docker Compose (`php` + `vite` + `mysql` + `reverb`) is the local stack. Remaining services (nginx, redis, worker, mailpit) are later — see `docs/architecture/07-Docker-and-Local-Dev.md`.
 

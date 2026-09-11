@@ -2,35 +2,29 @@
 version: alpha
 name: Esyres
 description: >-
-  Index for two design packs that share the Cal visual system but differ by
-  surface. Read the matching pack before UI work — do not mix company-pitch
-  IA with product chrome.
+  Index for one Cal design pack. Read refs/design-1 before UI work.
+  Homepage IA stays on `/` only; owner stays a dense panel.
 ---
 
 ## Overview
 
-Esyres has **two design packs**. They share the same Cal tokens (white canvas, black CTAs, Cal Sans + Inter); they differ by **surface and composition**. Agents must read the correct pack before generating UI.
+Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal Sans + Inter). Discovery, salon, and `/owner` share those tokens. Homepage composition (header + hero + footer) stays on `/` only. Owner keeps dense queue + 15-minute grid with Cal light chrome (no dark nav).
 
 | Design | Scope | Spec |
 |--------|--------|------|
-| **Design 1** | **Company pitch** on typed `/` (one screen; then discovery) | [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md) (Cal-adapted; provenance [designmd.co/d/cal](https://www.designmd.co/d/cal)) |
-| **Design 2** | **Product PWA** after the pitch — discovery, salon, owner, worker (when built) | [`refs/design-2/DESIGN.md`](refs/design-2/DESIGN.md) + [`panel-ref.jpg`](refs/design-2/panel-ref.jpg) (skeleton only) |
+| **Design 1** | Homepage on `/`, discovery, salon, owner | [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md) (Cal-adapted; provenance [designmd.co/d/cal](https://www.designmd.co/d/cal)) |
 
-**Same Cal system; separate packs.** Salon pages and `/owner` are never Design 1 long-scroll/hero landings. The company pitch is never owner-panel chrome. Do not mix pack IA even though tokens match.
-
-Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste.
+Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conflicts with visual taste. See `docs/adr/0026-one-design-1-pack.md`. STORY-42 moves busy/cell tokens into Design 1 and deletes `refs/design-2`.
 
 ## Which file to read
 
-- Building **company pitch** on typed `/` → `refs/design-1/DESIGN.md`.
-- Building **discovery / salon / owner** → `refs/design-2/DESIGN.md` (also `panel-ref.jpg` for owner skeleton), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX.
-- Unsure → read this index first, then open the matching source.
+- Any PWA UI → `refs/design-1/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX (sparse customer, dense owner).
+- Unsure → this index first.
 
-## Skills (Design 1 only)
+## Skills (homepage on `/` only)
 
-Use `landing-page` only when the user explicitly asks for the company pitch / Esyres landing on `/`. Do not use `pricing-page` (no public pricing). Use `build-awwwards-quality-sites` only when the user explicitly asks for pitch polish — never discovery, salon, or `/owner`. Code: [`esyres_app/frontend/`](esyres_app/frontend/). Never scaffold `esyres_app/marketing/`.
+Use `landing-page` only when the user explicitly asks for the homepage / Esyres landing on `/`. Do not use `pricing-page` (no public pricing). Use `build-awwwards-quality-sites` only when the user explicitly asks for homepage polish — never discovery, salon, or `/owner`. Code: [`esyres_app/frontend/`](esyres_app/frontend/). Never scaffold `esyres_app/marketing/`.
 
 ## Status
 
-- **Design 1:** locked direction (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). MVP composition is **one screen** (hero + three how-it-works lines + one guest CTA). No long-scroll, feature grid, dark footer, or product mock.
-- **Design 2:** locked direction (same Cal tokens + role composition; owner dark nav; `panel-ref.jpg` skeleton only; not a dashboard IA clone).
+- **Design 1:** locked direction (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage (header + existing hero + simple footer). No feature grid, product mock, or dark footer. Owner is not a marketing landing.

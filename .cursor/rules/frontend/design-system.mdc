@@ -1,5 +1,5 @@
 ---
-description: Read DESIGN.md index, then the correct design pack — same Cal tokens, separate packs by surface
+description: Read DESIGN.md index, then Design 1 — one Cal pack
 globs: esyres_app/frontend/**
 alwaysApply: false
 ---
@@ -8,10 +8,8 @@ alwaysApply: false
 
 Before generating or changing visual UI:
 
-1. Read root `DESIGN.md` (index — two packs, shared Cal system; do not mix company-pitch IA with product chrome).
-2. Open the matching source:
-   - **Company pitch** on typed `/` → `refs/design-1/DESIGN.md`
-   - **Discovery / salon / owner** → `refs/design-2/DESIGN.md` (also `panel-ref.jpg` for owner skeleton), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX
+1. Read root `DESIGN.md` (one Cal pack).
+2. Open [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX.
 
-- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter; MVP is one screen, not a long-scroll site). Design 2 is locked (same Cal tokens + role composition; owner dark nav; not a dashboard IA clone).
+- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage; owner keeps a dense panel with light chrome. Busy/cell tokens move into Design 1 in STORY-42; do not keep a second pack.
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

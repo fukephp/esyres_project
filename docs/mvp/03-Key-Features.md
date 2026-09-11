@@ -4,14 +4,14 @@
 
 ## Customer-Facing (MVP)
 
-- **Company pitch** — typed `/` first paint is one Bosnian screen (hero + three how-it-works lines + one guest CTA) before discovery home on the same URL. Not a login wall. `/salon/:id` and the QR sticker skip it. No separate marketing site, no owner waitlist.
-- **Discovery/Home** — no login required; geolocation-based "salons near you," falling back to "Popular in Sarajevo"; search/filter by service type and name. Mounts only after the company pitch (or when the guest has already seen it).
+- **Homepage** — typed `/` is a permanent Bosnian page: homepage-only header (logo, Prijava/Registracija, Get your panel → `/create-salon` or Panel → `/owner`), the existing hero + Pronađi salon, simple footer. Not a login wall. Pronađi salon goes to `/salons`. `/salon/:id` and the QR sticker skip it. No persist-seen, no separate marketing site, no owner waitlist.
+- **Discovery home** — `/salons`; no login required; geolocation-based "salons near you," falling back to "Popular in Sarajevo"; search/filter by service type and name. Only **listed** salons (one open weekday and one service). Brand on `/salons` links home.
 - **Salon Profile** — photos, address, working hours, service list with prices/durations, and a busy-level badge (🟢/🟡/🔴 — see below). Optional link-out to maps; no in-app map SDK.
 - **Busy-Level Indicator** — coarse signal of how booked a day is, shown instead of a detailed time grid. Deliberately hides per-slot scheduling detail from customers.
 - **Service Selection** — multi-select, durations/prices stack automatically.
 - **Worker & Date/Time Selection** — pick a specific worker or "no preference"; pick a preferred day and time via a simple picker (no availability grid). This is the **primary** booking CTA on the salon profile (`Pošalji zahtjev`).
 - **Salon Booking Assistant (scripted chat)** — alternate path on the same salon profile for messy intent (`Nisi sigurna? Pitaj salon.`). Guided steps: service → worker → day (busy-level) → 1–3 suggested preferred times → confirm. Speaks as the salon, Bosnian, live salon data only (services, KM prices, durations, hours, address, busy-level, workers). Unknown → says it does not know; may ping the owner; guest does not wait. Same `createBooking` as the picker. Chat cannot skip send gates. Already-verified users confirm in one step. Ships after the picker/panel loop exists (Epic 10), still MVP.
-- **Registration / login** — email + password. Guest browse has no login wall. Email verification is required before a request can be sent (and before owner routes). Phone is optional at register (encouraged); **phone OTP is required to send a request and to respond to a counter-proposal**. Verified phone also enables OTP as an alternate login. `phone_verified_at` is captured now; reward-badge **display** is Phase 2.
+- **Registration / login** — email + password. Guest browse has no login wall. Homepage header offers Prijava/Registracija (same `AuthShell`); request submit and My Bookings still have it. Email verification is required before a request can be sent (and before owner routes or create salon). Phone is optional at register (encouraged); **phone OTP is required to send a request and to respond to a counter-proposal**. Verified phone also enables OTP as an alternate login. `phone_verified_at` is captured now; reward-badge **display** is Phase 2.
 - **Send Request** — creates a `requested` booking with preferred date and time; no clock slot is held yet, just counted toward that day's busy-level. Picker and assistant both produce this row.
 - **Time Proposed screen** — Approve / Reject / Ask for a different day or time (shown only when owner counter-proposes). Ask-other-day-or-time **reopens the same booking** (`requested` + new preferred date/time); it does not spawn a second request.
 - **My Bookings** — list of requests by status (Pending / Time Proposed / Confirmed / Declined); cancel/reschedule confirmed bookings.
@@ -39,7 +39,7 @@
 
 - **QR Reconnect Loop** — the existing front-counter acquisition QR code gets a second job: a ~7 day guest cookie holds the last scanned salon; once a customer verifies, the scan silently bookmarks the salon as "visited" and adds a reciprocal marker on the owner's customer history. No second sticker, no popups.
 - **Trust signal data capture** — response-time timestamps, no-show/cancellation counters, QR scan events, and verification status (`email_verified_at`, `phone_verified_at`) are captured from MVP launch, even though badge display is Phase 2.
-- **Owner onboarding** — invite-only / founder-provisioned. No public “Register salon.”
+- **Owner onboarding** — self-serve **create salon** on the same account (`/create-salon`, name only). Not invite-only. Not a waitlist. Not a second user type.
 - **Multi-service, multi-category salons** — a salon may offer hair + make-up + massage from day one.
 
 ## Explicitly Phase 2 (not MVP)

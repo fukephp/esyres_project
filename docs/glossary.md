@@ -9,12 +9,20 @@ A person with email+password who can browse as a guest and send requests once ve
 _Avoid_: account (as a type), member, client user, shopper
 
 **Owner**:
-A user who owns at least one salon. The same person can also be a customer. Owners are invite-only; there is no public salon registration.
+A user who owns at least one salon. The same person can also be a customer. They become an owner by creating a salon on the same account, not by a second user type.
 _Avoid_: merchant, vendor, admin, staff login
+
+**Create salon**:
+The act of adding a salon the signed-in user owns. Same account as the customer. Not a waitlist, not founder provision, and not a separate owner signup.
+_Avoid_: register salon (as a second account), owner signup, waitlist, Get your panel (the button copy)
 
 **Salon**:
 A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
 _Avoid_: location, branch, store, storefront
+
+**Listed salon**:
+A salon that appears on discovery home. It has at least one open weekday and at least one service. Having a salon profile URL is not the same thing.
+_Avoid_: published, live, active, approved, indexed
 
 **Salon switcher**:
 The owner control that chooses which of their salons is in context. Shown only when they own more than one. Each salon stays a separate shop. Not a chain location picker and not a customer discovery list.
@@ -34,13 +42,13 @@ _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
 
-**Company pitch**:
-The one-screen first paint on typed `/` that explains Esyres before discovery home. Bosnian. Not a login wall, not the salon list, and not a separate company site. The salon profile and the QR sticker path never show it.
-_Avoid_: landing, marketing site, homepage wall, welcome tour
+**Homepage**:
+The permanent guest-facing `/` surface: a homepage-only header, the existing hero (how-it-works + Pronađi salon), and a simple footer. Bosnian. Not a login wall, not the salon list, and not a one-shot gate. The salon profile and the QR sticker path never show it.
+_Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour
 
 **Discovery home**:
-The guest salon list on `/` after the company pitch, or when the guest has already seen it. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the company pitch, and not a separate search page.
-_Avoid_: homepage wall, feed, marketplace index, landing
+The guest salon list of listed salons, not on the homepage. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a separate search page.
+_Avoid_: homepage wall, feed, marketplace index, landing, company pitch
 
 **Discovery filter**:
 An optional overlay on discovery home: one service category and/or a salon-name match. Same nearby-or-popular list, not a separate search page.
@@ -51,7 +59,7 @@ The discovery list sorted by distance from the guest’s current location. Only 
 _Avoid_: near me map, radius search, geo grid
 
 **Popular in Sarajevo**:
-The discovery list when location is denied or unavailable, so `/` is never blank. Not a ranking of bookings or trust badges.
+The discovery list when location is denied or unavailable, so discovery home is never blank. Not a ranking of bookings or trust badges.
 _Avoid_: trending, featured, curated homepage, popular ranking
 
 ## Request paths

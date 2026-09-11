@@ -11,7 +11,7 @@ Application code is in `esyres_app/` (Laravel 13 + React TypeScript PWA placehol
 | Realtime | Laravel Reverb + Lighthouse subscriptions |
 | Cache / OTP / queues | Redis |
 | Frontend | One React TypeScript PWA (Vite), Apollo Client, GraphQL Code Generator |
-| UI | Tailwind CSS, i18next default `bs`, React Router (`/` customer, `/owner` owner) |
+| UI | Tailwind CSS, i18next default `bs`, React Router (`/` homepage, `/salons` discovery, `/owner` owner) |
 | PWA | `vite-plugin-pwa` + Workbox, native Web Push (VAPID) |
 | Owner grid | `@dnd-kit` + tap/form fallback |
 | Tests | Behat GraphQL HTTP (backend); Vitest + Playwright (frontend) |
@@ -24,7 +24,7 @@ Same origin: Nginx serves the SPA at `/`, GraphQL at `/graphql`, Reverb on the s
 One git repo. Application code is not at the git root.
 
 - `esyres_app/` — Laravel (`artisan`, `composer.json`, `app/`)
-- `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`). Typed `/` first paint is the company pitch; then discovery home on the same URL.
+- `esyres_app/frontend/` — Vite React TypeScript PWA (product SPA; not `resources/js`). Typed `/` is the homepage; Pronađi salon goes to `/salons`.
 - `esyres_app/docker-compose.yml` — slim `php` + `vite` + `mysql` (full service list later)
 - `docs/mvp/` — product
 - `docs/architecture/` — this set
@@ -35,4 +35,4 @@ Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet/Google Maps SDK,
 
 ## Related product overrides
 
-Auth, owner invite, salon switcher, per-service duration, preferred time, “ask for a different day or time”, the scripted salon booking assistant, and the in-PWA company pitch (no sibling marketing site) were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md). Assistant v1 does not add a stack component (no LLM, no WhatsApp).
+Auth, self-serve create salon, salon switcher, per-service duration, preferred time, “ask for a different day or time”, the scripted salon booking assistant, and the in-PWA homepage (no sibling marketing site) were grilled against `docs/mvp/` and then patched there so product truth and architecture do not diverge. See [08-Decisions.md](08-Decisions.md). Assistant v1 does not add a stack component (no LLM, no WhatsApp).

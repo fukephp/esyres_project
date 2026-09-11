@@ -3,13 +3,13 @@
 *High-level groupings of the MVP feature set. Each maps to a chunk of work that could reasonably be built and demoed as a unit. Architecture/data-model breakdown is intentionally excluded — product scope only.*
 
 ## Epic 1 — Salon Discovery & Profile Browsing
-Guest-accessible discovery flow: one-screen company pitch on typed `/` (then live discovery on the same URL), location-based "near you" with "Popular in Sarajevo" fallback, search/filter, salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the pitch.
+Guest-accessible discovery flow: Bosnian homepage on typed `/` (header + hero + Pronađi salon → `/salons`), location-based "near you" with "Popular in Sarajevo" fallback (listed salons only), search/filter, salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the homepage.
 
 ## Epic 2 — Booking Request Flow (Customer)
 Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account, verified email + phone OTP at request submit, pending state.
 
 ## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
-The core owner scheduling surface: per-day worker × time grid, Pending Requests queue (shows preferred date/time), one-tap accept preferred time, drag-to-counter-propose (+ tap fallback), Request Detail screen, decline flow.
+The core owner scheduling surface: per-day worker × time grid, Pending Requests queue (shows preferred date/time), one-tap accept preferred time, drag-to-counter-propose (+ tap fallback), Request Detail screen, decline flow. Cal light chrome (one Design 1 pack).
 
 ## Epic 4 — Booking Lifecycle & Customer Response
 Time-Proposed screen (Approve / Reject / Ask for a different day or time on the **same** booking row — only when owner counter-proposes), status transitions through `requested → confirmed` (accept) or `requested → time_proposed → confirmed/declined` (counter-propose), My Bookings list.
@@ -21,7 +21,7 @@ Reschedule flow for confirmed bookings (original stays protected until new time 
 Web push (owner real-time events, customer time-critical events) + SMS fallback (iOS/undelivered push) for status changes; email channel for day-before/hour-before reminders, including the email verification requirement this introduces.
 
 ## Epic 7 — Salon & Service Management (Owner Onboarding)
-Salon profile setup (founder invite / provision — no public owner signup), working hours/availability settings (including cancellation notice window), service & pricing management (per-service duration), worker/staff setup, salon switcher if the owner has more than one salon.
+Salon profile setup (self-serve create salon on the same account — `/create-salon`, name only), working hours/availability settings (including cancellation notice window), service & pricing management (per-service duration), worker/staff setup, salon switcher if the owner has more than one salon.
 
 ## Epic 8 — Trust Signal Data Foundations
 QR Reconnect Loop (scan → ~7 day guest cookie → reconcile at verification → Favorites/Customer History markers), response-time tracking, no-show/cancellation counters, email + phone verification status — all captured at MVP even though badge **display** is Phase 2.

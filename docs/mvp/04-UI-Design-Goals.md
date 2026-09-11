@@ -2,7 +2,7 @@
 
 ## 1. Frictionless Funnel First
 
-Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password) and phone OTP appear at request submit / My Bookings, not on the homepage. Typed `/` may show a one-screen company pitch once (Design 1 Cal look, Bosnian, one guest CTA); that is not a login wall and never sits in front of `/salon/:id` or the QR sticker. After the CTA, `/` is discovery home (Design 2).
+Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password) and phone OTP appear at request submit / My Bookings, and optionally in the homepage header (not a wall). Typed `/` is the Bosnian homepage (Design 1 Cal look: header + existing hero + Pronađi salon + simple footer); that is not a login wall and never sits in front of `/salon/:id` or the QR sticker. Pronađi salon goes to `/salons`.
 
 On the salon profile, the **primary** button stays the picker (`Pošalji zahtjev`). Scripted chat is a visible alternate (`Nisi sigurna? Pitaj salon.`), not a second product. Owners may market the assistant; guests who already know still get a few taps.
 
@@ -38,7 +38,7 @@ Guest chat speaks as the salon (Bosnian). No platform character (no “Cora”).
 
 ## Decided (visual)
 
-- **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Status tokens are Design-2-only and are never brand chrome. See `refs/design-2/DESIGN.md`.
+- **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Status tokens live in Design 1 and are never brand chrome. See `refs/design-1/DESIGN.md`.
 
 ## Not Yet Decided (needs discussion before final design)
 

@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-39` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-42` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–42. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -61,4 +61,7 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-36 | Basic stats | 9 | — | STORY-14 |
 | STORY-37 | QR conversion stats | 9 | — | STORY-34 |
 | STORY-38 | Local demo seed | 7 | — | STORY-03, STORY-04, STORY-05, STORY-13, STORY-15, STORY-18 |
-| STORY-39 | Company pitch on `/` | 1 | `STORY-39` | STORY-05 |
+| STORY-39 | Company pitch on `/` (superseded by STORY-40) | 1 | `STORY-39` | STORY-05 |
+| STORY-40 | Homepage on `/`; discovery at `/salons` | 1 | — | STORY-05, STORY-10, STORY-39 |
+| STORY-41 | Create salon and listed discovery | 7 | — | STORY-01, STORY-11, STORY-40 |
+| STORY-42 | One Design 1 pack; owner Cal chrome | 3 | — | STORY-13, STORY-40 |

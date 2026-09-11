@@ -35,9 +35,9 @@ Not a WhatsApp auto-book product and not an LLM in v1. Esyres stays a two-sided 
 
 The YouTube “Claude + WhatsApp” pattern is a conversation-shape guideline (acknowledge, short questions, close to a request) only — not GoHighLevel, not auto-confirm, not per-appointment agency pricing.
 
-### Company pitch in the PWA, not a sibling marketing site (decided)
+### Homepage in the PWA, not a sibling marketing site (decided)
 
-Typed `/` first paint is one Bosnian Design 1 screen (hero + three how-it-works lines + guest CTA), then discovery home on the same URL. Once per browser after the CTA. Do not mount discovery until then. `/salon/:id` and `GET /qr/{id}` never show the pitch. Delete `esyres_app/marketing/`. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. No Design 1 composition on salon or `/owner`.
+Typed `/` is the Bosnian homepage (header + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. No persist-seen. `/salon/:id` and `GET /qr/{id}` never show the homepage. `esyres_app/marketing/` stays gone. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. One Design 1 pack (owner keeps dense panel, Cal light chrome). Self-serve create salon is `/create-salon`, not a waitlist.
 
 ## Part 2 — Consolidated Open Questions (from existing docs)
 
@@ -51,7 +51,7 @@ Typed `/` first paint is one Bosnian Design 1 screen (hero + three how-it-works 
 **Discovery**
 - Are category chips on Discovery fixed, or dynamically pulled from registered salon services?
 - Does skipping the category step need an explicit affordance?
-- Address geocoding: **decided** — founder sets `lat`/`lng` when provisioning the salon.
+- Address geocoding: **decided** — no geocode in this MVP slice. Nearby omits salons without `lat`/`lng`. Self-serve create does not set coords.
 
 **Trust & Badges**
 - QR unauthenticated hold: **decided** — guest cookie ~7 days, last salon wins, reconcile at verification.

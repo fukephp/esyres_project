@@ -2,10 +2,10 @@
 version: alpha
 name: Esyres Marketing Landing
 description: >-
-  Design 1 — Esyres company pitch on typed `/` (one screen, then discovery).
+  Design 1 — Esyres Cal pack (homepage on `/`, discovery, salon, owner).
   Visual system adapted from Cal.com DESIGN.md (https://www.designmd.co/d/cal):
   white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards.
-  Do not apply this composition to discovery, salon, or `/owner`.
+  Homepage IA stays on `/` only; owner stays a dense panel.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -180,7 +180,7 @@ components:
 
 ## Overview
 
-Design 1 is the **company pitch** — one Bosnian screen on typed `/` before discovery home in the same PWA. Implementation lives in [`esyres_app/frontend/`](../../esyres_app/frontend/). There is no sibling `esyres_app/marketing/` site.
+Design 1 is the **only Cal pack** — homepage on `/`, discovery, salon, and owner. Implementation lives in [`esyres_app/frontend/`](../../esyres_app/frontend/). There is no sibling `esyres_app/marketing/` site.
 
 **Provenance:** Visual system adapted from [Cal.com DESIGN.md on designmd.co](https://www.designmd.co/d/cal). Tokens, type roles, radius, and whitespace follow that system. Product framing and page IA are Esyres-specific.
 
@@ -188,17 +188,17 @@ The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black pri
 
 Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Do not apply Design 1 composition to discovery home, salon profile, or `/owner`.** After the guest CTA, those routes use [`refs/design-2/DESIGN.md`](../design-2/DESIGN.md).
+**Homepage IA stays on `/` only.** Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav). Busy/cell tokens move here in STORY-42.
 
-### Locked company-pitch IA
+### Locked homepage IA
 
-One screen only:
+Short scroll:
 
-1. **Hero** — H1 + one support line.
-2. **How it works** — three short lines (pick day and preferred time; salon accepts or adjusts; you confirm only when they propose a different time).
-3. **One guest CTA** — reveals discovery home on the same `/`.
+1. **Header** — logo, Prijava/Registracija, Get your panel (or Panel). Homepage only.
+2. **Hero** — existing H1 + support + three how-it-works lines + Pronađi salon → `/salons`.
+3. **Simple footer** — Sarajevo + one line. No dark footer, Terms, Privacy, Instagram, or language toggle.
 
-No top-nav marketing links, long-scroll, feature grid, dark footer, in-card product mock, or owner CTA.
+No feature grid, in-card product mock, or long-scroll SaaS landing. `/create-salon` is a sparse form (brand link home), not this header/footer.
 
 No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carousels.
 
@@ -241,10 +241,10 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 ## Layout
 
-- Max content width ~1200px; the pitch is one viewport, not a long-scroll of `{spacing.section}` bands.
+- Max content width ~1200px; `/` is a short scroll (header + hero + footer), not a long-scroll of `{spacing.section}` bands.
 - Stack on mobile; modest two-column only if the three how-it-works lines need it on desktop.
 - Safe margins: ~48–64px desktop, ~20–24px mobile.
-- First (and only) viewport: brand **Esyres** + one H1 + one support line + three how-it-works lines + one guest CTA. No stats strip, no mock, no second CTA.
+- First viewport: brand **Esyres** + homepage header + one H1 + one support line + three how-it-works lines + Pronađi salon. No stats strip, no mock.
 
 ## Elevation & Depth
 
@@ -260,25 +260,25 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — optional wordmark only; no marketing link row, no owner CTA.
+**Top nav** — homepage only: wordmark, Prijava/Registracija, Get your panel / Panel. Not on `/salons` or `/salon/:id`.
 
-**Hero mock / product mockup card** — not used on the MVP company pitch.
+**Hero mock / product mockup card** — not used on the MVP homepage.
 
-**Feature card** — not used on the MVP company pitch.
+**Feature card** — not used on the MVP homepage.
 
-**Footer** — not used on the MVP company pitch (no dark page ending).
+**Footer** — simple light footer on `/` only (Sarajevo + one line). No dark page ending.
 
 ## Do's and Don'ts
 
 **Do**
 
-- Read this file (and the Cal provenance URL) before generating the company pitch.
+- Read this file (and the Cal provenance URL) before generating homepage or product chrome.
 - Keep Bosnian-first copy; Esyres offer: guest picks preferred day and time, owner accepts or adjusts, guest confirms when counter-proposed.
-- Use gated skills (`landing-page`) only on explicit company-pitch / Esyres-landing triggers. `pricing-page` is unused (no public pricing). `build-awwwards-quality-sites` only if the user asks for pitch polish.
+- Use gated skills (`landing-page`) only on explicit homepage / Esyres-landing triggers. `pricing-page` is unused (no public pricing). `build-awwwards-quality-sites` only if the user asks for homepage polish.
 
 **Don't**
 
-- Do not apply this composition to discovery home, salon profile, or `/owner`.
+- Do not turn discovery, salon, or `/owner` into homepage hero/footer IA.
 - Do not scaffold `esyres_app/marketing/` or a second Vite app.
 - Do not use pixel art, isometric salon illustrations, magenta/cobalt palettes, mega-bento shells, or screenshot JPG refs.
 - Do not use Unsplash photos, glassmorphism, neon glow, or Cal.com “schedule meetings” copy.

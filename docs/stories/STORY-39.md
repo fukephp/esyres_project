@@ -1,5 +1,7 @@
 # STORY-39 — Company pitch on `/`
 
+Superseded by STORY-40 (permanent homepage + `/salons`). Keep this file as the PR that shipped the in-PWA pitch; do not re-implement persist-seen.
+
 | Field | Value |
 |-------|--------|
 | ID | STORY-39 |

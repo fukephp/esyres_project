@@ -1,8 +1,8 @@
 ---
 name: landing-page
 description: >-
-  Design a high-converting company pitch (structure, copy, SEO).
-  Use when the user asks for the Esyres company pitch or landing on `/`.
+  Design a high-converting homepage (structure, copy, SEO).
+  Use when the user asks for the Esyres homepage or landing on `/`.
   Do not scaffold a marketing site. Prefer docs/mvp and DESIGN.md.
 ---
 
@@ -12,7 +12,7 @@ description: >-
 
 Vendored from [MengTo/Skills](https://github.com/MengTo/Skills) (MIT, Copyright (c) 2026 Meng To). Do not rewrite the techniques below. If they conflict with this gate, the gate wins.
 
-Use when the user asks for the company pitch, Esyres landing, or marketing homepage on typed `/`. Do not treat discovery, salon, or `/owner` as landings unless asked. Do not scaffold a marketing site or add a `marketing/` folder. Product truth remains `docs/mvp/` (one-screen Bosnian pitch, one guest CTA, then discovery). Stack truth remains `docs/architecture/`. Code lives in `esyres_app/frontend/`.
+Use when the user asks for the homepage, Esyres landing, or marketing homepage on typed `/`. Do not treat discovery, salon, or `/owner` as landings unless asked. Do not scaffold a marketing site or add a `marketing/` folder. Product truth remains `docs/mvp/` (Bosnian homepage: header + existing hero + Pronađi salon + simple footer; discovery at `/salons`). Stack truth remains `docs/architecture/`. Code lives in `esyres_app/frontend/`.
 
 A landing page is not a homepage.
 A homepage serves multiple intents.

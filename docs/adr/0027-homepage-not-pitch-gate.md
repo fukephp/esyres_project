@@ -1,0 +1,3 @@
+# `/` is the homepage; discovery lives at `/salons`
+
+The one-shot company pitch (persist “seen”, then discovery on the same `/`) is gone. `/` is a permanent homepage: homepage-only header, the existing hero, a simple footer. Pronađi salon goes to `/salons`. Auth does not skip the homepage; visiting `/` never auto-jumps to `/owner`. `/salon/:id` and `GET /qr/{id}` never show the homepage. Rejected: persist-seen on `/`, a sibling marketing site, `/welcome`, and a long-scroll feature-grid landing. This supersedes the same-URL pitch routing in `docs/adr/0024-company-pitch-in-pwa.md`.

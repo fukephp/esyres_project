@@ -8,7 +8,7 @@ alwaysApply: false
 
 Stack, GraphQL, and data rules: `docs/architecture/`.
 
-- Login is email+password. Guest queries stay public. `createBooking` requires verified email **and** phone OTP. Owner mutations require verified email plus salon policy. Owner onboarding is invite-only.
+- Login is email+password. Guest queries stay public. `createBooking` requires verified email **and** phone OTP. Owner mutations require verified email plus salon policy. `createSalon` requires verified email; owner access is owning at least one salon.
 - Capture from day one: response-time timestamps, no-show/cancel counters, QR scan + visited markers, verification status.
 - QR scan after verify silently favorites the salon and marks owner customer history as visited. No extra popup/sticker flow.
 - Notifications: web push + SMS fallback for booking status; email for day-before/hour-before reminders. Owner push is real-time for new requests and customer responses.
