@@ -4,7 +4,7 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 
 ## Routing
 
-- `/` — customer **homepage** (homepage-only header, existing hero, simple footer). Discovery home is a named route (nearby / Popular, filter). Salon profile, request via picker or scripted salon-profile chat, bookings, favorites stay on their routes. `/salon/:id` never shows homepage chrome. `/login` and `/register` are dedicated auth routes linked from the homepage header.
+- `/` — customer **homepage** (homepage-only header, existing hero, simple footer). Discovery home is `/salons` (nearby / Popular, filter). Salon profile, request via picker or scripted salon-profile chat, bookings, favorites stay on their routes. `/salon/:id` never shows homepage chrome. `/login` and `/register` are dedicated auth routes linked from the homepage header.
 - Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Records a QR scan (`qr_hits`), sets the hold cookie, and 302s to `/salon/:id`. Never shows the company pitch. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie or record a scan.
 - `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route.
 - `/owner` — owner: inbox, worker panel (home), in-flight chat tab (`/owner/chats`, list + optional Take over / Release + DND toggle), settings, Basic Stats (`/owner/stats`: last-7-day bookings + all-time QR scan/visit/conversion; `?salon=` like chats; nav `Statistika`); **salon switcher** when the user owns more than one salon
@@ -40,8 +40,8 @@ Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client, 
 
 ## Homepage
 
-Typed `/` is the Bosnian homepage (homepage-only header, existing hero, simple footer). Discovery home is a named route; do not persist a “seen” overlay on `/`. `/salon/:id` and `GET /qr/{salonId}` never show homepage chrome. No second Vite app, no `/welcome`. Header login/register are `/login` and `/register`; signed-in chip is email. See `docs/adr/0025-homepage-named-discovery.md`.
+Typed `/` is the Bosnian homepage (homepage-only header, existing hero, simple footer). Discovery home is `/salons`; do not persist a “seen” overlay on `/`. `/salon/:id` and `GET /qr/{salonId}` never show homepage chrome. No second Vite app, no `/welcome`. Header login/register are `/login` and `/register`; signed-in chip is email. See `docs/adr/0025-homepage-named-discovery.md`.
 
 ## Discovery
 
-Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. No map SDK. Salon `lat`/`lng` is stored when the salon is provisioned. Geolocation runs only after discovery home mounts (the named route, not `/`).
+Browser geolocation → `salonsNearby(lat, lng)` sorted list. Permission denied → `popularInSarajevo`. No map SDK. Salon `lat`/`lng` is stored when the salon is provisioned. Geolocation runs only after discovery home mounts (`/salons`, not `/`).

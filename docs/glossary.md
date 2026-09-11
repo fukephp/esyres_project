@@ -9,8 +9,12 @@ A person with email+password who can browse as a guest and send requests once ve
 _Avoid_: account (as a type), member, client user, shopper
 
 **Owner**:
-A user who owns at least one salon. The same person can also be a customer. Owners are invite-only; there is no public salon registration.
-_Avoid_: merchant, vendor, admin, staff login
+A user who owns at least one salon. The same person can also be a customer. A customer becomes an owner by creating a salon (public). Not a separate account type and not a worker login.
+_Avoid_: merchant, vendor, admin, staff login, invite-only owner
+
+**Get your panel**:
+The homepage control that opens the owner door: create a salon if they have none, or the owner panel if they already own one. Not customer register and not a waitlist.
+_Avoid_: Register salon (as a second account type), owner waitlist, Sign up your salon
 
 **Salon**:
 A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
@@ -39,7 +43,7 @@ The permanent guest page at `/`: homepage-only header, existing hero, simple foo
 _Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour
 
 **Discovery home**:
-The guest salon list on its own named route, not on `/`. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a search page.
+The guest salon list on `/salons`, not on `/`. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a search page.
 _Avoid_: homepage wall, feed, marketplace index, landing
 
 **Discovery filter**:

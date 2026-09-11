@@ -12,7 +12,7 @@ One `users` table. A person can be customer and owner. Owner access = owns at le
 
 **Local:** when `APP_ENV=local`, `hasVerifiedEmail()` and `hasVerifiedPhone()` return true so GraphQL `me` and the gates above succeed without timestamps. Columns stay null. Staging, production, and Behat (`testing`) keep the real gates. Signed-GET and OTP still write columns if used. See `docs/adr/0013-local-skip-verification-gates.md`.
 
-**Owner onboarding:** invite-only. Salon + first owner are provisioned (or a one-time invite). No public “Register salon.” Customer register is public.
+**Owner onboarding:** public. A signed-in user may create a salon (ADR 0026). Customer register is public and does not create a salon. Email verify still gates `/owner`.
 
 ## OTP
 
