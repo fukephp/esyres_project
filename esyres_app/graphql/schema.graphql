@@ -236,6 +236,7 @@ type Mutation {
     requestPhoneOtp(phone: String!): Boolean!
     verifyPhoneOtp(code: String!): Boolean!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
+    createSalon(name: String!): Salon!
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker

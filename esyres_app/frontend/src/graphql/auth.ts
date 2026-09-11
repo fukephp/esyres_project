@@ -46,6 +46,15 @@ export const LOGOUT_MUTATION = gql`
   }
 `
 
+export const CREATE_SALON_MUTATION = gql`
+  mutation CreateSalon($name: String!) {
+    createSalon(name: $name) {
+      id
+      name
+    }
+  }
+`
+
 export const RESEND_VERIFICATION_EMAIL = gql`
   mutation ResendVerificationEmail {
     resendVerificationEmail

@@ -13,8 +13,8 @@
 | Goal (one sentence) | A signed-in verified user creates a salon by name on `/create-salon`, lands on `/owner`, and Nearby/Popular return only listed salons. |
 | Branch name | `cursor/story-41-create-salon-3135` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-11 |
 
 ## Pass/fail — product
 
