@@ -30,7 +30,7 @@ This keeps the customer experience light (state a preference, no slot hunting) w
 - Replace phone tag and Instagram DM waiting with a structured request-and-propose flow.
 - Give owners one shared workspace (Worker Availability Panel) to manage all incoming requests and worker schedules without needing per-worker logins. Owner habit stays this panel; the in-PWA assistant fills it 24/7 so opening the app is worth it.
 - Capture the data needed for trust signals (verification, response speed, reliability) from day one, even where the UI to display it is a later phase.
-- A guest who typed `/` sees the Bosnian homepage, then Pronađi salon to the live list at `/salons` — no separate marketing site.
+- A guest who typed `/` sees the Bosnian homepage, then Pronađi salon to discovery at `/salons` (teaser, then results) — no separate marketing site.
 
 ## Explicit Non-Goals (for now)
 

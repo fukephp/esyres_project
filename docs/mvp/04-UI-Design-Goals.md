@@ -14,7 +14,7 @@ The owner side, by contrast, is where the real scheduling tool lives — the Wor
 
 ## 3. Coarse Signals, Not Detailed Schedules (Customer Side)
 
-Customers see a 🟢/🟡/🔴 busy-level badge per day and pick a preferred day and time via a simple picker — not a slot-by-slot availability grid. The assistant uses the same coarse signal: it may suggest 1–3 preferred times from hours, busy-level, and worker preference. It must not name live free slots or hold a clock cell. This keeps both request paths light while letting guests state when they'd like to come; the salon still accepts or counter-proposes.
+Customers see a 🟢/🟡/🔴 busy-level badge per day — on the salon profile and on discovery teaser/results — and pick a preferred day and time via a simple picker — not a slot-by-slot availability grid. The assistant uses the same coarse signal: it may suggest 1–3 preferred times from hours, busy-level, and worker preference. It must not name live free slots or hold a clock cell. This keeps both request paths light while letting guests state when they'd like to come; the salon still accepts or counter-proposes.
 
 ## 4. Mobile-First, Responsive Second
 

@@ -3,7 +3,7 @@
 *High-level groupings of the MVP feature set. Each maps to a chunk of work that could reasonably be built and demoed as a unit. Architecture/data-model breakdown is intentionally excluded — product scope only.*
 
 ## Epic 1 — Salon Discovery & Profile Browsing
-Guest-accessible discovery flow: Bosnian homepage on typed `/` (top-nav homepage slot + hero + Pronađi salon → `/salons`), shared Cal top-nav on guest and owner routes (per-route slot; salon/discovery = Moje rezervacije, not homepage CTAs), location-based "near you" with "Popular in Sarajevo" fallback (listed salons only), search/filter, salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the homepage page.
+Guest-accessible discovery flow: Bosnian homepage on typed `/` (top-nav homepage slot + hero + Pronađi salon → `/salons`), shared Cal top-nav on guest and owner routes (per-route slot; salon/discovery = Moje rezervacije, not homepage CTAs), location-based "near you" with "Popular in Sarajevo" fallback (listed salons only), search/filter, idle discovery teaser then richer results (name, today’s busy, categories, address), salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the homepage page.
 
 ## Epic 2 — Booking Request Flow (Customer)
 Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account, verified email + phone OTP at request submit, pending state.

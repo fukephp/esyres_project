@@ -24,7 +24,7 @@ Classify the topic, then maybe widen options. **You** invoke this, not the grill
 3. If diverge ran: wait for its critic shortlist, then grilling **round 1** is cluster-pick (see grilling). Later rounds lock as usual.
 4. If skipped: start grilling rounds as usual.
 
-Never load diverge from story-loop, what-next, or custom-feature-skills. Story-loop may tell you to use this skill for glossary/ADRs on an **existing** story — that is a subroutine: skip diverge.
+Never load diverge from story-loop, what-next, custom-feature-skills, or `/new-story`. Story-loop may tell you to use this skill for glossary/ADRs on an **existing** story — that is a subroutine: skip diverge.
 
 ## vs grill-me
 
@@ -48,7 +48,7 @@ Same routing as **grill-me**. When that grill topic reaches shared understanding
 | Stack | `docs/architecture/` (if not already updated with an ADR) |
 | Process / framework | `.cursor/CONTEXT.md` and skills as decided — **no** `STORY-xx` |
 
-Only a product grill **creates** new `STORY-xx`. Format: `docs/stories/index.md`. One file = one PR.
+Only a product grill or `/new-story` **creates** new `STORY-xx`. Format: `docs/stories/index.md`. One file = one PR.
 
 ## Done
 
