@@ -37,7 +37,7 @@ The YouTube “Claude + WhatsApp” pattern is a conversation-shape guideline (a
 
 ### Homepage in the PWA, not a sibling marketing site (decided)
 
-Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. Shared Cal top-nav on `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, and as an overlay on `/owner` (ADR 0029). No persist-seen. `/salon/:id` and `GET /qr/{id}` never show the homepage page. `esyres_app/marketing/` stays gone. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. One Design 1 pack (owner keeps dense panel, Cal light chrome). Self-serve create salon is `/create-salon`, not a waitlist.
+Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. Shared Cal top-nav on `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, and as an overlay on `/owner` (ADR 0029). Guest routes share a ~1200px inner column (nav inner + main align); owner bar inner unconstrained. No persist-seen. `/salon/:id` and `GET /qr/{id}` never show the homepage page. `esyres_app/marketing/` stays gone. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. One Design 1 pack (owner keeps dense panel, Cal light chrome). Self-serve create salon is `/create-salon`, not a waitlist.
 
 ## Part 2 — Consolidated Open Questions (from existing docs)
 

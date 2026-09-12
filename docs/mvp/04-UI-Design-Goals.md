@@ -39,6 +39,7 @@ Guest chat speaks as the salon (Bosnian). No platform character (no “Cora”).
 ## Decided (visual)
 
 - **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Status tokens live in Design 1 and are never brand chrome. See `refs/design-1/DESIGN.md`.
+- **Guest inner column.** `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings` share one ~1200px column (Design 1): top-nav inner and `main` align (same padding, `mx-auto`). Hairline bar stays full-bleed. Lists and headings span; copy/forms/CTAs keep left-aligned local max-widths (not a second centered `max-w-md` page). Discovery stays 1-col. No two-column salon. Owner overlay inner stays unconstrained. Sparse still means no homepage hero/footer on other routes.
 
 ## Not Yet Decided (needs discussion before final design)
 
