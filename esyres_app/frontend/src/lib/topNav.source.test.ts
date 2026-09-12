@@ -44,6 +44,10 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   const page = read('pages/Homepage.tsx')
   expect(page).toMatch(/<TopNav/)
   expect(page).toMatch(/AuthShell/)
+  expect(page).toMatch(/nextHomepageAuth/)
+  expect(page).toMatch(/PLACE_HEADING_CLASS/)
+  expect(page).toMatch(/auth\.placeCustomer/)
+  expect(page).toMatch(/authOpen \?/)
   expect(page).toMatch(/pitch\.h1/)
   expect(page).toMatch(/pitch\.cta/)
   expect(page).toMatch(/home\.footerCity/)
@@ -55,6 +59,8 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   expect(page).toMatch(/w-fit/)
   expect(page).not.toMatch(/navigate\('\/owner'\)/)
   expect(page).not.toMatch(/nav\.bookings/)
+  expect(page).toMatch(/PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}[\s\S]*max-w-sm[\s\S]*AuthShell/)
+  expect(page).not.toMatch(/max-w-sm[\s\S]*PLACE_HEADING_CLASS/)
 })
 
 test('discovery and salon share TopNav discovery slot; no in-page BookingsLink', () => {

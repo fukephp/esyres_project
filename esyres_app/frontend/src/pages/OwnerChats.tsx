@@ -18,6 +18,7 @@ import {
 } from '../graphql/intake'
 import { OWNER_SALON_QUERY, type OwnerSalonData } from '../graphql/pending'
 import { formatSarajevoDateTime } from '../lib/format'
+import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
   chatBadgeCount,
   intakePingMark,
@@ -88,7 +89,7 @@ export function OwnerChats() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.chat')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
           </div>
@@ -102,7 +103,7 @@ export function OwnerChats() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.chat')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <EmailVerifyPanel />
           </div>

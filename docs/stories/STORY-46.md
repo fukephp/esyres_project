@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-46 |
 | Epic | 2 — Booking Request Flow (Customer) |
-| Loop | — |
+| Loop | `STORY-46` |
 | Depends on | STORY-10, STORY-11, STORY-40, STORY-41, STORY-43 |
 
 ## User story

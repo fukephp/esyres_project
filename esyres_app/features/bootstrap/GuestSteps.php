@@ -17,17 +17,14 @@ use Illuminate\Support\Facades\URL;
 
 trait GuestSteps
 {
+    private const DEFAULT_REGISTER_NAME = 'Ana';
+
     /**
      * @When I register as :email with password :password
      */
     public function iRegisterAs(string $email, string $password): void
     {
-        $this->iFetchTheCsrfCookie();
-        $this->graphql($this->registerMutation(), [
-            'email' => $email,
-            'password' => $password,
-        ]);
-        $this->rememberRegisteredUser();
+        $this->registerWith(self::DEFAULT_REGISTER_NAME, $email, $password, null);
     }
 
     /**
@@ -35,13 +32,23 @@ trait GuestSteps
      */
     public function iRegisterAsWithPhone(string $email, string $password, string $phone): void
     {
-        $this->iFetchTheCsrfCookie();
-        $this->graphql($this->registerMutation(), [
-            'email' => $email,
-            'password' => $password,
-            'phone' => $phone,
-        ]);
-        $this->rememberRegisteredUser();
+        $this->registerWith(self::DEFAULT_REGISTER_NAME, $email, $password, $phone);
+    }
+
+    /**
+     * @When I register as :email named :name with password :password
+     */
+    public function iRegisterAsNamed(string $email, string $name, string $password): void
+    {
+        $this->registerWith($name, $email, $password, null);
+    }
+
+    /**
+     * @When I register as :email named :name with password :password and phone :phone
+     */
+    public function iRegisterAsNamedWithPhone(string $email, string $name, string $password, string $phone): void
+    {
+        $this->registerWith($name, $email, $password, $phone);
     }
 
     /**
@@ -1978,12 +1985,31 @@ query MyBookings($limit: Int = 20, $offset: Int = 0) {
 GQL;
     }
 
+    /**
+     * @param  string|null  $phone
+     */
+    private function registerWith(string $name, string $email, string $password, ?string $phone): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $variables = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+        ];
+        if ($phone !== null) {
+            $variables['phone'] = $phone;
+        }
+        $this->graphql($this->registerMutation(), $variables);
+        $this->rememberRegisteredUser();
+    }
+
     private function registerMutation(): string
     {
         return <<<'GQL'
-mutation Register($email: String!, $password: String!, $phone: String) {
-  register(email: $email, password: $password, phone: $phone) {
+mutation Register($name: String!, $email: String!, $password: String!, $phone: String) {
+  register(name: $name, email: $email, password: $password, phone: $phone) {
     id
+    name
     email
     emailVerified
   }

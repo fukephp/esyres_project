@@ -14,6 +14,7 @@ import {
   type SalonStatsData,
 } from '../graphql/stats'
 import { chatBadgeCount } from '../lib/intake'
+import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { ownerChatSearchParams, ownerSalonFromSearch, statsHourLabel } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
 
@@ -70,7 +71,7 @@ export function OwnerStats() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
           </div>
@@ -84,7 +85,7 @@ export function OwnerStats() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <EmailVerifyPanel />
           </div>

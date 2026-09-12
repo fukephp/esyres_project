@@ -23,6 +23,9 @@ function authMessage(code: string | null, t: (key: string) => string): string {
   if (code === 'INVALID_CREDENTIALS') {
     return t('auth.gate.INVALID_CREDENTIALS')
   }
+  if (code === 'INVALID_NAME') {
+    return t('auth.gate.INVALID_NAME')
+  }
   return t('auth.gate.fallback')
 }
 
@@ -39,6 +42,7 @@ export function AuthShell({
   const [login] = useMutation(LOGIN_MUTATION, { refetchQueries: ['Me'] })
   const [register] = useMutation(REGISTER_MUTATION, { refetchQueries: ['Me'] })
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
@@ -55,7 +59,12 @@ export function AuthShell({
     try {
       if (mode === 'register') {
         await register({
-          variables: { email, password, phone: phone.trim() === '' ? null : phone.trim() },
+          variables: {
+            name: name.trim(),
+            email,
+            password,
+            phone: phone.trim() === '' ? null : phone.trim(),
+          },
         })
       } else {
         await login({ variables: { email, password } })
@@ -88,6 +97,18 @@ export function AuthShell({
           </button>
         </div>
       ) : null}
+      {mode === 'register' && (
+        <label className="block text-sm text-body">
+          {t('auth.name')}
+          <input
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+          />
+        </label>
+      )}
       <label className="block text-sm text-body">
         {t('auth.email')}
         <input

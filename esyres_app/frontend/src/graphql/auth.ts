@@ -31,8 +31,8 @@ export const LOGIN_MUTATION = gql`
 `
 
 export const REGISTER_MUTATION = gql`
-  mutation Register($email: String!, $password: String!, $phone: String) {
-    register(email: $email, password: $password, phone: $phone) {
+  mutation Register($name: String!, $email: String!, $password: String!, $phone: String) {
+    register(name: $name, email: $email, password: $password, phone: $phone) {
       id
       name
       email

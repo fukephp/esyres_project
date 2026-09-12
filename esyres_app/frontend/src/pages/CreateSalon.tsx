@@ -8,7 +8,7 @@ import { TopNav } from '../components/TopNav'
 import { CREATE_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
 import { createSalonSurface } from '../lib/createSalon'
-import { GUEST_COLUMN_CLASS } from '../lib/homepage'
+import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
 
 export function CreateSalon() {
   const { t } = useTranslation()
@@ -40,6 +40,7 @@ export function CreateSalon() {
       <>
         <TopNav />
         <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8 max-w-md">
             <AuthShell allowRegister onAuthenticated={() => refetch()} />
           </div>
@@ -52,6 +53,7 @@ export function CreateSalon() {
       <>
         <TopNav />
         <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8 max-w-md">
             <EmailVerifyPanel />
           </div>

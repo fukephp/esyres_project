@@ -4,6 +4,7 @@ import { AuthShell } from './AuthShell'
 import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
+import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
   assistantAddressLine,
   assistantCanSend,
@@ -281,7 +282,12 @@ export function AssistantIntake({
       )}
       {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}
       {chrome === 'phone' && <PhoneOtpPanel onRetry={onAfterAuth} />}
-      {chrome === 'login' && <AuthShell onAuthenticated={onAfterAuth} />}
+      {chrome === 'login' && (
+        <>
+          <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
+          <AuthShell onAuthenticated={onAfterAuth} />
+        </>
+      )}
         </>
       )}
     </form>
