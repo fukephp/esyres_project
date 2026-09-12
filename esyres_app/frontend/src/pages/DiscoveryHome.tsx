@@ -3,28 +3,42 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { BookingsLink } from '../components/BookingsLink'
-import { discoveryBrandLink } from '../lib/homepage'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
   SALONS_NEARBY_QUERY,
+  type DiscoverySalon,
   type DiscoveryVars,
   type PopularInSarajevoData,
   type SalonsNearbyData,
 } from '../graphql/discovery'
+import { busyToken } from '../lib/busyToken'
 import {
   DISCOVERY_CATEGORIES,
+  discoveryAddressLine,
   discoveryEmptyKey,
   discoveryHasFilter,
+  discoveryListMode,
+  discoverySalonCategories,
+  discoveryShowAllVisible,
   discoverySource,
+  discoveryVisibleSalons,
   type DiscoverySource,
   type ServiceCategory,
 } from '../lib/discovery'
+import { sarajevoToday } from '../lib/format'
+import { discoveryBrandLink } from '../lib/homepage'
 
 type Geo =
   | { status: 'pending' }
   | { status: 'granted'; lat: number; lng: number }
   | { status: 'denied' }
   | { status: 'unavailable' }
+
+const busyBg = {
+  'busy-free': 'bg-busy-free',
+  'busy-moderate': 'bg-busy-moderate',
+  'busy-busy': 'bg-busy-busy',
+} as const
 
 function useGeo(): Geo {
   const [geo, setGeo] = useState<Geo>({ status: 'pending' })
@@ -53,8 +67,8 @@ function useDebounced(value: string, ms: number): string {
   return debounced
 }
 
-function filterVars(category: ServiceCategory | null, name: string): DiscoveryVars {
-  const vars: DiscoveryVars = {}
+function filterVars(category: ServiceCategory | null, name: string): Pick<DiscoveryVars, 'category' | 'name'> {
+  const vars: Pick<DiscoveryVars, 'category' | 'name'> = {}
   if (category) {
     vars.category = category
   }
@@ -65,30 +79,79 @@ function filterVars(category: ServiceCategory | null, name: string): DiscoveryVa
   return vars
 }
 
+function SearchIcon() {
+  return (
+    <svg
+      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M10.5 10.5 14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SalonFacts({ salon }: { salon: DiscoverySalon }) {
+  const { t } = useTranslation()
+  const token = busyToken(salon.busyLevel)
+  const categories = discoverySalonCategories(salon.services)
+  const address = discoveryAddressLine(salon.address)
+
+  return (
+    <>
+      <div className="flex items-start justify-between gap-4">
+        <span className="text-sm font-medium text-ink">{salon.name}</span>
+        <span className="flex items-center gap-2 text-sm text-body">
+          <span className={`size-2.5 shrink-0 rounded-full ${busyBg[token]}`} aria-hidden />
+          {t(`salon.busy.${salon.busyLevel}`)}
+        </span>
+      </div>
+      {categories.length > 0 ? (
+        <p className="mt-1 text-sm text-muted">
+          {categories.map((c) => t(`category.${c}`)).join(', ')}
+        </p>
+      ) : null}
+      {address !== null ? <p className="mt-1 text-sm text-muted">{address}</p> : null}
+    </>
+  )
+}
+
 export function DiscoveryHome() {
   const { t } = useTranslation()
   const geo = useGeo()
   const [category, setCategory] = useState<ServiceCategory | null>(null)
   const [nameDraft, setNameDraft] = useState('')
+  const [showAll, setShowAll] = useState(false)
   const name = useDebounced(nameDraft, 300)
   const source: DiscoverySource | null =
     geo.status === 'pending' ? null : discoverySource(geo.status)
   const vars = filterVars(category, name)
   const filtered = discoveryHasFilter(category, name)
+  const date = sarajevoToday()
+
+  useEffect(() => {
+    if (filtered) {
+      setShowAll(false)
+    }
+  }, [filtered])
 
   const nearby = useQuery<SalonsNearbyData>(SALONS_NEARBY_QUERY, {
-    variables: geo.status === 'granted' ? { lat: geo.lat, lng: geo.lng, ...vars } : undefined,
+    variables: geo.status === 'granted' ? { lat: geo.lat, lng: geo.lng, date, ...vars } : undefined,
     skip: source !== 'nearby',
   })
   const popular = useQuery<PopularInSarajevoData>(POPULAR_IN_SARAJEVO_QUERY, {
-    variables: vars,
+    variables: { date, ...vars },
     skip: source !== 'popular',
   })
 
   const loading = geo.status === 'pending' || nearby.loading || popular.loading
   const salons =
     source === 'nearby' ? nearby.data?.salonsNearby : source === 'popular' ? popular.data?.popularInSarajevo : undefined
-
+  const listMode = discoveryListMode({ filtered, showAll })
+  const visible = salons === undefined ? [] : discoveryVisibleSalons(salons, listMode)
+  const showAllButton = salons !== undefined && discoveryShowAllVisible(salons.length, listMode)
   const brand = discoveryBrandLink()
 
   return (
@@ -125,27 +188,51 @@ export function DiscoveryHome() {
           )
         })}
       </div>
-      <input
-        type="search"
-        value={nameDraft}
-        onChange={(e) => setNameDraft(e.target.value)}
-        placeholder={t('discovery.searchPlaceholder')}
-        aria-label={t('discovery.searchPlaceholder')}
-        className="mt-4 w-full rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink placeholder:text-muted"
-      />
+      <div className="relative mt-4">
+        <SearchIcon />
+        <input
+          type="search"
+          value={nameDraft}
+          onChange={(e) => setNameDraft(e.target.value)}
+          placeholder={t('discovery.searchPlaceholder')}
+          aria-label={t('discovery.searchPlaceholder')}
+          className="w-full rounded-md border border-hairline bg-canvas py-3 pl-10 pr-3 text-sm text-ink placeholder:text-muted"
+        />
+      </div>
       {loading || !source ? (
         <p className="mt-6 text-sm text-body">{t('salon.loading')}</p>
       ) : !salons || salons.length === 0 ? (
         <p className="mt-6 text-sm text-muted">{t(discoveryEmptyKey(source, filtered))}</p>
+      ) : listMode === 'teaser' ? (
+        <>
+          <ul className="mt-6 space-y-3">
+            {visible.map((salon) => (
+              <li key={salon.id}>
+                <Link
+                  to={`/salon/${salon.id}`}
+                  className="block rounded-lg bg-surface-card p-4"
+                >
+                  <SalonFacts salon={salon} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {showAllButton ? (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="mt-4 text-sm font-medium text-ink"
+            >
+              {t('discovery.showAll')}
+            </button>
+          ) : null}
+        </>
       ) : (
         <ul className="mt-6 divide-y divide-hairline">
-          {salons.map((salon) => (
+          {visible.map((salon) => (
             <li key={salon.id}>
-              <Link
-                to={`/salon/${salon.id}`}
-                className="block py-3 text-sm font-medium text-ink"
-              >
-                {salon.name}
+              <Link to={`/salon/${salon.id}`} className="block py-3">
+                <SalonFacts salon={salon} />
               </Link>
             </li>
           ))}

@@ -748,6 +748,87 @@ trait GuestSteps
     }
 
     /**
+     * @When I query salonsNearby facts lat :lat lng :lng date :date as a guest
+     */
+    public function iQuerySalonsNearbyFactsAsAGuest(string $lat, string $lng, string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonsNearbyFactsQuery(), [
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query popularInSarajevo facts date :date as a guest
+     */
+    public function iQueryPopularInSarajevoFactsAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->popularInSarajevoFactsQuery(), [
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then the first listed salon address is :address
+     */
+    public function theFirstListedSalonAddressIs(string $address): void
+    {
+        $this->assertSame($address, $this->firstListedSalon()['address']);
+    }
+
+    /**
+     * @Then the first listed salon busy level is :level
+     */
+    public function theFirstListedSalonBusyLevelIs(string $level): void
+    {
+        $this->assertSame($level, $this->firstListedSalon()['busyLevel']);
+    }
+
+    /**
+     * @Then the first listed salon categories are:
+     */
+    public function theFirstListedSalonCategoriesAre(PyStringNode $payload): void
+    {
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $services = $this->firstListedSalon()['services'] ?? [];
+        if (! is_array($services)) {
+            throw new RuntimeException('Expected services on the first listed salon');
+        }
+        $seen = [];
+        foreach ($services as $service) {
+            $category = $service['category'] ?? null;
+            if (is_string($category)) {
+                $seen[$category] = true;
+            }
+        }
+        $actual = [];
+        foreach (['HAIR', 'MAKE_UP', 'MASSAGE'] as $category) {
+            if (isset($seen[$category])) {
+                $actual[] = $category;
+            }
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function firstListedSalon(): array
+    {
+        $this->assertNoGraphqlErrors();
+        $data = $this->graphql['data'];
+        $list = $data['salonsNearby'] ?? $data['popularInSarajevo'] ?? null;
+        if (! is_array($list) || $list === [] || ! is_array($list[0] ?? null)) {
+            throw new RuntimeException('Expected a listed salon, got '.json_encode($this->graphql));
+        }
+
+        return $list[0];
+    }
+
+    /**
      * @When I query salonsNearby lat :lat lng :lng as a guest
      */
     public function iQuerySalonsNearbyAsAGuest(string $lat, string $lng): void
@@ -1185,6 +1266,40 @@ query Popular($limit: Int, $offset: Int, $category: ServiceCategory, $name: Stri
   popularInSarajevo(limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
+  }
+}
+GQL;
+    }
+
+    private function salonsNearbyFactsQuery(): string
+    {
+        return <<<'GQL'
+query NearbyFacts($lat: Float!, $lng: Float!, $date: String!) {
+  salonsNearby(lat: $lat, lng: $lng) {
+    id
+    name
+    address
+    busyLevel(date: $date)
+    services {
+      category
+    }
+  }
+}
+GQL;
+    }
+
+    private function popularInSarajevoFactsQuery(): string
+    {
+        return <<<'GQL'
+query PopularFacts($date: String!) {
+  popularInSarajevo {
+    id
+    name
+    address
+    busyLevel(date: $date)
+    services {
+      category
+    }
   }
 }
 GQL;
