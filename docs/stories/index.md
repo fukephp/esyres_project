@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-45` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–45. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-46` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–46. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -68,3 +68,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-43 | Shared Cal top-nav | 1 | `STORY-43` | STORY-07, STORY-18, STORY-40, STORY-41, STORY-42 |
 | STORY-44 | Discovery teaser and richer results | 1 | `STORY-44` | STORY-06, STORY-07, STORY-40, STORY-41, STORY-43 |
 | STORY-45 | Guest column: nav and main align | 1 | `STORY-45` | STORY-43, STORY-44 |
+| STORY-46 | Person name at register; Rezervacije vs Panel | 2 | — | STORY-10, STORY-11, STORY-40, STORY-41, STORY-43 |

@@ -5,7 +5,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 1. **Same origin via Nginx** — SPA + GraphQL + Reverb. Avoids CORS and cookie issues for a solo PWA.
 2. **Sanctum cookies, not Bearer** — httpOnly session; tokens later for native.
 3. **One users table + roles** — same human can book and own salons. Workers are not users.
-4. **Email+password login** — phone is not the username. Guest browse stays open.
+4. **Email+password login** — phone is not the username. Guest browse stays open. Register requires person name (`users.name`, Ime i prezime); do not derive it from the email local-part. Login has no name field.
 5. **Phone OTP required to send a request, respond to a counter-proposal, request a reschedule, and cancel a confirmed booking, optional at register** — SMS fallback and owner trust; less funnel pain than OTP-as-login. Phone stored as E.164, any country (see `docs/adr/0006-phone-e164-any-country.md`). Customer respond mutations share the `createBooking` gates (`docs/adr/0011-customer-respond-same-verify-gates.md`). Exception: `APP_ENV=local` treats phone as verified for gates and GraphQL fields; timestamps stay null (`docs/adr/0013-local-skip-verification-gates.md`).
 6. **Email verified before request or owner panel** — reminders and fake-owner protection. Exception: `APP_ENV=local` treats email as verified for gates and GraphQL fields; timestamps stay null (`docs/adr/0013-local-skip-verification-gates.md`).
 7. **Self-serve create salon** — a signed-in user creates a salon they own (same account). Not invite-only, not a waitlist, not a second user type. See `docs/adr/0025-self-serve-create-salon.md`.

@@ -12,6 +12,10 @@ _Avoid_: account (as a type), member, client user, shopper
 A user who owns at least one salon. The same person can also be a customer. They become an owner by creating a salon on the same account, not by a second user type.
 _Avoid_: merchant, vendor, admin, staff login
 
+**Person name**:
+The person's Ime i prezime. Not the salon name, not a worker name, and not an email local-part.
+_Avoid_: display name, username, handle, full name (as a second field)
+
 **Create salon**:
 The act of adding a salon the signed-in user owns. Same account as the customer. Not a waitlist, not founder provision, and not a separate owner signup.
 _Avoid_: register salon (as a second account), owner signup, waitlist, Get your panel (the button copy)

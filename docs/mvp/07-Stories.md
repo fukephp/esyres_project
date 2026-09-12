@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-45`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-46`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -21,6 +21,7 @@
 - As a customer, I want to optionally pick a specific worker or say "no preference," so that I have control when I care, and less friction when I don't.
 - As a customer, I want to pick a preferred day and time with a simple picker (no availability grid), so that the salon knows when I'd like to come without me guessing their schedule.
 - As a customer, I want to create an account with email and password without a homepage login wall, so that I can browse first and sign in when I request or open My Bookings.
+- As a customer or someone opening a panel, I want to type my Ime i prezime when I register and see Rezervacije or Panel on the auth shell, so that my name is real and I know which door I opened.
 - As a customer, I want to verify my email before my request is sent, so that the salon can reach me with reminders.
 - As a customer, I want to verify my phone with OTP before my request is sent (optional earlier, required at submit), so that the salon can SMS me if push fails.
 - As a customer, I want confirmation that my request was sent and is awaiting salon response (accept or counter-propose), so that I know what to expect next.

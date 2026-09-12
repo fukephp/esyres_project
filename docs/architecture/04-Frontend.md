@@ -14,7 +14,7 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 
 Owner chunks (including `@dnd-kit`) are lazy-loaded so the customer first paint does not ship the grid.
 
-Customer browse has no login wall. The homepage is not a login wall. Login/register appears in the homepage top-nav slot, at request submit, My Bookings, `/create-salon`, and owner routes. Owner routes overlay the shared top-nav (name + Odjava) above OwnerNav.
+Customer browse has no login wall. The homepage is not a login wall. Login/register appears in the homepage top-nav slot, at request submit, My Bookings, `/create-salon`, and owner routes. Register asks for person name first (Ime i prezime); login does not. AuthShell shows **Rezervacije** on customer shells and **Panel** on `/create-salon` and `/owner*` (including those email-verify screens). Homepage auth hides hero + footer while open. Owner routes overlay the shared top-nav (name + Odjava) above OwnerNav.
 
 ## Libraries (MVP)
 

@@ -6,7 +6,7 @@
 
 ### Funnel friction: email verification + phone at request (decided)
 
-Login is email+password so browsing stays open. Phone is optional at register and **required (OTP) to send a request**, with verified email required for request and owner panel. This is the locked trade-off: less than OTP-as-the-only-login, still two gates at submit. Watch verification completion rate once live.
+Login is email+password so browsing stays open. Register requires person name (Ime i prezime). Phone is optional at register and **required (OTP) to send a request**, with verified email required for request and owner panel. This is the locked trade-off: less than OTP-as-the-only-login, still two gates at submit. Watch verification completion rate once live.
 
 ### Two-step approval may slow down perceived responsiveness (worth discussing)
 

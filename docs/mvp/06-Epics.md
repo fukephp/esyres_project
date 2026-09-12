@@ -6,7 +6,7 @@
 Guest-accessible discovery flow: Bosnian homepage on typed `/` (top-nav homepage slot + hero + Pronađi salon → `/salons`), shared Cal top-nav on guest and owner routes (per-route slot; salon/discovery = Moje rezervacije, not homepage CTAs), guest inner column ~1200px so nav and main align (owner bar inner unconstrained), location-based "near you" with "Popular in Sarajevo" fallback (listed salons only), search/filter, idle discovery teaser then richer results (name, today’s busy, categories, address), salon profile page with services, prices, and busy-level badge. QR and `/salon/:id` skip the homepage page.
 
 ## Epic 2 — Booking Request Flow (Customer)
-Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account, verified email + phone OTP at request submit, pending state.
+Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account with person name at register, Rezervacije vs Panel on the auth shell, verified email + phone OTP at request submit, pending state.
 
 ## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
 The core owner scheduling surface: per-day worker × time grid, Pending Requests queue (shows preferred date/time), one-tap accept preferred time, drag-to-counter-propose (+ tap fallback), Request Detail screen, decline flow. Cal light chrome (one Design 1 pack).
