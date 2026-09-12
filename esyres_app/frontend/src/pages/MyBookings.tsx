@@ -5,7 +5,8 @@ import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
-import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
+import { TopNav } from '../components/TopNav'
+import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ASK_OTHER_TIME_MUTATION,
   CANCEL_BOOKING_MUTATION,
@@ -293,7 +294,6 @@ export function MyBookings() {
   const { data: list, loading: listLoading, refetch: refetchList } = useQuery<MyBookingsData>(MY_BOOKINGS_QUERY, {
     skip: !loggedIn,
   })
-  const [logout] = useMutation(LOGOUT_MUTATION, { refetchQueries: ['Me'] })
   const [confirmProposed] = useMutation(CONFIRM_PROPOSED_TIME_MUTATION)
   const [rejectProposed] = useMutation(REJECT_PROPOSED_TIME_MUTATION)
   const [askOther] = useMutation(ASK_OTHER_TIME_MUTATION)
@@ -345,32 +345,42 @@ export function MyBookings() {
     }
   }
 
+  const navMe = loading ? null : (data?.me ?? null)
+
   if (loading) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8 text-body">
-        <p>{t('salon.loading')}</p>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8 text-body">
+          <p>{t('salon.loading')}</p>
+        </main>
+      </>
     )
   }
 
   if (data?.me == null) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
-          {t('bookings.title')}
-        </h1>
-        <VerifyBanner />
-        <div className="mt-8">
-          <AuthShell onAuthenticated={() => refetch()} />
-        </div>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
+            {t('bookings.title')}
+          </h1>
+          <VerifyBanner />
+          <div className="mt-8">
+            <AuthShell onAuthenticated={() => refetch()} />
+          </div>
+        </main>
+      </>
     )
   }
 
   const rows = list?.myBookings ?? []
 
   return (
-    <main className="mx-auto max-w-md px-5 py-8">
+    <>
+      <TopNav me={navMe} />
+      <main className="mx-auto max-w-md px-5 py-8">
       <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
         {t('bookings.title')}
       </h1>
@@ -427,13 +437,7 @@ export function MyBookings() {
           ))}
         </ul>
       )}
-      <button
-        type="button"
-        className="mt-6 text-sm text-body"
-        onClick={() => void logout()}
-      >
-        {t('bookings.logout')}
-      </button>
-    </main>
+      </main>
+    </>
   )
 }
