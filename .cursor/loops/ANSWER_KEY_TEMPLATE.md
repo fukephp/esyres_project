@@ -38,13 +38,17 @@ Cite `docs/architecture/` constraints this story must not violate.
 
 ## Verify commands
 
-Run from the **app root** named in `.cursor/CONTEXT.md` unless noted. Every command must exit 0 before the loop may open a ready PR.
+Run the CONTEXT **frontend-only classifier** first (union of untracked + unstaged + staged + `main...HEAD`). Do not skip Behat from a story label. Every command in the matching set must exit 0 before the loop may open a ready PR.
+
+**If skipped** — from `esyres_app/frontend/` (host npm; `docker compose exec -T vite` only if that container is already up). Do not `compose up` or run `php artisan --version`.
 
 ```text
-TBD after scaffold
+npm run typecheck
+npm run test
+npm run build
 ```
 
-Examples to replace TBD once the app exists (copy from CONTEXT; Behat flags are required):
+**If Behat runs** (classifier fails, or the human asked for Behat / `--suite`) — from `esyres_app/`:
 
 ```text
 docker compose up -d
@@ -65,7 +69,7 @@ Explicit non-goals for this PR (later phase, adjacent stories, refactors not req
 
 1. Read this answer key and `.cursor/CONTEXT.md`. Follow `.cursor/skills/custom-feature-skills/SKILL.md` for product constraints.
 2. Implement **only** what this key requires. Do not expand scope or invent stack.
-3. Loop: implement → run every verify command → fix failures. Count each full implement→verify as one cycle.
+3. Loop: implement → run the CONTEXT frontend-only classifier → run the matching verify commands → fix failures. Count each full implement→verify as one cycle.
 4. Stop when all named-verifier product checks, architecture checks, and verify commands pass, **or** when the iteration cap is hit, **or** when the same failure repeats twice with no progress. Human-only checks (at most 1–2) are for the human at PR review unless the key says otherwise.
 5. On success: open a PR whose body links this answer key and lists what was verified. UI stories use the same ready rule as non-UI (machine gates). Do not embed screenshots in the PR. Do not open a draft/blocked PR because shots are missing. Do not type credentials into the IDE browser or ask the human to attach shots.
 6. On escalate: open a draft/blocked PR with failing checks, last command output summary, and the decision needed from a human. Do not keep spending cycles.

@@ -8,7 +8,17 @@ Not Laravel Sail. Backend gate is Behat, not `php artisan test`.
 
 ## Verify
 
-From this directory. `up -d` is idempotent (starts php artisan on :8000 and Vite on :5173). Do not `down` as part of verify. Never `docker compose run` for verify or servers.
+Agent default: run the **frontend-only classifier** in `.cursor/CONTEXT.md` first. If every changed `esyres_app/` path is under `frontend/`, skip Behat/php/mysql and from `frontend/` run:
+
+```text
+npm run typecheck
+npm run test
+npm run build
+```
+
+(`docker compose exec -T vite npm run …` only if that container is already up.) Humans can still ask for full Behat; `--suite owner|guest` always runs Behat.
+
+When Behat runs, from this directory. `up -d` is idempotent (starts php artisan on :8000 and Vite on :5173). Do not `down` as part of verify. Never `docker compose run` for verify or servers.
 
 ```text
 docker compose up -d
@@ -21,7 +31,7 @@ docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 ```
 
-Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB). Do not `migrate:fresh` on `esyres`. Cloud Agent without a real Docker daemon: host PHP + host MySQL (same Behat flags); do not nest `docker.io`.
+Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB). Do not `migrate:fresh` on `esyres`. Cloud Agent: frontend-only is host npm from `frontend/` (no PHP/MySQL). If Behat runs without a real Docker daemon: host PHP + host MySQL (same Behat flags); do not nest `docker.io`.
 
 First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`.
 

@@ -33,15 +33,13 @@
 
 Cite `docs/architecture/04-Frontend.md` (one PWA, shared top-nav, homepage IA on `/` only), `08-Decisions.md` #41 #42 #44, `docs/adr/0029-shared-top-nav.md`, `docs/adr/0026-one-design-1-pack.md`.
 
-- [ ] One React PWA in `esyres_app/frontend/`. No sibling marketing site. No new GraphQL, REST, or booking mutations. `GET /qr/{id}` still Laravel 302 to `/salon/:id` — verify: no new schema/feature files this PR; `test ! -d esyres_app/marketing`; existing Behat stays green
+- [ ] One React PWA in `esyres_app/frontend/`. No sibling marketing site. No new GraphQL, REST, or booking mutations. `GET /qr/{id}` still Laravel 302 to `/salon/:id` — verify: no new schema/feature files this PR; `test ! -d esyres_app/marketing`; Behat per CONTEXT frontend-only classifier (skip if the union stays under `esyres_app/frontend/`)
 - [ ] i18next `bs` only. No Playwright, RTL, Pest, new npm, or copy keys this PR. Owner chunks stay lazy in `App.tsx` — verify: `esyres_app/frontend/package.json` unchanged deps; `App.tsx` still `lazy()` for owner pages
 - [ ] Do not replace `OwnerNav`, restyle discovery/salon as homepage hero/footer, add sticky chrome, or add a 3-up discovery grid — verify: product checks above + `OwnerNav.tsx` / `WorkerPanel.tsx` unchanged aside from this PR not touching them
 
 ## Verify commands
 
-Run from `esyres_app/` (app root in CONTEXT). Stack must be up (`docker compose up -d`). Every command must exit 0 before the loop may open a ready PR.
-
-Cloud Agent: if Docker is missing or dockerd is nested, use host PHP + host MySQL (STORY-36), still `.env.behat` / `esyres_test` only. Do not apt-install dockerd. Do not `migrate:fresh` or seed `esyres`. Do not `compose down -v`. Behat flags stay CLI-only.
+Run the CONTEXT **frontend-only classifier** first (union of untracked + unstaged + staged + `main...HEAD`). Do not skip Behat because this story is UI. Every command in the matching set must exit 0 before the loop may open a ready PR.
 
 From **git root**:
 
@@ -49,7 +47,15 @@ From **git root**:
 test ! -d esyres_app/marketing
 ```
 
-From **`esyres_app/`**:
+**If skipped** — from `esyres_app/frontend/` (host npm; `docker compose exec -T vite` only if that container is already up). Do not `compose up`, start php/mysql, or run `php artisan --version`.
+
+```text
+npm run typecheck
+npm run test
+npm run build
+```
+
+**If Behat runs** (classifier fails, or the human asked for Behat / `--suite`) — from `esyres_app/`. Cloud Agent: if Docker is missing or dockerd is nested, use host PHP + host MySQL (STORY-36), still `.env.behat` / `esyres_test` only. Do not apt-install dockerd. Do not `migrate:fresh` or seed `esyres`. Do not `compose down -v`. Behat flags stay CLI-only.
 
 ```text
 docker compose up -d
@@ -85,6 +91,6 @@ docker compose exec -T vite npm run build
 8. **Do not** change owner aside, `OwnerNav`, `WorkerPanel`, queue, or owner early-return page `max-w-md` (those are not the guest column). Do not add a discovery grid.
 9. **Design 1:** patch Layout in `refs/design-1/DESIGN.md` per the product check. Update `designPack.test.ts` and `topNav.source.test.ts` so they assert the guest column instead of `max-w-md` / `max-w-3xl` page measures.
 10. **Index:** set `docs/stories/index.md` and `docs/stories/STORY-45.md` Loop to `STORY-45`.
-11. Loop: implement → run every verify command from `esyres_app/` → fix. Cap 8. Same failure twice → escalate.
+11. Loop: implement → run the CONTEXT frontend-only classifier → matching verify commands → fix. Cap 8. Same failure twice → escalate.
 12. On success: ready PR linking this key; list commands run. Do **not** embed screenshots. Do not draft/block for missing shots.
 13. After PR: Bugbot; nits on same PR. If Bugbot contradicts this key, stop and ask.

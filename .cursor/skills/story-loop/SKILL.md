@@ -58,7 +58,7 @@ Only after fog empty + opens cleared (no extra compile OK):
 
 1. Draft or update `.cursor/loops/answer-keys/STORY-xx.md` from `.cursor/loops/ANSWER_KEY_TEMPLATE.md`.
 2. Derive Goal, pass/fail product/architecture checks, and Out of scope from the map’s Destination, Decisions so far, and Out of scope. Do not invent checks for areas that were never decided. Every product check must name a verifier; cap human-only at 1–2.
-3. Fill verify commands (concrete when a runner exists; else leave TBD and stay on plan-gate prep). Cite the app root from CONTEXT. Behat must be `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` (same flags with `--suite` if a key scopes a suite). Do not put those flags in `behat.yml`.
+3. Fill verify commands (concrete when a runner exists; else leave TBD and stay on plan-gate prep). Cite the app root from CONTEXT. Copy the CONTEXT **frontend-only classifier** plus both command sets (frontend npm only vs full Behat). Do not omit Behat from the key because the story looks like UI — the classifier decides at verify time. When Behat runs it must be `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` (same flags with `--suite` if a key scopes a suite). Do not put those flags in `behat.yml`.
 4. Set map Status to `compiled`. Leave answer key Status as `draft` until the user approves the key.
 
 ### Answer key approval
@@ -81,7 +81,7 @@ Implement in this chat against the answer key:
 
 - Branch from the key (e.g. `story/STORY-xx-short-slug`)
 - Follow **Implementer instructions** in the key and `.cursor/skills/custom-feature-skills/SKILL.md`
-- Run every verify command from the app root named in CONTEXT. Behat: `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` (same flags on `--suite owner|guest`). Fail-fast; exit 0 still means the full selected suite passed. Do not change `behat.yml`.
+- Run the CONTEXT **frontend-only classifier**, then the matching verify commands. Frontend-only: `npm run typecheck` / `test` / `build` from `esyres_app/frontend/` (no php/mysql). Else from the app root: Behat `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure` (same flags on `--suite owner|guest`). Fail-fast; exit 0 still means the full selected suite passed. Do not change `behat.yml`.
 - Implement→verify loop; **iteration cap 5–8** (use the key’s cap if set); stop early if the same failure repeats twice with no progress
 - Open a PR on success or a draft/blocked PR on escalate; do not expand scope
 - **UI stories:** same ready rule as non-UI (machine gates). Follow playbook **UI ready rule**. Do not embed PR screenshots, draft for missing shots, type secrets into the IDE browser, or ask the human to log in and attach shots. Optional browser-check of public/unauthed surfaces never gates ready.
@@ -95,7 +95,7 @@ If the user said `unattended` or clearly asked for a Cloud Agent, emit this past
 Branch: <from answer key>
 Answer key: .cursor/loops/answer-keys/STORY-xx.md
 Follow Implementer instructions in that key.
-Run every verify command from the app root named in CONTEXT. Behat: docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure. Iteration cap from key.
+Run verify per CONTEXT: frontend-only classifier first; skip Behat/php/mysql when it passes; else Behat `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure`. Iteration cap from key.
 Open PR on pass; draft/blocked on escalate. Do not expand scope.
 UI stories: same ready rule as non-UI (machine gates). Do not embed screenshots or draft for missing shots.
 ```
