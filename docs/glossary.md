@@ -43,8 +43,12 @@ _Avoid_: unassigned, any stylist, empty worker, default worker
 ## Discovery
 
 **Homepage**:
-The permanent guest-facing `/` surface: a homepage-only header, the existing hero (how-it-works + Pronađi salon), and a simple footer. Bosnian. Not a login wall, not the salon list, and not a one-shot gate. The salon profile and the QR sticker path never show it.
-_Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour
+The permanent guest-facing `/` surface: the top-nav with the homepage slot, the existing hero (how-it-works + Pronađi salon), and a simple footer. Bosnian. Not a login wall, not the salon list, and not a one-shot gate. The salon profile and the QR sticker path never show this page.
+_Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour, homepage header (the bar is the top-nav)
+
+**Top-nav**:
+The shared site bar on guest and owner pages. Brand goes home. Each page fills one native slot of actions. Not the homepage, not the owner aside, and not a catalog menu.
+_Avoid_: homepage header, standard header, guest header, MENU, mega-menu
 
 **Discovery home**:
 The guest salon list of listed salons, not on the homepage. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a separate search page.

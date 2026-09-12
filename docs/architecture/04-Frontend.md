@@ -4,17 +4,17 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 
 ## Routing
 
-- `/` — homepage: homepage-only header, existing hero, simple footer. Pronađi salon goes to `/salons`. Auth does not skip `/` and never auto-jumps to `/owner`. `/salon/:id` never shows the homepage.
-- `/salons` — discovery home (nearby / Popular of listed salons, filter). Brand/logo links to `/`. Geolocation mounts here.
-- `/create-salon` — sparse Design-1 form (AuthShell, email verify, salon name). Already-owner redirects to `/owner`.
+- `/` — homepage: shared top-nav (homepage slot), existing hero, simple footer. Pronađi salon goes to `/salons`. Auth does not skip `/` and never auto-jumps to `/owner`. `/salon/:id` never shows the homepage page.
+- `/salons` — discovery home (nearby / Popular of listed salons, filter). Top-nav brand links to `/`; slot is Moje rezervacije. Geolocation mounts here.
+- `/create-salon` — sparse Design-1 form (AuthShell, email verify, salon name) under an empty top-nav slot. Already-owner redirects to `/owner`.
 - Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Records a QR scan (`qr_hits`), sets the hold cookie, and 302s to `/salon/:id`. Never shows the homepage. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie or record a scan.
-- `/salon/:id` — salon profile (picker + optional assistant). Never the homepage.
-- `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route.
-- `/owner` — owner: inbox, worker panel (home), in-flight chat tab (`/owner/chats`, list + optional Take over / Release + DND toggle), settings, Basic Stats (`/owner/stats`: last-7-day bookings + all-time QR scan/visit/conversion; `?salon=` like chats; nav `Statistika`); **salon switcher** when the user owns more than one salon
+- `/salon/:id` — salon profile (picker + optional assistant). Never the homepage. Top-nav matches `/salons` (Moje rezervacije only).
+- `/bookings?verified=1` — landing after a successful email-verify signed GET (banner on My Bookings). `?verify=invalid` (bad or expired signature) and `?verify=mismatch` (session is a different user). No dedicated `/verify-email` route. Top-nav slot: empty when logged out; name + Odjava when logged in.
+- `/owner` — owner: inbox, worker panel (home), in-flight chat tab (`/owner/chats`, list + optional Take over / Release + DND toggle), settings, Basic Stats (`/owner/stats`: last-7-day bookings + all-time QR scan/visit/conversion; `?salon=` like chats; nav `Statistika`); **salon switcher** when the user owns more than one salon. Shared top-nav overlays above aside + OwnerNav (name + Odjava).
 
 Owner chunks (including `@dnd-kit`) are lazy-loaded so the customer first paint does not ship the grid.
 
-Customer browse has no login wall. The homepage is not a login wall. Login/register appears on the homepage header, at request submit, My Bookings, `/create-salon`, and owner routes.
+Customer browse has no login wall. The homepage is not a login wall. Login/register appears in the homepage top-nav slot, at request submit, My Bookings, `/create-salon`, and owner routes. Owner routes overlay the shared top-nav (name + Odjava) above OwnerNav.
 
 ## Libraries (MVP)
 
@@ -43,7 +43,7 @@ Next.js, Inertia, Redux, Storybook, MUI/Ant, Bootstrap, Leaflet, a REST client, 
 
 ## Homepage
 
-Typed `/` is the Bosnian homepage (header + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. No persist-seen. Auth does not skip `/`. `/salon/:id` and `GET /qr/{salonId}` never show it. No second Vite app, no `/welcome`, no owner waitlist. See `docs/adr/0027-homepage-not-pitch-gate.md`.
+Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. No persist-seen. Auth does not skip `/`. `/salon/:id` and `GET /qr/{salonId}` never show it. Shared top-nav is `docs/adr/0029-shared-top-nav.md`. No second Vite app, no `/welcome`, no owner waitlist. See `docs/adr/0027-homepage-not-pitch-gate.md`.
 
 ## Discovery
 

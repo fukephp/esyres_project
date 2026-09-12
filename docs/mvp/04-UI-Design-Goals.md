@@ -2,7 +2,7 @@
 
 ## 1. Frictionless Funnel First
 
-Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password) and phone OTP appear at request submit / My Bookings, and optionally in the homepage header (not a wall). Typed `/` is the Bosnian homepage (Design 1 Cal look: header + existing hero + Pronađi salon + simple footer); that is not a login wall and never sits in front of `/salon/:id` or the QR sticker. Pronađi salon goes to `/salons`.
+Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password) and phone OTP appear at request submit / My Bookings, and optionally in the homepage top-nav slot (not a wall). Typed `/` is the Bosnian homepage (Design 1 Cal look: top-nav homepage slot + existing hero + Pronađi salon + simple footer); that is not a login wall and never sits in front of `/salon/:id` or the QR sticker. Pronađi salon goes to `/salons`. The shared top-nav may appear on salon/discovery with Moje rezervacije only — not Prijava or Get your panel.
 
 On the salon profile, the **primary** button stays the picker (`Pošalji zahtjev`). Scripted chat is a visible alternate (`Nisi sigurna? Pitaj salon.`), not a second product. Owners may market the assistant; guests who already know still get a few taps.
 

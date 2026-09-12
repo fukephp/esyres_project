@@ -13,11 +13,11 @@ As a guest who typed `/`, I want a permanent Bosnian homepage with a way into th
 
 ## Acceptance criteria
 
-- `/` is always the homepage: homepage-only header, the existing hero (same Bosnian h1, support, three how-it-works lines, Pronađi salon), and a simple footer. No persist-seen, no `HomeGate` swap, no `companyPitchSeen`. Auth/session does not skip `/`. Visiting `/` never auto-jumps to `/owner`.
-- Header exists only on `/`: logo, Prijava / Registracija (reuse `AuthShell`, one account, not two doors), and Have salon? Get your panel as a link to `/create-salon` (the page itself is STORY-41). Logged-in: `User.name` or email + Odjava. Not a login wall — Pronađi salon still works as a guest.
-- Pronađi salon navigates to `/salons`. Discovery home (and geolocation) mounts there, not on `/`. Brand/logo on `/salons` links to `/`. That is not the homepage header. `/salon/:id` does not get it.
+- `/` is always the homepage: top-nav with the homepage slot, the existing hero (same Bosnian h1, support, three how-it-works lines, Pronađi salon), and a simple footer. No persist-seen, no `HomeGate` swap, no `companyPitchSeen`. Auth/session does not skip `/`. Visiting `/` never auto-jumps to `/owner`. Shared top-nav on other routes is STORY-43.
+- Homepage slot: logo, Prijava / Registracija (reuse `AuthShell`, one account, not two doors), and Have salon? Get your panel as a link to `/create-salon` (the page itself is STORY-41; STORY-43 makes this the black primary in the bar). Logged-in: `User.name` or email + Odjava. Not a login wall — Pronađi salon still works as a guest.
+- Pronađi salon navigates to `/salons`. Discovery home (and geolocation) mounts there, not on `/`. Brand/logo links to `/`. `/salon/:id` never shows the homepage page (hero + footer + homepage slot). Putting discovery/salon on the shared top-nav is STORY-43.
 - `/salon/:id` and `GET /qr/{id}` never show the homepage.
-- Short scroll only (header + hero + footer). Footer is Sarajevo + one Bosnian line. No Terms, Privacy, cookies, Instagram, language toggle, feature grid, product mock, or dark footer. Implementer drafts new Bosnian chrome copy; existing hero strings stay.
+- Short scroll only (top-nav + hero + footer). Footer is Sarajevo + one Bosnian line. No Terms, Privacy, cookies, Instagram, language toggle, feature grid, product mock, or dark footer. Implementer drafts new Bosnian chrome copy; existing hero strings stay.
 - `esyres_app/marketing/` stays gone. No `/welcome`.
 
 ## Out of scope
@@ -31,3 +31,4 @@ As a guest who typed `/`, I want a permanent Bosnian homepage with a way into th
 - Awwwards / GSAP / Three.js
 - Geocoding
 - Rewriting historical `MKT-*` or STORY-39 acceptance criteria
+- Shared top-nav on `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, `/owner` (STORY-43)

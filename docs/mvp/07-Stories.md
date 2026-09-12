@@ -2,11 +2,12 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-42`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-43`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
 - As a guest who typed `/`, I want a Bosnian homepage and then the live salon list at `/salons`, so that I can see the product without a separate marketing site.
+- As a guest or owner, I want the same Esyres top-nav on public and owner pages, so that I can always go home and use only the actions that belong on that page.
 - As a customer, I want to see salons near my current location without logging in, so that I can start browsing immediately from a QR code or IG link.
 - As a customer, I want a fallback list ("Popular in Sarajevo") when location is denied or unavailable, so that I never hit a blank screen.
 - As a customer, I want to filter by service type (hair / make-up / massage) or search by name, so that I can find a relevant salon quickly.

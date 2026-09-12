@@ -5,7 +5,7 @@ description: >-
   Design 1 — Esyres Cal pack (homepage on `/`, discovery, salon, owner).
   Visual system adapted from Cal.com DESIGN.md (https://www.designmd.co/d/cal):
   white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards.
-  Homepage IA stays on `/` only; owner stays a dense panel.
+  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense panel.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -200,17 +200,17 @@ The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black pri
 
 Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Homepage IA stays on `/` only.** Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav). Busy-badge and panel cell tokens live in this pack.
+**Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge and panel cell tokens live in this pack.
 
 ### Locked homepage IA
 
-Short scroll:
+Short scroll on `/`:
 
-1. **Header** — logo, Prijava/Registracija, Get your panel (or Panel). Homepage only.
+1. **Top-nav** — shared bar; homepage slot is Prijava/Registracija (text) + Get your panel / Panel (black primary).
 2. **Hero** — existing H1 + support + three how-it-works lines + Pronađi salon → `/salons`.
 3. **Simple footer** — Sarajevo + one line. No dark footer, Terms, Privacy, Instagram, or language toggle.
 
-No feature grid, in-card product mock, or long-scroll SaaS landing. `/create-salon` is a sparse form (brand link home), not this header/footer.
+No feature grid, in-card product mock, or long-scroll SaaS landing. `/create-salon` is a sparse form under an empty top-nav slot, not this hero/footer.
 
 No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carousels.
 
@@ -275,24 +275,25 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 ## Layout
 
-- Max content width ~1200px; `/` is a short scroll (header + hero + footer), not a long-scroll of `{spacing.section}` bands.
+- Max content width ~1200px; `/` is a short scroll (top-nav + hero + footer), not a long-scroll of `{spacing.section}` bands.
 - Stack on mobile; modest two-column only if the three how-it-works lines need it on desktop.
 - Safe margins: ~48–64px desktop, ~20–24px mobile.
-- First viewport: brand **Esyres** + homepage header + one H1 + one support line + three how-it-works lines + Pronađi salon. No stats strip, no mock.
+- First viewport: brand **Esyres** in the top-nav + one H1 + one support line + three how-it-works lines + Pronađi salon. No stats strip, no mock.
 
 ### Customer (sparse)
 
 - No dark sidebar, no right schedule rail, no KPI card grids, no charts.
 - White canvas; primary black CTAs; hairline borders; at most one soft surface block when it aids the funnel.
-- Discovery and salon keep this sparse layout. Do not restyle them as homepage header/hero/footer.
+- Discovery and salon keep this sparse layout. Do not restyle them as homepage hero/footer. They share the top-nav with Moje rezervacije in the slot (not Prijava/Get your panel).
 
 ### Owner (dense)
 
 Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from the former `panel-ref.jpg`):
 
-1. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
-2. **Main** — pending-request queue + Worker Availability Panel (15-minute grid) on white / `{colors.surface-card}`; primary CTAs.
-3. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
+1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, name + Odjava). Not a replacement for the aside.
+2. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
+3. **Main** — pending-request queue + Worker Availability Panel (15-minute grid) on white / `{colors.surface-card}`; primary CTAs.
+4. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
 
 Phone: collapse nav; stack queue above availability.
 
@@ -310,7 +311,7 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — homepage only: wordmark, Prijava/Registracija, Get your panel / Panel. Not on `/salons` or `/salon/:id`.
+**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings`: name + Odjava when logged in. `/owner*`: overlay name + Odjava; OwnerNav stays. No search, cart, or mega-menu.
 
 **Owner nav** — dense panel left rail: `{colors.canvas}` floor, ink links, hairline edge. Not `{colors.surface-dark}`. Not a marketing hero/footer.
 

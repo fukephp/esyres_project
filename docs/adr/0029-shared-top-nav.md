@@ -1,0 +1,3 @@
+# Shared top-nav; homepage is still only `/`
+
+STORY-40 kept chrome on `/` only so QR/Instagram salon would not become a company page. That lock stays for the **homepage** (hero + footer + homepage slot). We still never **show the homepage** on `/salon/:id` or `GET /qr/{id}`. We do share one full-bleed top-nav (brand → `/`, per-route native slot, no catalog menu) on `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, and as an overlay on `/owner` (aside + OwnerNav stay). Discovery and salon share Moje rezervacije in the slot — not Prijava or Get your panel. Rejected: Poseidon MENU (search, cart, mega-menu, two-row), cloning homepage CTAs onto the sticker path, replacing OwnerNav, and a sticky bar.

@@ -15,12 +15,13 @@ As an owner, I want the panel to use the same Cal look as the homepage, so that 
 
 - Design 1 is the only pack. Move busy-badge and owner panel cell tokens into `refs/design-1`. Delete `refs/design-2` (including `panel-ref.jpg` after any density note that still belongs in Design 1). Update root `DESIGN.md`, `.cursor/rules/frontend/design-system.mdc`, and CONTEXT pointers so agents do not open a second pack.
 - `/owner` (queue, chats, stats, request detail) keeps dense queue + 15-minute grid. Drop dark nav for Cal light chrome (white canvas, black CTAs, Cal Sans + Inter). Not a marketing hero/footer on the panel.
-- Discovery and salon profile keep their current layout (sparse customer). They inherit the shared tokens; do not restyle them as homepage IA.
+- Discovery and salon profile keep their current layout (sparse customer). They inherit the shared tokens; do not restyle them as homepage hero/footer. Shared top-nav overlay (including on `/owner` without replacing OwnerNav) is STORY-43.
 - Status colors stay functional and separate from brand chrome (customer 🟢/🟡/🔴 vs owner cell tokens).
 
 ## Out of scope
 
-- Homepage IA on `/salons` or `/salon/:id`
+- Homepage hero/footer on `/salons` or `/salon/:id`
+- Shared top-nav (STORY-43)
 - Changing panel interactions (accept, drag, tap fallback)
 - Public pricing page
 - Awwwards / GSAP / Three.js

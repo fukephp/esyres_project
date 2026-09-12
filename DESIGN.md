@@ -3,12 +3,12 @@ version: alpha
 name: Esyres
 description: >-
   Index for one Cal design pack. Read refs/design-1 before UI work.
-  Homepage IA stays on `/` only; owner stays a dense panel.
+  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense panel.
 ---
 
 ## Overview
 
-Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal Sans + Inter). Discovery, salon, and `/owner` share those tokens. Homepage composition (header + hero + footer) stays on `/` only. Owner keeps dense queue + 15-minute grid with Cal light chrome (no dark nav).
+Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal Sans + Inter). Discovery, salon, and `/owner` share those tokens. Homepage hero + footer stay on `/` only; the top-nav is shared (per-route slot). Owner keeps dense queue + 15-minute grid with Cal light chrome (no dark nav).
 
 | Design | Scope | Spec |
 |--------|--------|------|
@@ -27,4 +27,4 @@ Use `landing-page` only when the user explicitly asks for the homepage / Esyres 
 
 ## Status
 
-- **Design 1:** locked direction (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage (header + existing hero + simple footer). No feature grid, product mock, or dark footer. Owner is not a marketing landing.
+- **Design 1:** locked direction (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage (top-nav homepage slot + existing hero + simple footer). Shared top-nav on other routes. No feature grid, product mock, or dark footer. Owner is not a marketing landing.
