@@ -2,8 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { BookingsLink } from '../components/BookingsLink'
-import { discoveryBrandLink } from '../lib/homepage'
+import { TopNav } from '../components/TopNav'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
   SALONS_NEARBY_QUERY,
@@ -89,17 +88,10 @@ export function DiscoveryHome() {
   const salons =
     source === 'nearby' ? nearby.data?.salonsNearby : source === 'popular' ? popular.data?.popularInSarajevo : undefined
 
-  const brand = discoveryBrandLink()
-
   return (
-    <main className="mx-auto max-w-md px-5 py-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <Link to={brand.to} className="flex items-center gap-2 text-sm font-medium text-ink">
-          <img src="/esyres-mark.svg" width={20} height={20} alt="" aria-hidden="true" />
-          {t(brand.brandKey)}
-        </Link>
-        <BookingsLink className="text-right" />
-      </div>
+    <>
+      <TopNav />
+      <main className="mx-auto max-w-md px-5 py-8">
       {source ? (
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
           {source === 'nearby' ? t('discovery.nearby') : t('discovery.popular')}
@@ -151,6 +143,7 @@ export function DiscoveryHome() {
           ))}
         </ul>
       )}
-    </main>
+      </main>
+    </>
   )
 }

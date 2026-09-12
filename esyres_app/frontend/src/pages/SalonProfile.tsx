@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { AssistantIntake } from '../components/AssistantIntake'
 import { AuthShell } from '../components/AuthShell'
-import { BookingsLink } from '../components/BookingsLink'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
+import { TopNav } from '../components/TopNav'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import {
@@ -225,20 +225,24 @@ export function SalonProfile() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8 text-body">
-        <BookingsLink />
-        <p>{t('salon.loading')}</p>
-      </main>
+      <>
+        <TopNav />
+        <main className="mx-auto max-w-md px-5 py-8 text-body">
+          <p>{t('salon.loading')}</p>
+        </main>
+      </>
     )
   }
 
   const salon = data?.salon
   if (!salon) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8 text-body">
-        <BookingsLink />
-        <p>{t('salon.notFound')}</p>
-      </main>
+      <>
+        <TopNav />
+        <main className="mx-auto max-w-md px-5 py-8 text-body">
+          <p>{t('salon.notFound')}</p>
+        </main>
+      </>
     )
   }
 
@@ -445,8 +449,9 @@ export function SalonProfile() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-5 py-8">
-      <BookingsLink />
+    <>
+      <TopNav />
+      <main className="mx-auto max-w-md px-5 py-8">
       <header className="flex items-start justify-between gap-4">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
           {salon.name}
@@ -681,6 +686,7 @@ export function SalonProfile() {
       )}
 
       {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
-    </main>
+      </main>
+    </>
   )
 }

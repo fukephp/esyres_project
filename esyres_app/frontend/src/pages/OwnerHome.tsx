@@ -6,6 +6,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
+import { TopNav } from '../components/TopNav'
 import { WorkerPanel } from '../components/WorkerPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
@@ -59,6 +60,7 @@ export function OwnerHome() {
   const [params, setParams] = useSearchParams()
   const date = ownerDateFromSearch(params.get('date'))
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
+  const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
@@ -256,46 +258,58 @@ export function OwnerHome() {
 
   if (loading) {
     return (
-      <main className="px-5 py-8 text-body">
-        <p>{t('salon.loading')}</p>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="px-5 py-8 text-body">
+          <p>{t('salon.loading')}</p>
+        </main>
+      </>
     )
   }
 
   if (data?.me == null) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
-        <div className="mt-8">
-          <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
-        </div>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
+          <div className="mt-8">
+            <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
+          </div>
+        </main>
+      </>
     )
   }
 
   if (!data.me.emailVerified) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
-        <div className="mt-8">
-          <EmailVerifyPanel />
-        </div>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
+          <div className="mt-8">
+            <EmailVerifyPanel />
+          </div>
+        </main>
+      </>
     )
   }
 
   if (salon === null) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
-        <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-        <Link
-          to={CREATE_SALON_PATH}
-          className="mt-4 inline-block text-sm font-semibold text-ink"
-        >
-          {t('owner.createSalon')}
-        </Link>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
+          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
+          <Link
+            to={CREATE_SALON_PATH}
+            className="mt-4 inline-block text-sm font-semibold text-ink"
+          >
+            {t('owner.createSalon')}
+          </Link>
+        </main>
+      </>
     )
   }
 
@@ -309,7 +323,9 @@ export function OwnerHome() {
   const firstOwnedId = salons[0]?.id ?? salon.id
 
   return (
-    <div className="min-h-svh md:flex">
+    <>
+      <TopNav me={navMe} />
+      <div className="min-h-svh md:flex">
       <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         {salons.length > 1 ? (
           <label className="block text-sm">
@@ -431,6 +447,7 @@ export function OwnerHome() {
         </DndContext>
       </main>
     </div>
+    </>
   )
 }
 

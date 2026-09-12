@@ -80,12 +80,14 @@ test('dense panel stays queue then 15-minute WorkerPanel', () => {
 test('discovery and salon stay sparse; no homepage IA', () => {
   const discovery = read('pages/DiscoveryHome.tsx')
   expect(discovery).toMatch(/<main className="mx-auto max-w-md px-5 py-8">/)
+  expect(discovery).toMatch(/<TopNav/)
   expect(discovery).not.toMatch(/CompanyPitch/)
   expect(discovery).not.toMatch(/company-pitch/)
   expect(discovery).not.toMatch(/['"]pitch\./)
 
   const salon = read('pages/SalonProfile.tsx')
   expect(salon).toMatch(/<main className="mx-auto max-w-md px-5 py-8">/)
+  expect(salon).toMatch(/<TopNav/)
   expect(salon).not.toMatch(/CompanyPitch/)
   expect(salon).not.toMatch(/company-pitch/)
   expect(salon).not.toMatch(/['"]pitch\./)

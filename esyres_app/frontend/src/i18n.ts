@@ -84,6 +84,9 @@ void i18n.use(initReactI18next).init({
           submit: 'Otvori panel',
           INVALID_NAME: 'Unesi ime salona.',
         },
+        nav: {
+          bookings: 'Moje rezervacije',
+        },
         home: {
           panel: 'Panel',
           getPanel: 'Imaš salon? Otvori panel',

@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-43 |
 | Epic | 1 — Salon Discovery & Profile Browsing |
-| Loop | — |
+| Loop | `STORY-43` |
 | Depends on | STORY-07, STORY-18, STORY-40, STORY-41, STORY-42 |
 
 ## User story
