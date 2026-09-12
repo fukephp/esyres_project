@@ -50,7 +50,7 @@ Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Prona
 
 **Discovery**
 - Are category chips on Discovery fixed, or dynamically pulled from registered salon services?
-- Does skipping the category step need an explicit affordance?
+- Skipping the category step: **decided** — idle `/salons` is a short discovery teaser; show all (or a chip / name search) opens discovery results. See `docs/adr/0030-discovery-teaser-then-results.md`.
 - Address geocoding: **decided** — no geocode in this MVP slice. Nearby omits salons without `lat`/`lng`. Self-serve create does not set coords.
 
 **Trust & Badges**

@@ -5,7 +5,7 @@ One installable React TypeScript PWA. Not Inertia, not two SPAs.
 ## Routing
 
 - `/` — homepage: shared top-nav (homepage slot), existing hero, simple footer. Pronađi salon goes to `/salons`. Auth does not skip `/` and never auto-jumps to `/owner`. `/salon/:id` never shows the homepage page.
-- `/salons` — discovery home (nearby / Popular of listed salons, filter). Top-nav brand links to `/`; slot is Moje rezervacije. Geolocation mounts here.
+- `/salons` — discovery home (nearby / Popular of listed salons). Idle **discovery teaser** (first few as cards); a category chip, name search, or show all opens **discovery results** (hairline rows: name, today’s busy-level, categories, address when set). Top-nav brand links to `/`; slot is Moje rezervacije. Geolocation mounts here. See `docs/adr/0030-discovery-teaser-then-results.md`.
 - `/create-salon` — sparse Design-1 form (AuthShell, email verify, salon name) under an empty top-nav slot. Already-owner redirects to `/owner`.
 - Laravel `GET /qr/{salonId}` — counter sticker (not a React route). Records a QR scan (`qr_hits`), sets the hold cookie, and 302s to `/salon/:id`. Never shows the homepage. Vite proxies `/qr` like `/sanctum` so the cookie is on the SPA origin. Instagram-bio and organic `/salon/:id` do not set the cookie or record a scan.
 - `/salon/:id` — salon profile (picker + optional assistant). Never the homepage. Top-nav matches `/salons` (Moje rezervacije only).
@@ -47,4 +47,4 @@ Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Prona
 
 ## Discovery
 
-Browser geolocation → `salonsNearby(lat, lng)` sorted list of **listed** salons. Permission denied → `popularInSarajevo` (same listed gate). No map SDK. Nearby requires `lat`/`lng`; self-serve create does not set them. Geolocation runs only after discovery home mounts on `/salons`. See `docs/adr/0028-listed-salon-on-discovery.md`.
+Browser geolocation → `salonsNearby(lat, lng)` sorted list of **listed** salons. Permission denied → `popularInSarajevo` (same listed gate). Idle `/salons` shows the first few of that list as the discovery teaser; show all or a discovery filter replaces it with discovery results. No map SDK. Nearby requires `lat`/`lng`; self-serve create does not set them. Geolocation runs only after discovery home mounts on `/salons`. See `docs/adr/0028-listed-salon-on-discovery.md` and `docs/adr/0030-discovery-teaser-then-results.md`.

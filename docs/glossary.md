@@ -51,11 +51,23 @@ The shared site bar on guest and owner pages. Brand goes home. Each page fills o
 _Avoid_: homepage header, standard header, guest header, MENU, mega-menu
 
 **Discovery home**:
-The guest salon list of listed salons, not on the homepage. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Guests may overlay a discovery filter. Not the salon profile, not the homepage, and not a separate search page.
+The guest discovery surface for listed salons, not on the homepage. No login wall. Nearby when the browser has a location; Popular in Sarajevo otherwise. Idle is the discovery teaser; a discovery filter or show all opens discovery results. Not the salon profile, not the homepage, and not a separate search page.
 _Avoid_: homepage wall, feed, marketplace index, landing, company pitch
 
+**Discovery teaser**:
+The idle strip on discovery home: the first few listed salons from Nearby or Popular in Sarajevo, shown as cards. Not a curated ranking, not discovery results, and not a third list.
+_Avoid_: featured strip, popular ranking, marketplace hero, curated homepage
+
+**Discovery results**:
+The hairline list on discovery home after a discovery filter or show all. Same salon facts as the discovery teaser. Not a separate search page.
+_Avoid_: search page, search index, marketplace search, typeahead
+
+**Show all**:
+The guest action that replaces the discovery teaser with the unfiltered Nearby or Popular in Sarajevo discovery results.
+_Avoid_: see more, load more, featured, curated
+
 **Discovery filter**:
-An optional overlay on discovery home: one service category and/or a salon-name match. Same nearby-or-popular list, not a separate search page.
+An optional overlay on discovery home: one service category and/or a salon-name match. Applying it replaces the discovery teaser with discovery results of the same nearby-or-popular list. Not a separate search page.
 _Avoid_: search index, search page, marketplace search, typeahead
 
 **Nearby**:
@@ -63,7 +75,7 @@ The discovery list sorted by distance from the guest’s current location. Only 
 _Avoid_: near me map, radius search, geo grid
 
 **Popular in Sarajevo**:
-The discovery list when location is denied or unavailable, so discovery home is never blank. Not a ranking of bookings or trust badges.
+The discovery list when location is denied or unavailable, so discovery home is never blank. The discovery teaser may show the first few of this list. Not a ranking of bookings or trust badges.
 _Avoid_: trending, featured, curated homepage, popular ranking
 
 ## Request paths
@@ -281,7 +293,7 @@ _Avoid_: booking conversion, sticker ROI, Regular (the badge)
 ## Signals
 
 **Busy-level**:
-A coarse per-day occupancy for one salon: free, moderate, or busy. Shown to guests instead of a slot grid. Not a Phase 2 trust badge (Fast Responder, Regular, and similar).
+A coarse per-day occupancy for one salon: free, moderate, or busy. Shown to guests on the salon profile and on discovery teaser/results, instead of a slot grid. Not a Phase 2 trust badge (Fast Responder, Regular, and similar).
 _Avoid_: availability, occupancy grid, traffic light, capacity, trust badge
 
 **Owner response time**:
