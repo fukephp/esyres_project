@@ -43,8 +43,8 @@ test('customer place heading is Rezervacije on homepage, bookings, salon, assist
 
   const salon = read('pages/SalonProfile.tsx')
   expect(salon).toMatch(/<p className=\{PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}<\/p>/)
-  expect(salon).toMatch(/needLogin[\s\S]*auth\.placeCustomer[\s\S]*AuthShell/)
-  expect(salon).not.toMatch(/needLogin[\s\S]*<h1[\s\S]*auth\.placeCustomer/)
+  expect(salon).toMatch(/needLogin && \([\s\S]*auth\.placeCustomer[\s\S]*AuthShell/)
+  expect(salon).not.toMatch(/needLogin && \([\s\S]*<h1[\s\S]*auth\.placeCustomer/)
 
   const assistant = read('components/AssistantIntake.tsx')
   expect(assistant).toMatch(/<p className=\{PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}<\/p>/)

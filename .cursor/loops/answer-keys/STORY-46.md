@@ -18,24 +18,24 @@
 
 ## Pass/fail — product
 
-- [ ] GraphQL `register(name: String!, email: String!, password: String!, phone: String): User!`. `login` stays `login(email: String!, password: String!)` with no name arg. Resolver trims `name`. Empty or whitespace-only → `INVALID_NAME`. One word (`Ana`) is enough. Do not mint `users.name` from the email local-part (`explode('@', …)` gone from `Register.php`). Success: `me.name` and the `users.name` column are that trimmed string. Existing rows are not backfilled (no migration/update of `users.name`) — verify: Behat (`features/guest/register.feature`: success `me name is "Ana"` for `ana@example.com`; trim `"  Ana  "` → `"Ana"`; `""` / `"   "` → `INVALID_NAME`; named `"Ana"` with a different local-part still `"Ana"`). Existing `I register as :email with password :password` (and the phone variant) send default name `"Ana"` so sibling features keep working. Named Gherkin step for the explicit cases.
-- [ ] Register UI (customer + `/create-salon`): when mode is register, first field is **Ime i prezime** (`auth.name`), then email, password, optional phone. Login mode has no name field. Tabs stay Prijava / Registracija. `/owner*` AuthShell stays `allowRegister={false}` — verify: Vitest reading `AuthShell.tsx` + i18n; owner pages still `allowRegister={false}`
-- [ ] i18n `bs`: `auth.name` is `Ime i prezime`; `auth.gate.INVALID_NAME` is `Unesi ime i prezime.`; `auth.placeCustomer` is `Rezervacije`; `auth.placePanel` is `Panel`. `createSalon.INVALID_NAME` stays `Unesi ime salona.`; `bookings.title` stays `Moji zahtjevi`; `home.panel` stays `Panel` (CTA, not the place heading key) — verify: Vitest (`i18n.ts`)
-- [ ] AuthShell maps GraphQL `INVALID_NAME` to `auth.gate.INVALID_NAME`. Create-salon name form still maps `INVALID_NAME` to `createSalon.INVALID_NAME` — verify: Vitest reading `AuthShell.tsx` + `CreateSalon.tsx`
-- [ ] `PLACE_HEADING_CLASS` in `esyres_app/frontend/src/lib/homepage.ts` is exactly `font-display text-[28px] font-semibold tracking-tight text-ink`. Full-page place headings are `<h1 className={PLACE_HEADING_CLASS}>`. Salon send and assistant use the same class on a `<p>`, not an `h1` — verify: Vitest (`homepage.test.ts` + source tests on Homepage, MyBookings, CreateSalon, owner pages, SalonProfile, AssistantIntake)
-- [ ] Customer **Rezervacije** (`auth.placeCustomer`) on: homepage AuthShell, logged-out `/bookings` AuthShell, salon send AuthShell, assistant AuthShell. After login, `/bookings` h1 stays `bookings.title` (`Moji zahtjevi`). Logged-in customer email-verify stays as today (that title + `EmailVerifyPanel`) — verify: Vitest reading those files
-- [ ] Panel **Panel** (`auth.placePanel`) on: `/create-salon` AuthShell and email-verify, and all `/owner*` logged-out AuthShell and email-verify. Those owner early returns must not use `owner.title` / `owner.chat` / `owner.stats` as that heading. After a verified session, those owner page titles return. Create-salon **Ime salona** form has no `auth.placePanel` heading — verify: Vitest reading `CreateSalon.tsx` + `OwnerHome.tsx` / `OwnerChats.tsx` / `OwnerStats.tsx` / `OwnerRequestDetail.tsx`
-- [ ] Homepage: `nextHomepageAuth(current, click)` — same-mode click closes (`login`+`login` → `null`); other tab switches; `null`+click opens that mode. While `authOpen` is set: do not render pitch (`pitch.h1` / support / steps / Pronađi salon) or footer (`home.footerCity` / `home.footerLine`); **Rezervacije** is the page `h1` (`PLACE_HEADING_CLASS`, not `pitch-display`); AuthShell form stays left `max-w-sm` (h1 is not inside that `max-w-sm`). Closing (toggle or success) brings pitch + footer back. Top-nav Prijava/Registracija still work as the toggle. Get your panel stays in the bar. Not a login wall when auth is closed — verify: Vitest (`nextHomepageAuth` + reading `Homepage.tsx` / `TopNav` wiring)
+- [x] GraphQL `register(name: String!, email: String!, password: String!, phone: String): User!`. `login` stays `login(email: String!, password: String!)` with no name arg. Resolver trims `name`. Empty or whitespace-only → `INVALID_NAME`. One word (`Ana`) is enough. Do not mint `users.name` from the email local-part (`explode('@', …)` gone from `Register.php`). Success: `me.name` and the `users.name` column are that trimmed string. Existing rows are not backfilled (no migration/update of `users.name`) — verify: Behat (`features/guest/register.feature`: success `me name is "Ana"` for `ana@example.com`; trim `"  Ana  "` → `"Ana"`; `""` / `"   "` → `INVALID_NAME`; named `"Ana"` with a different local-part still `"Ana"`). Existing `I register as :email with password :password` (and the phone variant) send default name `"Ana"` so sibling features keep working. Named Gherkin step for the explicit cases.
+- [x] Register UI (customer + `/create-salon`): when mode is register, first field is **Ime i prezime** (`auth.name`), then email, password, optional phone. Login mode has no name field. Tabs stay Prijava / Registracija. `/owner*` AuthShell stays `allowRegister={false}` — verify: Vitest reading `AuthShell.tsx` + i18n; owner pages still `allowRegister={false}`
+- [x] i18n `bs`: `auth.name` is `Ime i prezime`; `auth.gate.INVALID_NAME` is `Unesi ime i prezime.`; `auth.placeCustomer` is `Rezervacije`; `auth.placePanel` is `Panel`. `createSalon.INVALID_NAME` stays `Unesi ime salona.`; `bookings.title` stays `Moji zahtjevi`; `home.panel` stays `Panel` (CTA, not the place heading key) — verify: Vitest (`i18n.ts`)
+- [x] AuthShell maps GraphQL `INVALID_NAME` to `auth.gate.INVALID_NAME`. Create-salon name form still maps `INVALID_NAME` to `createSalon.INVALID_NAME` — verify: Vitest reading `AuthShell.tsx` + `CreateSalon.tsx`
+- [x] `PLACE_HEADING_CLASS` in `esyres_app/frontend/src/lib/homepage.ts` is exactly `font-display text-[28px] font-semibold tracking-tight text-ink`. Full-page place headings are `<h1 className={PLACE_HEADING_CLASS}>`. Salon send and assistant use the same class on a `<p>`, not an `h1` — verify: Vitest (`homepage.test.ts` + source tests on Homepage, MyBookings, CreateSalon, owner pages, SalonProfile, AssistantIntake)
+- [x] Customer **Rezervacije** (`auth.placeCustomer`) on: homepage AuthShell, logged-out `/bookings` AuthShell, salon send AuthShell, assistant AuthShell. After login, `/bookings` h1 stays `bookings.title` (`Moji zahtjevi`). Logged-in customer email-verify stays as today (that title + `EmailVerifyPanel`) — verify: Vitest reading those files
+- [x] Panel **Panel** (`auth.placePanel`) on: `/create-salon` AuthShell and email-verify, and all `/owner*` logged-out AuthShell and email-verify. Those owner early returns must not use `owner.title` / `owner.chat` / `owner.stats` as that heading. After a verified session, those owner page titles return. Create-salon **Ime salona** form has no `auth.placePanel` heading — verify: Vitest reading `CreateSalon.tsx` + `OwnerHome.tsx` / `OwnerChats.tsx` / `OwnerStats.tsx` / `OwnerRequestDetail.tsx`
+- [x] Homepage: `nextHomepageAuth(current, click)` — same-mode click closes (`login`+`login` → `null`); other tab switches; `null`+click opens that mode. While `authOpen` is set: do not render pitch (`pitch.h1` / support / steps / Pronađi salon) or footer (`home.footerCity` / `home.footerLine`); **Rezervacije** is the page `h1` (`PLACE_HEADING_CLASS`, not `pitch-display`); AuthShell form stays left `max-w-sm` (h1 is not inside that `max-w-sm`). Closing (toggle or success) brings pitch + footer back. Top-nav Prijava/Registracija still work as the toggle. Get your panel stays in the bar. Not a login wall when auth is closed — verify: Vitest (`nextHomepageAuth` + reading `Homepage.tsx` / `TopNav` wiring)
 - [ ] Place headings read as Rezervacije vs Panel on the two doors; homepage auth hides hero+footer and toggle restores Pronađi salon — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/03-Backend.md` (register person name), `04-Frontend.md` (AuthShell Rezervacije vs Panel; homepage auth hides hero+footer), `05-Data-Model.md` (`User.name` not from local-part), `06-Auth-Notifications-Realtime.md`, `08-Decisions.md` #4, `docs/glossary.md` **Person name**.
 
-- [ ] Lighthouse `/graphql` only; `register` gains `name`; no REST auth, no Fortify/Breeze, no `/profil` `/prijava` `/registracija` routes — verify: schema + Behat hits `/graphql`; no new web auth routes
-- [ ] Sanctum session on register/login unchanged. Verify-email dispatch on register unchanged. Phone still optional at register — verify: existing register/email-verify/phone Behat still pass after default name `"Ana"`
-- [ ] One React PWA. i18next `bs` only. No Playwright, RTL, Pest, GraphQL codegen, new npm, or sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`
-- [ ] Do not center AuthShell, add a header person-name Link, change Odjava hover, backfill names, add a name editor, or a second owner signup — verify: product checks + no new profile/name-edit route
+- [x] Lighthouse `/graphql` only; `register` gains `name`; no REST auth, no Fortify/Breeze, no `/profil` `/prijava` `/registracija` routes — verify: schema + Behat hits `/graphql`; no new web auth routes
+- [x] Sanctum session on register/login unchanged. Verify-email dispatch on register unchanged. Phone still optional at register — verify: existing register/email-verify/phone Behat still pass after default name `"Ana"`
+- [x] One React PWA. i18next `bs` only. No Playwright, RTL, Pest, GraphQL codegen, new npm, or sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`
+- [x] Do not center AuthShell, add a header person-name Link, change Odjava hover, backfill names, add a name editor, or a second owner signup — verify: product checks + no new profile/name-edit route
 
 ## Verify commands
 
@@ -65,6 +65,26 @@ docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 ```
+
+**This PR (2026-09-12):** Docker missing. Host PHP 8.3 + host MySQL, `.env.behat` / `esyres_test` only (no `esyres` DB). Hostname `mysql` → 127.0.0.1. Frontend via host `npm` from `esyres_app/frontend/`.
+
+Passed:
+
+```text
+test ! -d esyres_app/marketing
+php artisan --version
+vendor/bin/behat --format=progress --stop-on-failure
+```
+
+447 scenarios (447 passed). From `esyres_app/frontend/`:
+
+```text
+npm run typecheck
+npm run test
+npm run build
+```
+
+133 tests passed.
 
 ## Out of scope
 
