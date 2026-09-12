@@ -1,9 +1,10 @@
 ---
 name: diverge
 description: >-
-  Isolated option-space before a product MVP or new-story grill. Three
-  parallel generator branches, critic in the parent chat, then stop so
-  grilling can lock. Wrappers invoke this; do not run it yourself.
+  Isolated option-space before a product MVP or new-feature grill
+  (grill-me / grill-with-docs only; never /new-story). Three parallel
+  generator branches, critic in the parent chat, then stop so grilling
+  can lock. Wrappers invoke this; do not run it yourself.
 disable-model-invocation: true
 ---
 
@@ -13,7 +14,7 @@ Widen the option space **before** grilling locks. Complement, not a replacement:
 
 Loop adapted from the ADHD method ([Udit Akhouri](https://github.com/UditAkhourii/adhd), MIT): isolated generator branches, then a separate critic. Not a copy of that skill. No `/adhd`. No deepen pass.
 
-**Only** [grill-me](../grill-me/SKILL.md) and [grill-with-docs](../grill-with-docs/SKILL.md) load this, after they classify the topic. If you were not sent here by a wrapper, **stop** and do not fan out. There is no `/diverge` command.
+**Only** [grill-me](../grill-me/SKILL.md) and [grill-with-docs](../grill-with-docs/SKILL.md) load this, after they classify the topic. If you were not sent here by a wrapper, **stop** and do not fan out. There is no `/diverge` command. [new-story](../new-story/SKILL.md) never loads this.
 
 ## Who runs this
 
@@ -21,7 +22,7 @@ Loop adapted from the ADHD method ([Udit Akhouri](https://github.com/UditAkhouri
 |--------|------|
 | `/grill-me` or `/grill-with-docs` after classify = product MVP breakdown, or a new story/feature not already in `docs/stories/` | Yes |
 | Wrapper classified closed or unsure | No — wrapper skips this skill |
-| [story-loop](../story-loop/SKILL.md), [what-next](../what-next/SKILL.md), [custom-feature-skills](../custom-feature-skills/SKILL.md), grilling as a subroutine | **Never** |
+| [story-loop](../story-loop/SKILL.md), [what-next](../what-next/SKILL.md), [custom-feature-skills](../custom-feature-skills/SKILL.md), [new-story](../new-story/SKILL.md), grilling as a subroutine | **Never** |
 
 ## Phase 0 — Fact pack (parent)
 

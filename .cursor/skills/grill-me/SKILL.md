@@ -22,7 +22,7 @@ Classify the topic, then maybe widen options. **You** invoke this, not the grill
 3. If diverge ran: wait for its critic shortlist, then grilling **round 1** is cluster-pick (see grilling). Later rounds lock as usual.
 4. If skipped: start grilling rounds as usual.
 
-Never load diverge from story-loop, what-next, or custom-feature-skills.
+Never load diverge from story-loop, what-next, custom-feature-skills, or `/new-story`.
 
 Do **not** write after every answer. Do **not** auto-implement after persist.
 
@@ -38,4 +38,4 @@ When that grill topic reaches shared understanding, write whatever was decided â
 
 `STORY-xx` files only on product breakdown. Naming: `STORY-01.md`, `STORY-02.md`, â€¦ (scan highest existing, increment). One file = one PR; split before persist if it would not fit. Format: `docs/stories/index.md`. Acceptance criteria live **only** on the story file.
 
-Only a product grill **creates** new `STORY-xx`. `/generate-docs` may update existing files only.
+Only a product grill or `/new-story` **creates** new `STORY-xx`. `/generate-docs` may update existing files only.

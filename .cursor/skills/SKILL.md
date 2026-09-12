@@ -12,9 +12,10 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 | Skill | When to use |
 |-------|-------------|
 | [grilling](grilling/SKILL.md) | **Default** interview engine (rounds/frontier); auto before locking a plan |
-| [diverge](diverge/SKILL.md) | Isolated option-space before a product MVP or new-story grill (wrappers only; no slash command) |
+| [diverge](diverge/SKILL.md) | Isolated option-space before a product MVP or new-feature grill (grill-me / grill-with-docs only; never `/new-story`) |
 | [grill-me](grill-me/SKILL.md) | User-invoked grilling; persist at end of topic (`/grill-me`) |
 | [grill-with-docs](grill-with-docs/SKILL.md) | User-invoked grilling against a **codebase**; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`) |
+| [new-story](new-story/SKILL.md) | Grill one incremental product story; always persist new `STORY-xx` (`/new-story`; no diverge; existing epic only) |
 | [domain-modeling](domain-modeling/SKILL.md) | Glossary + ADRs as terms/decisions lock (loaded by grill-with-docs) |
 | [scaffold-project](scaffold-project/SKILL.md) | New sibling project from this framework layout (`/scaffold-project`) |
 | [sync-framework](sync-framework/SKILL.md) | Propagate allowlisted Cursor defaults into one existing sibling (`/sync-framework`) |
@@ -33,4 +34,4 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 | [pricing-page](pricing-page/SKILL.md) | Not MVP — no public pricing |
 | [build-awwwards-quality-sites](build-awwwards-quality-sites/SKILL.md) | Pitch polish / motion (only when the user asks) |
 
-Do not invent a parallel workflow. If the task is a slash command (`/generate-docs`, `/run-tests`, `/scaffold-project`, `/sync-framework`, `/story-loop`, `/what-next`, `/grill-me`, `/grill-with-docs`), use `.cursor/commands/` instead.
+Do not invent a parallel workflow. If the task is a slash command (`/generate-docs`, `/run-tests`, `/scaffold-project`, `/sync-framework`, `/story-loop`, `/what-next`, `/grill-me`, `/grill-with-docs`, `/new-story`), use `.cursor/commands/` instead.

@@ -11,7 +11,7 @@ description: Add or change a product feature against MVP epics and stories. Use 
 2. Classify the work:
    - **In current scope** → implement against the story; do not expand.
    - **Later phase / explicit non-goal** → stop and confirm with the user before coding.
-   - **Not in docs** → write the gap in the reply; do not silently invent product behavior.
+   - **Not in docs** → write the gap in the reply; do not silently invent product behavior. User starts `/new-story` to add a `STORY-xx`.
 3. Prefer the smallest change that ships the story. Follow `docs/architecture/` for stack; do not invent a second API style.
 4. Respect surfaces and constraints documented in CONTEXT.md and `docs/mvp/`.
 5. If docs are still stubs only, use **grilling** / `/grill-me` (persist at end of topic) before inventing behavior. If app code exists, use **grill-with-docs**.
@@ -26,5 +26,5 @@ description: Add or change a product feature against MVP epics and stories. Use 
 ## Examples
 
 - "Add X from story Y" → implement only what the story requires.
-- "Add something not in docs" → report the gap; do not invent.
+- "Add something not in docs" → report the gap; do not invent. User starts `/new-story` to add a story.
 - "Build a Phase 2 idea" → confirm with the user before coding.

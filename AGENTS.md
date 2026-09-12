@@ -29,3 +29,4 @@ Before locking a plan or design, prefer **grilling** over guessing:
 - **grilling** — default interview engine (rounds/frontier); auto before locking a plan
 - **grill-me** (`/grill-me`) — user-invoked; persist at end of topic
 - **grill-with-docs** (`/grill-with-docs`) — against the codebase; glossary + ADRs as they lock via domain-modeling; product/stories end-batch. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
+- **new-story** (`/new-story`) — grill one incremental product story; persist always writes `STORY-xx` (no diverge; existing epic only)
