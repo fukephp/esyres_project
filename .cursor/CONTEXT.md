@@ -44,13 +44,14 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `skills/domain-modeling/` | Glossary + ADRs as they lock (via grill-with-docs) |
 | `skills/grill-me/` | User-invoked grilling + end-of-topic persist (`/grill-me`) |
 | `skills/grill-with-docs/` | User-invoked grilling against the codebase; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`) |
+| `skills/new-story/` | Incremental product story; grilling then always persist `STORY-xx` (`/new-story`; no diverge; existing epic only) |
 | `skills/tailwindcss/` | Tailwind for the PWA (vendored MengTo; Esyres gate) |
 | `skills/design-first-ui-prompting/` | Spec-driven UI prompts for the PWA (vendored MengTo; Esyres gate) |
 | `skills/landing-page/` | Esyres **homepage** on `/` only — not discovery, salon, or `/owner` |
 | `skills/pricing-page/` | Not MVP — do not invent public pricing; not salon KM prices |
 | `skills/build-awwwards-quality-sites/` | Company-pitch polish only when explicitly asked — never discovery, salon, or `/owner` |
 | `loops/` | Story-loop playbook, Wayfinder-lite maps, answer-key template, and per-story keys |
-| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/story-loop`, `/grill-me`, `/grill-with-docs`) |
+| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/story-loop`, `/grill-me`, `/grill-with-docs`, `/new-story`) |
 
 ## How to follow this file
 
