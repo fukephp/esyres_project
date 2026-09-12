@@ -25,7 +25,7 @@ test('TopNav is full-bleed Cal bar with mark link home and panel primary', () =>
   expect(nav).toMatch(/\/esyres-mark\.svg/)
   expect(nav).toMatch(/width=\{24\}/)
   expect(nav).toMatch(/to=\{chrome\.brand\.to\}/)
-  expect(nav).toMatch(/h-10 rounded-md bg-ink/)
+  expect(nav).toMatch(/h-10 items-center rounded-md bg-ink/)
   expect(nav).toMatch(/text-canvas/)
   expect(nav).toMatch(/text-sm text-body/)
   expect(nav).toMatch(/nav\.bookings/)
