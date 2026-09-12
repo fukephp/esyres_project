@@ -25,6 +25,7 @@ final class PopularInSarajevo
         ListFilter::apply($query, $args['category'] ?? null, $args['name'] ?? null);
 
         return $query
+            ->with('services')
             ->orderBy('id')
             ->offset($offset)
             ->limit($limit)

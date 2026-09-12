@@ -68,6 +68,7 @@ void i18n.use(initReactI18next).init({
           emptyPopular: 'Nema salona.',
           emptyFiltered: 'Nema rezultata.',
           searchPlaceholder: 'Ime salona',
+          showAll: 'Prikaži sve',
         },
         pitch: {
           brand: 'Esyres',

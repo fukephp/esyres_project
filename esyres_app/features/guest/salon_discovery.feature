@@ -257,3 +257,35 @@ Feature: Guest salon discovery
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Hidden"
     When I query the public salon as a guest
     Then the public salon name is "Hidden"
+
+  Scenario: Listed salon facts include address busy-level and unique categories
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Studio"
+    And the salon is at lat "43.8563" lng "18.4131"
+    And the salon address is "Ferhadija 12"
+    And the salon has a service:
+      """
+      {"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}
+      """
+    And the salon has a service:
+      """
+      {"name": "Boja", "category": "HAIR", "durationMinutes": 60, "priceFeninga": 5000}
+      """
+    And the salon has a service:
+      """
+      {"name": "Šminka", "category": "MAKE_UP", "durationMinutes": 45, "priceFeninga": 4000}
+      """
+    And the salon is listed
+    When I query popularInSarajevo facts date "2026-09-07" as a guest
+    Then the first listed salon address is "Ferhadija 12"
+    And the first listed salon busy level is "LOW"
+    And the first listed salon categories are:
+      """
+      ["HAIR", "MAKE_UP"]
+      """
+    When I query salonsNearby facts lat "43.8563" lng "18.4131" date "2026-09-07" as a guest
+    Then the first listed salon address is "Ferhadija 12"
+    And the first listed salon busy level is "LOW"
+    And the first listed salon categories are:
+      """
+      ["HAIR", "MAKE_UP"]
+      """

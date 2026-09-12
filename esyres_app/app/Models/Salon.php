@@ -90,7 +90,7 @@ class Salon extends Model
      */
     public function serviceList()
     {
-        return $this->services()->get();
+        return $this->services;
     }
 
     /**

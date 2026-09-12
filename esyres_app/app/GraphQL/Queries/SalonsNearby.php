@@ -28,6 +28,7 @@ final class SalonsNearby
         ListFilter::apply($query, $args['category'] ?? null, $args['name'] ?? null);
 
         return $query
+            ->with('services')
             ->orderByRaw(
                 'ST_Distance_Sphere(POINT(lng, lat), POINT(?, ?))',
                 [(float) $args['lng'], (float) $args['lat']],
