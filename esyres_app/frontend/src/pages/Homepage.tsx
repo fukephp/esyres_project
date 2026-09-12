@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
-import { DISCOVERY_HREF } from '../lib/homepage'
+import { DISCOVERY_HREF, GUEST_COLUMN_CLASS } from '../lib/homepage'
 
 export function Homepage() {
   const { t } = useTranslation()
@@ -19,7 +19,7 @@ export function Homepage() {
         onLogin={() => setAuthOpen('login')}
         onRegister={() => setAuthOpen('register')}
       />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 py-8 md:px-16 md:py-12">
+      <div className={`${GUEST_COLUMN_CLASS} flex flex-1 flex-col py-8 md:py-12`}>
         {authOpen ? (
           <div className="max-w-sm">
             <AuthShell key={authOpen} initialMode={authOpen} onAuthenticated={() => setAuthOpen(null)} />

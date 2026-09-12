@@ -26,6 +26,7 @@ import {
   type ServiceCategory,
 } from '../lib/discovery'
 import { sarajevoToday } from '../lib/format'
+import { GUEST_COLUMN_CLASS } from '../lib/homepage'
 
 type Geo =
   | { status: 'pending' }
@@ -155,7 +156,7 @@ export function DiscoveryHome() {
   return (
     <>
       <TopNav />
-      <main className="mx-auto max-w-md px-5 py-8">
+      <main className={`${GUEST_COLUMN_CLASS} py-8`}>
       {source ? (
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
           {source === 'nearby' ? t('discovery.nearby') : t('discovery.popular')}

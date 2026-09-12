@@ -28,6 +28,7 @@ import {
   respondErrorKey,
 } from '../lib/booking'
 import { formatSarajevoDateTime } from '../lib/format'
+import { GUEST_COLUMN_CLASS } from '../lib/homepage'
 import { useCustomerPush } from '../lib/push'
 
 type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' | 'cancel' } | null
@@ -351,7 +352,7 @@ export function MyBookings() {
     return (
       <>
         <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8 text-body">
+        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.loading')}</p>
         </main>
       </>
@@ -362,12 +363,12 @@ export function MyBookings() {
     return (
       <>
         <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8">
+        <main className={`${GUEST_COLUMN_CLASS} py-8`}>
           <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
             {t('bookings.title')}
           </h1>
           <VerifyBanner />
-          <div className="mt-8">
+          <div className="mt-8 max-w-md">
             <AuthShell onAuthenticated={() => refetch()} />
           </div>
         </main>
@@ -380,19 +381,19 @@ export function MyBookings() {
   return (
     <>
       <TopNav me={navMe} />
-      <main className="mx-auto max-w-md px-5 py-8">
+      <main className={`${GUEST_COLUMN_CLASS} py-8`}>
       <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
         {t('bookings.title')}
       </h1>
       <VerifyBanner />
       {data.me.emailVerified ? (
         data.me.phoneVerified ? null : (
-          <div className="mt-8">
+          <div className="mt-8 max-w-md">
             <PhoneOtpPanel />
           </div>
         )
       ) : (
-        <div className="mt-8">
+        <div className="mt-8 max-w-md">
           <EmailVerifyPanel />
         </div>
       )}

@@ -5,6 +5,7 @@ export const CREATE_SALON_HREF = CREATE_SALON_PATH
 export const HOME_HREF = '/'
 export const BOOKINGS_HREF = '/bookings'
 export const DISCOVERY_BRAND_KEY = 'pitch.brand' as const
+export const GUEST_COLUMN_CLASS = 'mx-auto w-full max-w-[1200px] px-5 md:px-16'
 
 export type TopNavSlot = 'home' | 'discovery' | 'empty' | 'session'
 
