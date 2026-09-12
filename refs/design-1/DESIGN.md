@@ -275,7 +275,8 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 ## Layout
 
-- Max content width ~1200px; `/` is a short scroll (top-nav + hero + footer), not a long-scroll of `{spacing.section}` bands.
+- Max content width ~1200px. Guest `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`: top-nav inner and `main` share that column (`mx-auto`, same horizontal padding). Hairline bar stays full-bleed. Owner overlay nav inner is unconstrained (padding only).
+- `/` is a short scroll (top-nav + hero + footer), not a long-scroll of `{spacing.section}` bands.
 - Stack on mobile; modest two-column only if the three how-it-works lines need it on desktop.
 - Safe margins: ~48–64px desktop, ~20–24px mobile.
 - First viewport: brand **Esyres** in the top-nav + one H1 + one support line + three how-it-works lines + Pronađi salon. No stats strip, no mock.
@@ -284,7 +285,7 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 - No dark sidebar, no right schedule rail, no KPI card grids, no charts.
 - White canvas; primary black CTAs; hairline borders; at most one soft surface block when it aids the funnel.
-- Discovery and salon keep this sparse layout. Do not restyle them as homepage hero/footer. They share the top-nav with Moje rezervacije in the slot (not Prijava/Get your panel).
+- Discovery and salon keep this sparse layout. Do not restyle them as homepage hero/footer. They share the ~1200px guest column; sparse is not a 448px page. Forms and CTAs may keep a left-aligned local max-width. They share the top-nav with Moje rezervacije in the slot (not Prijava/Get your panel).
 
 ### Owner (dense)
 
@@ -311,7 +312,7 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings`: name + Odjava when logged in. `/owner*`: overlay name + Odjava; OwnerNav stays. No search, cart, or mega-menu.
+**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Guest inner row matches the ~1200px column; owner overlay inner stays unconstrained. Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings`: name + Odjava when logged in. `/owner*`: overlay name + Odjava; OwnerNav stays. No search, cart, or mega-menu.
 
 **Owner nav** — dense panel left rail: `{colors.canvas}` floor, ink links, hairline edge. Not `{colors.surface-dark}`. Not a marketing hero/footer.
 

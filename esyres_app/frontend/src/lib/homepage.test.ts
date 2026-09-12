@@ -4,6 +4,7 @@ import {
   CREATE_SALON_HREF,
   DISCOVERY_BRAND_KEY,
   DISCOVERY_HREF,
+  GUEST_COLUMN_CLASS,
   HOME_HREF,
   discoveryBrandLink,
   homepageChrome,
@@ -17,6 +18,10 @@ import {
   topNavChrome,
   topNavSlot,
 } from './homepage'
+
+test('GUEST_COLUMN_CLASS is the Design 1 1200px inner', () => {
+  expect(GUEST_COLUMN_CLASS).toBe('mx-auto w-full max-w-[1200px] px-5 md:px-16')
+})
 
 test('isHomepagePath is only / or empty', () => {
   expect(isHomepagePath('/')).toBe(true)

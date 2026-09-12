@@ -34,6 +34,7 @@ import {
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
+import { GUEST_COLUMN_CLASS } from '../lib/homepage'
 import {
   clearIntakeToken,
   emptyIntakeSnapshot,
@@ -227,7 +228,7 @@ export function SalonProfile() {
     return (
       <>
         <TopNav />
-        <main className="mx-auto max-w-md px-5 py-8 text-body">
+        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.loading')}</p>
         </main>
       </>
@@ -239,7 +240,7 @@ export function SalonProfile() {
     return (
       <>
         <TopNav />
-        <main className="mx-auto max-w-md px-5 py-8 text-body">
+        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.notFound')}</p>
         </main>
       </>
@@ -451,7 +452,7 @@ export function SalonProfile() {
   return (
     <>
       <TopNav />
-      <main className="mx-auto max-w-md px-5 py-8">
+      <main className={`${GUEST_COLUMN_CLASS} py-8`}>
       <header className="flex items-start justify-between gap-4">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
           {salon.name}
@@ -517,6 +518,7 @@ export function SalonProfile() {
         )}
       </section>
 
+      <div className="max-w-md">
       {salon.services.length > 0 && !picking && !sent && (
         <button
           type="button"
@@ -685,6 +687,7 @@ export function SalonProfile() {
         />
       )}
 
+      </div>
       {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
       </main>
     </>

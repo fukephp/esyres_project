@@ -8,6 +8,7 @@ import { TopNav } from '../components/TopNav'
 import { CREATE_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
 import { createSalonSurface } from '../lib/createSalon'
+import { GUEST_COLUMN_CLASS } from '../lib/homepage'
 
 export function CreateSalon() {
   const { t } = useTranslation()
@@ -23,7 +24,7 @@ export function CreateSalon() {
     return (
       <>
         <TopNav />
-        <main className="px-5 py-8 text-body">
+        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.loading')}</p>
         </main>
       </>
@@ -38,8 +39,8 @@ export function CreateSalon() {
     return (
       <>
         <TopNav />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <div className="mt-8">
+        <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+          <div className="mt-8 max-w-md">
             <AuthShell allowRegister onAuthenticated={() => refetch()} />
           </div>
         </main>
@@ -50,8 +51,8 @@ export function CreateSalon() {
     return (
       <>
         <TopNav />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <div className="mt-8">
+        <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+          <div className="mt-8 max-w-md">
             <EmailVerifyPanel />
           </div>
         </main>
@@ -77,8 +78,8 @@ export function CreateSalon() {
   return (
     <>
       <TopNav />
-      <main className="mx-auto flex min-h-svh max-w-md flex-col px-5 py-8">
-        <form className="mt-10 space-y-4" onSubmit={(e) => void onSubmit(e)}>
+      <main className={`${GUEST_COLUMN_CLASS} flex min-h-svh flex-col py-8`}>
+        <form className="mt-10 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
           <label className="block text-sm text-body">
             {t('createSalon.name')}
             <input
