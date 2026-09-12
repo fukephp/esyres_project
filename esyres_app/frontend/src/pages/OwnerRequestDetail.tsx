@@ -19,6 +19,7 @@ import {
   type OwnerSalonData,
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
+import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
@@ -172,7 +173,7 @@ export function OwnerRequestDetail() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
           </div>
@@ -186,7 +187,7 @@ export function OwnerRequestDetail() {
       <>
         <TopNav me={navMe} />
         <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
+          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8">
             <EmailVerifyPanel />
           </div>

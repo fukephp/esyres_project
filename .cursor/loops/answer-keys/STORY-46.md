@@ -13,8 +13,8 @@
 | Goal (one sentence) | Register stores a typed person name (not an email local-part), and AuthShell shows Rezervacije on customer doors and Panel on create-salon / owner doors. |
 | Branch name | `cursor/story-46-person-name-726a` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-12 |
 
 ## Pass/fail — product
 

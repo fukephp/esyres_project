@@ -12,10 +12,10 @@ Feature: Customer email and password account
     Then register succeeds for "ana@example.com"
     When I query me
     Then me email is "ana@example.com"
-    And me name is "ana"
+    And me name is "Ana"
     And me email is not verified
     And the customer has no phone
-    And the customer name is "ana"
+    And the customer name is "Ana"
     And a verify-email notification was sent
     And the customer email is not verified in the database
 
@@ -24,6 +24,28 @@ Feature: Customer email and password account
     Then register succeeds for "ana@example.com"
     And the customer phone is "+38761111111"
     And the customer phone is not verified
+
+  Scenario: Register stores a trimmed person name
+    When I register as "xx@example.com" named "  Ana  " with password "secret-pass"
+    Then register succeeds for "xx@example.com"
+    When I query me
+    Then me name is "Ana"
+    And the customer name is "Ana"
+
+  Scenario: Register does not mint name from the email local-part
+    When I register as "xxlocal@example.com" named "Ana" with password "secret-pass"
+    Then register succeeds for "xxlocal@example.com"
+    When I query me
+    Then me name is "Ana"
+    And the customer name is "Ana"
+
+  Scenario: Empty name on register is rejected
+    When I register as "ana@example.com" named "" with password "secret-pass"
+    Then the GraphQL error code is "INVALID_NAME"
+
+  Scenario: Whitespace name on register is rejected
+    When I register as "ana@example.com" named "   " with password "secret-pass"
+    Then the GraphQL error code is "INVALID_NAME"
 
   Scenario: Invalid phone on register is rejected
     When I register as "ana@example.com" with password "secret-pass" and phone "not-a-phone"

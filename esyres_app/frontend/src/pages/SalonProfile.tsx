@@ -34,7 +34,7 @@ import {
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
-import { GUEST_COLUMN_CLASS } from '../lib/homepage'
+import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
   clearIntakeToken,
   emptyIntakeSnapshot,
@@ -624,6 +624,7 @@ export function SalonProfile() {
           )}
           {needLogin && (
             <div className="mt-8">
+              <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
               <AuthShell onAuthenticated={() => afterAuth()} />
             </div>
           )}

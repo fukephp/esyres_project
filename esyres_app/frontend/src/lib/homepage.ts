@@ -6,6 +6,16 @@ export const HOME_HREF = '/'
 export const BOOKINGS_HREF = '/bookings'
 export const DISCOVERY_BRAND_KEY = 'pitch.brand' as const
 export const GUEST_COLUMN_CLASS = 'mx-auto w-full max-w-[1200px] px-5 md:px-16'
+export const PLACE_HEADING_CLASS = 'font-display text-[28px] font-semibold tracking-tight text-ink'
+
+export type HomepageAuthMode = 'login' | 'register'
+
+export function nextHomepageAuth(
+  current: HomepageAuthMode | null,
+  click: HomepageAuthMode,
+): HomepageAuthMode | null {
+  return current === click ? null : click
+}
 
 export type TopNavSlot = 'home' | 'discovery' | 'empty' | 'session'
 

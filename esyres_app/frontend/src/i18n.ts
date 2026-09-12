@@ -98,11 +98,14 @@ void i18n.use(initReactI18next).init({
         auth: {
           login: 'Prijava',
           register: 'Registracija',
+          name: 'Ime i prezime',
           email: 'Email',
           password: 'Lozinka',
           phone: 'Telefon (opcionalno)',
           submitLogin: 'Prijavi se',
           submitRegister: 'Napravi nalog',
+          placeCustomer: 'Rezervacije',
+          placePanel: 'Panel',
           gate: {
             EMAIL_TAKEN: 'Ovaj email je već registrovan.',
             PHONE_TAKEN: 'Ovaj telefon je već registrovan.',
@@ -110,6 +113,7 @@ void i18n.use(initReactI18next).init({
             INVALID_EMAIL: 'Unesi ispravan email.',
             INVALID_PHONE: 'Unesi ispravan broj.',
             INVALID_CREDENTIALS: 'Pogrešan email ili lozinka.',
+            INVALID_NAME: 'Unesi ime i prezime.',
             fallback: 'Prijava nije uspjela.',
           },
         },

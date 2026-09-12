@@ -11,10 +11,15 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 final class Register
 {
     /**
-     * @param  array{email: string, password: string, phone?: string|null}  $args
+     * @param  array{name: string, email: string, password: string, phone?: string|null}  $args
      */
     public function __invoke(mixed $root, array $args, GraphQLContext $context): User
     {
+        $name = trim($args['name']);
+        if ($name === '') {
+            throw new ClientError('INVALID_NAME');
+        }
+
         $email = strtolower(trim($args['email']));
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             throw new ClientError('INVALID_EMAIL');
@@ -32,7 +37,7 @@ final class Register
         }
 
         $user = new User;
-        $user->name = explode('@', $email)[0];
+        $user->name = $name;
         $user->email = $email;
         $user->phone = $phone;
         $user->password = $args['password'];

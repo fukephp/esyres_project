@@ -6,6 +6,7 @@ import {
   DISCOVERY_HREF,
   GUEST_COLUMN_CLASS,
   HOME_HREF,
+  PLACE_HEADING_CLASS,
   discoveryBrandLink,
   homepageChrome,
   homepageDisplayName,
@@ -15,12 +16,26 @@ import {
   isHomepagePath,
   isOwnerPath,
   isSalonProfilePath,
+  nextHomepageAuth,
   topNavChrome,
   topNavSlot,
 } from './homepage'
 
 test('GUEST_COLUMN_CLASS is the Design 1 1200px inner', () => {
   expect(GUEST_COLUMN_CLASS).toBe('mx-auto w-full max-w-[1200px] px-5 md:px-16')
+})
+
+test('PLACE_HEADING_CLASS is the 28px display h1', () => {
+  expect(PLACE_HEADING_CLASS).toBe('font-display text-[28px] font-semibold tracking-tight text-ink')
+})
+
+test('nextHomepageAuth toggles the already-open mode closed', () => {
+  expect(nextHomepageAuth(null, 'login')).toBe('login')
+  expect(nextHomepageAuth(null, 'register')).toBe('register')
+  expect(nextHomepageAuth('login', 'login')).toBe(null)
+  expect(nextHomepageAuth('register', 'register')).toBe(null)
+  expect(nextHomepageAuth('login', 'register')).toBe('register')
+  expect(nextHomepageAuth('register', 'login')).toBe('login')
 })
 
 test('isHomepagePath is only / or empty', () => {
@@ -184,4 +199,10 @@ test('homepage chrome copy is Bosnian; pitch hero strings unchanged', async () =
   expect(i18n.t('home.footerLine')).toBe('Termini bez jurnjave.')
   expect(i18n.t('auth.login')).toBe('Prijava')
   expect(i18n.t('auth.register')).toBe('Registracija')
+  expect(i18n.t('auth.name')).toBe('Ime i prezime')
+  expect(i18n.t('auth.gate.INVALID_NAME')).toBe('Unesi ime i prezime.')
+  expect(i18n.t('auth.placeCustomer')).toBe('Rezervacije')
+  expect(i18n.t('auth.placePanel')).toBe('Panel')
+  expect(i18n.t('createSalon.INVALID_NAME')).toBe('Unesi ime salona.')
+  expect(i18n.t('bookings.title')).toBe('Moji zahtjevi')
 })
