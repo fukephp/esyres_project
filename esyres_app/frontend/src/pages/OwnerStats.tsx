@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
+import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import {
@@ -20,6 +21,7 @@ export function OwnerStats() {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
+  const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
@@ -54,45 +56,59 @@ export function OwnerStats() {
 
   if (loading) {
     return (
-      <main className="px-5 py-8 text-body">
-        <p>{t('salon.loading')}</p>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="px-5 py-8 text-body">
+          <p>{t('salon.loading')}</p>
+        </main>
+      </>
     )
   }
 
   if (data?.me == null) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
-        <div className="mt-8">
-          <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
-        </div>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
+          <div className="mt-8">
+            <AuthShell allowRegister={false} onAuthenticated={() => refetch()} />
+          </div>
+        </main>
+      </>
     )
   }
 
   if (!data.me.emailVerified) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
-        <div className="mt-8">
-          <EmailVerifyPanel />
-        </div>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
+          <div className="mt-8">
+            <EmailVerifyPanel />
+          </div>
+        </main>
+      </>
     )
   }
 
   if (salon === null) {
     return (
-      <main className="mx-auto max-w-md px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
-        <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-      </main>
+      <>
+        <TopNav me={navMe} />
+        <main className="mx-auto max-w-md px-5 py-8">
+          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.stats')}</h1>
+          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
+        </main>
+      </>
     )
   }
 
   return (
-    <div className="min-h-svh md:flex">
+    <>
+      <TopNav me={navMe} />
+      <div className="min-h-svh md:flex">
       <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         <Switcher salons={salons} salon={salon} onSalon={onSalon} />
         <OwnerNav
@@ -177,6 +193,7 @@ export function OwnerStats() {
         )}
       </main>
     </div>
+    </>
   )
 }
 

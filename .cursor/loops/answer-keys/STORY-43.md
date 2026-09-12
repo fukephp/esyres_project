@@ -13,8 +13,8 @@
 | Goal (one sentence) | Every listed route shares one full-bleed Cal top-nav (brand → `/`, native slot only) so `/` keeps the homepage slot+hero+footer and salon/QR never become the company page. |
 | Branch name | `cursor/story-43-shared-top-nav-012e` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-12 |
 
 ## Pass/fail — product
 
