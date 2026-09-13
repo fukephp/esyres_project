@@ -44,10 +44,29 @@ test('address is omitted helper plus muted line; no maps heading', () => {
 
 test('header send is idle ink pill in max-w-md; lower send still shows during chat', () => {
   const page = read('pages/SalonProfile.tsx')
-  expect(page).toMatch(/hasServices && mode === 'idle'[\s\S]*max-w-md[\s\S]*w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas[\s\S]*openIntake\('picker'\)[\s\S]*setScrollPicker\(true\)[\s\S]*salon\.send/)
+  expect(page).toMatch(/hasServices && mode === 'idle'[\s\S]*max-w-md[\s\S]*mt-8 \$\{SALON_SEND_CLASS\}[\s\S]*openIntake\('picker'\)[\s\S]*setScrollPicker\(true\)[\s\S]*salon\.send[\s\S]*salon\.sendHint/)
   expect(page).toMatch(/hasServices && !picking && !sent[\s\S]*openIntake\('picker'\)[\s\S]*salon\.send/)
   expect(page).toMatch(/showChatCta\(salon\.services\.length, sent\) && !chatting/)
   expect(page).not.toMatch(/\bsticky\b/)
+})
+
+test('sendHint is only under the header idle button; chat alternate stays underline', () => {
+  const page = read('pages/SalonProfile.tsx')
+  const headerStart = page.indexOf("hasServices && mode === 'idle'")
+  const hoursAt = page.indexOf("t('salon.hours')")
+  const header = page.slice(headerStart, hoursAt)
+  expect(header).toMatch(/salon\.sendHint/)
+  expect(header).toMatch(/mt-2 text-sm text-muted/)
+
+  const lowerStart = page.indexOf('hasServices && !picking && !sent')
+  const lower = page.slice(lowerStart)
+  expect(lower).not.toMatch(/salon\.sendHint/)
+  expect(page).toMatch(/underline underline-offset-4[\s\S]*assistant\.ask/)
+  expect(page.slice(page.indexOf("t('assistant.ask')") - 280, page.indexOf("t('assistant.ask')"))).not.toMatch(/SALON_SEND_CLASS/)
+  expect(page.slice(page.indexOf("t('assistant.ask')") - 280, page.indexOf("t('assistant.ask')"))).not.toMatch(/bg-ink/)
+
+  const chat = read('components/AssistantIntake.tsx')
+  expect(chat).not.toMatch(/salon\.sendHint/)
 })
 
 test('hours rows use helpers; closed is muted; chat tap does not copy intake', () => {

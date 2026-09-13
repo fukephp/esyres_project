@@ -18,6 +18,7 @@ void i18n.use(initReactI18next).init({
           duration: '{{n}} min',
           loading: 'Učitavanje…',
           send: 'Pošalji zahtjev',
+          sendHint: 'Odaberi usluge, dan i vrijeme.',
           submit: 'Pošalji',
           date: 'Datum',
           time: 'Vrijeme',
