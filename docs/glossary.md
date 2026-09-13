@@ -33,8 +33,12 @@ The owner control that chooses which of their salons is in context. Shown only w
 _Avoid_: location switcher, branch picker, store selector
 
 **Salon profile**:
-The guest-facing page for one salon: name, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
+The guest-facing page for one salon: name, optional address, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
 _Avoid_: storefront, landing, listing detail, shop page
+
+**Address**:
+The salon’s written location line. Guests see it when it is set. Not coordinates and not a map.
+_Avoid_: pin, geocode, lat/lng, maps link
 
 **Worker**:
 A named person at a salon who can be requested for a booking. Not a user and not a login. A new salon has none until the owner adds them. Workers inherit the salon’s working hours.

@@ -285,7 +285,7 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 - No dark sidebar, no right schedule rail, no KPI card grids, no charts.
 - White canvas; primary black CTAs; hairline borders; at most one soft surface block when it aids the funnel.
-- Discovery and salon keep this sparse layout. Do not restyle them as homepage hero/footer. They share the ~1200px guest column; sparse is not a 448px page. Forms and CTAs may keep a left-aligned local max-width. They share the top-nav with Moje rezervacije in the slot (not Prijava/Get your panel).
+- Discovery and salon keep this sparse layout. Do not restyle them as homepage hero/footer. They share the ~1200px guest column; sparse is not a 448px page. Forms and CTAs may keep a left-aligned local max-width. They share the top-nav with Moje rezervacije in the slot (not Prijava/Get your panel). Salon hours stay a seven-row list in that column (tappable open days, muted closed days); no schedule rail.
 
 ### Owner (dense)
 

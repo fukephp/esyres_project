@@ -4,7 +4,7 @@
 
 Every screen on the customer side is designed around a single-tap path: QR code or Instagram bio link → live salon page → request sent. No install step, no login wall before value is shown (browsing is fully guest). Account (email+password, person name at register) and phone OTP appear at request submit / My Bookings, and optionally in the homepage top-nav slot (not a wall). The auth shell says **Rezervacije** (customer) or **Panel** (create-salon / owner) so the door is obvious. Typed `/` is the Bosnian homepage (Design 1 Cal look: top-nav homepage slot + existing hero + Pronađi salon + simple footer); that is not a login wall and never sits in front of `/salon/:id` or the QR sticker. When homepage auth is open, hide hero + footer. Pronađi salon goes to `/salons`. The shared top-nav may appear on salon/discovery with Moje rezervacije only — not Prijava or Get your panel.
 
-On the salon profile, the **primary** button stays the picker (`Pošalji zahtjev`). Scripted chat is a visible alternate (`Nisi sigurna? Pitaj salon.`), not a second product. Owners may market the assistant; guests who already know still get a few taps.
+On the salon profile, the **primary** button stays the picker (`Pošalji zahtjev`): idle also shows it under the title; the lower one stays above chat. Scripted chat is a visible alternate (`Nisi sigurna? Pitaj salon.`), not a second product. Open weekday hours rows (one column) seed the picker’s day. Owners may market the assistant; guests who already know still get a few taps.
 
 ## 2. Complexity Belongs on the Owner Side
 
@@ -39,7 +39,7 @@ Guest chat speaks as the salon (Bosnian). No platform character (no “Cora”).
 ## Decided (visual)
 
 - **Busy badge vs availability panel colors intentionally diverge.** Customer day busy stays 🟢/🟡/🔴; owner cells use distinct free / pending / proposed / booked / off tokens. Status tokens live in Design 1 and are never brand chrome. See `refs/design-1/DESIGN.md`.
-- **Guest inner column.** `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings` share one ~1200px column (Design 1): top-nav inner and `main` align (same padding, `mx-auto`). Hairline bar stays full-bleed. Lists and headings span; copy/forms/CTAs keep left-aligned local max-widths (not a second centered `max-w-md` page). Discovery stays 1-col. No two-column salon. Owner overlay inner stays unconstrained. Sparse still means no homepage hero/footer on other routes.
+- **Guest inner column.** `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings` share one ~1200px column (Design 1): top-nav inner and `main` align (same padding, `mx-auto`). Hairline bar stays full-bleed. Lists and headings span; copy/forms/CTAs keep left-aligned local max-widths (not a second centered `max-w-md` page). Discovery stays 1-col. No two-column salon and no right hours rail: open weekday rows are in-column buttons that seed the picker. Owner overlay inner stays unconstrained. Sparse still means no homepage hero/footer on other routes.
 
 ## Not Yet Decided (needs discussion before final design)
 
