@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
+import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
+import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   DECLINE_BOOKING_MUTATION,
@@ -20,6 +22,7 @@ import {
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
+import { chatBadgeCount } from '../lib/intake'
 import { sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
@@ -55,6 +58,14 @@ export function OwnerRequestDetail() {
     skip: !ownerReady || id === '',
   })
   const booking = bookingData?.ownerBooking
+  const firstOwnedId = data?.me?.salons[0]?.id ?? ''
+  const navSalonId = booking?.salon.id ?? firstOwnedId
+  const { data: chatCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
+    variables: { salonId: navSalonId },
+    skip: !ownerReady || navSalonId === '',
+    fetchPolicy: 'network-only',
+  })
+  const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const salonId = booking?.salon.id ?? ''
   const date = booking?.preferredDate ?? ''
   const { data: board } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
@@ -93,7 +104,6 @@ export function OwnerRequestDetail() {
     .map((row: OccupyingBooking) => occupyingBlock(row))
     .filter((row) => row !== null)
   const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
-  const firstOwnedId = data?.me?.salons[0]?.id ?? null
   const queuePath =
     booking === undefined
       ? '/owner'
@@ -225,11 +235,24 @@ export function OwnerRequestDetail() {
       <div className="min-h-svh md:flex">
       <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
         <p className="text-sm font-semibold">{booking?.salon.name ?? ''}</p>
-        <p className="mt-6 text-sm font-medium">{t('owner.title')}</p>
+        <OwnerNav
+          salonId={navSalonId}
+          firstOwnedId={firstOwnedId}
+          badge={badge}
+          active="queue"
+        />
       </aside>
       <main className="mx-auto w-full max-w-xl flex-1 px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
         <p className="mt-1 text-sm text-body md:hidden">{booking?.salon.name ?? ''}</p>
+        <div className="md:hidden">
+          <OwnerNav
+            salonId={navSalonId}
+            firstOwnedId={firstOwnedId}
+            badge={badge}
+            active="queue"
+          />
+        </div>
         <p className="mt-6">
           <Link to={queuePath} className="text-sm font-medium text-ink underline">
             {t('owner.back')}

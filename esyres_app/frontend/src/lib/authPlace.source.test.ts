@@ -67,16 +67,18 @@ test('owner logged-out and email-verify use Panel; session titles return; login-
     'pages/OwnerChats.tsx',
     'pages/OwnerStats.tsx',
     'pages/OwnerRequestDetail.tsx',
+    'pages/OwnerSalons.tsx',
   ]
   for (const file of files) {
     const text = read(file)
     expect(text, file).toMatch(/allowRegister=\{false\}/)
     expect(text, file).toMatch(/data\?\.me == null[\s\S]*auth\.placePanel[\s\S]*AuthShell/)
     expect(text, file).toMatch(/emailVerified[\s\S]*auth\.placePanel[\s\S]*EmailVerifyPanel/)
-    expect(text, file).not.toMatch(/data\?\.me == null[\s\S]*owner\.(title|chat|stats)[\s\S]*AuthShell/)
+    expect(text, file).not.toMatch(/data\?\.me == null[\s\S]*owner\.(title|chat|stats|salons)[\s\S]*AuthShell/)
   }
   expect(read('pages/OwnerHome.tsx')).toMatch(/owner\.title/)
   expect(read('pages/OwnerChats.tsx')).toMatch(/owner\.chat/)
   expect(read('pages/OwnerStats.tsx')).toMatch(/owner\.stats/)
   expect(read('pages/OwnerRequestDetail.tsx')).toMatch(/owner\.title/)
+  expect(read('pages/OwnerSalons.tsx')).toMatch(/owner\.salons/)
 })

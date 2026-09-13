@@ -13,6 +13,9 @@ import {
   ownerQueuePath,
   ownerChatPath,
   ownerStatsPath,
+  ownerSalonsPath,
+  OWNER_SALONS_PATH,
+  salonIsOpenNow,
   statsHourLabel,
   ownerSalonFromSearch,
   panelCells,
@@ -195,6 +198,47 @@ test('owner stats path is not home and omits first-owned salon', () => {
   expect(ownerStatsPath()).toBe('/owner/stats')
   expect(ownerStatsPath('1', '1')).toBe('/owner/stats')
   expect(ownerStatsPath('2', '1')).toBe('/owner/stats?salon=2')
+})
+
+test('owner salons path never has a query', () => {
+  expect(OWNER_SALONS_PATH).toBe('/owner/salons')
+  expect(ownerSalonsPath()).toBe('/owner/salons')
+})
+
+test('salonIsOpenNow uses Sarajevo clock, closes exclusive, skips breaks', () => {
+  const monday = {
+    weekday: 'MONDAY',
+    closed: false,
+    opensAt: '09:00',
+    closesAt: '17:00',
+    breakStartsAt: '12:00',
+    breakEndsAt: '13:00',
+  }
+  const closed = {
+    weekday: 'TUESDAY',
+    closed: true,
+    opensAt: null,
+    closesAt: null,
+    breakStartsAt: null,
+    breakEndsAt: null,
+  }
+  const hours = [monday, closed]
+  expect(salonIsOpenNow(hours, new Date('2026-08-31T07:00:00.000Z'))).toBe(true)
+  expect(salonIsOpenNow(hours, new Date('2026-08-31T15:00:00.000Z'))).toBe(false)
+  expect(salonIsOpenNow(hours, new Date('2026-08-31T10:00:00.000Z'))).toBe(false)
+  expect(salonIsOpenNow(hours, new Date('2026-08-31T11:00:00.000Z'))).toBe(true)
+  expect(salonIsOpenNow(hours, new Date('2026-09-01T10:00:00.000Z'))).toBe(false)
+  expect(salonIsOpenNow(hours, new Date('2026-08-30T10:00:00.000Z'))).toBe(false)
+  expect(salonIsOpenNow([], new Date('2026-08-31T10:00:00.000Z'))).toBe(false)
+  expect(salonIsOpenNow([closed], new Date('2026-09-01T10:00:00.000Z'))).toBe(false)
+})
+
+test('owner catalog copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.salons')).toBe('Saloni')
+  expect(i18n.t('owner.openNow')).toBe('Otvoreno')
+  expect(i18n.t('owner.closedNow')).toBe('Zatvoreno')
+  expect(i18n.exists('owner.listed')).toBe(false)
 })
 
 test('owner stats copy is Bosnian', async () => {

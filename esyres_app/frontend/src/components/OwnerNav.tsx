@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { sarajevoToday } from '../lib/format'
-import { ownerChatPath, ownerQueuePath, ownerStatsPath } from '../lib/owner'
+import { OWNER_SALONS_PATH, ownerChatPath, ownerQueuePath, ownerStatsPath } from '../lib/owner'
 
 type Props = {
   salonId: string
   firstOwnedId: string
   date?: string
   badge: number | null
-  active: 'queue' | 'chats' | 'stats'
+  active: 'queue' | 'chats' | 'stats' | 'salons'
 }
 
 export function OwnerNav({ salonId, firstOwnedId, date, badge, active }: Props) {
@@ -36,6 +36,9 @@ export function OwnerNav({ salonId, firstOwnedId, date, badge, active }: Props) 
       </Link>
       <Link to={stats} className={active === 'stats' ? on : idle}>
         {t('owner.stats')}
+      </Link>
+      <Link to={OWNER_SALONS_PATH} className={active === 'salons' ? on : idle}>
+        {t('owner.salons')}
       </Link>
     </nav>
   )

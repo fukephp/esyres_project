@@ -72,7 +72,7 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-47 | Salon profile address, header CTA, tappable hours | 1 | `STORY-47` | STORY-07, STORY-08, STORY-21, STORY-45 |
 | STORY-48 | Salon Pošalji zahtjev chrome | 1 | `STORY-48` | STORY-47 |
 | STORY-49 | Current job on occupying cells | 3 | — | STORY-14, STORY-15 |
-| STORY-50 | Salon catalog and OwnerNav Saloni | 7 | — | STORY-01, STORY-04, STORY-41, STORY-43 |
+| STORY-50 | Salon catalog and OwnerNav Saloni | 7 | `STORY-50` | STORY-01, STORY-04, STORY-41, STORY-43 |
 | STORY-51 | Salon edit name and address | 7 | — | STORY-50 |
 | STORY-52 | Add salon | 7 | — | STORY-50, STORY-51 |
 | STORY-53 | Hours on salon edit | 7 | — | STORY-01, STORY-51 |
