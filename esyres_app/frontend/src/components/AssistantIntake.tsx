@@ -5,6 +5,7 @@ import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
+import { SALON_SEND_CLASS } from '../lib/salonSend'
 import {
   assistantAddressLine,
   assistantCanSend,
@@ -275,9 +276,9 @@ export function AssistantIntake({
         <button
           type="submit"
           disabled={!canSend || busy}
-          className="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+          className={SALON_SEND_CLASS}
         >
-          {t('salon.submit')}
+          {t('salon.send')}
         </button>
       )}
       {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}

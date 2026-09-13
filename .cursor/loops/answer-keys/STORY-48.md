@@ -13,8 +13,8 @@
 | Goal (one sentence) | All four salon-profile `Pošalji zahtjev` share one CSS black pill (press + scale + ink ring; disabled hairline), and the idle header button gets one muted support line. |
 | Branch name | `cursor/story-48-posalji-zahtjev-chrome-d71f` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-13 |
 
 ## Pass/fail — product
 
