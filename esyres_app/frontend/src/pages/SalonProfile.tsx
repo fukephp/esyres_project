@@ -18,6 +18,7 @@ import {
 } from '../graphql/intake'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
 import {
+  assistantAddressLine,
   assistantBookingInput,
   assistantCanSend,
   assistantDateChange,
@@ -35,6 +36,12 @@ import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/bookin
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
 import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
+import {
+  applyHoursRowTap,
+  hoursRowClosed,
+  hoursRowSelected,
+  hoursRowTappable,
+} from '../lib/salonHours'
 import {
   clearIntakeToken,
   emptyIntakeSnapshot,
@@ -128,6 +135,8 @@ export function SalonProfile() {
   const [pinged, setPinged] = useState(false)
   const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
   const restored = useRef(false)
+  const pickerFormRef = useRef<HTMLFormElement>(null)
+  const [scrollPicker, setScrollPicker] = useState(false)
   const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
     variables: { token: intakeToken ?? '' },
     skip: !intakeToken,
@@ -182,6 +191,14 @@ export function SalonProfile() {
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [intakeToken, refetchIntake])
+
+  useEffect(() => {
+    if (!scrollPicker || mode !== 'picker') {
+      return
+    }
+    pickerFormRef.current?.scrollIntoView()
+    setScrollPicker(false)
+  }, [scrollPicker, mode])
 
   const chatSnapshot: IntakeSnapshot = {
     serviceIds: chatSelected,
@@ -248,6 +265,8 @@ export function SalonProfile() {
   }
 
   const token = busyToken(salon.busyLevel)
+  const addressLine = assistantAddressLine(salon.address)
+  const hasServices = salon.services.length > 0
   const chosen = salon.services.filter((s) => selected.includes(s.id))
   const stack = stackSelection(chosen)
   const picking = isPickerOpen(mode)
@@ -331,6 +350,36 @@ export function SalonProfile() {
     setNeedEmail(false)
     setNeedPhone(false)
     setError(null)
+  }
+
+  function onHoursTap(day: DayHours) {
+    const closed = hoursRowClosed(day)
+    const tappable = hoursRowTappable({
+      closed,
+      hasServices,
+      mode,
+    })
+    const selected = hoursRowSelected({
+      tappable,
+      rowWeekday: day.weekday,
+      preferredDate,
+    })
+    const next = applyHoursRowTap({
+      tappable,
+      selected,
+      weekday: day.weekday,
+      today: date,
+      preferredTime,
+    })
+    if ('noop' in next) {
+      return
+    }
+    openIntake('picker')
+    setPreferredDate(next.preferredDate)
+    setPreferredTime(next.preferredTime)
+    if (next.scroll) {
+      setScrollPicker(true)
+    }
   }
 
   function bookingInput(): CreateBookingInput | null {
@@ -463,15 +512,64 @@ export function SalonProfile() {
         </p>
       </header>
 
+      {addressLine !== null ? <p className="mt-3 text-sm text-muted">{addressLine}</p> : null}
+
+      {hasServices && mode === 'idle' && (
+        <div className="max-w-md">
+          <button
+            type="button"
+            className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
+            onClick={() => {
+              openIntake('picker')
+              setScrollPicker(true)
+            }}
+          >
+            {t('salon.send')}
+          </button>
+        </div>
+      )}
+
       <section className="mt-8">
         <h2 className="text-sm font-semibold text-ink">{t('salon.hours')}</h2>
         <ul className="mt-3 space-y-2">
-          {salon.hours.map((day) => (
-            <li key={day.weekday} className="flex justify-between gap-4 text-sm text-body">
-              <span>{t(`weekday.${day.weekday}`)}</span>
-              <span className="text-right">{hoursLine(day, t)}</span>
-            </li>
-          ))}
+          {salon.hours.map((day) => {
+            const closed = hoursRowClosed(day)
+            const tappable = hoursRowTappable({
+              closed,
+              hasServices,
+              mode,
+            })
+            const selected = hoursRowSelected({
+              tappable,
+              rowWeekday: day.weekday,
+              preferredDate,
+            })
+            const label = t(`weekday.${day.weekday}`)
+            const line = hoursLine(day, t)
+            if (tappable) {
+              return (
+                <li key={day.weekday}>
+                  <button
+                    type="button"
+                    className={`flex w-full justify-between gap-4 px-2 py-1.5 text-left text-sm text-body hover:bg-surface-soft focus:bg-surface-soft ${selected ? 'bg-surface-soft' : ''}`}
+                    onClick={() => onHoursTap(day)}
+                  >
+                    <span>{label}</span>
+                    <span className="text-right">{line}</span>
+                  </button>
+                </li>
+              )
+            }
+            return (
+              <li
+                key={day.weekday}
+                className={`flex justify-between gap-4 px-2 py-1.5 text-sm ${closed ? 'text-muted' : 'text-body'}`}
+              >
+                <span>{label}</span>
+                <span className="text-right">{line}</span>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
@@ -519,7 +617,7 @@ export function SalonProfile() {
       </section>
 
       <div className="max-w-md">
-      {salon.services.length > 0 && !picking && !sent && (
+      {hasServices && !picking && !sent && (
         <button
           type="button"
           className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
@@ -540,7 +638,7 @@ export function SalonProfile() {
 
       {picking && !sent && (
         <>
-          <form className="mt-8 space-y-4" onSubmit={onSubmit}>
+          <form ref={pickerFormRef} className="mt-8 space-y-4" onSubmit={onSubmit}>
             {chosen.length > 0 && (
               <p className="text-sm text-ink">
                 {t('salon.total')}: {t('salon.duration', { n: stack.durationMinutes })} · {formatFeninga(stack.priceFeninga)}

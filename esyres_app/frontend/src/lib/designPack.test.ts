@@ -12,6 +12,7 @@ function read(rel: string): string {
 
 test('busy and cell CSS variables keep Design 1 hexes; display is Cal Sans', () => {
   const css = read('index.css')
+  expect(css).toMatch(/--color-surface-soft:\s*#f8f9fa/)
   expect(css).toMatch(/--color-busy-free:\s*#22c55e/)
   expect(css).toMatch(/--color-busy-moderate:\s*#eab308/)
   expect(css).toMatch(/--color-busy-busy:\s*#ef4444/)
@@ -89,6 +90,8 @@ test('discovery and salon stay sparse; no homepage IA', () => {
   const salon = read('pages/SalonProfile.tsx')
   expect(salon).toMatch(/GUEST_COLUMN_CLASS/)
   expect(salon).not.toMatch(/mx-auto max-w-md/)
+  expect(salon).not.toMatch(/md:grid-cols-2/)
+  expect(salon).toMatch(/bg-surface-soft/)
   expect(salon).toMatch(/<TopNav/)
   expect(salon).not.toMatch(/CompanyPitch/)
   expect(salon).not.toMatch(/company-pitch/)
