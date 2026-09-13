@@ -13,8 +13,8 @@
 | Goal (one sentence) | `/salon/:id` shows a trimmed address when set, an idle header send button under the title, and tappable open-hour rows that seed the picker’s next Sarajevo date — still one guest column, no rail. |
 | Branch name | `cursor/story-47-salon-profile-hours-6adc` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk Hopic / 2026-09-13 |
 
 ## Pass/fail — product
 
