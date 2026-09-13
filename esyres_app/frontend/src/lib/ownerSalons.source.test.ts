@@ -14,17 +14,20 @@ test('ME_QUERY loads salon hours and address; no new GraphQL openNow field', () 
   const auth = read('graphql/auth.ts')
   expect(auth).toMatch(/query Me \{[\s\S]*salons \{[\s\S]*address[\s\S]*hours \{[\s\S]*weekday[\s\S]*closed[\s\S]*opensAt[\s\S]*closesAt[\s\S]*breakStartsAt[\s\S]*breakEndsAt/)
   expect(auth).toMatch(/mutation UpdateSalon/)
+  expect(auth).toMatch(/mutation AddSalon/)
   expect(auth).not.toMatch(/openNow/)
 })
 
-test('App lazy-loads catalog then /owner/salons/:id and does not register create', () => {
+test('App lazy-loads catalog then create then /owner/salons/:id', () => {
   const app = read('App.tsx')
   expect(app).toMatch(/const OwnerSalons = lazy\(/)
+  expect(app).toMatch(/const OwnerSalonCreate = lazy\(/)
   expect(app).toMatch(/const OwnerSalonEdit = lazy\(/)
   expect(app).toMatch(/path="\/owner\/salons"/)
+  expect(app).toMatch(/path="\/owner\/salons\/create"/)
   expect(app).toMatch(/path="\/owner\/salons\/:id"/)
-  expect(app).not.toMatch(/path="\/owner\/salons\/create"/)
-  expect(app.indexOf('path="/owner/salons"')).toBeLessThan(app.indexOf('path="/owner/salons/:id"'))
+  expect(app.indexOf('path="/owner/salons"')).toBeLessThan(app.indexOf('path="/owner/salons/create"'))
+  expect(app.indexOf('path="/owner/salons/create"')).toBeLessThan(app.indexOf('path="/owner/salons/:id"'))
 })
 
 test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
@@ -39,6 +42,7 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerStats.tsx',
     'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
+    'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
   ]) {
     expect(read(file), file).toMatch(/<OwnerNav/)
@@ -54,12 +58,13 @@ test('catalog overlay has name links to edit; not-owner keeps create-salon', () 
   expect(page).toMatch(/owner\.closedNow/)
   expect(page).toMatch(/salonIsOpenNow/)
   expect(page).toMatch(/ownerSalonEditPath\(row\.id\)/)
+  expect(page).toMatch(/ownerSalonCreatePath\(\)/)
+  expect(page).toMatch(/owner\.addSalon/)
   expect(page).toMatch(/<ul className="mt-8 max-w-xl divide-y divide-hairline/)
   expect(page).not.toMatch(/<select/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/\?salon=/)
   expect(page).not.toMatch(/navigate\(/)
-  expect(page).not.toMatch(/\/owner\/salons\/create/)
 })
 
 test('salon edit loads from me.salons; name and address form; no hours UI', () => {
@@ -84,6 +89,32 @@ test('salon edit loads from me.salons; name and address form; no hours UI', () =
   expect(page).not.toMatch(/createSalonService/)
   expect(page).not.toMatch(/createSalonWorker/)
   expect(page).not.toMatch(/updateSalonDnd/)
+  expect(page).not.toMatch(/\/owner\/salons\/create/)
+})
+
+test('add salon overlay form calls addSalon and lands on edit', () => {
+  const page = read('pages/OwnerSalonCreate.tsx')
+  expect(page).toMatch(/ME_QUERY/)
+  expect(page).toMatch(/ADD_SALON_MUTATION/)
+  expect(page).toMatch(/owner\.addSalon/)
+  expect(page).toMatch(/owner\.salonName/)
+  expect(page).toMatch(/owner\.address/)
+  expect(page).toMatch(/owner\.save/)
+  expect(page).toMatch(/owner\.INVALID_NAME/)
+  expect(page).toMatch(/owner\.INVALID_ADDRESS/)
+  expect(page).toMatch(/salon\.gate\.fallback/)
+  expect(page).toMatch(/active="salons"/)
+  expect(page).toMatch(/rounded-md bg-ink/)
+  expect(page).toMatch(/ownerSalonEditPath\(id\)/)
+  expect(page).toMatch(/CREATE_SALON_PATH/)
+  expect(page).toMatch(/owner\.createSalon/)
+  expect(page).not.toMatch(/GUEST_COLUMN_CLASS/)
+  expect(page).not.toMatch(/t\('owner\.salon'\)/)
+  expect(page).not.toMatch(/<select/)
+  expect(page).not.toMatch(/updateSalonHours/)
+  expect(page).not.toMatch(/createSalonService/)
+  expect(page).not.toMatch(/createSalonWorker/)
+  expect(page).not.toMatch(/updateSalonDnd/)
 })
 
 test('request detail has OwnerNav and no salon switcher', () => {
@@ -98,4 +129,11 @@ test('create-salon is unchanged and has no OwnerNav', () => {
   expect(page).not.toMatch(/OwnerNav/)
   expect(page).not.toMatch(/owner\.salons/)
   expect(page).toMatch(/createSalon\.name/)
+})
+
+test('edit and home have no add-salon control', () => {
+  expect(read('pages/OwnerSalonEdit.tsx')).not.toMatch(/\/owner\/salons\/create/)
+  expect(read('pages/OwnerHome.tsx')).not.toMatch(/\/owner\/salons\/create/)
+  expect(read('pages/OwnerSalonEdit.tsx')).not.toMatch(/owner\.addSalon/)
+  expect(read('pages/OwnerHome.tsx')).not.toMatch(/owner\.addSalon/)
 })

@@ -189,6 +189,7 @@ void i18n.use(initReactI18next).init({
           salonName: 'Ime salona',
           address: 'Adresa',
           save: 'Spremi',
+          addSalon: 'Dodaj salon',
           INVALID_NAME: 'Unesi ime salona.',
           INVALID_ADDRESS: 'Unesi adresu.',
           FORBIDDEN: 'Salon nije tvoj.',
