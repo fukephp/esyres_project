@@ -33,6 +33,7 @@ test('owner chrome is Cal light; no dark nav', () => {
     'pages/OwnerStats.tsx',
     'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
+    'pages/OwnerSalonEdit.tsx',
   ]
   for (const file of files) {
     const text = read(file)
@@ -57,6 +58,7 @@ test('owner chrome is Cal light; no dark nav', () => {
     'pages/OwnerStats.tsx',
     'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
+    'pages/OwnerSalonEdit.tsx',
   ]) {
     const text = read(file)
     expect(text, file).toMatch(/bg-canvas/)

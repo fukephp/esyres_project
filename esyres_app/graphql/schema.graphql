@@ -31,6 +31,11 @@ input UpdateSalonHoursInput {
     cancellationNoticeHours: Int!
 }
 
+input UpdateSalonInput {
+    name: String!
+    address: String!
+}
+
 enum ServiceCategory {
     HAIR
     MAKE_UP
@@ -238,6 +243,7 @@ type Mutation {
     verifyPhoneOtp(code: String!): Boolean!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
     createSalon(name: String!): Salon!
+    updateSalon(salonId: ID!, input: UpdateSalonInput!): Salon!
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
