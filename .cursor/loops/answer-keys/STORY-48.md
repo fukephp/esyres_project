@@ -18,22 +18,22 @@
 
 ## Pass/fail — product
 
-- [ ] `esyres_app/frontend/src/lib/salonSend.ts` exports `SALON_SEND_CLASS` exactly `inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-4 text-sm font-semibold text-canvas active:scale-[0.98] active:bg-[#242424] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 disabled:scale-100 disabled:bg-hairline disabled:text-muted`. Inter is already `--font-sans` (14px = `text-sm`, 600 = `font-semibold`, 48px = `min-h-12`). No `py-3`, no `font-medium`, no `disabled:opacity-40`, no `transition`, no `animate-`, no `pulse`, no icon class, no new `@theme` token for `#242424` — verify: Vitest (`esyres_app/frontend/src/lib/salonSend.test.ts` equality + `index.css` still has `--color-hairline: #e5e7eb` and `--font-sans: Inter`; no `--color-ink-press`)
-- [ ] All four `Pošalji zahtjev` use that constant as the pill class (call-site `mt-8` allowed on idle header/lower only): (1) idle header `type="button"`, (2) idle lower `type="button"`, (3) picker `type="submit"`, (4) chat `type="submit"` in `AssistantIntake.tsx`. All four labels are `t('salon.send')` (`Pošalji zahtjev`). Picker and chat submit must not use `t('salon.submit')`. Leave `salon.submit` in `i18n.ts` unused this PR (do not delete the key) — verify: Vitest reading `SalonProfile.tsx` + `AssistantIntake.tsx` (className includes `SALON_SEND_CLASS`; four `salon.send`; picker/chat have no `salon.submit`)
-- [ ] i18n `bs`: `salon.send` stays `Pošalji zahtjev`. New `salon.sendHint` is `Odaberi usluge, dan i vrijeme.` No other new `salon.` / `assistant.` / `discovery.` keys — verify: Vitest reading `i18n.ts`
-- [ ] Header idle (`hasServices && mode === 'idle'`, left `max-w-md`): after the header send button, one `<p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>`. Same show/hide as the header button. Not under the lower idle button, not under picker submit, not under chat submit — verify: Vitest reading `SalonProfile.tsx` + `AssistantIntake.tsx` (`sendHint` only in the header idle block; absent from lower/picker/chat)
-- [ ] Chat alternate stays `t('assistant.ask')` with underline classes (`underline underline-offset-4`); not `SALON_SEND_CLASS`; not `bg-ink` — verify: Vitest reading `SalonProfile.tsx`
-- [ ] Behavior unchanged from STORY-47: header idle still `openIntake('picker')` + `setScrollPicker(true)`; lower idle still `openIntake('picker')` without scroll; picker/chat submit still send (`onSubmit` / existing chat submit); hide/show (`idle` header vs lower during chat vs `sent` / no services) unchanged. No sticky, no morph-to-form — verify: Vitest reading `SalonProfile.tsx` (existing header/lower/scroll assertions still pass; no `sticky`; no GSAP / Three)
-- [ ] AuthShell, owner pills, My Bookings pills, TopNav, Homepage Pronađi salon are not restyled this PR — verify: Vitest (`authPlace.source.test.ts` / `topNav.source.test.ts` still green); those files are not in the diff except if an import is required (it must not be)
+- [x] `esyres_app/frontend/src/lib/salonSend.ts` exports `SALON_SEND_CLASS` exactly `inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-4 text-sm font-semibold text-canvas active:scale-[0.98] active:bg-[#242424] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 disabled:scale-100 disabled:bg-hairline disabled:text-muted`. Inter is already `--font-sans` (14px = `text-sm`, 600 = `font-semibold`, 48px = `min-h-12`). No `py-3`, no `font-medium`, no `disabled:opacity-40`, no `transition`, no `animate-`, no `pulse`, no icon class, no new `@theme` token for `#242424` — verify: Vitest (`esyres_app/frontend/src/lib/salonSend.test.ts` equality + `index.css` still has `--color-hairline: #e5e7eb` and `--font-sans: Inter`; no `--color-ink-press`)
+- [x] All four `Pošalji zahtjev` use that constant as the pill class (call-site `mt-8` allowed on idle header/lower only): (1) idle header `type="button"`, (2) idle lower `type="button"`, (3) picker `type="submit"`, (4) chat `type="submit"` in `AssistantIntake.tsx`. All four labels are `t('salon.send')` (`Pošalji zahtjev`). Picker and chat submit must not use `t('salon.submit')`. Leave `salon.submit` in `i18n.ts` unused this PR (do not delete the key) — verify: Vitest reading `SalonProfile.tsx` + `AssistantIntake.tsx` (className includes `SALON_SEND_CLASS`; four `salon.send`; picker/chat have no `salon.submit`)
+- [x] i18n `bs`: `salon.send` stays `Pošalji zahtjev`. New `salon.sendHint` is `Odaberi usluge, dan i vrijeme.` No other new `salon.` / `assistant.` / `discovery.` keys — verify: Vitest reading `i18n.ts`
+- [x] Header idle (`hasServices && mode === 'idle'`, left `max-w-md`): after the header send button, one `<p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>`. Same show/hide as the header button. Not under the lower idle button, not under picker submit, not under chat submit — verify: Vitest reading `SalonProfile.tsx` + `AssistantIntake.tsx` (`sendHint` only in the header idle block; absent from lower/picker/chat)
+- [x] Chat alternate stays `t('assistant.ask')` with underline classes (`underline underline-offset-4`); not `SALON_SEND_CLASS`; not `bg-ink` — verify: Vitest reading `SalonProfile.tsx`
+- [x] Behavior unchanged from STORY-47: header idle still `openIntake('picker')` + `setScrollPicker(true)`; lower idle still `openIntake('picker')` without scroll; picker/chat submit still send (`onSubmit` / existing chat submit); hide/show (`idle` header vs lower during chat vs `sent` / no services) unchanged. No sticky, no morph-to-form — verify: Vitest reading `SalonProfile.tsx` (existing header/lower/scroll assertions still pass; no `sticky`; no GSAP / Three)
+- [x] AuthShell, owner pills, My Bookings pills, TopNav, Homepage Pronađi salon are not restyled this PR — verify: Vitest (`authPlace.source.test.ts` / `topNav.source.test.ts` still green); those files are not in the diff except if an import is required (it must not be)
 - [ ] Four pills read as one primary; support line only under the header idle button; chat alternate stays the underline — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/04-Frontend.md` (salon profile four black pills + header support line), `08-Decisions.md` #12 #15 #42, `docs/mvp/04-UI-Design-Goals.md` (salon `Pošalji zahtjev` chrome), `refs/design-1/DESIGN.md` (product pill).
 
-- [ ] One React PWA. CSS/Tailwind only for press (no GSAP, no Three.js, no new npm). No new GraphQL, REST, or booking mutations. No sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`; no new schema/feature/PHP files this PR
-- [ ] i18next `bs` only. One new copy key (`salon.sendHint`). No Playwright, RTL, Pest, GraphQL codegen — verify: `i18n.ts` as above; `package.json` unchanged deps
-- [ ] Lighthouse `/graphql` only. Classifier: skip Behat only if every `esyres_app/` path is under `esyres_app/frontend/`. Do not change `behat.yml` — verify: CONTEXT classifier at verify time; no `features/` or `behat.yml` edits this PR
+- [x] One React PWA. CSS/Tailwind only for press (no GSAP, no Three.js, no new npm). No new GraphQL, REST, or booking mutations. No sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`; no new schema/feature/PHP files this PR
+- [x] i18next `bs` only. One new copy key (`salon.sendHint`). No Playwright, RTL, Pest, GraphQL codegen — verify: `i18n.ts` as above; `package.json` unchanged deps
+- [x] Lighthouse `/graphql` only. Classifier: skip Behat only if every `esyres_app/` path is under `esyres_app/frontend/`. Do not change `behat.yml` — verify: CONTEXT classifier at verify time; no `features/` or `behat.yml` edits this PR
 
 ## Verify commands
 
@@ -65,6 +65,19 @@ docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build
 ```
+
+**This PR (2026-09-13):** Classifier skipped Behat (every `esyres_app/` path under `esyres_app/frontend/`). Host npm from `esyres_app/frontend/`.
+
+Passed:
+
+```text
+test ! -d esyres_app/marketing
+npm run typecheck
+npm run test
+npm run build
+```
+
+150 tests passed.
 
 ## Out of scope
 
