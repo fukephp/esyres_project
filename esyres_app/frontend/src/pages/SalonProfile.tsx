@@ -266,6 +266,7 @@ export function SalonProfile() {
 
   const token = busyToken(salon.busyLevel)
   const addressLine = assistantAddressLine(salon.address)
+  const hasServices = salon.services.length > 0
   const chosen = salon.services.filter((s) => selected.includes(s.id))
   const stack = stackSelection(chosen)
   const picking = isPickerOpen(mode)
@@ -355,7 +356,7 @@ export function SalonProfile() {
     const closed = hoursRowClosed(day)
     const tappable = hoursRowTappable({
       closed,
-      hasServices: salon.services.length > 0,
+      hasServices,
       mode,
     })
     const selected = hoursRowSelected({
@@ -513,7 +514,7 @@ export function SalonProfile() {
 
       {addressLine !== null ? <p className="mt-3 text-sm text-muted">{addressLine}</p> : null}
 
-      {salon.services.length > 0 && mode === 'idle' && (
+      {hasServices && mode === 'idle' && (
         <div className="max-w-md">
           <button
             type="button"
@@ -535,7 +536,7 @@ export function SalonProfile() {
             const closed = hoursRowClosed(day)
             const tappable = hoursRowTappable({
               closed,
-              hasServices: salon.services.length > 0,
+              hasServices,
               mode,
             })
             const selected = hoursRowSelected({
@@ -616,7 +617,7 @@ export function SalonProfile() {
       </section>
 
       <div className="max-w-md">
-      {salon.services.length > 0 && !picking && !sent && (
+      {hasServices && !picking && !sent && (
         <button
           type="button"
           className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"

@@ -18,10 +18,10 @@ test('salon profile stack is address, header send, hours, services, lower CTAs',
   const page = read('pages/SalonProfile.tsx')
   const nameAt = page.indexOf('{salon.name}')
   const addressAt = page.indexOf('{addressLine}')
-  const headerIdleAt = page.indexOf("mode === 'idle'")
+  const headerIdleAt = page.indexOf('hasServices && mode === \'idle\'')
   const hoursAt = page.indexOf("t('salon.hours')")
   const servicesAt = page.indexOf("t('salon.services')")
-  const lowerAt = page.indexOf('!picking && !sent')
+  const lowerAt = page.indexOf('hasServices && !picking && !sent')
   const askAt = page.indexOf("t('assistant.ask')")
 
   expect(nameAt).toBeGreaterThan(-1)
@@ -44,8 +44,8 @@ test('address is omitted helper plus muted line; no maps heading', () => {
 
 test('header send is idle ink pill in max-w-md; lower send still shows during chat', () => {
   const page = read('pages/SalonProfile.tsx')
-  expect(page).toMatch(/mode === 'idle'[\s\S]*max-w-md[\s\S]*w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas[\s\S]*openIntake\('picker'\)[\s\S]*setScrollPicker\(true\)[\s\S]*salon\.send/)
-  expect(page).toMatch(/services\.length > 0 && !picking && !sent[\s\S]*openIntake\('picker'\)[\s\S]*salon\.send/)
+  expect(page).toMatch(/hasServices && mode === 'idle'[\s\S]*max-w-md[\s\S]*w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas[\s\S]*openIntake\('picker'\)[\s\S]*setScrollPicker\(true\)[\s\S]*salon\.send/)
+  expect(page).toMatch(/hasServices && !picking && !sent[\s\S]*openIntake\('picker'\)[\s\S]*salon\.send/)
   expect(page).toMatch(/showChatCta\(salon\.services\.length, sent\) && !chatting/)
   expect(page).not.toMatch(/\bsticky\b/)
 })
