@@ -17,7 +17,7 @@ The person's Ime i prezime. Not the salon name, not a worker name, and not an em
 _Avoid_: display name, username, handle, full name (as a second field)
 
 **Create salon**:
-The act of adding a salon the signed-in user owns. Same account as the customer. Not a waitlist, not founder provision, and not a separate owner signup.
+The act of adding a salon the signed-in user owns. Same account as the customer. Name and address are both required. Not a waitlist, not founder provision, and not a separate owner signup.
 _Avoid_: register salon (as a second account), owner signup, waitlist, Get your panel (the button copy)
 
 **Salon**:
@@ -32,12 +32,16 @@ _Avoid_: published, live, active, approved, indexed
 The owner control that chooses which of their salons is in context. Shown only when they own more than one. Each salon stays a separate shop. Not a chain location picker and not a customer discovery list.
 _Avoid_: location switcher, branch picker, store selector
 
+**Salon catalog**:
+The owner’s list of salons they own. Each row shows whether that shop is open now. Not discovery home, not the salon switcher, and not the Worker Availability Panel.
+_Avoid_: salon list (guest), locations, dashboard, salons index (as discovery)
+
 **Salon profile**:
 The guest-facing page for one salon: name, optional address, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
 _Avoid_: storefront, landing, listing detail, shop page
 
 **Address**:
-The salon’s written location line. Guests see it when it is set. Not coordinates and not a map.
+The salon’s written location line. Required when creating a salon. Guests see it when it is set (a shop created before this lock may have none). Not coordinates and not a map.
 _Avoid_: pin, geocode, lat/lng, maps link
 
 **Worker**:
@@ -120,6 +124,10 @@ _Avoid_: live chat, owner composer, takeover thread, handoff (as a worker)
 Right now outside that salon’s weekly working hours, including a closed weekday and a break. Not a live owner shift calendar.
 _Avoid_: owner offline, shift calendar, closed (as the salon forever)
 
+**Open now**:
+This salon is inside today’s working hours at this moment, and not in a break. A closed weekday, a break, and a salon with no hours are not open now. The salon catalog shows this. Not listed and not a manual flag.
+_Avoid_: open/closed toggle, listed, active, live, after hours (the inverse)
+
 **DND**:
 A per-salon setting that turns take-over off. Not after hours and not a live owner shift calendar.
 _Avoid_: quiet hours, owner offline, do-not-disturb (as a user-global flag)
@@ -151,8 +159,12 @@ The collapsed labeled answers on Request Detail for an assistant-originated requ
 _Avoid_: chat log, message history, conversation thread, why-line (as a stored essay)
 
 **Worker Availability Panel**:
-The owner’s per-day table of workers × 15-minute cells, with that day’s pending queue above it. Home after owner login. Not the pending queue alone, not Request Detail, and not the customer busy-level badge.
+The owner’s per-day table of workers × 15-minute cells, with that day’s pending queue above it. Home after owner login. Occupying cells show the current job. Not the pending queue alone, not Request Detail, not the salon catalog, and not the customer busy-level badge.
 _Avoid_: calendar, schedule grid (customer), inbox, dashboard, slot picker (guest)
+
+**Current job**:
+The occupying block on the Worker Availability Panel, labeled with that booking’s service snapshot names. The worker is the row. Confirmed and time-proposed both occupy; time-proposed is held, not in the chair. Not a now-only strip and not on the salon catalog.
+_Avoid_: in-chair, live job, active assistant, now-board
 
 **Counter-proposal**:
 The owner’s offered worker and clock range on a booking, instead of accepting the preferred time. It holds that range. Not a confirmed booking until the customer acts, and not the guest’s preferred time.
