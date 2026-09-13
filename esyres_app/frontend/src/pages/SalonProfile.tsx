@@ -42,6 +42,7 @@ import {
   hoursRowSelected,
   hoursRowTappable,
 } from '../lib/salonHours'
+import { SALON_SEND_CLASS } from '../lib/salonSend'
 import {
   clearIntakeToken,
   emptyIntakeSnapshot,
@@ -518,7 +519,7 @@ export function SalonProfile() {
         <div className="max-w-md">
           <button
             type="button"
-            className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
+            className={`mt-8 ${SALON_SEND_CLASS}`}
             onClick={() => {
               openIntake('picker')
               setScrollPicker(true)
@@ -526,6 +527,7 @@ export function SalonProfile() {
           >
             {t('salon.send')}
           </button>
+          <p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>
         </div>
       )}
 
@@ -620,7 +622,7 @@ export function SalonProfile() {
       {hasServices && !picking && !sent && (
         <button
           type="button"
-          className="mt-8 w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas"
+          className={`mt-8 ${SALON_SEND_CLASS}`}
           onClick={() => openIntake('picker')}
         >
           {t('salon.send')}
@@ -704,9 +706,9 @@ export function SalonProfile() {
               <button
                 type="submit"
                 disabled={!canSendPicker || busy}
-                className="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+                className={SALON_SEND_CLASS}
               >
-                {t('salon.submit')}
+                {t('salon.send')}
               </button>
             )}
           </form>
