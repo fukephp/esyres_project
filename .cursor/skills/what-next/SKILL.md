@@ -171,6 +171,7 @@ Rules:
 | Skill | Role |
 |-------|------|
 | [story-loop](../story-loop/SKILL.md) | Execute one approved story → PR; fog-gate definition reused here as tags |
+| [start-building-stories](../start-building-stories/SKILL.md) | Attended drain: this skill’s ranking, then Local story-loop for Recommended |
 | [custom-feature-skills](../custom-feature-skills/SKILL.md) | Implementation constraints during coding |
 | [grilling](../grilling/SKILL.md) | Default interview engine (rounds/frontier) — user starts separately |
 | [grill-me](../grill-me/SKILL.md) | Clarify fog (no app code; persist at end of topic) — user starts separately |

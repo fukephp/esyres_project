@@ -45,6 +45,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `hooks/` | Scripts wired in `hooks.json` (session injects this file) |
 | `skills/custom-feature-skills/` | How to add a feature against epics/stories |
 | `skills/story-loop/` | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot |
+| `skills/start-building-stories/` | Attended sequential drain: what-next then Local story-loop (`/start-building-stories`) |
 | `skills/deploy-staging/` | How to ship to staging |
 | `skills/grilling/` | Default interview engine (rounds/frontier); auto before locking a plan |
 | `skills/domain-modeling/` | Glossary + ADRs as they lock (via grill-with-docs) |
@@ -57,7 +58,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `skills/pricing-page/` | Not MVP — do not invent public pricing; not salon KM prices |
 | `skills/build-awwwards-quality-sites/` | Company-pitch polish only when explicitly asked — never discovery, salon, or `/owner` |
 | `loops/` | Story-loop playbook, Wayfinder-lite maps, answer-key template, and per-story keys |
-| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/story-loop`, `/grill-me`, `/grill-with-docs`, `/new-story`) |
+| `commands/` | Slash workflows (`/generate-docs`, `/run-tests`, `/story-loop`, `/what-next`, `/start-building-stories`, `/grill-me`, `/grill-with-docs`, `/new-story`) |
 
 ## How to follow this file
 
@@ -67,7 +68,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 4. Update this file when a locked product or architecture decision lands.
 5. Before UI work, read root `DESIGN.md`, then `refs/design-1/DESIGN.md`. Discovery / salon / `/owner` still follow `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX (dense owner panel, sparse customer). Homepage hero/footer stay on `/` only; the top-nav is shared (STORY-43). Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page` runs only when the user explicitly asks for the homepage / Esyres landing on `/`. `pricing-page` stays unused (no public pricing). `build-awwwards-quality-sites` only when the user explicitly asks for homepage polish — never discovery, salon, or `/owner`. Code lives in `esyres_app/frontend/`. Never scaffold a `marketing/` folder.
-7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops run the **frontend-only classifier** above, then the matching verify (frontend npm only, or full Behat from `esyres_app/`). Cloud Agent: frontend-only is host npm; if Behat runs and Docker is missing or nested, host PHP + host MySQL (STORY-36) — do not apt-install dockerd; Behat still `esyres_test` only. Clear fog with **grilling** rounds; user starts `/grill-with-docs` so glossary and ADRs land on disk. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map. UI stories: ready on machine gates; visual review is you at merge (no PR screenshot gate). See playbook **UI ready rule**.
+7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops run the **frontend-only classifier** above, then the matching verify (frontend npm only, or full Behat from `esyres_app/`). Cloud Agent: frontend-only is host npm; if Behat runs and Docker is missing or nested, host PHP + host MySQL (STORY-36) — do not apt-install dockerd; Behat still `esyres_test` only. Clear fog with **grilling** rounds; user starts `/grill-with-docs` so glossary and ADRs land on disk. Attended sequential drain is `/start-building-stories` (print what-next, then Local story-loop for Recommended; after merge, continue) — still one story → one PR, not an unattended gauntlet. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map. UI stories: ready on machine gates; visual review is you at merge (no PR screenshot gate). See playbook **UI ready rule**.
 
 ## Docs index
 

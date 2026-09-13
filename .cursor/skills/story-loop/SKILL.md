@@ -119,3 +119,4 @@ Remind: Bugbot → human merge. Machine gates already passed; Bugbot is the ligh
 - Grilling: `.cursor/skills/grilling/SKILL.md`
 - Grill-me: `.cursor/skills/grill-me/SKILL.md`
 - Grill-with-docs: `.cursor/skills/grill-with-docs/SKILL.md`
+- Start-building-stories: `.cursor/skills/start-building-stories/SKILL.md` (sequences this skill one story at a time; does not make this loop a gauntlet)

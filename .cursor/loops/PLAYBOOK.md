@@ -4,7 +4,7 @@ Loop Engineering means: clear fog, approve a pass/fail answer key, implement and
 
 **Runtime is Hybrid.** Default is Local Agent in this chat. Cloud Agent is opt-in only (`story-loop STORY-xx unattended`, or a clear “Cloud Agent for STORY-xx”). There is no `briefs/` folder; the answer key is the contract.
 
-This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt.
+This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt. An **attended** sequential drain (`/start-building-stories`) is allowed: print what-next, run one Local story-loop, wait for you to merge and say continue. Still one story → one PR.
 
 ## Project fields (fill in CONTEXT when locked)
 
@@ -122,7 +122,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 
 ## Out of scope
 
-- Unattended whole-MVP or multi-epic gauntlet
+- Unattended whole-MVP or multi-epic gauntlet (attended `/start-building-stories` drain is in scope)
 - Creating or inventing `docs/stories/STORY-xx.md` (product grill persist owns that)
 - Restoring `docs/tasks/`
 - Coding loops before the app root has a real verify runner
@@ -139,6 +139,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 - Answer key template: `.cursor/loops/ANSWER_KEY_TEMPLATE.md`
 - Keys: `.cursor/loops/answer-keys/`
 - Skill: `.cursor/skills/story-loop/SKILL.md`
+- Attended drain: `.cursor/skills/start-building-stories/SKILL.md`
 - Product constraints while implementing: `.cursor/skills/custom-feature-skills/SKILL.md`
 - Tests command: `.cursor/commands/run-tests.md`
 - Grilling: `.cursor/skills/grilling/SKILL.md`
