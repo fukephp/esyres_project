@@ -35,5 +35,6 @@ As a customer, I want the salon profile to show the address when it exists, a se
 - Maps link-out, lat/lng, owner address editor (STORY-41)
 - Seeding address on demo salons
 - Week chips, slot grid, sticky top-nav
+- `Pošalji zahtjev` chrome and header support line (STORY-48)
 - Awwwards / GSAP / Three.js
 - Public pricing page
