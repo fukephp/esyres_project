@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-48` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–48. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-55` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–55. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -71,3 +71,10 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-46 | Person name at register; Rezervacije vs Panel | 2 | `STORY-46` | STORY-10, STORY-11, STORY-40, STORY-41, STORY-43 |
 | STORY-47 | Salon profile address, header CTA, tappable hours | 1 | `STORY-47` | STORY-07, STORY-08, STORY-21, STORY-45 |
 | STORY-48 | Salon Pošalji zahtjev chrome | 1 | — | STORY-47 |
+| STORY-49 | Current job on occupying cells | 3 | — | STORY-14, STORY-15 |
+| STORY-50 | Salon catalog and OwnerNav Saloni | 7 | — | STORY-01, STORY-04, STORY-41, STORY-43 |
+| STORY-51 | Salon edit name and address | 7 | — | STORY-50 |
+| STORY-52 | Add salon | 7 | — | STORY-50, STORY-51 |
+| STORY-53 | Hours on salon edit | 7 | — | STORY-01, STORY-51 |
+| STORY-54 | Services on salon edit | 7 | — | STORY-02, STORY-51 |
+| STORY-55 | Workers on salon edit | 7 | — | STORY-03, STORY-51 |

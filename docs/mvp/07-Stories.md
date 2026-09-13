@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-48`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-55`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -30,6 +30,7 @@
 
 ## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
 
+- As an owner, I want occupying cells on the Worker Availability Panel to show which service is on that worker, so that the grid is the current-job board.
 - As an owner, I want to see all pending requests for a day in one queue, sorted so urgent ones aren't buried, so that nothing slips through.
 - As an owner, I want to accept a guest's preferred time in one tap when it works, so that simple requests don't need an extra back-and-forth.
 - As an owner, I want to drag a pending request onto an open slot on a worker's row to counter-propose a different time, so that I can adjust when the preferred time doesn't fit.
@@ -57,6 +58,9 @@
 ## Epic 7 — Salon & Service Management (Owner Onboarding)
 
 - As a customer who has a salon, I want to create it on the same account from Get your panel, so that I can open the panel without a founder invite.
+- As an owner, I want a salon catalog of shops I own with whether each is open now, so that I can see all my shops without treating the switcher as a directory.
+- As an owner, I want to edit a salon’s name and address on `/owner/salons/:id`, so that the catalog has a place for the rest of the profile to land.
+- As an owner, I want to add another salon I own from `/owner/salons/create` with name and address, so that I do not reuse `/create-salon` as a second factory.
 - As an owner, I want to set my working hours, breaks, and cancellation notice window, so that the system reflects how my salon actually runs.
 - As an owner, I want to add/edit services with durations and prices, so that customers see accurate options.
 - As an owner, I want to add workers to my salon, so that customers can request them specifically or leave it open. Workers follow the salon’s hours.

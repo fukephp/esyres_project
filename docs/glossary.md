@@ -17,8 +17,12 @@ The person's Ime i prezime. Not the salon name, not a worker name, and not an em
 _Avoid_: display name, username, handle, full name (as a second field)
 
 **Create salon**:
-The act of adding a salon the signed-in user owns. Same account as the customer. Name and address are both required. Not a waitlist, not founder provision, and not a separate owner signup.
+The act of adding the first salon the signed-in user owns, on the public path. Same account as the customer. Name only. Not a waitlist, not founder provision, not add salon, and not a separate owner signup.
 _Avoid_: register salon (as a second account), owner signup, waitlist, Get your panel (the button copy)
+
+**Add salon**:
+The owner’s act of creating another salon they own. Name and address are both required. Not the public first create, not the salon switcher, and not chain multi-location.
+_Avoid_: create salon (the first shop), register salon, location, branch
 
 **Salon**:
 A customer-facing shop with its own profile, hours, services, and workers. One owner may own several salons; each is a separate shop, not a chain location.
@@ -36,12 +40,16 @@ _Avoid_: location switcher, branch picker, store selector
 The owner’s list of salons they own. Each row shows whether that shop is open now. Not discovery home, not the salon switcher, and not the Worker Availability Panel.
 _Avoid_: salon list (guest), locations, dashboard, salons index (as discovery)
 
+**Salon edit**:
+The owner screen for one salon they own: name, address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not the Worker Availability Panel.
+_Avoid_: settings, salon profile, admin, CMS
+
 **Salon profile**:
 The guest-facing page for one salon: name, optional address, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
 _Avoid_: storefront, landing, listing detail, shop page
 
 **Address**:
-The salon’s written location line. Required when creating a salon. Guests see it when it is set (a shop created before this lock may have none). Not coordinates and not a map.
+The salon’s written location line. Required on add salon and on salon edit (cannot blank). Guests see it when it is set (a shop from create salon may have none). Not coordinates and not a map.
 _Avoid_: pin, geocode, lat/lng, maps link
 
 **Worker**:

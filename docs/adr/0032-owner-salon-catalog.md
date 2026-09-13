@@ -1,0 +1,7 @@
+# Owner salon catalog and salon edit
+
+Owners get a **salon catalog** (`/owner/salons`) of shops they own. Each row shows **open now** from working hours (not listed, not a toggle). **Add salon** is `/owner/salons/create` and requires they already own a salon (zero shops: same not-owner treatment as `/owner`; first shop stays `/create-salon`). Success lands on **salon edit** for the new shop (`/owner/salons/:id`, no `/edit` suffix). OwnerNav **Saloni** is on every owner route. Salon switcher stays `?salon=` on queue, chats, and stats only.
+
+**Salon edit** is name + address (required, cannot blank), the full weekly hours template already in STORY-01 (days, times, optional break, cancel window), and create/edit services and workers by name (STORY-02/03 fields). No worker↔service assignment matrix. No delete/deactivate of salon, service, or worker. DND stays on chats. Photos, coordinates, and reschedule cap stay off this page. **Current job** stays on the Worker Availability Panel (service names on occupying cells), not on the catalog. Worker login stays Phase 2.
+
+Rejected: a live in-chair wall on the catalog; days-only hours UI; assignment matrix in this slice; changing `/create-salon`; `/owner/salons/:id/edit`; delete/deactivate; photos/coords/reschedule cap on salon edit.
