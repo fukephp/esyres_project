@@ -75,6 +75,7 @@ test('path helpers for salon, create-salon, bookings, owner', () => {
   expect(isOwnerPath('/owner/chats')).toBe(true)
   expect(isOwnerPath('/owner/stats')).toBe(true)
   expect(isOwnerPath('/owner/requests/9')).toBe(true)
+  expect(isOwnerPath('/owner/salons')).toBe(true)
   expect(isOwnerPath('/bookings')).toBe(false)
 })
 
@@ -89,6 +90,7 @@ test('topNavSlot by path', () => {
   expect(topNavSlot('/owner/chats')).toBe('session')
   expect(topNavSlot('/owner/stats')).toBe('session')
   expect(topNavSlot('/owner/requests/9')).toBe('session')
+  expect(topNavSlot('/owner/salons')).toBe('session')
   expect(topNavSlot('/welcome')).toBe('empty')
   expect(topNavSlot('/nope')).toBe('empty')
 })

@@ -14,6 +14,7 @@ const OwnerStats = lazy(() => import('./pages/OwnerStats').then((m) => ({ defaul
 const OwnerRequestDetail = lazy(() =>
   import('./pages/OwnerRequestDetail').then((m) => ({ default: m.OwnerRequestDetail })),
 )
+const OwnerSalons = lazy(() => import('./pages/OwnerSalons').then((m) => ({ default: m.OwnerSalons })))
 
 export default function App() {
   return (
@@ -53,6 +54,14 @@ export default function App() {
           element={
             <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
               <OwnerRequestDetail />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/owner/salons"
+          element={
+            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
+              <OwnerSalons />
             </Suspense>
           }
         />

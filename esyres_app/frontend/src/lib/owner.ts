@@ -1,4 +1,4 @@
-import { formatSarajevoTime, sarajevoToday } from './format'
+import { formatSarajevoTime, sarajevoNowMinutes, sarajevoToday } from './format'
 
 export { formatSarajevoTime }
 
@@ -169,6 +169,29 @@ export function hoursForDate(hours: PanelHours[], date: string): PanelHours | un
   return hours.find((row) => row.weekday === weekday)
 }
 
+export function salonIsOpenNow(hours: PanelHours[], now = new Date()): boolean {
+  const date = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Sarajevo',
+  }).format(now)
+  const day = hoursForDate(hours, date)
+  if (day === undefined || day.closed || day.opensAt === null || day.closesAt === null) {
+    return false
+  }
+  const current = sarajevoNowMinutes(now)
+  if (current < minutes(day.opensAt) || current >= minutes(day.closesAt)) {
+    return false
+  }
+  if (day.breakStartsAt !== null && day.breakEndsAt !== null) {
+    const breakStart = minutes(day.breakStartsAt)
+    const breakEnd = minutes(day.breakEndsAt)
+    if (current >= breakStart && current < breakEnd) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export type PanelCell = { time: string; off: boolean }
 
 export function panelCells(hours: PanelHours | undefined): PanelCell[] {
@@ -282,6 +305,12 @@ export function ownerChatPath(salonId: string | null = null, firstOwnedId: strin
 export function ownerStatsPath(salonId: string | null = null, firstOwnedId: string | null = null): string {
   const query = ownerChatSearchParams(salonId, firstOwnedId).toString()
   return query === '' ? '/owner/stats' : `/owner/stats?${query}`
+}
+
+export const OWNER_SALONS_PATH = '/owner/salons'
+
+export function ownerSalonsPath(): string {
+  return OWNER_SALONS_PATH
 }
 
 export function statsHourLabel(hour: number): string {

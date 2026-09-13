@@ -12,6 +12,14 @@ export const ME_QUERY = gql`
       salons {
         id
         name
+        hours {
+          weekday
+          closed
+          opensAt
+          closesAt
+          breakStartsAt
+          breakEndsAt
+        }
       }
     }
   }
@@ -84,6 +92,17 @@ export type MeData = {
     emailVerified: boolean
     phone: string | null
     phoneVerified: boolean
-    salons: { id: string; name: string }[]
+    salons: {
+      id: string
+      name: string
+      hours: {
+        weekday: string
+        closed: boolean
+        opensAt: string | null
+        closesAt: string | null
+        breakStartsAt: string | null
+        breakEndsAt: string | null
+      }[]
+    }[]
   } | null
 }
