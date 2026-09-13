@@ -1068,6 +1068,87 @@ GQL, ['id' => (string) $this->salon->id]);
     }
 
     /**
+     * @When I update the salon with:
+     */
+    public function iUpdateTheSalon(PyStringNode $payload): void
+    {
+        $this->graphql($this->updateSalonMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I update salon id :id with:
+     */
+    public function iUpdateSalonIdWith(string $id, PyStringNode $payload): void
+    {
+        $this->graphql($this->updateSalonMutation(), [
+            'salonId' => $id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I update the salon as a guest with:
+     */
+    public function iUpdateTheSalonAsAGuest(PyStringNode $payload): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->updateSalonMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I query salon name and address
+     */
+    public function iQuerySalonNameAndAddress(): void
+    {
+        $this->graphql($this->salonNameAddressQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @Then updateSalon name is :name and address is :address
+     */
+    public function updateSalonNameIsAndAddressIs(string $name, string $address): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['updateSalon']['name']);
+        $this->assertSame($address, $this->graphql['data']['updateSalon']['address']);
+    }
+
+    /**
+     * @Then the salon name is :name and address is :address
+     */
+    public function theSalonNameIsAndAddressIs(string $name, string $address): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['salon']['name']);
+        $this->assertSame($address, $this->graphql['data']['salon']['address']);
+    }
+
+    /**
+     * @Then the salon has no address
+     */
+    public function theSalonHasNoAddress(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(null, $this->graphql['data']['salon']['address']);
+    }
+
+    /**
+     * @Then the salon still has no coordinates
+     */
+    public function theSalonStillHasNoCoordinates(): void
+    {
+        $salon = $this->salon->fresh() ?? $this->salon;
+        $this->assertSame(null, $salon->lat);
+        $this->assertSame(null, $salon->lng);
+    }
+
+    /**
      * @When I update salon hours with notice :hours:
      */
     public function iUpdateSalonHours(string $hours, PyStringNode $payload): void
@@ -1423,6 +1504,32 @@ query MeSalons {
   me {
     id
     salons { id name }
+  }
+}
+GQL;
+    }
+
+    private function salonNameAddressQuery(): string
+    {
+        return <<<'GQL'
+query Salon($id: ID!) {
+  salon(id: $id) {
+    id
+    name
+    address
+  }
+}
+GQL;
+    }
+
+    private function updateSalonMutation(): string
+    {
+        return <<<'GQL'
+mutation UpdateSalon($salonId: ID!, $input: UpdateSalonInput!) {
+  updateSalon(salonId: $salonId, input: $input) {
+    id
+    name
+    address
   }
 }
 GQL;

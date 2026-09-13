@@ -10,7 +10,7 @@ import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../g
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
-import { salonIsOpenNow } from '../lib/owner'
+import { ownerSalonEditPath, salonIsOpenNow } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
 
 export function OwnerSalons() {
@@ -97,7 +97,9 @@ export function OwnerSalons() {
           <ul className="mt-8 max-w-xl divide-y divide-hairline border-y border-hairline">
             {salons.map((row) => (
               <li key={row.id} className="flex items-baseline justify-between gap-3 py-3 text-sm">
-                <span className="font-medium text-ink">{row.name}</span>
+                <Link to={ownerSalonEditPath(row.id)} className="font-medium text-ink">
+                  {row.name}
+                </Link>
                 <span className="text-body">{t(salonIsOpenNow(row.hours) ? 'owner.openNow' : 'owner.closedNow')}</span>
               </li>
             ))}

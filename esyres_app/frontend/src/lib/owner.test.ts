@@ -14,6 +14,7 @@ import {
   ownerChatPath,
   ownerStatsPath,
   ownerSalonsPath,
+  ownerSalonEditPath,
   OWNER_SALONS_PATH,
   salonIsOpenNow,
   statsHourLabel,
@@ -205,6 +206,10 @@ test('owner salons path never has a query', () => {
   expect(ownerSalonsPath()).toBe('/owner/salons')
 })
 
+test('owner salon edit path is /owner/salons/:id', () => {
+  expect(ownerSalonEditPath('7')).toBe('/owner/salons/7')
+})
+
 test('salonIsOpenNow uses Sarajevo clock, closes exclusive, skips breaks', () => {
   const monday = {
     weekday: 'MONDAY',
@@ -238,6 +243,12 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.salons')).toBe('Saloni')
   expect(i18n.t('owner.openNow')).toBe('Otvoreno')
   expect(i18n.t('owner.closedNow')).toBe('Zatvoreno')
+  expect(i18n.t('owner.salonName')).toBe('Ime salona')
+  expect(i18n.t('owner.address')).toBe('Adresa')
+  expect(i18n.t('owner.save')).toBe('Spremi')
+  expect(i18n.t('owner.INVALID_NAME')).toBe('Unesi ime salona.')
+  expect(i18n.t('owner.INVALID_ADDRESS')).toBe('Unesi adresu.')
+  expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
   expect(i18n.exists('owner.listed')).toBe(false)
 })
 

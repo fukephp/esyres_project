@@ -10,18 +10,21 @@ function read(rel: string): string {
   return readFileSync(join(src, rel), 'utf8')
 }
 
-test('ME_QUERY loads salon hours; no new GraphQL openNow field', () => {
+test('ME_QUERY loads salon hours and address; no new GraphQL openNow field', () => {
   const auth = read('graphql/auth.ts')
-  expect(auth).toMatch(/query Me \{[\s\S]*salons \{[\s\S]*hours \{[\s\S]*weekday[\s\S]*closed[\s\S]*opensAt[\s\S]*closesAt[\s\S]*breakStartsAt[\s\S]*breakEndsAt/)
+  expect(auth).toMatch(/query Me \{[\s\S]*salons \{[\s\S]*address[\s\S]*hours \{[\s\S]*weekday[\s\S]*closed[\s\S]*opensAt[\s\S]*closesAt[\s\S]*breakStartsAt[\s\S]*breakEndsAt/)
+  expect(auth).toMatch(/mutation UpdateSalon/)
   expect(auth).not.toMatch(/openNow/)
 })
 
-test('App lazy-loads /owner/salons and does not register create or edit', () => {
+test('App lazy-loads catalog then /owner/salons/:id and does not register create', () => {
   const app = read('App.tsx')
   expect(app).toMatch(/const OwnerSalons = lazy\(/)
+  expect(app).toMatch(/const OwnerSalonEdit = lazy\(/)
   expect(app).toMatch(/path="\/owner\/salons"/)
+  expect(app).toMatch(/path="\/owner\/salons\/:id"/)
   expect(app).not.toMatch(/path="\/owner\/salons\/create"/)
-  expect(app).not.toMatch(/path="\/owner\/salons\/:id"/)
+  expect(app.indexOf('path="/owner/salons"')).toBeLessThan(app.indexOf('path="/owner/salons/:id"'))
 })
 
 test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
@@ -36,12 +39,13 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerStats.tsx',
     'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
+    'pages/OwnerSalonEdit.tsx',
   ]) {
     expect(read(file), file).toMatch(/<OwnerNav/)
   }
 })
 
-test('catalog overlay has no switcher or row links; not-owner keeps create-salon', () => {
+test('catalog overlay has name links to edit; not-owner keeps create-salon', () => {
   const page = read('pages/OwnerSalons.tsx')
   expect(page).toMatch(/owner\.notOwner/)
   expect(page).toMatch(/CREATE_SALON_PATH/)
@@ -49,12 +53,37 @@ test('catalog overlay has no switcher or row links; not-owner keeps create-salon
   expect(page).toMatch(/owner\.openNow/)
   expect(page).toMatch(/owner\.closedNow/)
   expect(page).toMatch(/salonIsOpenNow/)
+  expect(page).toMatch(/ownerSalonEditPath\(row\.id\)/)
   expect(page).toMatch(/<ul className="mt-8 max-w-xl divide-y divide-hairline/)
   expect(page).not.toMatch(/<select/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/\?salon=/)
-  expect(page).not.toMatch(/\/owner\/salons\//)
   expect(page).not.toMatch(/navigate\(/)
+  expect(page).not.toMatch(/\/owner\/salons\/create/)
+})
+
+test('salon edit loads from me.salons; name and address form; no hours UI', () => {
+  const page = read('pages/OwnerSalonEdit.tsx')
+  expect(page).toMatch(/ME_QUERY/)
+  expect(page).toMatch(/UPDATE_SALON_MUTATION/)
+  expect(page).toMatch(/salons\.find/)
+  expect(page).toMatch(/owner\.salonName/)
+  expect(page).toMatch(/owner\.address/)
+  expect(page).toMatch(/owner\.save/)
+  expect(page).toMatch(/owner\.INVALID_NAME/)
+  expect(page).toMatch(/owner\.INVALID_ADDRESS/)
+  expect(page).toMatch(/owner\.FORBIDDEN/)
+  expect(page).toMatch(/salon\.gate\.fallback/)
+  expect(page).toMatch(/active="salons"/)
+  expect(page).toMatch(/rounded-md bg-ink/)
+  expect(page).not.toMatch(/OWNER_SALON_QUERY/)
+  expect(page).not.toMatch(/salon\(id/)
+  expect(page).not.toMatch(/t\('owner\.salon'\)/)
+  expect(page).not.toMatch(/<select/)
+  expect(page).not.toMatch(/updateSalonHours/)
+  expect(page).not.toMatch(/createSalonService/)
+  expect(page).not.toMatch(/createSalonWorker/)
+  expect(page).not.toMatch(/updateSalonDnd/)
 })
 
 test('request detail has OwnerNav and no salon switcher', () => {

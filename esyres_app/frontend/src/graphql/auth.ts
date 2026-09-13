@@ -12,6 +12,7 @@ export const ME_QUERY = gql`
       salons {
         id
         name
+        address
         hours {
           weekday
           closed
@@ -66,6 +67,16 @@ export const CREATE_SALON_MUTATION = gql`
   }
 `
 
+export const UPDATE_SALON_MUTATION = gql`
+  mutation UpdateSalon($salonId: ID!, $input: UpdateSalonInput!) {
+    updateSalon(salonId: $salonId, input: $input) {
+      id
+      name
+      address
+    }
+  }
+`
+
 export const RESEND_VERIFICATION_EMAIL = gql`
   mutation ResendVerificationEmail {
     resendVerificationEmail
@@ -95,6 +106,7 @@ export type MeData = {
     salons: {
       id: string
       name: string
+      address: string | null
       hours: {
         weekday: string
         closed: boolean
