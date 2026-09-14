@@ -8,6 +8,8 @@ import {
   isFifteenMinute,
   isPreferredSoon,
   occupyingBlock,
+  occupyingColSpan,
+  currentJobLabel,
   overlayQueueChrome,
   ownerDateFromSearch,
   ownerQueuePath,
@@ -147,7 +149,7 @@ test('grid window from hours', () => {
 })
 
 test('start cell droppable only when free', () => {
-  const blocks = [{ workerId: '1', start: '09:00', durationMinutes: 30, status: 'CONFIRMED' as const }]
+  const blocks = [{ workerId: '1', start: '09:00', durationMinutes: 30, status: 'CONFIRMED' as const, label: '' }]
   expect(canDropOnStart(cellKind('09:00', false, blocks, '1'))).toBe(false)
   expect(canDropOnStart(cellKind('09:15', false, blocks, '1'))).toBe(false)
   expect(canDropOnStart(cellKind('09:30', false, blocks, '1'))).toBe(true)
@@ -163,7 +165,7 @@ test('propose start times are droppable starts for that worker', () => {
     { time: '09:30', off: true },
     { time: '09:45', off: false },
   ]
-  const blocks = [{ workerId: '1', start: '09:00', durationMinutes: 30, status: 'CONFIRMED' as const }]
+  const blocks = [{ workerId: '1', start: '09:00', durationMinutes: 30, status: 'CONFIRMED' as const, label: '' }]
   expect(proposeStartTimes(cells, blocks, '1')).toEqual(['09:45'])
   expect(proposeStartTimes(cells, blocks, '2')).toEqual(['09:00', '09:15', '09:45'])
   expect(proposeStartTimes([], blocks, '1')).toEqual([])
@@ -318,11 +320,59 @@ test('occupying block uses proposed fields for time proposed', () => {
       durationMinutes: 30,
       worker: { id: 'a' },
       proposedWorker: { id: 'b' },
+      services: [{ name: 'Šišanje' }, { name: 'Boja' }],
     }),
   ).toEqual({
     workerId: 'b',
     start: '14:00',
     durationMinutes: 30,
     status: 'TIME_PROPOSED',
+    label: 'Šišanje, Boja',
   })
+})
+
+test('occupying block labels confirmed from snapshots', () => {
+  expect(
+    occupyingBlock({
+      status: 'CONFIRMED',
+      preferredStartsAt: '2026-08-29T07:00:00.000Z',
+      proposedStartsAt: null,
+      durationMinutes: 45,
+      worker: { id: 'a' },
+      proposedWorker: null,
+      services: [{ name: 'Masaža' }],
+    }),
+  ).toEqual({
+    workerId: 'a',
+    start: '09:00',
+    durationMinutes: 45,
+    status: 'CONFIRMED',
+    label: 'Masaža',
+  })
+})
+
+test('requested occupying block is null even with services', () => {
+  expect(
+    occupyingBlock({
+      status: 'REQUESTED',
+      preferredStartsAt: '2026-08-29T07:00:00.000Z',
+      proposedStartsAt: null,
+      durationMinutes: 30,
+      worker: { id: 'a' },
+      proposedWorker: null,
+      services: [{ name: 'Šišanje' }],
+    }),
+  ).toBeNull()
+})
+
+test('current job label joins snapshot names', () => {
+  expect(currentJobLabel([{ name: 'Šišanje' }, { name: 'Boja' }])).toBe('Šišanje, Boja')
+  expect(currentJobLabel([])).toBe('')
+  expect(currentJobLabel(undefined)).toBe('')
+})
+
+test('occupying colspan clips to remaining cells', () => {
+  expect(occupyingColSpan(30, 4)).toBe(2)
+  expect(occupyingColSpan(60, 1)).toBe(1)
+  expect(occupyingColSpan(15, 8)).toBe(1)
 })

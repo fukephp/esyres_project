@@ -216,6 +216,19 @@ export type OccupyingBlock = {
   start: string
   durationMinutes: number
   status: 'CONFIRMED' | 'TIME_PROPOSED'
+  label: string
+}
+
+export function currentJobLabel(services: { name: string }[] | null | undefined): string {
+  return (services ?? []).map((row) => row.name).join(', ')
+}
+
+export function occupyingColSpan(durationMinutes: number, remainingCells: number): number {
+  if (remainingCells <= 0) {
+    return 1
+  }
+
+  return Math.max(1, Math.min(Math.floor(durationMinutes / 15), remainingCells))
 }
 
 export type CellKind = 'off' | 'booked' | 'proposed' | 'free'
@@ -355,13 +368,16 @@ export function occupyingBlock(row: {
   durationMinutes: number
   worker: { id: string } | null
   proposedWorker: { id: string } | null
+  services?: { name: string }[] | null
 }): OccupyingBlock | null {
+  const label = currentJobLabel(row.services)
   if (row.status === 'TIME_PROPOSED' && row.proposedWorker !== null && row.proposedStartsAt !== null) {
     return {
       workerId: row.proposedWorker.id,
       start: formatSarajevoTime(row.proposedStartsAt),
       durationMinutes: row.durationMinutes,
       status: 'TIME_PROPOSED',
+      label,
     }
   }
   if (row.status === 'CONFIRMED' && row.worker !== null) {
@@ -370,6 +386,7 @@ export function occupyingBlock(row: {
       start: formatSarajevoTime(row.preferredStartsAt),
       durationMinutes: row.durationMinutes,
       status: 'CONFIRMED',
+      label,
     }
   }
 
