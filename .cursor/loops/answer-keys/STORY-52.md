@@ -70,6 +70,20 @@ docker compose exec -T vite npm run build
 
 460 scenarios passed. 164 Vitest tests passed.
 
+**This PR (2026-09-13):** Classifier ran Behat (PHP / `graphql/` / `features/`). Compose already up.
+
+Passed:
+
+```text
+docker compose exec -T php php artisan --version
+docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
+docker compose exec -T vite npm run typecheck
+docker compose exec -T vite npm run test
+docker compose exec -T vite npm run build
+```
+
+460 scenarios passed. 164 Vitest tests passed.
+
 ## Out of scope
 
 - Hours / cancel window UI (STORY-53)
