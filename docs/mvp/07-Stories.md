@@ -64,6 +64,7 @@
 - As an owner, I want to set my working hours, breaks, and cancellation notice window, so that the system reflects how my salon actually runs.
 - As an owner, I want to add/edit services with durations and prices, so that customers see accurate options.
 - As an owner, I want to add workers to my salon, so that customers can request them specifically or leave it open. Workers follow the salon’s hours.
+- As an owner, I want salon edit split into exclusive sections, so I can edit one chunk at a time on a full-width page instead of a stacked skinny form.
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.
 
 ## Epic 8 — Trust Signal Data Foundations

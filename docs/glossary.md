@@ -41,8 +41,8 @@ The owner’s list of salons they own. Each row shows whether that shop is open 
 _Avoid_: salon list (guest), locations, dashboard, salons index (as discovery)
 
 **Salon edit**:
-The owner screen for one salon they own: name, address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not the Worker Availability Panel.
-_Avoid_: settings, salon profile, admin, CMS
+The owner screen for one salon they own. One of four sections is visible at a time: name and address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not the Worker Availability Panel.
+_Avoid_: settings, salon profile, admin, CMS, working days (as the hours section)
 
 **Salon profile**:
 The guest-facing page for one salon: name, optional address, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.
@@ -276,7 +276,7 @@ _Avoid_: reserved slot (as a request), hold (as requested), availability cell
 
 **Working hours**:
 The salon’s weekly template: each weekday is closed or open for one local interval. A newly provisioned salon is closed every day until the owner writes hours. Workers inherit this. Not a live slot calendar and not a holiday calendar.
-_Avoid_: availability grid, schedule, shifts, opening hours (as a single pair for every day)
+_Avoid_: availability grid, schedule, shifts, opening hours (as a single pair for every day), working days
 
 **Break**:
 An optional lunch-style hole on an open weekday, inside that day’s working hours. At most one per weekday. Distinct from a closed weekday and from a holiday.

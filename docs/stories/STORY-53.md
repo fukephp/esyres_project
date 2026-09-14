@@ -14,7 +14,7 @@ As an owner, I want to edit working hours, breaks, and the cancellation notice w
 ## Acceptance criteria
 
 - Salon edit `/owner/salons/:id` includes the full STORY-01 weekly template: each Mon–Sun closed or one opens/closes (Sarajevo local, 15-minute steps, closes exclusive) plus optional one break inside that day’s open interval, and `cancellation_notice_hours`. Same mutation and rejection rules as STORY-01.
-- Saving hours updates **open now** on the catalog for that shop. No holiday calendar. Address/name from STORY-51 stay on the same screen and stay required.
+- Saving hours updates **open now** on the catalog for that shop. No holiday calendar. Address/name from STORY-51 stay required on this route (co-visible with hours until STORY-56 exclusive chips).
 
 ## Out of scope
 
