@@ -6,23 +6,65 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
-import { ME_QUERY, UPDATE_SALON_MUTATION, type MeData } from '../graphql/auth'
+import {
+  ME_QUERY,
+  UPDATE_SALON_HOURS_MUTATION,
+  UPDATE_SALON_MUTATION,
+  type MeData,
+} from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
+import {
+  SALON_WEEKDAYS,
+  toSalonHoursInput,
+  type PanelHours,
+  type SalonHoursDayForm,
+} from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
+
+function emptyWeek(): SalonHoursDayForm[] {
+  return SALON_WEEKDAYS.map((weekday) => ({
+    weekday,
+    closed: true,
+    opensAt: '',
+    closesAt: '',
+    breakOn: false,
+    breakStartsAt: '',
+    breakEndsAt: '',
+  }))
+}
+
+function daysFromHours(hours: PanelHours[]): SalonHoursDayForm[] {
+  return SALON_WEEKDAYS.map((weekday) => {
+    const row = hours.find((day) => day.weekday === weekday)
+    const breakOn = row?.breakStartsAt != null && row.breakEndsAt != null
+
+    return {
+      weekday,
+      closed: row === undefined || row.closed,
+      opensAt: row?.opensAt ?? '',
+      closesAt: row?.closesAt ?? '',
+      breakOn,
+      breakStartsAt: row?.breakStartsAt ?? '',
+      breakEndsAt: row?.breakEndsAt ?? '',
+    }
+  })
+}
 
 export function OwnerSalonEdit() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
-  const [updateSalon, { loading: saving }] = useMutation(UPDATE_SALON_MUTATION, {
-    refetchQueries: ['Me'],
-  })
+  const [updateSalon, { loading: savingSalon }] = useMutation(UPDATE_SALON_MUTATION)
+  const [updateSalonHours, { loading: savingHours }] = useMutation(UPDATE_SALON_HOURS_MUTATION)
+  const saving = savingSalon || savingHours
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const [days, setDays] = useState<SalonHoursDayForm[]>(emptyWeek)
+  const [notice, setNotice] = useState('24')
   const [error, setError] = useState<string | null>(null)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
@@ -44,7 +86,13 @@ export function OwnerSalonEdit() {
     }
     setName(salon.name)
     setAddress(salon.address ?? '')
+    setDays(daysFromHours(salon.hours))
+    setNotice(String(salon.cancellationNoticeHours ?? 24))
   }, [salon])
+
+  function patchDay(weekday: string, patch: Partial<SalonHoursDayForm>): void {
+    setDays((rows) => rows.map((row) => (row.weekday === weekday ? { ...row, ...patch } : row)))
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -62,6 +110,29 @@ export function OwnerSalonEdit() {
         setError(t('owner.INVALID_NAME'))
       } else if (code === 'INVALID_ADDRESS') {
         setError(t('owner.INVALID_ADDRESS'))
+      } else {
+        setError(t('salon.gate.fallback'))
+      }
+      return
+    }
+    const cancellationNoticeHours = Number.parseInt(notice, 10)
+    try {
+      await updateSalonHours({
+        variables: {
+          salonId: salon.id,
+          input: {
+            hours: toSalonHoursInput(days),
+            cancellationNoticeHours: Number.isNaN(cancellationNoticeHours)
+              ? 24
+              : cancellationNoticeHours,
+          },
+        },
+      })
+      await refetch()
+    } catch (err) {
+      const code = graphqlErrorCode(err)
+      if (code === 'INVALID_HOURS') {
+        setError(t('owner.INVALID_HOURS'))
       } else {
         setError(t('salon.gate.fallback'))
       }
@@ -155,6 +226,110 @@ export function OwnerSalonEdit() {
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
+                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                />
+              </label>
+              <h2 className="pt-2 text-sm font-semibold text-ink">{t('salon.hours')}</h2>
+              <ul className="space-y-3">
+                {days.map((day) => (
+                  <li
+                    key={day.weekday}
+                    className={day.closed ? 'space-y-2 text-muted' : 'space-y-2 text-body'}
+                  >
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="font-medium text-ink">{t(`weekday.${day.weekday}`)}</span>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={day.closed}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              patchDay(day.weekday, { closed: true })
+                              return
+                            }
+                            patchDay(day.weekday, {
+                              closed: false,
+                              opensAt: day.opensAt || '09:00',
+                              closesAt: day.closesAt || '17:00',
+                            })
+                          }}
+                        />
+                        {t('salon.closed')}
+                      </label>
+                    </div>
+                    {day.closed ? null : (
+                      <>
+                        <div className="grid grid-cols-2 gap-2">
+                          <label className="block text-sm">
+                            {t('owner.opens')}
+                            <input
+                              type="time"
+                              step={900}
+                              value={day.opensAt}
+                              onChange={(e) => patchDay(day.weekday, { opensAt: e.target.value })}
+                              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                            />
+                          </label>
+                          <label className="block text-sm">
+                            {t('owner.closes')}
+                            <input
+                              type="time"
+                              step={900}
+                              value={day.closesAt}
+                              onChange={(e) => patchDay(day.weekday, { closesAt: e.target.value })}
+                              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                            />
+                          </label>
+                        </div>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={day.breakOn}
+                            onChange={(e) => {
+                              if (!e.target.checked) {
+                                patchDay(day.weekday, { breakOn: false })
+                                return
+                              }
+                              patchDay(day.weekday, {
+                                breakOn: true,
+                                breakStartsAt: day.breakStartsAt || '12:00',
+                                breakEndsAt: day.breakEndsAt || '13:00',
+                              })
+                            }}
+                          />
+                          {t('owner.break')}
+                        </label>
+                        {day.breakOn ? (
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              type="time"
+                              step={900}
+                              value={day.breakStartsAt}
+                              onChange={(e) =>
+                                patchDay(day.weekday, { breakStartsAt: e.target.value })
+                              }
+                              className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                            />
+                            <input
+                              type="time"
+                              step={900}
+                              value={day.breakEndsAt}
+                              onChange={(e) => patchDay(day.weekday, { breakEndsAt: e.target.value })}
+                              className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                            />
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <label className="block text-sm text-body">
+                {t('owner.cancellationNotice')}
+                <input
+                  type="number"
+                  value={notice}
+                  onChange={(e) => setNotice(e.target.value)}
                   className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
                 />
               </label>

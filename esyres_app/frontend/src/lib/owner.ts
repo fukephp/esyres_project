@@ -163,6 +163,55 @@ export type PanelHours = {
   breakEndsAt: string | null
 }
 
+export const SALON_WEEKDAYS = [
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+  'SUNDAY',
+] as const
+
+export type SalonHoursDayForm = {
+  weekday: string
+  closed: boolean
+  opensAt: string
+  closesAt: string
+  breakOn: boolean
+  breakStartsAt: string
+  breakEndsAt: string
+}
+
+function clock(value: string): string {
+  return value.slice(0, 5)
+}
+
+export function toSalonHoursInput(days: SalonHoursDayForm[]): PanelHours[] {
+  return SALON_WEEKDAYS.map((weekday) => {
+    const day = days.find((row) => row.weekday === weekday)
+    if (day === undefined || day.closed) {
+      return {
+        weekday,
+        closed: true,
+        opensAt: null,
+        closesAt: null,
+        breakStartsAt: null,
+        breakEndsAt: null,
+      }
+    }
+
+    return {
+      weekday,
+      closed: false,
+      opensAt: clock(day.opensAt),
+      closesAt: clock(day.closesAt),
+      breakStartsAt: day.breakOn ? clock(day.breakStartsAt) : null,
+      breakEndsAt: day.breakOn ? clock(day.breakEndsAt) : null,
+    }
+  })
+}
+
 export function hoursForDate(hours: PanelHours[], date: string): PanelHours | undefined {
   const weekday = sarajevoWeekday(date)
 
