@@ -86,8 +86,12 @@ _Avoid_: search page, search index, marketplace search, typeahead
 The guest action that replaces the discovery teaser with the unfiltered Nearby or Popular in Sarajevo discovery results.
 _Avoid_: see more, load more, featured, curated
 
+**Discovery chip**:
+One of the three hardcoded discovery-home filters: Kosa, Šminka, Masaža. Not a service category and not an owner-typed name.
+_Avoid_: service category, tag, type, HAIR (as a guest label)
+
 **Discovery filter**:
-An optional overlay on discovery home: one service category and/or a salon-name match. Applying it replaces the discovery teaser with discovery results of the same nearby-or-popular list. Not a separate search page.
+An optional overlay on discovery home: one discovery chip and/or a salon-name match. Applying it replaces the discovery teaser with discovery results of the same nearby-or-popular list. Not a separate search page.
 _Avoid_: search index, search page, marketplace search, typeahead
 
 **Nearby**:
@@ -264,8 +268,12 @@ _Avoid_: live service row, price lookup
 
 ## Catalog
 
+**Service category**:
+A named group of services that belongs to one salon. The owner creates and names it. A service belongs to exactly one. Not a discovery chip, not a platform catalog, and not HAIR / MAKE_UP / MASSAGE.
+_Avoid_: tag, type, folder, menu section (as a different entity), discovery chip
+
 **Service**:
-A named offering at one salon: a category (hair, make-up, or massage), a duration, and a KM price. A salon may list services in more than one category. A new salon has none until the owner adds them.
+A named offering at one salon: one service category, a duration, and a KM price. A salon may have several service categories. A new salon has none until the owner adds them.
 _Avoid_: product, menu item, treatment package, listing
 
 ## Time rules

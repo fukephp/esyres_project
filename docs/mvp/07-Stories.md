@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-57`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-58`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -12,7 +12,8 @@
 - As a guest, I want the top-nav and the page content to share one width on public pages, so that the logo and the main column line up.
 - As a customer, I want to see salons near my current location without logging in, so that I can start browsing immediately from a QR code or IG link.
 - As a customer, I want a fallback list ("Popular in Sarajevo") when location is denied or unavailable, so that I never hit a blank screen.
-- As a customer, I want to filter by service type (hair / make-up / massage) or search by name, so that I can find a relevant salon quickly.
+- As a customer, I want to filter by a discovery chip (Kosa / Šminka / Masaža) or search by name, so that I can find a relevant salon quickly.
+- As a customer, I want the salon profile and picker to group services under the owner’s category names, so that the menu matches the shop instead of three locked types.
 - As a customer, I want `/salons` to show a short card teaser and then a richer results list when I filter, search, or show all, so that I can pick a salon without opening every profile.
 - As a customer, I want to see a salon's services, prices, hours, and a busy-level badge on its profile, so that I can decide whether to request an appointment.
 - As a customer, I want the salon profile to show the address when it exists, a send button under the title, and tappable open hours that fill the picker’s day, so that I can start a request from what I already see.
@@ -64,6 +65,7 @@
 - As an owner, I want to add another salon I own from `/owner/salons/create` with name and address, so that I do not reuse `/create-salon` as a second factory.
 - As an owner, I want to set my working hours, breaks, and cancellation notice window, so that the system reflects how my salon actually runs.
 - As an owner, I want to add/edit services with durations and prices, so that customers see accurate options.
+- As an owner, I want to create named service categories and attach services to the selected category, so that the guest menu matches my real cjenovnik instead of locked hair / make-up / massage.
 - As an owner, I want to add workers to my salon, so that customers can request them specifically or leave it open. Workers follow the salon’s hours.
 - As an owner, I want salon edit split into exclusive sections, so I can edit one chunk at a time on a full-width page instead of a stacked skinny form.
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.

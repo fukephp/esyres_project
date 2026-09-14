@@ -49,7 +49,7 @@ Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Prona
 - Busy-level thresholds (🟢 <50%, 🟡 50–85%, 🔴 >85%) are placeholders.
 
 **Discovery**
-- Are category chips on Discovery fixed, or dynamically pulled from registered salon services?
+- Are discovery chips fixed, or dynamically pulled from registered salon services? **Still open.** STORY-58 keeps the three hardcoded chips via a migrate-only legacy key; owner-named groups are not chips. See `docs/adr/0033-salon-service-categories.md`.
 - Skipping the category step: **decided** — idle `/salons` is a short discovery teaser; show all (or a chip / name search) opens discovery results. See `docs/adr/0030-discovery-teaser-then-results.md`.
 - Address geocoding: **decided** — no geocode in this MVP slice. Nearby omits salons without `lat`/`lng`. Self-serve create does not set coords.
 

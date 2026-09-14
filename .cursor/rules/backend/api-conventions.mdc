@@ -12,5 +12,5 @@ Stack, GraphQL, and data rules: `docs/architecture/`.
 - Capture from day one: response-time timestamps, no-show/cancel counters, QR scan + visited markers, verification status.
 - QR scan after verify silently favorites the salon and marks owner customer history as visited. No extra popup/sticker flow.
 - Notifications: web push + SMS fallback for booking status; email for day-before/hour-before reminders. Owner push is real-time for new requests and customer responses.
-- Multi-category salons (hair, make-up, massage) are valid in one profile.
+- A salon may have several owner-named service categories; a service belongs to exactly one. Not a locked HAIR / MAKE_UP / MASSAGE enum.
 - Do not add in-app payments, worker auth, reviews, or chat in MVP.
