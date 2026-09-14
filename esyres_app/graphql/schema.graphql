@@ -243,6 +243,7 @@ type Mutation {
     verifyPhoneOtp(code: String!): Boolean!
     updateSalonHours(salonId: ID!, input: UpdateSalonHoursInput!): Salon
     createSalon(name: String!): Salon!
+    addSalon(name: String!, address: String!): Salon!
     updateSalon(salonId: ID!, input: UpdateSalonInput!): Salon!
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service

@@ -4,7 +4,7 @@ Loop Engineering means: clear fog, approve a pass/fail answer key, implement and
 
 **Runtime is Hybrid.** Default is Local Agent in this chat. Cloud Agent is opt-in only (`story-loop STORY-xx unattended`, or a clear “Cloud Agent for STORY-xx”). There is no `briefs/` folder; the answer key is the contract.
 
-This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt. An **attended** sequential drain (`/start-building-stories`) is allowed: print what-next, run one Local story-loop, wait for you to merge and say continue. Still one story → one PR.
+This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt. An **attended** sequential drain (`/start-building-stories`) is allowed: print what-next, run one Local story-loop, wait for you to merge and say continue. Still one story → one PR. Story-create tokens `no-human-grilling` / `no-human-review` on `/new-story` (and `/grill-me` / `/grill-with-docs` product persist) do **not** skip this loop’s key approval, Bugbot, or merge.
 
 ## Project fields (fill in CONTEXT when locked)
 

@@ -4,4 +4,6 @@ Follow `.cursor/skills/grill-with-docs/SKILL.md` exactly. That skill is the sour
 
 If the user named a plan, feature, or change after this command, use that as the subject. Otherwise ask what to grill.
 
-Do not invent product scope or architecture. Do not implement until the user confirms shared understanding. If there is no application code yet and the user did not insist on this skill, use grill-me instead.
+Phrases: `/grill-with-docs` (default). Opt-in `no-human-grilling` and/or `no-human-review` (order-independent; same as `story-loop … unattended`). Product persist only; refuse flags on a full MVP breakdown; process/stack → flags are no-ops. At most one incremental `STORY-xx`. Never diverge under flags. Ignore the tokens when this skill is a story-loop subroutine.
+
+Do not invent product scope or architecture. Do not implement until the user confirms shared understanding (skip that wait when `no-human-review`). If there is no application code yet and the user did not insist on this skill, use grill-me instead.

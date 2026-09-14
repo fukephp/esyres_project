@@ -27,6 +27,6 @@ Read `.cursor/CONTEXT.md`. Prefer `docs/mvp/` and `docs/architecture/` over inve
 Before locking a plan or design, prefer **grilling** over guessing:
 
 - **grilling** — default interview engine (rounds/frontier); auto before locking a plan
-- **grill-me** (`/grill-me`) — user-invoked; persist at end of topic
-- **grill-with-docs** (`/grill-with-docs`) — against the codebase; glossary + ADRs as they lock via domain-modeling; product/stories end-batch. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
-- **new-story** (`/new-story`) — grill one incremental product story; persist always writes `STORY-xx` (no diverge; existing epic only)
+- **grill-me** (`/grill-me`) — user-invoked; persist at end of topic. Opt-in `no-human-grilling` / `no-human-review` on product persist (one incremental `STORY-xx`; refuse flags on a full MVP)
+- **grill-with-docs** (`/grill-with-docs`) — against the codebase; glossary + ADRs as they lock via domain-modeling; product/stories end-batch. Same opt-in tokens. Do not treat `.cursor/CONTEXT.md` as a glossary. If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`.
+- **new-story** (`/new-story`) — grill one incremental product story; persist always writes `STORY-xx` (no diverge; existing epic only; same opt-in tokens)

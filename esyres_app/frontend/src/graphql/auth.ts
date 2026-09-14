@@ -77,6 +77,16 @@ export const UPDATE_SALON_MUTATION = gql`
   }
 `
 
+export const ADD_SALON_MUTATION = gql`
+  mutation AddSalon($name: String!, $address: String!) {
+    addSalon(name: $name, address: $address) {
+      id
+      name
+      address
+    }
+  }
+`
+
 export const RESEND_VERIFICATION_EMAIL = gql`
   mutation ResendVerificationEmail {
     resendVerificationEmail

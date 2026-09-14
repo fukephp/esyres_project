@@ -317,6 +317,10 @@ export function ownerSalonEditPath(id: string): string {
   return `${OWNER_SALONS_PATH}/${id}`
 }
 
+export function ownerSalonCreatePath(): string {
+  return `${OWNER_SALONS_PATH}/create`
+}
+
 export function statsHourLabel(hour: number): string {
   return `${String(hour).padStart(2, '0')}:00`
 }

@@ -1068,6 +1068,103 @@ GQL, ['id' => (string) $this->salon->id]);
     }
 
     /**
+     * @When I add a salon with:
+     */
+    public function iAddASalon(PyStringNode $payload): void
+    {
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->graphql($this->addSalonMutation(), [
+            'name' => $input['name'],
+            'address' => $input['address'],
+        ]);
+    }
+
+    /**
+     * @When I add a salon as a guest with:
+     */
+    public function iAddASalonAsAGuest(PyStringNode $payload): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->graphql($this->addSalonMutation(), [
+            'name' => $input['name'],
+            'address' => $input['address'],
+        ]);
+    }
+
+    /**
+     * @Then addSalon name is :name and address is :address
+     */
+    public function addSalonNameIsAndAddressIs(string $name, string $address): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['addSalon']['name']);
+        $this->assertSame($address, $this->graphql['data']['addSalon']['address']);
+        $id = $this->graphql['data']['addSalon']['id'] ?? null;
+        if (! is_string($id) && ! is_int($id)) {
+            throw new \RuntimeException('Expected addSalon id, got '.json_encode($this->graphql));
+        }
+        $this->salon = Salon::query()->find($id);
+    }
+
+    /**
+     * @Then the added salon has provisioned defaults except address is :address
+     */
+    public function theAddedSalonHasProvisionedDefaultsExceptAddressIs(string $address): void
+    {
+        if ($this->salon === null) {
+            throw new \RuntimeException('Expected an added salon');
+        }
+        $salon = $this->salon->fresh() ?? $this->salon;
+        $hours = $salon->hours ?? [];
+        foreach (WeeklyHours::WEEKDAYS as $day) {
+            $this->assertTrue(($hours[$day]['closed'] ?? false) === true);
+        }
+        $this->assertSame(24, $salon->cancellation_notice_hours);
+        $this->assertSame(0, $salon->services()->count());
+        $this->assertSame(0, $salon->workers()->count());
+        $this->assertSame($address, $salon->address);
+        $this->assertSame(null, $salon->lat);
+        $this->assertSame(null, $salon->lng);
+    }
+
+    /**
+     * @Then the owner owns :count salons
+     */
+    public function theOwnerOwnsSalons(string $count): void
+    {
+        if ($this->user === null) {
+            throw new \RuntimeException('Expected a session user');
+        }
+        $user = $this->user->fresh() ?? $this->user;
+        $this->assertSame((int) $count, $user->salons()->count());
+    }
+
+    /**
+     * @When I query popularInSarajevo as a guest
+     */
+    public function iQueryPopularInSarajevoAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->popularInSarajevoQuery());
+    }
+
+    /**
+     * @Then popularInSarajevo does not include :name
+     */
+    public function popularInSarajevoDoesNotInclude(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $list = $this->graphql['data']['popularInSarajevo'] ?? null;
+        if (! is_array($list)) {
+            throw new \RuntimeException('Expected popularInSarajevo, got '.json_encode($this->graphql));
+        }
+        foreach ($list as $salon) {
+            $this->assertNotSame($name, $salon['name'] ?? null);
+        }
+    }
+
+    /**
      * @When I update the salon with:
      */
     public function iUpdateTheSalon(PyStringNode $payload): void
@@ -1517,6 +1614,31 @@ query Salon($id: ID!) {
     id
     name
     address
+  }
+}
+GQL;
+    }
+
+    private function addSalonMutation(): string
+    {
+        return <<<'GQL'
+mutation AddSalon($name: String!, $address: String!) {
+  addSalon(name: $name, address: $address) {
+    id
+    name
+    address
+  }
+}
+GQL;
+    }
+
+    private function popularInSarajevoQuery(): string
+    {
+        return <<<'GQL'
+query Popular {
+  popularInSarajevo {
+    id
+    name
   }
 }
 GQL;

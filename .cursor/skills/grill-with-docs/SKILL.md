@@ -3,7 +3,8 @@ name: grill-with-docs
 description: >-
   User-invoked grilling session against a codebase; glossary and ADRs as they
   lock; product/stories persist at end of topic. Use when the user says
-  "grill-with-docs", "grill with docs", or /grill-with-docs.
+  "grill-with-docs", "grill with docs", or /grill-with-docs. Opt-in
+  no-human-grilling / no-human-review on product persist only.
 disable-model-invocation: true
 ---
 
@@ -15,16 +16,35 @@ Read and follow [grilling](../grilling/SKILL.md) and [domain-modeling](../domain
 
 `.cursor/CONTEXT.md` is agent OS in this framework — **not** the glossary. Do not turn it into a ubiquitous-language file.
 
+### Phrases
+
+- `/grill-with-docs` — default: wait for answers; persist after confirm
+- `/grill-with-docs no-human-grilling` · `no-human-review` · both — opt-in tokens (order-independent; same phrases in chat). Semantics: [grilling](../grilling/SKILL.md)
+
+Missing subject: still ask what to grill.
+
+### Flags (product persist only)
+
+Classify first. Default is human.
+
+- **Process / stack:** flags are **no-ops**. Human grill as today. Never write `STORY-xx` from flags.
+- **Product MVP breakdown** (full split or vague whole-MVP): **refuse the flags**. Tell the user to run a human grill. Do not persist an inventory. Do not honor the tokens and continue.
+- **Incremental new feature** not already a `STORY-xx`: honor flags. **Never** run [diverge](../diverge/SKILL.md). Persist at most **one** `STORY-xx` with the same refuse rules as [new-story](../new-story/SKILL.md) (existing epic, not already a story, not process/stack). Never auto-split.
+
+Story-loop may tell you to use this skill for glossary/ADRs on an **existing** story — that is a subroutine: skip diverge; **ignore** these tokens.
+
 ### Before the first round (diverge prefix)
 
 Classify the topic, then maybe widen options. **You** invoke this, not the grilling engine.
 
-1. **Run [diverge](../diverge/SKILL.md)** if this is a product MVP breakdown, or a new story/feature that is not already a `STORY-xx` in `docs/stories/`.
+Never run diverge when flags are **honored** (incremental under flags) or **refused** (MVP under flags). Diverge stays for human product / new-feature grills only.
+
+1. **Run [diverge](../diverge/SKILL.md)** if this is a product MVP breakdown, or a new story/feature that is not already a `STORY-xx` in `docs/stories/` — and flags are not in play (not honored, not refused).
 2. **Skip** if the topic is closed (one AC, stack trivia, a process lock with a canonical answer) or you are unsure.
 3. If diverge ran: wait for its critic shortlist, then grilling **round 1** is cluster-pick (see grilling). Later rounds lock as usual.
 4. If skipped: start grilling rounds as usual.
 
-Never load diverge from story-loop, what-next, custom-feature-skills, or `/new-story`. Story-loop may tell you to use this skill for glossary/ADRs on an **existing** story — that is a subroutine: skip diverge.
+Never load diverge from story-loop, what-next, custom-feature-skills, or `/new-story`.
 
 ## vs grill-me
 
@@ -40,7 +60,9 @@ Do **not** create `STORY-xx` files while interviewing. Product/stories wait for 
 
 ## Persist (end of topic)
 
-Same routing as **grill-me**. When that grill topic reaches shared understanding, one batch, then stop. Do not auto-implement.
+Same routing as **grill-me**. When that grill topic reaches shared understanding — or **`no-human-review`** and the frontier is empty — one batch, then stop. Do not auto-implement.
+
+When flags were **honored**, persist per [new-story persist](../new-story/SKILL.md) (one `STORY-xx`). Do not use the product-breakdown row.
 
 | Topic | Write |
 |-------|--------|
@@ -52,4 +74,4 @@ Only a product grill or `/new-story` **creates** new `STORY-xx`. Format: `docs/s
 
 ## Done
 
-Frontier empty: every branch visited, nothing silently assumed. Confirm shared understanding. Persist the end-of-topic batch. Then stop — do not auto-implement, auto-compile an answer key, or invent a spec.
+Frontier empty: every branch visited, nothing silently assumed. Confirm shared understanding (skip that wait when **`no-human-review`**). Persist the end-of-topic batch. Then stop — do not auto-implement, auto-compile an answer key, or invent a spec.
