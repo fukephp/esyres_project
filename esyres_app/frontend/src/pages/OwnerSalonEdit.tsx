@@ -8,10 +8,12 @@ import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
 import {
   CREATE_SALON_SERVICE_MUTATION,
+  CREATE_SALON_WORKER_MUTATION,
   ME_QUERY,
   UPDATE_SALON_HOURS_MUTATION,
   UPDATE_SALON_MUTATION,
   UPDATE_SALON_SERVICE_MUTATION,
+  UPDATE_SALON_WORKER_MUTATION,
   type MeData,
 } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
@@ -36,6 +38,7 @@ const SAVE_BTN =
   'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
 
 type OwnerSalonService = NonNullable<MeData['me']>['salons'][number]['services'][number]
+type OwnerSalonWorker = NonNullable<MeData['me']>['salons'][number]['workers'][number]
 
 function emptyWeek(): SalonHoursDayForm[] {
   return SALON_WEEKDAYS.map((weekday) => ({
@@ -84,6 +87,83 @@ function serviceFail(code: string, t: (key: string) => string): string {
   }
 
   return t('salon.gate.fallback')
+}
+
+function workerFail(code: string, t: (key: string) => string): string {
+  if (code === 'INVALID_NAME') {
+    return t('owner.INVALID_WORKER_NAME')
+  }
+  if (code === 'DUPLICATE_WORKER_NAME') {
+    return t('owner.DUPLICATE_WORKER_NAME')
+  }
+  if (code === 'FORBIDDEN') {
+    return t('owner.FORBIDDEN')
+  }
+
+  return t('salon.gate.fallback')
+}
+
+function SalonWorkerForm({
+  salonId,
+  worker,
+  onSaved,
+}: {
+  salonId: string
+  worker?: OwnerSalonWorker
+  onSaved: () => Promise<unknown>
+}) {
+  const { t } = useTranslation()
+  const [createSalonWorker, { loading: creating }] = useMutation(CREATE_SALON_WORKER_MUTATION)
+  const [updateSalonWorker, { loading: updating }] = useMutation(UPDATE_SALON_WORKER_MUTATION)
+  const saving = creating || updating
+  const [name, setName] = useState(worker?.name ?? '')
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (worker === undefined) {
+      return
+    }
+    setName(worker.name)
+  }, [worker])
+
+  async function onSaveWorker(e: FormEvent) {
+    e.preventDefault()
+    if (saving) {
+      return
+    }
+    setError(null)
+    try {
+      if (worker === undefined) {
+        await createSalonWorker({ variables: { salonId, input: { name: name.trim() } } })
+        setName('')
+      } else {
+        await updateSalonWorker({
+          variables: { id: worker.id, input: { name: name.trim() } },
+        })
+      }
+      await onSaved()
+    } catch (err) {
+      setError(workerFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  return (
+    <form className="space-y-3" onSubmit={(e) => void onSaveWorker(e)}>
+      <label className="block text-sm text-body">
+        {t('owner.workerName')}
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={FIELD}
+        />
+      </label>
+      {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+      <button type="submit" disabled={saving} className={SAVE_BTN}>
+        {worker === undefined ? t('owner.addWorker') : t('owner.save')}
+      </button>
+    </form>
+  )
 }
 
 function SalonServiceForm({
@@ -512,6 +592,21 @@ export function OwnerSalonEdit() {
                   </ul>
                 )}
                 <SalonServiceForm salonId={salon.id} onSaved={refetch} />
+              </section>
+              <section className="mt-10 max-w-md space-y-4">
+                <h2 className="text-sm font-semibold text-ink">{t('owner.workers')}</h2>
+                {salon.workers.length === 0 ? (
+                  <p className="text-sm text-body">{t('owner.noWorkers')}</p>
+                ) : (
+                  <ul className="space-y-6">
+                    {salon.workers.map((row) => (
+                      <li key={row.id}>
+                        <SalonWorkerForm salonId={salon.id} worker={row} onSaved={refetch} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <SalonWorkerForm salonId={salon.id} onSaved={refetch} />
               </section>
             </>
           )}
