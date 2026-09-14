@@ -131,6 +131,9 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
         id
         name
       }
+      services {
+        name
+      }
     }
   }
 `
@@ -230,6 +233,7 @@ export type OccupyingBooking = {
   durationMinutes: number
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null
+  services: { name: string }[]
 }
 
 export type OccupyingBookingsData = {
