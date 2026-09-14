@@ -29,6 +29,10 @@ export const ME_QUERY = gql`
           durationMinutes
           priceFeninga
         }
+        workers {
+          id
+          name
+        }
       }
     }
   }
@@ -126,6 +130,24 @@ export const UPDATE_SALON_SERVICE_MUTATION = gql`
   }
 `
 
+export const CREATE_SALON_WORKER_MUTATION = gql`
+  mutation CreateSalonWorker($salonId: ID!, $input: CreateSalonWorkerInput!) {
+    createSalonWorker(salonId: $salonId, input: $input) {
+      id
+      name
+    }
+  }
+`
+
+export const UPDATE_SALON_WORKER_MUTATION = gql`
+  mutation UpdateSalonWorker($id: ID!, $input: UpdateSalonWorkerInput!) {
+    updateSalonWorker(id: $id, input: $input) {
+      id
+      name
+    }
+  }
+`
+
 export const ADD_SALON_MUTATION = gql`
   mutation AddSalon($name: String!, $address: String!) {
     addSalon(name: $name, address: $address) {
@@ -181,6 +203,10 @@ export type MeData = {
         category: string
         durationMinutes: number
         priceFeninga: number
+      }[]
+      workers: {
+        id: string
+        name: string
       }[]
     }[]
   } | null
