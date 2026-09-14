@@ -29,6 +29,8 @@ colors:
   success: "#10b981"
   warning: "#f59e0b"
   error: "#ef4444"
+  error-strong: "#dc2626"
+  error-strong-active: "#b91c1c"
   badge-orange: "#fb923c"
   badge-pink: "#ec4899"
   badge-violet: "#8b5cf6"
@@ -147,6 +149,17 @@ components:
     backgroundColor: "{colors.primary-disabled}"
     textColor: "{colors.muted}"
     rounded: "{rounded.md}"
+  button-destructive:
+    backgroundColor: "{colors.error-strong}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    padding: 12px 20px
+    height: 40px
+  button-destructive-active:
+    backgroundColor: "{colors.error-strong-active}"
+    textColor: "{colors.on-primary}"
+    rounded: "{rounded.md}"
   button-secondary:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -206,7 +219,7 @@ Copy is **Bosnian-first**, same as the rest of the PWA.
 
 Short scroll on `/`:
 
-1. **Top-nav** — shared bar; homepage slot is Prijava/Registracija (text) + Get your panel / Panel (black primary).
+1. **Top-nav** — shared bar; homepage slot is Prijava/Registracija (text) + Get your panel / Panel (black primary). Logged-in: name → Odjava (`button-destructive`) → Panel.
 2. **Hero** — existing H1 + support + three how-it-works lines + Pronađi salon → `/salons`.
 3. **Simple footer** — Sarajevo + one line. No dark footer, Terms, Privacy, Instagram, or language toggle.
 
@@ -238,6 +251,9 @@ No pixel art, no mega-bento shells, no screenshot JPG refs, no icon-strip carous
 ### Status (not brand chrome)
 
 Customer day busy stays 🟢 / 🟡 / 🔴. Owner cells use distinct tokens. Never encode status with `{colors.brand-accent}` or badge pastels.
+
+- **Error** (`{colors.error}` — #ef4444): status text later. Do not use as a filled-button background (white-on-fill misses AA at 14px).
+- **Error strong** (`{colors.error-strong}` — #dc2626): `button-destructive` fill. Press → `{colors.error-strong-active}` (#b91c1c). Do not reuse `busy-busy` for this button.
 
 **Customer busy badge**
 
@@ -291,7 +307,7 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from the former `panel-ref.jpg`):
 
-1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, name + Odjava). Not a replacement for the aside.
+1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, name + Odjava as `button-destructive`). Not a replacement for the aside.
 2. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
 3. **Main** — pending-request queue + Worker Availability Panel (15-minute grid) on white / `{colors.surface-card}`; primary CTAs.
 4. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
@@ -310,9 +326,11 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Primary button** — #111111 fill, white label, 8px radius, 40px height. Disabled uses `{colors.primary-disabled}`.
 
+**Destructive button** — `{colors.error-strong}` fill (#dc2626), white label, same 8px / 40px as primary. Press → `{colors.error-strong-active}` (#b91c1c). No hover. Top-nav Odjava only for now. Do not fill with `{colors.error}` (#ef4444). Do not reuse `busy-busy`.
+
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Guest inner row matches the ~1200px column; owner overlay inner stays unconstrained. Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings`: name + Odjava when logged in. `/owner*`: overlay name + Odjava; OwnerNav stays. No search, cart, or mega-menu.
+**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Guest inner row matches the ~1200px column; owner overlay inner stays unconstrained. Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. Logged-in homepage: name → Odjava (`button-destructive`) → Panel. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings` and `/owner*`: name + Odjava as `button-destructive`. OwnerNav stays. No search, cart, or mega-menu.
 
 **Owner nav** — dense panel left rail: `{colors.canvas}` floor, ink links, hairline edge. Not `{colors.surface-dark}`. Not a marketing hero/footer.
 
