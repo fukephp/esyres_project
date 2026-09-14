@@ -187,6 +187,7 @@ void i18n.use(initReactI18next).init({
           openNow: 'Otvoreno',
           closedNow: 'Zatvoreno',
           salonName: 'Ime salona',
+          info: 'Informacije',
           address: 'Adresa',
           save: 'Spremi',
           addSalon: 'Dodaj salon',

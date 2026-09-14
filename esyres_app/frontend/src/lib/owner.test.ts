@@ -333,6 +333,7 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.openNow')).toBe('Otvoreno')
   expect(i18n.t('owner.closedNow')).toBe('Zatvoreno')
   expect(i18n.t('owner.salonName')).toBe('Ime salona')
+  expect(i18n.t('owner.info')).toBe('Informacije')
   expect(i18n.t('owner.address')).toBe('Adresa')
   expect(i18n.t('owner.save')).toBe('Spremi')
   expect(i18n.t('owner.addSalon')).toBe('Dodaj salon')

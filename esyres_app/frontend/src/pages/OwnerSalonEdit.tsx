@@ -36,6 +36,11 @@ const FIELD =
   'mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink'
 const SAVE_BTN =
   'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
+const CHIP_IDLE = 'text-body'
+const CHIP_ON = 'font-semibold text-ink'
+const PANEL = 'mt-8 space-y-4 border border-hairline p-5'
+
+type SalonEditSection = 'info' | 'hours' | 'services' | 'workers'
 
 type OwnerSalonService = NonNullable<MeData['me']>['salons'][number]['services'][number]
 type OwnerSalonWorker = NonNullable<MeData['me']>['salons'][number]['workers'][number]
@@ -297,12 +302,13 @@ export function OwnerSalonEdit() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [updateSalon, { loading: savingSalon }] = useMutation(UPDATE_SALON_MUTATION)
   const [updateSalonHours, { loading: savingHours }] = useMutation(UPDATE_SALON_HOURS_MUTATION)
-  const saving = savingSalon || savingHours
+  const [section, setSection] = useState<SalonEditSection>('info')
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [days, setDays] = useState<SalonHoursDayForm[]>(emptyWeek)
   const [notice, setNotice] = useState('24')
-  const [error, setError] = useState<string | null>(null)
+  const [infoError, setInfoError] = useState<string | null>(null)
+  const [hoursError, setHoursError] = useState<string | null>(null)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
   const firstOwnedId = salons[0]?.id ?? ''
@@ -331,27 +337,35 @@ export function OwnerSalonEdit() {
     setDays((rows) => rows.map((row) => (row.weekday === weekday ? { ...row, ...patch } : row)))
   }
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmitInfo(e: FormEvent) {
     e.preventDefault()
-    if (saving || salon === undefined) {
+    if (savingSalon || salon === undefined) {
       return
     }
-    setError(null)
+    setInfoError(null)
     try {
       await updateSalon({
         variables: { salonId: salon.id, input: { name, address } },
       })
+      await refetch()
     } catch (err) {
       const code = graphqlErrorCode(err)
       if (code === 'INVALID_NAME') {
-        setError(t('owner.INVALID_NAME'))
+        setInfoError(t('owner.INVALID_NAME'))
       } else if (code === 'INVALID_ADDRESS') {
-        setError(t('owner.INVALID_ADDRESS'))
+        setInfoError(t('owner.INVALID_ADDRESS'))
       } else {
-        setError(t('salon.gate.fallback'))
+        setInfoError(t('salon.gate.fallback'))
       }
+    }
+  }
+
+  async function onSubmitHours(e: FormEvent) {
+    e.preventDefault()
+    if (savingHours || salon === undefined) {
       return
     }
+    setHoursError(null)
     const cancellationNoticeHours = Number.parseInt(notice, 10)
     try {
       await updateSalonHours({
@@ -369,9 +383,9 @@ export function OwnerSalonEdit() {
     } catch (err) {
       const code = graphqlErrorCode(err)
       if (code === 'INVALID_HOURS') {
-        setError(t('owner.INVALID_HOURS'))
+        setHoursError(t('owner.INVALID_HOURS'))
       } else {
-        setError(t('salon.gate.fallback'))
+        setHoursError(t('salon.gate.fallback'))
       }
     }
   }
@@ -448,7 +462,40 @@ export function OwnerSalonEdit() {
             <p className="mt-8 text-sm text-body">{t('owner.FORBIDDEN')}</p>
           ) : (
             <>
-              <form className="mt-8 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
+              <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                <button
+                  type="button"
+                  className={section === 'info' ? CHIP_ON : CHIP_IDLE}
+                  onClick={() => setSection('info')}
+                >
+                  {t('owner.info')}
+                </button>
+                <button
+                  type="button"
+                  className={section === 'hours' ? CHIP_ON : CHIP_IDLE}
+                  onClick={() => setSection('hours')}
+                >
+                  {t('salon.hours')}
+                </button>
+                <button
+                  type="button"
+                  className={section === 'services' ? CHIP_ON : CHIP_IDLE}
+                  onClick={() => setSection('services')}
+                >
+                  {t('salon.services')}
+                </button>
+                <button
+                  type="button"
+                  className={section === 'workers' ? CHIP_ON : CHIP_IDLE}
+                  onClick={() => setSection('workers')}
+                >
+                  {t('owner.workers')}
+                </button>
+              </div>
+              <form
+                className={section === 'info' ? PANEL : `${PANEL} hidden`}
+                onSubmit={(e) => void onSubmitInfo(e)}
+              >
                 <label className="block text-sm text-body">
                   {t('owner.salonName')}
                   <input
@@ -467,7 +514,16 @@ export function OwnerSalonEdit() {
                     className={FIELD}
                   />
                 </label>
-                <h2 className="pt-2 text-sm font-semibold text-ink">{t('salon.hours')}</h2>
+                {infoError ? <p className="text-sm text-busy-busy">{infoError}</p> : null}
+                <button type="submit" disabled={savingSalon} className={SAVE_BTN}>
+                  {t('owner.save')}
+                </button>
+              </form>
+              <form
+                className={section === 'hours' ? PANEL : `${PANEL} hidden`}
+                onSubmit={(e) => void onSubmitHours(e)}
+              >
+                <h2 className="text-sm font-semibold text-ink">{t('salon.hours')}</h2>
                 <ul className="space-y-3">
                   {days.map((day) => (
                     <li
@@ -573,12 +629,12 @@ export function OwnerSalonEdit() {
                     className={FIELD}
                   />
                 </label>
-                {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
-                <button type="submit" disabled={saving} className={SAVE_BTN}>
+                {hoursError ? <p className="text-sm text-busy-busy">{hoursError}</p> : null}
+                <button type="submit" disabled={savingHours} className={SAVE_BTN}>
                   {t('owner.save')}
                 </button>
               </form>
-              <section className="mt-10 max-w-md space-y-4">
+              <section className={section === 'services' ? PANEL : `${PANEL} hidden`}>
                 <h2 className="text-sm font-semibold text-ink">{t('salon.services')}</h2>
                 {salon.services.length === 0 ? (
                   <p className="text-sm text-body">{t('salon.emptyServices')}</p>
@@ -593,7 +649,7 @@ export function OwnerSalonEdit() {
                 )}
                 <SalonServiceForm salonId={salon.id} onSaved={refetch} />
               </section>
-              <section className="mt-10 max-w-md space-y-4">
+              <section className={section === 'workers' ? PANEL : `${PANEL} hidden`}>
                 <h2 className="text-sm font-semibold text-ink">{t('owner.workers')}</h2>
                 {salon.workers.length === 0 ? (
                   <p className="text-sm text-body">{t('owner.noWorkers')}</p>
