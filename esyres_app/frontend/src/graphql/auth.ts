@@ -22,6 +22,13 @@ export const ME_QUERY = gql`
           breakStartsAt
           breakEndsAt
         }
+        services {
+          id
+          name
+          category
+          durationMinutes
+          priceFeninga
+        }
       }
     }
   }
@@ -95,6 +102,30 @@ export const UPDATE_SALON_HOURS_MUTATION = gql`
   }
 `
 
+export const CREATE_SALON_SERVICE_MUTATION = gql`
+  mutation CreateSalonService($salonId: ID!, $input: CreateSalonServiceInput!) {
+    createSalonService(salonId: $salonId, input: $input) {
+      id
+      name
+      category
+      durationMinutes
+      priceFeninga
+    }
+  }
+`
+
+export const UPDATE_SALON_SERVICE_MUTATION = gql`
+  mutation UpdateSalonService($id: ID!, $input: UpdateSalonServiceInput!) {
+    updateSalonService(id: $id, input: $input) {
+      id
+      name
+      category
+      durationMinutes
+      priceFeninga
+    }
+  }
+`
+
 export const ADD_SALON_MUTATION = gql`
   mutation AddSalon($name: String!, $address: String!) {
     addSalon(name: $name, address: $address) {
@@ -143,6 +174,13 @@ export type MeData = {
         closesAt: string | null
         breakStartsAt: string | null
         breakEndsAt: string | null
+      }[]
+      services: {
+        id: string
+        name: string
+        category: string
+        durationMinutes: number
+        priceFeninga: number
       }[]
     }[]
   } | null
