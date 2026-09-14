@@ -32,6 +32,8 @@ import {
   assistantOriginVisible,
   assistantTranscriptLines,
   toSalonHoursInput,
+  kmToFeninga,
+  feningaToKm,
 } from './owner'
 
 test('omit or invalid date falls back to Sarajevo today', () => {
@@ -312,6 +314,19 @@ test('toSalonHoursInput always emits Mon–Sun; closed days send no clocks', () 
   })
 })
 
+test('kmToFeninga parses KM to integer feninga', () => {
+  expect(kmToFeninga('')).toBeNull()
+  expect(kmToFeninga('  ')).toBeNull()
+  expect(kmToFeninga('nope')).toBeNull()
+  expect(kmToFeninga('-1')).toBeNull()
+  expect(kmToFeninga('0')).toBe(0)
+  expect(kmToFeninga('25')).toBe(2500)
+  expect(kmToFeninga('25.50')).toBe(2550)
+  expect(kmToFeninga('25,50')).toBe(2550)
+  expect(feningaToKm(2500)).toBe('25')
+  expect(feningaToKm(2550)).toBe('25.5')
+})
+
 test('owner catalog copy is Bosnian', async () => {
   const { default: i18n } = await import('../i18n')
   expect(i18n.t('owner.salons')).toBe('Saloni')
@@ -328,6 +343,14 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.INVALID_NAME')).toBe('Unesi ime salona.')
   expect(i18n.t('owner.INVALID_ADDRESS')).toBe('Unesi adresu.')
   expect(i18n.t('owner.INVALID_HOURS')).toBe('Radno vrijeme nije ispravno.')
+  expect(i18n.t('owner.serviceName')).toBe('Ime usluge')
+  expect(i18n.t('owner.duration')).toBe('Trajanje (min)')
+  expect(i18n.t('owner.price')).toBe('Cijena (KM)')
+  expect(i18n.t('owner.addService')).toBe('Dodaj')
+  expect(i18n.t('owner.INVALID_SERVICE_NAME')).toBe('Unesi ime usluge.')
+  expect(i18n.t('owner.INVALID_DURATION')).toBe('Trajanje mora biti 15 min ili više (korak 15).')
+  expect(i18n.t('owner.INVALID_PRICE')).toBe('Cijena nije ispravna.')
+  expect(i18n.t('owner.DUPLICATE_SERVICE_NAME')).toBe('Usluga s tim imenom već postoji.')
   expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
   expect(i18n.exists('owner.listed')).toBe(false)
 })

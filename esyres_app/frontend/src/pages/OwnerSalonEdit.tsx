@@ -7,23 +7,35 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
 import {
+  CREATE_SALON_SERVICE_MUTATION,
   ME_QUERY,
   UPDATE_SALON_HOURS_MUTATION,
   UPDATE_SALON_MUTATION,
+  UPDATE_SALON_SERVICE_MUTATION,
   type MeData,
 } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { graphqlErrorCode } from '../lib/booking'
+import { DISCOVERY_CATEGORIES } from '../lib/discovery'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
+  feningaToKm,
+  kmToFeninga,
   SALON_WEEKDAYS,
   toSalonHoursInput,
   type PanelHours,
   type SalonHoursDayForm,
 } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
+
+const FIELD =
+  'mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink'
+const SAVE_BTN =
+  'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
+
+type OwnerSalonService = NonNullable<MeData['me']>['salons'][number]['services'][number]
 
 function emptyWeek(): SalonHoursDayForm[] {
   return SALON_WEEKDAYS.map((weekday) => ({
@@ -52,6 +64,151 @@ function daysFromHours(hours: PanelHours[]): SalonHoursDayForm[] {
       breakEndsAt: row?.breakEndsAt ?? '',
     }
   })
+}
+
+function serviceFail(code: string, t: (key: string) => string): string {
+  if (code === 'INVALID_NAME') {
+    return t('owner.INVALID_SERVICE_NAME')
+  }
+  if (code === 'INVALID_DURATION') {
+    return t('owner.INVALID_DURATION')
+  }
+  if (code === 'INVALID_PRICE') {
+    return t('owner.INVALID_PRICE')
+  }
+  if (code === 'DUPLICATE_SERVICE_NAME') {
+    return t('owner.DUPLICATE_SERVICE_NAME')
+  }
+  if (code === 'FORBIDDEN') {
+    return t('owner.FORBIDDEN')
+  }
+
+  return t('salon.gate.fallback')
+}
+
+function SalonServiceForm({
+  salonId,
+  service,
+  onSaved,
+}: {
+  salonId: string
+  service?: OwnerSalonService
+  onSaved: () => Promise<unknown>
+}) {
+  const { t } = useTranslation()
+  const [createSalonService, { loading: creating }] = useMutation(CREATE_SALON_SERVICE_MUTATION)
+  const [updateSalonService, { loading: updating }] = useMutation(UPDATE_SALON_SERVICE_MUTATION)
+  const saving = creating || updating
+  const [name, setName] = useState(service?.name ?? '')
+  const [category, setCategory] = useState(service?.category ?? 'HAIR')
+  const [duration, setDuration] = useState(
+    service === undefined ? '' : String(service.durationMinutes),
+  )
+  const [price, setPrice] = useState(service === undefined ? '' : feningaToKm(service.priceFeninga))
+  const [error, setError] = useState<string | null>(null)
+  const radioName = `service-category-${service?.id ?? 'new'}`
+
+  useEffect(() => {
+    if (service === undefined) {
+      return
+    }
+    setName(service.name)
+    setCategory(service.category)
+    setDuration(String(service.durationMinutes))
+    setPrice(feningaToKm(service.priceFeninga))
+  }, [service])
+
+  async function onSaveService(e: FormEvent) {
+    e.preventDefault()
+    if (saving) {
+      return
+    }
+    const priceFeninga = kmToFeninga(price)
+    if (priceFeninga === null) {
+      setError(t('owner.INVALID_PRICE'))
+      return
+    }
+    setError(null)
+    try {
+      if (service === undefined) {
+        const input: {
+          name: string
+          category: string
+          priceFeninga: number
+          durationMinutes?: number
+        } = { name: name.trim(), category, priceFeninga }
+        if (duration.trim() !== '') {
+          input.durationMinutes = Number.parseInt(duration, 10)
+        }
+        await createSalonService({ variables: { salonId, input } })
+        setName('')
+        setCategory('HAIR')
+        setDuration('')
+        setPrice('')
+      } else {
+        await updateSalonService({
+          variables: {
+            id: service.id,
+            input: {
+              name: name.trim(),
+              category,
+              durationMinutes: Number.parseInt(duration, 10) || 0,
+              priceFeninga,
+            },
+          },
+        })
+      }
+      await onSaved()
+    } catch (err) {
+      setError(serviceFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  return (
+    <form className="space-y-3" onSubmit={(e) => void onSaveService(e)}>
+      <label className="block text-sm text-body">
+        {t('owner.serviceName')}
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={FIELD}
+        />
+      </label>
+      <div className="flex flex-wrap gap-3 text-sm text-body">
+        {DISCOVERY_CATEGORIES.map((cat) => (
+          <label key={cat} className="flex items-center gap-2">
+            <input
+              type="radio"
+              name={radioName}
+              checked={category === cat}
+              onChange={() => setCategory(cat)}
+            />
+            {t(`category.${cat}`)}
+          </label>
+        ))}
+      </div>
+      <label className="block text-sm text-body">
+        {t('owner.duration')}
+        <input
+          type="number"
+          step={15}
+          min={15}
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+          className={FIELD}
+        />
+      </label>
+      <label className="block text-sm text-body">
+        {t('owner.price')}
+        <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={FIELD} />
+      </label>
+      {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+      <button type="submit" disabled={saving} className={SAVE_BTN}>
+        {service === undefined ? t('owner.addService') : t('owner.save')}
+      </button>
+    </form>
+  )
 }
 
 export function OwnerSalonEdit() {
@@ -210,138 +367,153 @@ export function OwnerSalonEdit() {
           {salon === undefined ? (
             <p className="mt-8 text-sm text-body">{t('owner.FORBIDDEN')}</p>
           ) : (
-            <form className="mt-8 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
-              <label className="block text-sm text-body">
-                {t('owner.salonName')}
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                />
-              </label>
-              <label className="block text-sm text-body">
-                {t('owner.address')}
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                />
-              </label>
-              <h2 className="pt-2 text-sm font-semibold text-ink">{t('salon.hours')}</h2>
-              <ul className="space-y-3">
-                {days.map((day) => (
-                  <li
-                    key={day.weekday}
-                    className={day.closed ? 'space-y-2 text-muted' : 'space-y-2 text-body'}
-                  >
-                    <div className="flex items-center justify-between gap-3 text-sm">
-                      <span className="font-medium text-ink">{t(`weekday.${day.weekday}`)}</span>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={day.closed}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              patchDay(day.weekday, { closed: true })
-                              return
-                            }
-                            patchDay(day.weekday, {
-                              closed: false,
-                              opensAt: day.opensAt || '09:00',
-                              closesAt: day.closesAt || '17:00',
-                            })
-                          }}
-                        />
-                        {t('salon.closed')}
-                      </label>
-                    </div>
-                    {day.closed ? null : (
-                      <>
-                        <div className="grid grid-cols-2 gap-2">
-                          <label className="block text-sm">
-                            {t('owner.opens')}
-                            <input
-                              type="time"
-                              step={900}
-                              value={day.opensAt}
-                              onChange={(e) => patchDay(day.weekday, { opensAt: e.target.value })}
-                              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                            />
-                          </label>
-                          <label className="block text-sm">
-                            {t('owner.closes')}
-                            <input
-                              type="time"
-                              step={900}
-                              value={day.closesAt}
-                              onChange={(e) => patchDay(day.weekday, { closesAt: e.target.value })}
-                              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                            />
-                          </label>
-                        </div>
-                        <label className="flex items-center gap-2 text-sm">
+            <>
+              <form className="mt-8 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
+                <label className="block text-sm text-body">
+                  {t('owner.salonName')}
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={FIELD}
+                  />
+                </label>
+                <label className="block text-sm text-body">
+                  {t('owner.address')}
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className={FIELD}
+                  />
+                </label>
+                <h2 className="pt-2 text-sm font-semibold text-ink">{t('salon.hours')}</h2>
+                <ul className="space-y-3">
+                  {days.map((day) => (
+                    <li
+                      key={day.weekday}
+                      className={day.closed ? 'space-y-2 text-muted' : 'space-y-2 text-body'}
+                    >
+                      <div className="flex items-center justify-between gap-3 text-sm">
+                        <span className="font-medium text-ink">{t(`weekday.${day.weekday}`)}</span>
+                        <label className="flex items-center gap-2">
                           <input
                             type="checkbox"
-                            checked={day.breakOn}
+                            checked={day.closed}
                             onChange={(e) => {
-                              if (!e.target.checked) {
-                                patchDay(day.weekday, { breakOn: false })
+                              if (e.target.checked) {
+                                patchDay(day.weekday, { closed: true })
                                 return
                               }
                               patchDay(day.weekday, {
-                                breakOn: true,
-                                breakStartsAt: day.breakStartsAt || '12:00',
-                                breakEndsAt: day.breakEndsAt || '13:00',
+                                closed: false,
+                                opensAt: day.opensAt || '09:00',
+                                closesAt: day.closesAt || '17:00',
                               })
                             }}
                           />
-                          {t('owner.break')}
+                          {t('salon.closed')}
                         </label>
-                        {day.breakOn ? (
+                      </div>
+                      {day.closed ? null : (
+                        <>
                           <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="time"
-                              step={900}
-                              value={day.breakStartsAt}
-                              onChange={(e) =>
-                                patchDay(day.weekday, { breakStartsAt: e.target.value })
-                              }
-                              className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                            />
-                            <input
-                              type="time"
-                              step={900}
-                              value={day.breakEndsAt}
-                              onChange={(e) => patchDay(day.weekday, { breakEndsAt: e.target.value })}
-                              className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                            />
+                            <label className="block text-sm">
+                              {t('owner.opens')}
+                              <input
+                                type="time"
+                                step={900}
+                                value={day.opensAt}
+                                onChange={(e) => patchDay(day.weekday, { opensAt: e.target.value })}
+                                className={FIELD}
+                              />
+                            </label>
+                            <label className="block text-sm">
+                              {t('owner.closes')}
+                              <input
+                                type="time"
+                                step={900}
+                                value={day.closesAt}
+                                onChange={(e) => patchDay(day.weekday, { closesAt: e.target.value })}
+                                className={FIELD}
+                              />
+                            </label>
                           </div>
-                        ) : null}
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <label className="block text-sm text-body">
-                {t('owner.cancellationNotice')}
-                <input
-                  type="number"
-                  value={notice}
-                  onChange={(e) => setNotice(e.target.value)}
-                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                />
-              </label>
-              {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
-              <button
-                type="submit"
-                disabled={saving}
-                className="h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
-              >
-                {t('owner.save')}
-              </button>
-            </form>
+                          <label className="flex items-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={day.breakOn}
+                              onChange={(e) => {
+                                if (!e.target.checked) {
+                                  patchDay(day.weekday, { breakOn: false })
+                                  return
+                                }
+                                patchDay(day.weekday, {
+                                  breakOn: true,
+                                  breakStartsAt: day.breakStartsAt || '12:00',
+                                  breakEndsAt: day.breakEndsAt || '13:00',
+                                })
+                              }}
+                            />
+                            {t('owner.break')}
+                          </label>
+                          {day.breakOn ? (
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="time"
+                                step={900}
+                                value={day.breakStartsAt}
+                                onChange={(e) =>
+                                  patchDay(day.weekday, { breakStartsAt: e.target.value })
+                                }
+                                className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                              />
+                              <input
+                                type="time"
+                                step={900}
+                                value={day.breakEndsAt}
+                                onChange={(e) =>
+                                  patchDay(day.weekday, { breakEndsAt: e.target.value })
+                                }
+                                className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                              />
+                            </div>
+                          ) : null}
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <label className="block text-sm text-body">
+                  {t('owner.cancellationNotice')}
+                  <input
+                    type="number"
+                    value={notice}
+                    onChange={(e) => setNotice(e.target.value)}
+                    className={FIELD}
+                  />
+                </label>
+                {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+                <button type="submit" disabled={saving} className={SAVE_BTN}>
+                  {t('owner.save')}
+                </button>
+              </form>
+              <section className="mt-10 max-w-md space-y-4">
+                <h2 className="text-sm font-semibold text-ink">{t('salon.services')}</h2>
+                {salon.services.length === 0 ? (
+                  <p className="text-sm text-body">{t('salon.emptyServices')}</p>
+                ) : (
+                  <ul className="space-y-6">
+                    {salon.services.map((row) => (
+                      <li key={row.id}>
+                        <SalonServiceForm salonId={salon.id} service={row} onSaved={refetch} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <SalonServiceForm salonId={salon.id} onSaved={refetch} />
+              </section>
+            </>
           )}
         </main>
       </div>
