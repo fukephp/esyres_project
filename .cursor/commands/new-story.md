@@ -4,6 +4,8 @@ Follow `.cursor/skills/new-story/SKILL.md` exactly. That skill is the source of 
 
 If the user named a feature or change after this command, use that as the subject. Otherwise ask what to grill.
 
+Phrases: `/new-story` (default). Opt-in `no-human-grilling` and/or `no-human-review` (order-independent; same as `story-loop … unattended`). At most one `STORY-xx`. Flags do not invent a subject and do not override refuse rules.
+
 Refuse (no new file) if the topic is process/stack, already a `STORY-xx`, or no existing epic fits. Attach to an existing epic only.
 
 If application code exists, use grill-with-docs interview rules (read the codebase; glossary + ADRs as they lock). Persist still **forces** `STORY-xx`. Do not implement after persist.

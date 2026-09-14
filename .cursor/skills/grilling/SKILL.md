@@ -3,7 +3,9 @@ name: grilling
 description: >-
   Grill the user relentlessly about a plan, decision, or idea. Use when the
   user wants to stress-test their thinking, uses any 'grill' trigger phrases,
-  or before locking a plan or design.
+  or before locking a plan or design. Opt-in no-human-grilling /
+  no-human-review only from grill-me, grill-with-docs, or new-story product
+  persist.
 ---
 
 # Grilling
@@ -12,9 +14,9 @@ Adapted from [mattpocock/skills grilling](https://github.com/mattpocock/skills/b
 
 Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
 
-**Diverge prefix (wrappers only).** [grill-me](../grill-me/SKILL.md) and [grill-with-docs](../grill-with-docs/SKILL.md) may run [diverge](../diverge/SKILL.md) **before** round 1 on a product MVP breakdown or a new story/feature not already in `docs/stories/`. If they did, round 1 is **cluster-pick** (below), then later rounds lock as usual. **Never** run diverge yourself when grilling is a subroutine (story-loop maps, what-next, coding) or from [new-story](../new-story/SKILL.md). There is no `/diverge` command.
+**Diverge prefix (wrappers only).** [grill-me](../grill-me/SKILL.md) and [grill-with-docs](../grill-with-docs/SKILL.md) may run [diverge](../diverge/SKILL.md) **before** round 1 on a product MVP breakdown or a new story/feature not already in `docs/stories/` — not when `no-human-grilling` / `no-human-review` are honored or refused. If they did, round 1 is **cluster-pick** (below), then later rounds lock as usual. **Never** run diverge yourself when grilling is a subroutine (story-loop maps, what-next, coding) or from [new-story](../new-story/SKILL.md). There is no `/diverge` command.
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round (unless **`no-human-grilling`** applies — below).
 
 Format a round like so:
 
@@ -34,16 +36,32 @@ Format a round like so:
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 
-Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
+Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait — except **`no-human-grilling`** (below) when the recommended answer is already locked in docs or code.
 
 Explore the repo, `docs/mvp/`, `docs/architecture/`, `docs/stories/`, `docs/glossary.md`, and `docs/adr/` instead of asking.
 
-The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not implement until the user confirms you have reached a shared understanding.
+The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not implement. Persist only after the user confirms shared understanding, unless **`no-human-review`** applies (below).
+
+## Opt-in flags (story-create wrappers only)
+
+Detect `no-human-grilling` and `no-human-review` as space-separated tokens after `/grill-me`, `/grill-with-docs`, or `/new-story`, or the same phrases in the invoking message. Order-independent. Default **off**.
+
+Honor them **only** from those three wrappers on a **product persist** path (a session that may write `STORY-xx`). Wrappers classify: if they mark flags as no-ops or refuse them, grill as today (wait for answers; persist after confirm).
+
+When grilling is a subroutine ([story-loop](../story-loop/SKILL.md) maps/keys, [what-next](../what-next/SKILL.md), [start-building-stories](../start-building-stories/SKILL.md), [custom-feature-skills](../custom-feature-skills/SKILL.md), coding), **ignore** these tokens even if they appear in chat. They do not skip key approval, Bugbot, or merge.
+
+**`no-human-grilling`:** Do not wait for round answers. Walk the tree. For each frontier question, take the recommended answer **only** when it is already locked in `docs/mvp/`, `docs/architecture/`, `docs/stories/`, `docs/glossary.md`, `docs/adr/`, or the codebase. Print auto-locks in chat (same round format; mark them taken). Still explore. Do not invent product.
+
+If a frontier decision is **not** locked there: **override** this flag for that question — persist nothing, ask the human, wait. After they answer, resume the tree (auto-lock remaining lockable questions).
+
+**`no-human-review`:** When the frontier is empty, persist in that turn (matching wrapper persist). Do not wait for “confirm shared understanding.” Do not auto-implement. Do not start `/story-loop`.
+
+**Combo:** grilling only → auto-lock, then wait for persist confirm. Review only → human rounds, persist when empty. Both → auto-lock + persist in one turn when every decision was lockable.
 
 ## After shared understanding (persist)
 
-When the user confirms shared understanding, persist — do not implement. Read only the persist section of the matching wrapper (do not re-run the interview):
+When the user confirms shared understanding — or **`no-human-review`** and the frontier is empty — persist — do not implement. Read only the persist section of the matching wrapper (do not re-run the interview):
 
-- **`/new-story`** → [new-story persist](../new-story/SKILL.md) (its own table; always `STORY-xx`)
+- **`/new-story`**, or flags **honored** on `/grill-me` / `/grill-with-docs` (incremental) → [new-story persist](../new-story/SKILL.md) (one `STORY-xx`)
 - **No application code** → [grill-me persist](../grill-me/SKILL.md)
 - **Application code exists**, or this is a docs session (`/grill-with-docs`) → [grill-with-docs persist](../grill-with-docs/SKILL.md) (glossary + ADRs already land via [domain-modeling](../domain-modeling/SKILL.md) as they lock)

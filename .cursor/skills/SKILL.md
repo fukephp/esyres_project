@@ -11,11 +11,11 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 
 | Skill | When to use |
 |-------|-------------|
-| [grilling](grilling/SKILL.md) | **Default** interview engine (rounds/frontier); auto before locking a plan |
-| [diverge](diverge/SKILL.md) | Isolated option-space before a product MVP or new-feature grill (grill-me / grill-with-docs only; never `/new-story`) |
-| [grill-me](grill-me/SKILL.md) | User-invoked grilling; persist at end of topic (`/grill-me`) |
-| [grill-with-docs](grill-with-docs/SKILL.md) | User-invoked grilling against a **codebase**; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`) |
-| [new-story](new-story/SKILL.md) | Grill one incremental product story; always persist new `STORY-xx` (`/new-story`; no diverge; existing epic only) |
+| [grilling](grilling/SKILL.md) | **Default** interview engine (rounds/frontier); auto before locking a plan. Opt-in `no-human-grilling` / `no-human-review` from story-create wrappers only |
+| [diverge](diverge/SKILL.md) | Isolated option-space before a product MVP or new-feature grill (grill-me / grill-with-docs only; never `/new-story`; never under those flags) |
+| [grill-me](grill-me/SKILL.md) | User-invoked grilling; persist at end of topic (`/grill-me`; opt-in `no-human-grilling` / `no-human-review` on product persist) |
+| [grill-with-docs](grill-with-docs/SKILL.md) | User-invoked grilling against a **codebase**; glossary + ADRs as they lock; product/stories end-batch (`/grill-with-docs`; same opt-in tokens) |
+| [new-story](new-story/SKILL.md) | Grill one incremental product story; always persist new `STORY-xx` (`/new-story`; no diverge; existing epic only; same opt-in tokens) |
 | [domain-modeling](domain-modeling/SKILL.md) | Glossary + ADRs as terms/decisions lock (loaded by grill-with-docs) |
 | [scaffold-project](scaffold-project/SKILL.md) | New sibling project from this framework layout (`/scaffold-project`) |
 | [sync-framework](sync-framework/SKILL.md) | Propagate allowlisted Cursor defaults into one existing sibling (`/sync-framework`) |
