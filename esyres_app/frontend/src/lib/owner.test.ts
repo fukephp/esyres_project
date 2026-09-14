@@ -31,6 +31,7 @@ import {
   sarajevoWeekday,
   assistantOriginVisible,
   assistantTranscriptLines,
+  toSalonHoursInput,
 } from './owner'
 
 test('omit or invalid date falls back to Sarajevo today', () => {
@@ -245,6 +246,72 @@ test('salonIsOpenNow uses Sarajevo clock, closes exclusive, skips breaks', () =>
   expect(salonIsOpenNow([closed], new Date('2026-09-01T10:00:00.000Z'))).toBe(false)
 })
 
+test('toSalonHoursInput always emits Mon–Sun; closed days send no clocks', () => {
+  const closedDay = {
+    weekday: 'MONDAY',
+    closed: true,
+    opensAt: null,
+    closesAt: null,
+    breakStartsAt: null,
+    breakEndsAt: null,
+  }
+  expect(toSalonHoursInput([])).toEqual([
+    closedDay,
+    { ...closedDay, weekday: 'TUESDAY' },
+    { ...closedDay, weekday: 'WEDNESDAY' },
+    { ...closedDay, weekday: 'THURSDAY' },
+    { ...closedDay, weekday: 'FRIDAY' },
+    { ...closedDay, weekday: 'SATURDAY' },
+    { ...closedDay, weekday: 'SUNDAY' },
+  ])
+  const week = toSalonHoursInput([
+    {
+      weekday: 'MONDAY',
+      closed: false,
+      opensAt: '09:00:00',
+      closesAt: '17:00:00',
+      breakOn: true,
+      breakStartsAt: '12:00:00',
+      breakEndsAt: '13:00:00',
+    },
+    {
+      weekday: 'TUESDAY',
+      closed: true,
+      opensAt: '09:00',
+      closesAt: '17:00',
+      breakOn: true,
+      breakStartsAt: '12:00',
+      breakEndsAt: '13:00',
+    },
+    {
+      weekday: 'WEDNESDAY',
+      closed: false,
+      opensAt: '10:00',
+      closesAt: '18:00',
+      breakOn: false,
+      breakStartsAt: '12:00',
+      breakEndsAt: '13:00',
+    },
+  ])
+  expect(week[0]).toEqual({
+    weekday: 'MONDAY',
+    closed: false,
+    opensAt: '09:00',
+    closesAt: '17:00',
+    breakStartsAt: '12:00',
+    breakEndsAt: '13:00',
+  })
+  expect(week[1]).toEqual({ ...closedDay, weekday: 'TUESDAY' })
+  expect(week[2]).toEqual({
+    weekday: 'WEDNESDAY',
+    closed: false,
+    opensAt: '10:00',
+    closesAt: '18:00',
+    breakStartsAt: null,
+    breakEndsAt: null,
+  })
+})
+
 test('owner catalog copy is Bosnian', async () => {
   const { default: i18n } = await import('../i18n')
   expect(i18n.t('owner.salons')).toBe('Saloni')
@@ -254,8 +321,13 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.address')).toBe('Adresa')
   expect(i18n.t('owner.save')).toBe('Spremi')
   expect(i18n.t('owner.addSalon')).toBe('Dodaj salon')
+  expect(i18n.t('owner.opens')).toBe('Od')
+  expect(i18n.t('owner.closes')).toBe('Do')
+  expect(i18n.t('owner.break')).toBe('Pauza')
+  expect(i18n.t('owner.cancellationNotice')).toBe('Rok za otkaz (sati)')
   expect(i18n.t('owner.INVALID_NAME')).toBe('Unesi ime salona.')
   expect(i18n.t('owner.INVALID_ADDRESS')).toBe('Unesi adresu.')
+  expect(i18n.t('owner.INVALID_HOURS')).toBe('Radno vrijeme nije ispravno.')
   expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
   expect(i18n.exists('owner.listed')).toBe(false)
 })
