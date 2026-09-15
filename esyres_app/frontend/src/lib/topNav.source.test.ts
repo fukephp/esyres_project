@@ -40,6 +40,40 @@ test('TopNav is full-bleed Cal bar with mark link home and panel primary', () =>
   expect(nav).not.toMatch(/country/)
 })
 
+test('Odjava uses Cal button-destructive on both logged-in slots', () => {
+  const nav = read('components/TopNav.tsx')
+  const logoutClass = nav.match(/const logoutClass =\s*'([^']+)'/)?.[1]
+  expect(logoutClass).toBe(
+    'inline-flex h-10 items-center rounded-md bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active',
+  )
+  expect(logoutClass).not.toMatch(/hover:/)
+  expect(logoutClass).not.toMatch(/rounded-full/)
+  expect(logoutClass).not.toMatch(/busy-busy/)
+  expect(logoutClass).not.toMatch(/bg-ink/)
+  expect(nav).toMatch(/LOGOUT_MUTATION/)
+  expect(nav).not.toMatch(/window\.confirm|confirm\(/)
+
+  const logoutButtons = [
+    ...nav.matchAll(/<button type="button" className=\{(\w+)\} onClick=\{\(\) => void logout\(\)\}>/g),
+  ]
+  expect(logoutButtons).toHaveLength(2)
+  for (const match of logoutButtons) {
+    expect(match[1]).toBe('logoutClass')
+  }
+
+  const homeSession = nav.match(/chrome\.slot === 'home-session'[\s\S]*?(?=chrome\.slot === 'discovery')/)?.[0]
+  expect(homeSession).toMatch(/displayName[\s\S]*home\.logout[\s\S]*panelClass/)
+  expect(homeSession).toMatch(/className=\{linkClass\}>\{chrome\.displayName\}/)
+  expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onLogin\}>/)
+  expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onRegister\}>/)
+
+  const css = read('index.css')
+  expect(css).toMatch(/--color-error-strong:\s*#dc2626/)
+  expect(css).toMatch(/--color-error-strong-active:\s*#b91c1c/)
+  expect(css).not.toMatch(/--color-error:/)
+  expect(css).not.toMatch(/--color-on-primary/)
+})
+
 test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constrained', () => {
   const page = read('pages/Homepage.tsx')
   expect(page).toMatch(/<TopNav/)
