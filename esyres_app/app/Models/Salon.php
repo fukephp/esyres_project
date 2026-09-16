@@ -62,6 +62,22 @@ class Salon extends Model
     }
 
     /**
+     * @return HasMany<SalonServiceCategory, $this>
+     */
+    public function serviceCategories(): HasMany
+    {
+        return $this->hasMany(SalonServiceCategory::class)->orderBy('id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, SalonServiceCategory>
+     */
+    public function serviceCategoryList()
+    {
+        return $this->serviceCategories;
+    }
+
+    /**
      * @return HasMany<Service, $this>
      */
     public function services(): HasMany

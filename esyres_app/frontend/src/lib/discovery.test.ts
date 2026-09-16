@@ -5,7 +5,7 @@ import {
   discoveryEmptyKey,
   discoveryHasFilter,
   discoveryListMode,
-  discoverySalonCategories,
+  discoverySalonCategoryNames,
   discoveryShowAllVisible,
   discoverySource,
   discoveryVisibleSalons,
@@ -58,17 +58,16 @@ test('show all is only on teaser with 4+ listed', () => {
   expect(discoveryShowAllVisible(4, 'results')).toBe(false)
 })
 
-test('categories are unique in chip order; unknown omitted', () => {
+test('category names skip empty groups and keep create order', () => {
   expect(
-    discoverySalonCategories([
-      { category: 'MAKE_UP' },
-      { category: 'HAIR' },
-      { category: 'HAIR' },
-      { category: 'MASSAGE' },
+    discoverySalonCategoryNames([
+      { name: 'Šminka', services: [{ id: '1' }] },
+      { name: 'Kosa', services: [{ id: '2' }, { id: '3' }] },
+      { name: 'Prazno', services: [] },
     ]),
-  ).toEqual(['HAIR', 'MAKE_UP', 'MASSAGE'])
-  expect(discoverySalonCategories([{ category: 'HAIR' }, { category: 'OTHER' }])).toEqual(['HAIR'])
-  expect(discoverySalonCategories([])).toEqual([])
+  ).toEqual(['Šminka', 'Kosa'])
+  expect(discoverySalonCategoryNames([{ name: 'Kosa', services: [] }])).toEqual([])
+  expect(discoverySalonCategoryNames([])).toEqual([])
 })
 
 test('address line reuses assistant omit rules', () => {
@@ -105,8 +104,8 @@ test('list queries ask for richer facts with a date', () => {
     expect(body).toContain('$date')
     expect(body).toContain('address')
     expect(body).toContain('busyLevel(date: $date)')
-    expect(body).toContain('services')
-    expect(body).toContain('category')
+    expect(body).toContain('serviceCategories')
+    expect(body).toContain('$category: String')
     expect(body).not.toContain('searchSalons')
   }
 })

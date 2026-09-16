@@ -37,7 +37,7 @@ Feature: Guest salon profile
       """
     And salon services match:
       """
-      [{"name": "Šišanje", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}]
+      [{"name": "Šišanje", "serviceCategoryName": "Kosa", "durationMinutes": 30, "priceFeninga": 2500}]
       """
     And salon workers are empty
 

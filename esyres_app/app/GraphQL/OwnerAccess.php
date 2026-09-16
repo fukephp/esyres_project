@@ -4,6 +4,7 @@ namespace App\GraphQL;
 
 use App\Exceptions\ClientError;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -42,6 +43,16 @@ final class OwnerAccess
         }
 
         return $service;
+    }
+
+    public static function serviceCategory(User $user, string $id): SalonServiceCategory
+    {
+        $category = SalonServiceCategory::query()->find($id);
+        if ($category === null || $category->salon->owner_id !== $user->id) {
+            throw new ClientError('FORBIDDEN');
+        }
+
+        return $category;
     }
 
     public static function worker(User $user, string $id): Worker

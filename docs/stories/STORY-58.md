@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-58 |
 | Epic | 7 — Salon & Service Management (Owner Onboarding) |
-| Loop | — |
+| Loop | `STORY-58` |
 | Depends on | STORY-54, STORY-56, STORY-07, STORY-08, STORY-06, STORY-44 |
 
 ## User story

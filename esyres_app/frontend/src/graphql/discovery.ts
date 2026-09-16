@@ -3,28 +3,34 @@ import type { BusyLevel } from '../lib/busyToken'
 import type { ServiceCategory } from '../lib/discovery'
 
 export const SALONS_NEARBY_QUERY = gql`
-  query SalonsNearby($lat: Float!, $lng: Float!, $date: String!, $category: ServiceCategory, $name: String) {
+  query SalonsNearby($lat: Float!, $lng: Float!, $date: String!, $category: String, $name: String) {
     salonsNearby(lat: $lat, lng: $lng, category: $category, name: $name) {
       id
       name
       address
       busyLevel(date: $date)
-      services {
-        category
+      serviceCategories {
+        name
+        services {
+          id
+        }
       }
     }
   }
 `
 
 export const POPULAR_IN_SARAJEVO_QUERY = gql`
-  query PopularInSarajevo($date: String!, $category: ServiceCategory, $name: String) {
+  query PopularInSarajevo($date: String!, $category: String, $name: String) {
     popularInSarajevo(category: $category, name: $name) {
       id
       name
       address
       busyLevel(date: $date)
-      services {
-        category
+      serviceCategories {
+        name
+        services {
+          id
+        }
       }
     }
   }
@@ -35,7 +41,7 @@ export type DiscoverySalon = {
   name: string
   address: string | null
   busyLevel: BusyLevel
-  services: { category: ServiceCategory }[]
+  serviceCategories: { name: string; services: { id: string }[] }[]
 }
 
 export type DiscoveryVars = {

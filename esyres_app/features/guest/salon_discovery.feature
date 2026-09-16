@@ -95,6 +95,24 @@ Feature: Guest salon discovery
       ["Hair Shop"]
       """
 
+  Scenario: Owner-created category name does not match a discovery chip
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Custom Shop"
+    And the salon is at lat "43.8563" lng "18.4131"
+    And the salon has an unkeyed service category "Tretmani"
+    And the salon has a service in that category:
+      """
+      {"name": "Peeling", "durationMinutes": 30, "priceFeninga": 3000}
+      """
+    And the salon is listed
+    When I query popularInSarajevo with:
+      """
+      {"category": "HAIR"}
+      """
+    Then the listed salon names are:
+      """
+      []
+      """
+
   Scenario: Nearby category still omits salons without coordinates and stays nearest first
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Near Hair"
     And the salon is at lat "43.8563" lng "18.4131"
@@ -280,12 +298,12 @@ Feature: Guest salon discovery
     And the first listed salon busy level is "LOW"
     And the first listed salon categories are:
       """
-      ["HAIR", "MAKE_UP"]
+      ["Kosa", "Šminka"]
       """
     When I query salonsNearby facts lat "43.8563" lng "18.4131" date "2026-09-07" as a guest
     Then the first listed salon address is "Ferhadija 12"
     And the first listed salon busy level is "LOW"
     And the first listed salon categories are:
       """
-      ["HAIR", "MAKE_UP"]
+      ["Kosa", "Šminka"]
       """

@@ -800,21 +800,16 @@ trait GuestSteps
     public function theFirstListedSalonCategoriesAre(PyStringNode $payload): void
     {
         $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
-        $services = $this->firstListedSalon()['services'] ?? [];
-        if (! is_array($services)) {
-            throw new RuntimeException('Expected services on the first listed salon');
-        }
-        $seen = [];
-        foreach ($services as $service) {
-            $category = $service['category'] ?? null;
-            if (is_string($category)) {
-                $seen[$category] = true;
-            }
+        $groups = $this->firstListedSalon()['serviceCategories'] ?? [];
+        if (! is_array($groups)) {
+            throw new RuntimeException('Expected serviceCategories on the first listed salon');
         }
         $actual = [];
-        foreach (['HAIR', 'MAKE_UP', 'MASSAGE'] as $category) {
-            if (isset($seen[$category])) {
-                $actual[] = $category;
+        foreach ($groups as $group) {
+            $name = $group['name'] ?? null;
+            $services = $group['services'] ?? [];
+            if (is_string($name) && is_array($services) && $services !== []) {
+                $actual[] = $name;
             }
         }
         $this->assertSame($expected, $actual);
@@ -1257,7 +1252,7 @@ GQL;
     private function salonsNearbyQuery(): string
     {
         return <<<'GQL'
-query Nearby($lat: Float!, $lng: Float!, $limit: Int, $offset: Int, $category: ServiceCategory, $name: String) {
+query Nearby($lat: Float!, $lng: Float!, $limit: Int, $offset: Int, $category: String, $name: String) {
   salonsNearby(lat: $lat, lng: $lng, limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
@@ -1269,7 +1264,7 @@ GQL;
     private function popularInSarajevoQuery(): string
     {
         return <<<'GQL'
-query Popular($limit: Int, $offset: Int, $category: ServiceCategory, $name: String) {
+query Popular($limit: Int, $offset: Int, $category: String, $name: String) {
   popularInSarajevo(limit: $limit, offset: $offset, category: $category, name: $name) {
     id
     name
@@ -1287,8 +1282,11 @@ query NearbyFacts($lat: Float!, $lng: Float!, $date: String!) {
     name
     address
     busyLevel(date: $date)
-    services {
-      category
+    serviceCategories {
+      name
+      services {
+        id
+      }
     }
   }
 }
@@ -1304,8 +1302,11 @@ query PopularFacts($date: String!) {
     name
     address
     busyLevel(date: $date)
-    services {
-      category
+    serviceCategories {
+      name
+      services {
+        id
+      }
     }
   }
 }
@@ -2141,7 +2142,9 @@ query PublicSalon($id: ID!) {
     services {
       id
       name
-      category
+      serviceCategory {
+        name
+      }
       durationMinutes
       priceFeninga
     }

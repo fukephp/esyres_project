@@ -31,9 +31,14 @@ test('salon profile stack is address, header send, hours, services, lower CTAs',
   expect(servicesAt).toBeGreaterThan(hoursAt)
   expect(lowerAt).toBeGreaterThan(servicesAt)
   expect(askAt).toBeGreaterThan(lowerAt)
+  expect(page).toMatch(/SalonServiceGroups/)
+  expect(page).toMatch(/svc-cat-\$\{group\.id\}/)
+  expect(page).toMatch(/hidden w-40 shrink-0 md:block/)
+  expect(page).toMatch(/visible\.length >= 2/)
+  expect(page).not.toMatch(/category\.\$\{/)
 })
 
-test('address is omitted helper plus muted line; no maps heading', () => {
+test('address is optional text line; no maps', () => {
   const page = read('pages/SalonProfile.tsx')
   expect(page).toMatch(/assistantAddressLine\(salon\.address\)/)
   expect(page).toMatch(/addressLine !== null \? <p className="mt-3 text-sm text-muted">\{addressLine\}<\/p>/)

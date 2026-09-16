@@ -36,22 +36,22 @@ input UpdateSalonInput {
     address: String!
 }
 
-enum ServiceCategory {
-    HAIR
-    MAKE_UP
-    MASSAGE
-}
-
 enum BusyLevel {
     LOW
     MEDIUM
     HIGH
 }
 
+type SalonServiceCategory {
+    id: ID!
+    name: String!
+    services: [Service!]! @method(name: "serviceList")
+}
+
 type Service {
     id: ID!
     name: String!
-    category: ServiceCategory!
+    serviceCategory: SalonServiceCategory! @belongsTo
     durationMinutes: Int! @rename(attribute: "duration_minutes")
     priceFeninga: Int! @rename(attribute: "price_feninga")
 }
@@ -63,16 +63,24 @@ type Worker {
 
 input CreateSalonServiceInput {
     name: String!
-    category: ServiceCategory!
+    serviceCategoryId: ID!
     durationMinutes: Int
     priceFeninga: Int!
 }
 
 input UpdateSalonServiceInput {
     name: String!
-    category: ServiceCategory!
+    serviceCategoryId: ID!
     durationMinutes: Int!
     priceFeninga: Int!
+}
+
+input CreateSalonServiceCategoryInput {
+    name: String!
+}
+
+input UpdateSalonServiceCategoryInput {
+    name: String!
 }
 
 input CreateSalonWorkerInput {
@@ -188,6 +196,7 @@ type Salon {
     cancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancelCount")
     lateCancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@lateCancelCount")
     hours: [DayHours!]! @method(name: "dayHours")
+    serviceCategories: [SalonServiceCategory!]! @method(name: "serviceCategoryList")
     services: [Service!]! @method(name: "serviceList")
     workers: [Worker!]! @method(name: "workerList")
     busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
@@ -219,8 +228,8 @@ type Query {
     vapidPublicKey: String!
     me: User
     salon(id: ID!): Salon
-    salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
-    popularInSarajevo(limit: Int = 20, offset: Int = 0, category: ServiceCategory, name: String): [Salon!]!
+    salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
+    popularInSarajevo(limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
     occupyingBookings(salonId: ID!, date: String!): [Booking!]!
     ownerBooking(id: ID!): Booking!
@@ -247,6 +256,9 @@ type Mutation {
     updateSalon(salonId: ID!, input: UpdateSalonInput!): Salon!
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
+    createSalonServiceCategory(salonId: ID!, input: CreateSalonServiceCategoryInput!): SalonServiceCategory
+    updateSalonServiceCategory(id: ID!, input: UpdateSalonServiceCategoryInput!): SalonServiceCategory
+    deleteSalonServiceCategory(id: ID!): Boolean!
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!

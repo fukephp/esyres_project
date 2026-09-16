@@ -80,4 +80,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-55 | Workers on salon edit | 7 | `STORY-55` | STORY-03, STORY-51 |
 | STORY-56 | Exclusive chips on salon edit | 7 | `STORY-56` | STORY-51, STORY-53, STORY-54, STORY-55 |
 | STORY-57 | Odjava as Cal destructive button | 1 | `STORY-57` | STORY-43 |
-| STORY-58 | Owner service categories | 7 | — | STORY-54, STORY-56, STORY-07, STORY-08, STORY-06, STORY-44 |
+| STORY-58 | Owner service categories | 7 | `STORY-58` | STORY-54, STORY-56, STORY-07, STORY-08, STORY-06, STORY-44 |

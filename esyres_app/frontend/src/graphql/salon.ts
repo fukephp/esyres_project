@@ -18,9 +18,18 @@ export const PUBLIC_SALON_QUERY = gql`
       services {
         id
         name
-        category
         durationMinutes
         priceFeninga
+      }
+      serviceCategories {
+        id
+        name
+        services {
+          id
+          name
+          durationMinutes
+          priceFeninga
+        }
       }
       workers {
         id
@@ -44,9 +53,14 @@ export type DayHours = {
 export type SalonService = {
   id: string
   name: string
-  category: 'HAIR' | 'MAKE_UP' | 'MASSAGE'
   durationMinutes: number
   priceFeninga: number
+}
+
+export type SalonServiceCategory = {
+  id: string
+  name: string
+  services: SalonService[]
 }
 
 export type SalonWorker = {
@@ -60,6 +74,7 @@ export type PublicSalon = {
   address: string | null
   hours: DayHours[]
   services: SalonService[]
+  serviceCategories: SalonServiceCategory[]
   workers: SalonWorker[]
   busyLevel: BusyLevel
   chatBusyLevel: BusyLevel

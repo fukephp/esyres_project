@@ -22,10 +22,19 @@ export const ME_QUERY = gql`
           breakStartsAt
           breakEndsAt
         }
+        serviceCategories {
+          id
+          name
+          services {
+            id
+            name
+            durationMinutes
+            priceFeninga
+          }
+        }
         services {
           id
           name
-          category
           durationMinutes
           priceFeninga
         }
@@ -111,7 +120,6 @@ export const CREATE_SALON_SERVICE_MUTATION = gql`
     createSalonService(salonId: $salonId, input: $input) {
       id
       name
-      category
       durationMinutes
       priceFeninga
     }
@@ -123,10 +131,33 @@ export const UPDATE_SALON_SERVICE_MUTATION = gql`
     updateSalonService(id: $id, input: $input) {
       id
       name
-      category
       durationMinutes
       priceFeninga
     }
+  }
+`
+
+export const CREATE_SALON_SERVICE_CATEGORY_MUTATION = gql`
+  mutation CreateSalonServiceCategory($salonId: ID!, $input: CreateSalonServiceCategoryInput!) {
+    createSalonServiceCategory(salonId: $salonId, input: $input) {
+      id
+      name
+    }
+  }
+`
+
+export const UPDATE_SALON_SERVICE_CATEGORY_MUTATION = gql`
+  mutation UpdateSalonServiceCategory($id: ID!, $input: UpdateSalonServiceCategoryInput!) {
+    updateSalonServiceCategory(id: $id, input: $input) {
+      id
+      name
+    }
+  }
+`
+
+export const DELETE_SALON_SERVICE_CATEGORY_MUTATION = gql`
+  mutation DeleteSalonServiceCategory($id: ID!) {
+    deleteSalonServiceCategory(id: $id)
   }
 `
 
@@ -197,10 +228,19 @@ export type MeData = {
         breakStartsAt: string | null
         breakEndsAt: string | null
       }[]
+      serviceCategories: {
+        id: string
+        name: string
+        services: {
+          id: string
+          name: string
+          durationMinutes: number
+          priceFeninga: number
+        }[]
+      }[]
       services: {
         id: string
         name: string
-        category: string
         durationMinutes: number
         priceFeninga: number
       }[]

@@ -13,7 +13,9 @@ final class ListFilter
     {
         if (is_string($category) && $category !== '') {
             $query->whereHas('services', static function (Builder $services) use ($category): void {
-                $services->where('category', $category);
+                $services->whereHas('serviceCategory', static function (Builder $groups) use ($category): void {
+                    $groups->where('legacy_key', $category);
+                });
             });
         }
         $term = is_string($name) ? trim($name) : '';

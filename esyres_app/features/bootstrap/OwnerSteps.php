@@ -2,6 +2,7 @@
 
 use App\Models\Booking;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\User;
 use App\Models\Worker;
 use App\SalonHours\WeeklyHours;
@@ -992,13 +993,74 @@ GQL, ['id' => (string) $this->salon->id]);
     }
 
     /**
+     * @When I query salon service categories
+     */
+    public function iQuerySalonServiceCategories(): void
+    {
+        $this->graphql($this->salonServiceCategoriesQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I create a salon service category:
+     */
+    public function iCreateASalonServiceCategory(PyStringNode $payload): void
+    {
+        $this->graphql($this->createServiceCategoryMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+        $this->rememberServiceCategoryFromMutation('createSalonServiceCategory');
+    }
+
+    /**
+     * @When I create a salon service category as a guest:
+     */
+    public function iCreateASalonServiceCategoryAsAGuest(PyStringNode $payload): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->createServiceCategoryMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I update the salon service category:
+     */
+    public function iUpdateTheSalonServiceCategory(PyStringNode $payload): void
+    {
+        $this->graphql($this->updateServiceCategoryMutation(), [
+            'id' => (string) $this->serviceCategory->id,
+            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @When I delete the salon service category
+     */
+    public function iDeleteTheSalonServiceCategory(): void
+    {
+        $this->graphql($this->deleteServiceCategoryMutation(), [
+            'id' => (string) $this->serviceCategory->id,
+        ]);
+    }
+
+    private function rememberServiceCategoryFromMutation(string $field): void
+    {
+        $id = $this->graphql['data'][$field]['id'] ?? null;
+        if (is_string($id) || is_int($id)) {
+            $this->serviceCategory = SalonServiceCategory::query()->find($id);
+        }
+    }
+
+    /**
      * @When I create a salon service:
      */
     public function iCreateASalonService(PyStringNode $payload): void
     {
         $this->graphql($this->createServiceMutation(), [
             'salonId' => (string) $this->salon->id,
-            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+            'input' => $this->graphqlServiceInput(json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR)),
         ]);
     }
 
@@ -1010,7 +1072,7 @@ GQL, ['id' => (string) $this->salon->id]);
         $this->iFetchTheCsrfCookie();
         $this->graphql($this->createServiceMutation(), [
             'salonId' => (string) $this->salon->id,
-            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+            'input' => $this->graphqlServiceInput(json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR)),
         ]);
     }
 
@@ -1021,7 +1083,7 @@ GQL, ['id' => (string) $this->salon->id]);
     {
         $this->graphql($this->updateServiceMutation(), [
             'id' => (string) $this->service->id,
-            'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
+            'input' => $this->graphqlServiceInput(json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR)),
         ]);
     }
 
@@ -1707,7 +1769,9 @@ query Salon($id: ID!) {
     services {
       id
       name
-      category
+      serviceCategory {
+        name
+      }
       durationMinutes
       priceFeninga
     }
@@ -1723,7 +1787,9 @@ mutation Create($salonId: ID!, $input: CreateSalonServiceInput!) {
   createSalonService(salonId: $salonId, input: $input) {
     id
     name
-    category
+    serviceCategory {
+      name
+    }
     durationMinutes
     priceFeninga
   }
@@ -1738,10 +1804,64 @@ mutation UpdateService($id: ID!, $input: UpdateSalonServiceInput!) {
   updateSalonService(id: $id, input: $input) {
     id
     name
-    category
+    serviceCategory {
+      name
+    }
     durationMinutes
     priceFeninga
   }
+}
+GQL;
+    }
+
+    private function salonServiceCategoriesQuery(): string
+    {
+        return <<<'GQL'
+query SalonCategories($id: ID!) {
+  salon(id: $id) {
+    id
+    serviceCategories {
+      id
+      name
+      services {
+        id
+        name
+      }
+    }
+  }
+}
+GQL;
+    }
+
+    private function createServiceCategoryMutation(): string
+    {
+        return <<<'GQL'
+mutation CreateCategory($salonId: ID!, $input: CreateSalonServiceCategoryInput!) {
+  createSalonServiceCategory(salonId: $salonId, input: $input) {
+    id
+    name
+  }
+}
+GQL;
+    }
+
+    private function updateServiceCategoryMutation(): string
+    {
+        return <<<'GQL'
+mutation UpdateCategory($id: ID!, $input: UpdateSalonServiceCategoryInput!) {
+  updateSalonServiceCategory(id: $id, input: $input) {
+    id
+    name
+  }
+}
+GQL;
+    }
+
+    private function deleteServiceCategoryMutation(): string
+    {
+        return <<<'GQL'
+mutation DeleteCategory($id: ID!) {
+  deleteSalonServiceCategory(id: $id)
 }
 GQL;
     }
@@ -1855,7 +1975,10 @@ GQL;
                 throw new RuntimeException('Expected worker and service on '.$salon->name);
             }
             foreach ($salon->services as $service) {
-                $categories[$service->category] = true;
+                $key = $service->serviceCategory?->legacy_key;
+                if (is_string($key)) {
+                    $categories[$key] = true;
+                }
             }
         }
         foreach (['HAIR', 'MAKE_UP', 'MASSAGE'] as $category) {

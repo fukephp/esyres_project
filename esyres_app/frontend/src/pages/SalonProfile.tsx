@@ -16,7 +16,7 @@ import {
   type PingAssistantIntakeData,
   type UpsertAssistantIntakeData,
 } from '../graphql/intake'
-import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService } from '../graphql/salon'
+import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService, type SalonServiceCategory } from '../graphql/salon'
 import {
   assistantAddressLine,
   assistantBookingInput,
@@ -104,6 +104,86 @@ function gateMessage(
     return t('salon.gate.INVALID_CREDENTIALS')
   }
   return t('salon.gate.fallback')
+}
+
+function visibleServiceGroups(categories: SalonServiceCategory[]): SalonServiceCategory[] {
+  return categories.filter((group) => group.services.length > 0)
+}
+
+function SalonServiceGroups({
+  categories,
+  picking,
+  selected,
+  toggle,
+}: {
+  categories: SalonServiceCategory[]
+  picking: boolean
+  selected: string[]
+  toggle: (service: SalonService) => void
+}) {
+  const { t } = useTranslation()
+  const visible = visibleServiceGroups(categories)
+  const showJump = visible.length >= 2
+
+  return (
+    <div className={showJump ? 'md:flex md:gap-8' : undefined}>
+      <div className="min-w-0 flex-1 space-y-8">
+        {visible.map((group) => (
+          <div key={group.id} id={`svc-cat-${group.id}`}>
+            <h3 className="text-sm font-semibold text-ink">{group.name}</h3>
+            <ul className="mt-3 divide-y divide-hairline">
+              {group.services.map((service) => (
+                <li key={service.id} className="py-3">
+                  {picking ? (
+                    <label className="flex cursor-pointer items-baseline justify-between gap-4">
+                      <span className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={selected.includes(service.id)}
+                          onChange={() => toggle(service)}
+                        />
+                        <span>
+                          <span className="block text-sm font-medium text-ink">{service.name}</span>
+                          <span className="text-xs text-muted">
+                            {t('salon.duration', { n: service.durationMinutes })}
+                          </span>
+                        </span>
+                      </span>
+                      <span className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</span>
+                    </label>
+                  ) : (
+                    <div className="flex items-baseline justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-ink">{service.name}</p>
+                        <p className="text-xs text-muted">
+                          {t('salon.duration', { n: service.durationMinutes })}
+                        </p>
+                      </div>
+                      <p className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</p>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {showJump ? (
+        <nav className="hidden w-40 shrink-0 md:block">
+          <ul className="space-y-2">
+            {visible.map((group) => (
+              <li key={group.id}>
+                <a href={`#svc-cat-${group.id}`} className="text-sm text-body">
+                  {group.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </div>
+  )
 }
 
 export function SalonProfile() {
@@ -580,41 +660,14 @@ export function SalonProfile() {
         {salon.services.length === 0 ? (
           <p className="mt-3 text-sm text-muted">{t('salon.emptyServices')}</p>
         ) : (
-          <ul className="mt-3 divide-y divide-hairline">
-            {salon.services.map((service) => (
-              <li key={service.id} className="py-3">
-                {picking ? (
-                  <label className="flex cursor-pointer items-baseline justify-between gap-4">
-                    <span className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        className="mt-1"
-                        checked={selected.includes(service.id)}
-                        onChange={() => toggle(service)}
-                      />
-                      <span>
-                        <span className="block text-sm font-medium text-ink">{service.name}</span>
-                        <span className="text-xs text-muted">
-                          {t(`category.${service.category}`)} · {t('salon.duration', { n: service.durationMinutes })}
-                        </span>
-                      </span>
-                    </span>
-                    <span className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</span>
-                  </label>
-                ) : (
-                  <div className="flex items-baseline justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-ink">{service.name}</p>
-                      <p className="text-xs text-muted">
-                        {t(`category.${service.category}`)} · {t('salon.duration', { n: service.durationMinutes })}
-                      </p>
-                    </div>
-                    <p className="text-sm text-ink">{formatFeninga(service.priceFeninga)}</p>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-3">
+            <SalonServiceGroups
+              categories={salon.serviceCategories}
+              picking={picking}
+              selected={selected}
+              toggle={toggle}
+            />
+          </div>
         )}
       </section>
 
