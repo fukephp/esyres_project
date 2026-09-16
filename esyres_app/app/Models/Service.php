@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\QueryException;
 
-#[Fillable(['salon_id', 'name', 'category', 'duration_minutes', 'price_feninga'])]
+#[Fillable(['salon_id', 'service_category_id', 'name', 'duration_minutes', 'price_feninga'])]
 class Service extends Model
 {
     /** @use HasFactory<ServiceFactory> */
@@ -36,7 +36,15 @@ class Service extends Model
     }
 
     /**
-     * @param  array{name: string, category: string, durationMinutes?: int|null, priceFeninga: int}  $input
+     * @return BelongsTo<SalonServiceCategory, $this>
+     */
+    public function serviceCategory(): BelongsTo
+    {
+        return $this->belongsTo(SalonServiceCategory::class, 'service_category_id');
+    }
+
+    /**
+     * @param  array{name: string, durationMinutes?: int|null, priceFeninga: int}  $input
      */
     public function fillFromInput(array $input): void
     {
@@ -56,9 +64,20 @@ class Service extends Model
         }
 
         $this->name = $name;
-        $this->category = $input['category'];
         $this->duration_minutes = $duration;
         $this->price_feninga = $price;
+    }
+
+    public function attachCategory(Salon $salon, mixed $categoryId): void
+    {
+        if (! is_string($categoryId) && ! is_int($categoryId)) {
+            throw new ClientError('INVALID_CATEGORY');
+        }
+        $category = SalonServiceCategory::query()->find((string) $categoryId);
+        if ($category === null || (int) $category->salon_id !== (int) $salon->id) {
+            throw new ClientError('INVALID_CATEGORY');
+        }
+        $this->service_category_id = $category->id;
     }
 
     public function saveOrDuplicate(): void
@@ -72,4 +91,4 @@ class Service extends Model
             throw $e;
         }
     }
-};
+}

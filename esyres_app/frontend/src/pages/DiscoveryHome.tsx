@@ -18,7 +18,7 @@ import {
   discoveryEmptyKey,
   discoveryHasFilter,
   discoveryListMode,
-  discoverySalonCategories,
+  discoverySalonCategoryNames,
   discoveryShowAllVisible,
   discoverySource,
   discoveryVisibleSalons,
@@ -96,7 +96,7 @@ function SearchIcon() {
 function SalonFacts({ salon }: { salon: DiscoverySalon }) {
   const { t } = useTranslation()
   const token = busyToken(salon.busyLevel)
-  const categories = discoverySalonCategories(salon.services)
+  const categories = discoverySalonCategoryNames(salon.serviceCategories)
   const address = discoveryAddressLine(salon.address)
 
   return (
@@ -110,7 +110,7 @@ function SalonFacts({ salon }: { salon: DiscoverySalon }) {
       </div>
       {categories.length > 0 ? (
         <p className="mt-1 text-sm text-muted">
-          {categories.map((c) => t(`category.${c}`)).join(', ')}
+          {categories.join(', ')}
         </p>
       ) : null}
       {address !== null ? <p className="mt-1 text-sm text-muted">{address}</p> : null}

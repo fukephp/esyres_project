@@ -7,11 +7,14 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
 import {
+  CREATE_SALON_SERVICE_CATEGORY_MUTATION,
   CREATE_SALON_SERVICE_MUTATION,
   CREATE_SALON_WORKER_MUTATION,
+  DELETE_SALON_SERVICE_CATEGORY_MUTATION,
   ME_QUERY,
   UPDATE_SALON_HOURS_MUTATION,
   UPDATE_SALON_MUTATION,
+  UPDATE_SALON_SERVICE_CATEGORY_MUTATION,
   UPDATE_SALON_SERVICE_MUTATION,
   UPDATE_SALON_WORKER_MUTATION,
   type MeData,
@@ -19,7 +22,6 @@ import {
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { graphqlErrorCode } from '../lib/booking'
-import { DISCOVERY_CATEGORIES } from '../lib/discovery'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
@@ -42,7 +44,8 @@ const PANEL = 'mt-8 space-y-4 border border-hairline p-5'
 
 type SalonEditSection = 'info' | 'hours' | 'services' | 'workers'
 
-type OwnerSalonService = NonNullable<MeData['me']>['salons'][number]['services'][number]
+type OwnerSalonCategory = NonNullable<MeData['me']>['salons'][number]['serviceCategories'][number]
+type OwnerSalonService = OwnerSalonCategory['services'][number]
 type OwnerSalonWorker = NonNullable<MeData['me']>['salons'][number]['workers'][number]
 
 function emptyWeek(): SalonHoursDayForm[] {
@@ -74,6 +77,26 @@ function daysFromHours(hours: PanelHours[]): SalonHoursDayForm[] {
   })
 }
 
+function categoryFail(code: string, t: (key: string) => string): string {
+  if (code === 'INVALID_NAME') {
+    return t('owner.INVALID_CATEGORY_NAME')
+  }
+  if (code === 'DUPLICATE_CATEGORY_NAME') {
+    return t('owner.DUPLICATE_CATEGORY_NAME')
+  }
+  if (code === 'CATEGORY_NOT_EMPTY') {
+    return t('owner.CATEGORY_NOT_EMPTY')
+  }
+  if (code === 'INVALID_CATEGORY') {
+    return t('owner.INVALID_CATEGORY')
+  }
+  if (code === 'FORBIDDEN') {
+    return t('owner.FORBIDDEN')
+  }
+
+  return t('salon.gate.fallback')
+}
+
 function serviceFail(code: string, t: (key: string) => string): string {
   if (code === 'INVALID_NAME') {
     return t('owner.INVALID_SERVICE_NAME')
@@ -86,6 +109,9 @@ function serviceFail(code: string, t: (key: string) => string): string {
   }
   if (code === 'DUPLICATE_SERVICE_NAME') {
     return t('owner.DUPLICATE_SERVICE_NAME')
+  }
+  if (code === 'INVALID_CATEGORY') {
+    return t('owner.INVALID_CATEGORY')
   }
   if (code === 'FORBIDDEN') {
     return t('owner.FORBIDDEN')
@@ -174,10 +200,14 @@ function SalonWorkerForm({
 function SalonServiceForm({
   salonId,
   service,
+  categories,
+  serviceCategoryId,
   onSaved,
 }: {
   salonId: string
   service?: OwnerSalonService
+  categories: { id: string; name: string }[]
+  serviceCategoryId: string
   onSaved: () => Promise<unknown>
 }) {
   const { t } = useTranslation()
@@ -185,23 +215,24 @@ function SalonServiceForm({
   const [updateSalonService, { loading: updating }] = useMutation(UPDATE_SALON_SERVICE_MUTATION)
   const saving = creating || updating
   const [name, setName] = useState(service?.name ?? '')
-  const [category, setCategory] = useState(service?.category ?? 'HAIR')
+  const [moveId, setMoveId] = useState(serviceCategoryId)
   const [duration, setDuration] = useState(
     service === undefined ? '' : String(service.durationMinutes),
   )
   const [price, setPrice] = useState(service === undefined ? '' : feningaToKm(service.priceFeninga))
   const [error, setError] = useState<string | null>(null)
   const radioName = `service-category-${service?.id ?? 'new'}`
+  const showMove = service !== undefined && categories.length >= 2
 
   useEffect(() => {
     if (service === undefined) {
       return
     }
     setName(service.name)
-    setCategory(service.category)
+    setMoveId(serviceCategoryId)
     setDuration(String(service.durationMinutes))
     setPrice(feningaToKm(service.priceFeninga))
-  }, [service])
+  }, [service, serviceCategoryId])
 
   async function onSaveService(e: FormEvent) {
     e.preventDefault()
@@ -218,16 +249,15 @@ function SalonServiceForm({
       if (service === undefined) {
         const input: {
           name: string
-          category: string
+          serviceCategoryId: string
           priceFeninga: number
           durationMinutes?: number
-        } = { name: name.trim(), category, priceFeninga }
+        } = { name: name.trim(), serviceCategoryId, priceFeninga }
         if (duration.trim() !== '') {
           input.durationMinutes = Number.parseInt(duration, 10)
         }
         await createSalonService({ variables: { salonId, input } })
         setName('')
-        setCategory('HAIR')
         setDuration('')
         setPrice('')
       } else {
@@ -236,7 +266,7 @@ function SalonServiceForm({
             id: service.id,
             input: {
               name: name.trim(),
-              category,
+              serviceCategoryId: moveId,
               durationMinutes: Number.parseInt(duration, 10) || 0,
               priceFeninga,
             },
@@ -260,19 +290,21 @@ function SalonServiceForm({
           className={FIELD}
         />
       </label>
-      <div className="flex flex-wrap gap-3 text-sm text-body">
-        {DISCOVERY_CATEGORIES.map((cat) => (
-          <label key={cat} className="flex items-center gap-2">
-            <input
-              type="radio"
-              name={radioName}
-              checked={category === cat}
-              onChange={() => setCategory(cat)}
-            />
-            {t(`category.${cat}`)}
-          </label>
-        ))}
-      </div>
+      {showMove ? (
+        <div className="flex flex-wrap gap-3 text-sm text-body">
+          {categories.map((cat) => (
+            <label key={cat.id} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={radioName}
+                checked={moveId === cat.id}
+                onChange={() => setMoveId(cat.id)}
+              />
+              {cat.name}
+            </label>
+          ))}
+        </div>
+      ) : null}
       <label className="block text-sm text-body">
         {t('owner.duration')}
         <input
@@ -302,6 +334,11 @@ export function OwnerSalonEdit() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [updateSalon, { loading: savingSalon }] = useMutation(UPDATE_SALON_MUTATION)
   const [updateSalonHours, { loading: savingHours }] = useMutation(UPDATE_SALON_HOURS_MUTATION)
+  const [createSalonServiceCategory] = useMutation<{
+    createSalonServiceCategory: { id: string; name: string }
+  }>(CREATE_SALON_SERVICE_CATEGORY_MUTATION)
+  const [updateSalonServiceCategory] = useMutation(UPDATE_SALON_SERVICE_CATEGORY_MUTATION)
+  const [deleteSalonServiceCategory] = useMutation(DELETE_SALON_SERVICE_CATEGORY_MUTATION)
   const [section, setSection] = useState<SalonEditSection>('info')
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
@@ -309,10 +346,17 @@ export function OwnerSalonEdit() {
   const [notice, setNotice] = useState('24')
   const [infoError, setInfoError] = useState<string | null>(null)
   const [hoursError, setHoursError] = useState<string | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState('')
+  const [categoryName, setCategoryName] = useState('')
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [categoryError, setCategoryError] = useState<string | null>(null)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
   const firstOwnedId = salons[0]?.id ?? ''
   const salon = salons.find((row) => row.id === id)
+  const categories = salon?.serviceCategories ?? []
+  const selectedCategory = categories.find((row) => row.id === selectedCategoryId)
+  const categoryIds = categories.map((row) => row.id).join(',')
   const ownerReady = firstOwnedId !== '' && data?.me?.emailVerified === true
   const navSalonId = salon?.id ?? firstOwnedId
   useOwnerPush(ownerReady)
@@ -332,6 +376,15 @@ export function OwnerSalonEdit() {
     setDays(daysFromHours(salon.hours))
     setNotice(String(salon.cancellationNoticeHours ?? 24))
   }, [salon])
+
+  useEffect(() => {
+    const ids = categoryIds === '' ? [] : categoryIds.split(',')
+    setSelectedCategoryId((current) => (ids.includes(current) ? current : (ids[0] ?? '')))
+  }, [categoryIds])
+
+  useEffect(() => {
+    setCategoryName(selectedCategory?.name ?? '')
+  }, [selectedCategory?.id, selectedCategory?.name])
 
   function patchDay(weekday: string, patch: Partial<SalonHoursDayForm>): void {
     setDays((rows) => rows.map((row) => (row.weekday === weekday ? { ...row, ...patch } : row)))
@@ -387,6 +440,57 @@ export function OwnerSalonEdit() {
       } else {
         setHoursError(t('salon.gate.fallback'))
       }
+    }
+  }
+
+  async function onAddCategory(e: FormEvent) {
+    e.preventDefault()
+    if (salon === undefined) {
+      return
+    }
+    setCategoryError(null)
+    try {
+      const result = await createSalonServiceCategory({
+        variables: { salonId: salon.id, input: { name: newCategoryName } },
+      })
+      const createdId = result.data?.createSalonServiceCategory?.id
+      setNewCategoryName('')
+      await refetch()
+      if (createdId) {
+        setSelectedCategoryId(createdId)
+      }
+    } catch (err) {
+      setCategoryError(categoryFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onRenameCategory(e: FormEvent) {
+    e.preventDefault()
+    if (selectedCategory === undefined) {
+      return
+    }
+    setCategoryError(null)
+    try {
+      await updateSalonServiceCategory({
+        variables: { id: selectedCategory.id, input: { name: categoryName } },
+      })
+      await refetch()
+    } catch (err) {
+      setCategoryError(categoryFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onDeleteCategory() {
+    if (selectedCategory === undefined) {
+      return
+    }
+    setCategoryError(null)
+    try {
+      await deleteSalonServiceCategory({ variables: { id: selectedCategory.id } })
+      setSelectedCategoryId('')
+      await refetch()
+    } catch (err) {
+      setCategoryError(categoryFail(graphqlErrorCode(err) ?? '', t))
     }
   }
 
@@ -636,18 +740,85 @@ export function OwnerSalonEdit() {
               </form>
               <section className={section === 'services' ? PANEL : `${PANEL} hidden`}>
                 <h2 className="text-sm font-semibold text-ink">{t('salon.services')}</h2>
-                {salon.services.length === 0 ? (
-                  <p className="text-sm text-body">{t('salon.emptyServices')}</p>
-                ) : (
-                  <ul className="space-y-6">
-                    {salon.services.map((row) => (
-                      <li key={row.id}>
-                        <SalonServiceForm salonId={salon.id} service={row} onSaved={refetch} />
-                      </li>
+                {categories.length > 0 ? (
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    {categories.map((row) => (
+                      <button
+                        key={row.id}
+                        type="button"
+                        className={row.id === selectedCategoryId ? CHIP_ON : CHIP_IDLE}
+                        onClick={() => setSelectedCategoryId(row.id)}
+                      >
+                        {row.name}
+                      </button>
                     ))}
-                  </ul>
-                )}
-                <SalonServiceForm salonId={salon.id} onSaved={refetch} />
+                  </div>
+                ) : null}
+                {selectedCategory ? (
+                  <>
+                    <form className="space-y-3" onSubmit={(e) => void onRenameCategory(e)}>
+                      <label className="block text-sm text-body">
+                        {t('owner.categoryName')}
+                        <input
+                          type="text"
+                          value={categoryName}
+                          onChange={(e) => setCategoryName(e.target.value)}
+                          className={FIELD}
+                        />
+                      </label>
+                      <button type="submit" className={SAVE_BTN}>
+                        {t('owner.save')}
+                      </button>
+                    </form>
+                    {selectedCategory.services.length === 0 ? (
+                      <button
+                        type="button"
+                        className={SAVE_BTN}
+                        onClick={() => void onDeleteCategory()}
+                      >
+                        {t('owner.deleteCategory')}
+                      </button>
+                    ) : null}
+                    {selectedCategory.services.length === 0 ? (
+                      <p className="text-sm text-body">{t('salon.emptyServices')}</p>
+                    ) : (
+                      <ul className="space-y-6">
+                        {selectedCategory.services.map((row) => (
+                          <li key={row.id}>
+                            <SalonServiceForm
+                              salonId={salon.id}
+                              service={row}
+                              categories={categories}
+                              serviceCategoryId={selectedCategory.id}
+                              onSaved={refetch}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <SalonServiceForm
+                      salonId={salon.id}
+                      categories={categories}
+                      serviceCategoryId={selectedCategory.id}
+                      onSaved={refetch}
+                    />
+                  </>
+                ) : null}
+                <form className="space-y-3" onSubmit={(e) => void onAddCategory(e)}>
+                  <label className="block text-sm text-body">
+                    {t('owner.categoryName')}
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className={FIELD}
+                    />
+                  </label>
+                  <button type="submit" className={SAVE_BTN}>
+                    {t('owner.addCategory')}
+                  </button>
+                </form>
+                {categoryError ? <p className="text-sm text-busy-busy">{categoryError}</p> : null}
               </section>
               <section className={section === 'workers' ? PANEL : `${PANEL} hidden`}>
                 <h2 className="text-sm font-semibold text-ink">{t('owner.workers')}</h2>

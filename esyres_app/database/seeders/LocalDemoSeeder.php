@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -84,12 +85,13 @@ class LocalDemoSeeder extends Seeder
         return $week;
     }
 
-    private function service(Salon $salon, string $name, string $category, int $minutes, int $feninga): Service
+    private function service(Salon $salon, string $name, string $legacyKey, int $minutes, int $feninga): Service
     {
+        $category = SalonServiceCategory::firstOrCreateLegacy((int) $salon->id, $legacyKey);
         $service = new Service;
         $service->salon_id = $salon->id;
+        $service->service_category_id = $category->id;
         $service->name = $name;
-        $service->category = $category;
         $service->duration_minutes = $minutes;
         $service->price_feninga = $feninga;
         $service->save();

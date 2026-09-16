@@ -5,6 +5,7 @@ use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -351,10 +352,72 @@ trait SharedFixtures
     public function theSalonHasAService(PyStringNode $payload): void
     {
         $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->service = $this->makeSalonService($input);
+        $this->services[] = $this->service;
+    }
+
+    /**
+     * @param  array{name: string, category: string, durationMinutes: int, priceFeninga: int}  $input
+     */
+    protected function makeSalonService(array $input): Service
+    {
+        $category = SalonServiceCategory::firstOrCreateLegacy((int) $this->salon->id, $input['category']);
+        $this->serviceCategory = $category;
+
+        return Service::factory()->create([
+            'salon_id' => $this->salon->id,
+            'service_category_id' => $category->id,
+            'name' => $input['name'],
+            'duration_minutes' => $input['durationMinutes'],
+            'price_feninga' => $input['priceFeninga'],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
+    protected function graphqlServiceInput(array $input): array
+    {
+        if (isset($input['category']) && is_string($input['category'])) {
+            $category = SalonServiceCategory::firstOrCreateLegacy((int) $this->salon->id, $input['category']);
+            unset($input['category']);
+            $input['serviceCategoryId'] = (string) $category->id;
+            $this->serviceCategory = $category;
+        } elseif (! isset($input['serviceCategoryId']) && $this->service !== null) {
+            $input['serviceCategoryId'] = (string) $this->service->service_category_id;
+        } elseif (! isset($input['serviceCategoryId']) && $this->serviceCategory !== null) {
+            $input['serviceCategoryId'] = (string) $this->serviceCategory->id;
+        }
+
+        return $input;
+    }
+
+    /**
+     * @Given the salon has an unkeyed service category :name
+     */
+    public function theSalonHasAnUnkeyedServiceCategory(string $name): void
+    {
+        $category = new SalonServiceCategory;
+        $category->salon_id = $this->salon->id;
+        $category->name = $name;
+        $category->save();
+        $this->serviceCategory = $category;
+    }
+
+    /**
+     * @Given the salon has a service in that category:
+     */
+    public function theSalonHasAServiceInThatCategory(PyStringNode $payload): void
+    {
+        $input = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        if ($this->serviceCategory === null) {
+            throw new RuntimeException('Service category fixture is missing');
+        }
         $this->service = Service::factory()->create([
             'salon_id' => $this->salon->id,
+            'service_category_id' => $this->serviceCategory->id,
             'name' => $input['name'],
-            'category' => $input['category'],
             'duration_minutes' => $input['durationMinutes'],
             'price_feninga' => $input['priceFeninga'],
         ]);
@@ -671,12 +734,11 @@ trait SharedFixtures
         if ($this->salon->services()->exists()) {
             return;
         }
-        $this->service = Service::factory()->create([
-            'salon_id' => $this->salon->id,
+        $this->service = $this->makeSalonService([
             'name' => 'Šišanje',
             'category' => 'HAIR',
-            'duration_minutes' => 30,
-            'price_feninga' => 2500,
+            'durationMinutes' => 30,
+            'priceFeninga' => 2500,
         ]);
         $this->services[] = $this->service;
     }
@@ -971,12 +1033,51 @@ GQL);
         foreach ($this->graphql['data']['salon']['services'] as $service) {
             $actual[] = [
                 'name' => $service['name'],
-                'category' => $service['category'],
+                'serviceCategoryName' => $service['serviceCategory']['name'],
                 'durationMinutes' => $service['durationMinutes'],
                 'priceFeninga' => $service['priceFeninga'],
             ];
         }
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then salon service categories are empty
+     */
+    public function salonServiceCategoriesAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['salon']['serviceCategories']);
+    }
+
+    /**
+     * @Then salon service categories match:
+     */
+    public function salonServiceCategoriesMatch(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['salon']['serviceCategories'] as $category) {
+            $services = [];
+            foreach ($category['services'] as $service) {
+                $services[] = $service['name'];
+            }
+            $actual[] = [
+                'name' => $category['name'],
+                'services' => $services,
+            ];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then deleteSalonServiceCategory is true
+     */
+    public function deleteSalonServiceCategoryIsTrue(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertTrue($this->graphql['data']['deleteSalonServiceCategory']);
     }
 
     /**

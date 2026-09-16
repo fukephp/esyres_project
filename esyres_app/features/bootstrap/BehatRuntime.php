@@ -3,6 +3,7 @@
 use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -37,6 +38,8 @@ trait BehatRuntime
     protected ?Salon $salon = null;
 
     protected ?Service $service = null;
+
+    protected ?SalonServiceCategory $serviceCategory = null;
 
     protected ?Worker $worker = null;
 

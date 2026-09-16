@@ -19,7 +19,7 @@ Feature: Owner salon services
     And I query salon services
     Then salon services match:
       """
-      [{"name": "Haircut", "category": "HAIR", "durationMinutes": 30, "priceFeninga": 2500}]
+      [{"name": "Haircut", "serviceCategoryName": "Kosa", "durationMinutes": 30, "priceFeninga": 2500}]
       """
 
   Scenario: Owner creates a service with explicit duration
@@ -32,7 +32,7 @@ Feature: Owner salon services
     And I query salon services
     Then salon services match:
       """
-      [{"name": "Makeup", "category": "MAKE_UP", "durationMinutes": 45, "priceFeninga": 4000}]
+      [{"name": "Makeup", "serviceCategoryName": "Šminka", "durationMinutes": 45, "priceFeninga": 4000}]
       """
 
   Scenario: Owner updates a service
@@ -49,7 +49,7 @@ Feature: Owner salon services
     And I query salon services
     Then salon services match:
       """
-      [{"name": "Color", "category": "MAKE_UP", "durationMinutes": 90, "priceFeninga": 5000}]
+      [{"name": "Color", "serviceCategoryName": "Šminka", "durationMinutes": 90, "priceFeninga": 5000}]
       """
 
   Scenario: Guest cannot create a service
@@ -141,6 +141,15 @@ Feature: Owner salon services
       {"name": "  ", "category": "HAIR", "priceFeninga": 2500}
       """
     Then the GraphQL error code is "INVALID_NAME"
+
+  Scenario: Unknown service category is rejected
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I create a salon service:
+      """
+      {"name": "Haircut", "serviceCategoryId": "999999", "priceFeninga": 2500}
+      """
+    Then the GraphQL error code is "INVALID_CATEGORY"
 
   Scenario: Duplicate name on the same salon is rejected
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
