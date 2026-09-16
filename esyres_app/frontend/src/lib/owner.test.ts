@@ -4,6 +4,7 @@ import {
   canAcceptPreferredTime,
   canDropOnStart,
   cellKind,
+  formatOwnerDayHeading,
   hoursForDate,
   isFifteenMinute,
   isPreferredSoon,
@@ -13,6 +14,8 @@ import {
   overlayQueueChrome,
   ownerDateFromSearch,
   ownerQueuePath,
+  queueChipInitial,
+  shiftOwnerDate,
   ownerChatPath,
   ownerStatsPath,
   ownerSalonsPath,
@@ -42,6 +45,21 @@ test('omit or invalid date falls back to Sarajevo today', () => {
   expect(ownerDateFromSearch('nope', '2026-08-29')).toBe('2026-08-29')
   expect(ownerDateFromSearch('2026-02-31', '2026-08-29')).toBe('2026-08-29')
   expect(ownerDateFromSearch('2026-08-31', '2026-08-29')).toBe('2026-08-31')
+})
+
+test('owner day heading is Bosnian Intl without trailing period', () => {
+  expect(formatOwnerDayHeading('2026-09-16')).toBe('srijeda, 16. septembar 2026')
+})
+
+test('shift owner date walks calendar days', () => {
+  expect(shiftOwnerDate('2026-09-16', -1)).toBe('2026-09-15')
+  expect(shiftOwnerDate('2026-09-30', 1)).toBe('2026-10-01')
+})
+
+test('queue chip initial is first trimmed letter', () => {
+  expect(queueChipInitial(' Ana')).toBe('A')
+  expect(queueChipInitial('')).toBe('?')
+  expect(queueChipInitial('   ')).toBe('?')
 })
 
 test('preferred time is soon when past or within two hours', () => {
@@ -395,6 +413,11 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.INVALID_WORKER_NAME')).toBe('Unesi ime radnika.')
   expect(i18n.t('owner.DUPLICATE_WORKER_NAME')).toBe('Radnik s tim imenom već postoji.')
   expect(i18n.t('owner.noWorkers')).toBe('Nema radnika.')
+  expect(i18n.t('owner.empty')).toBe('Nema zahtjeva za ovaj dan.')
+  expect(i18n.t('owner.closedDay')).toBe('Zatvoreno ovaj dan.')
+  expect(i18n.t('owner.prevDay')).toBe('Prethodni dan')
+  expect(i18n.t('owner.nextDay')).toBe('Sljedeći dan')
+  expect(i18n.exists('owner.today')).toBe(false)
   expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
   expect(i18n.exists('owner.listed')).toBe(false)
 })

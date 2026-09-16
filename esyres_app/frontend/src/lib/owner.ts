@@ -25,6 +25,40 @@ export function ownerDateFromSearch(param: string | null, today = sarajevoToday(
   return today
 }
 
+export function shiftOwnerDate(ymd: string, deltaDays: number): string {
+  const [year, month, day] = ymd.split('-').map(Number)
+  const next = new Date(Date.UTC(year, month - 1, day, 12))
+  next.setUTCDate(next.getUTCDate() + deltaDays)
+
+  return [
+    next.getUTCFullYear(),
+    String(next.getUTCMonth() + 1).padStart(2, '0'),
+    String(next.getUTCDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+export function formatOwnerDayHeading(ymd: string): string {
+  const [year, month, day] = ymd.split('-').map(Number)
+  const formatted = new Intl.DateTimeFormat('bs-BA', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Sarajevo',
+  }).format(new Date(Date.UTC(year, month - 1, day, 12)))
+
+  return formatted.replace(/\.$/, '')
+}
+
+export function queueChipInitial(name: string): string {
+  const trimmed = name.trim()
+  if (trimmed === '') {
+    return '?'
+  }
+
+  return trimmed.charAt(0).toLocaleUpperCase('bs-BA')
+}
+
 export function isPreferredSoon(iso: string, now = new Date()): boolean {
   const start = Date.parse(iso)
   if (Number.isNaN(start)) {
