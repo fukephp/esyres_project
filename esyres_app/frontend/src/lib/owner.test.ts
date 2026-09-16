@@ -32,6 +32,7 @@ import {
   assistantOriginVisible,
   assistantTranscriptLines,
   toSalonHoursInput,
+  hoursAccordionSummary,
   kmToFeninga,
   feningaToKm,
 } from './owner'
@@ -312,6 +313,35 @@ test('toSalonHoursInput always emits Mon–Sun; closed days send no clocks', () 
     breakStartsAt: null,
     breakEndsAt: null,
   })
+})
+
+test('hoursAccordionSummary is clock range without pauza', () => {
+  expect(hoursAccordionSummary({ closed: true, opensAt: '09:00', closesAt: '17:00' })).toEqual({
+    closed: true,
+  })
+  expect(hoursAccordionSummary({ closed: false, opensAt: '', closesAt: '17:00' })).toEqual({
+    closed: true,
+  })
+  expect(hoursAccordionSummary({ closed: false, opensAt: '09:00', closesAt: '' })).toEqual({
+    closed: true,
+  })
+  expect(
+    hoursAccordionSummary({
+      closed: false,
+      opensAt: '09:00:00',
+      closesAt: '17:00:00',
+    }),
+  ).toEqual({ closed: false, range: '09:00–17:00' })
+  const withPauza = {
+    weekday: 'WEDNESDAY',
+    closed: false,
+    opensAt: '10:00',
+    closesAt: '18:00',
+    breakOn: true,
+    breakStartsAt: '12:00',
+    breakEndsAt: '13:00',
+  }
+  expect(hoursAccordionSummary(withPauza)).toEqual({ closed: false, range: '10:00–18:00' })
 })
 
 test('kmToFeninga parses KM to integer feninga', () => {
