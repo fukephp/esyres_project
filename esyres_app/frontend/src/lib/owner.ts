@@ -187,6 +187,16 @@ function clock(value: string): string {
   return value.slice(0, 5)
 }
 
+export function hoursAccordionSummary(
+  day: Pick<SalonHoursDayForm, 'closed' | 'opensAt' | 'closesAt'>,
+): { closed: true } | { closed: false; range: string } {
+  if (day.closed || day.opensAt === '' || day.closesAt === '') {
+    return { closed: true }
+  }
+
+  return { closed: false, range: `${clock(day.opensAt)}–${clock(day.closesAt)}` }
+}
+
 export function kmToFeninga(raw: string): number | null {
   const trimmed = raw.trim().replace(',', '.')
   if (trimmed === '') {

@@ -13,8 +13,8 @@
 | Goal (one sentence) | Owners scan the week as seven collapsed weekday headers and open at most one day’s STORY-53 editor, without a week grid, new GraphQL, or guest hours restyle. |
 | Branch name | `cursor/story-60-hours-accordion-5dc8` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-16 |
 
 ## Pass/fail — product
 
