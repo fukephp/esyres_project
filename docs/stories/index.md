@@ -81,6 +81,6 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-56 | Exclusive chips on salon edit | 7 | `STORY-56` | STORY-51, STORY-53, STORY-54, STORY-55 |
 | STORY-57 | Odjava as Cal destructive button | 1 | `STORY-57` | STORY-43 |
 | STORY-58 | Owner service categories | 7 | `STORY-58` | STORY-54, STORY-56, STORY-07, STORY-08, STORY-06, STORY-44 |
-| STORY-59 | One idle Pošalji zahtjev; md+ booking sidebar | 1 | — | STORY-47, STORY-48 |
+| STORY-59 | One idle Pošalji zahtjev; md+ booking sidebar | 1 | `STORY-59` | STORY-47, STORY-48 |
 | STORY-60 | Radno vrijeme exclusive accordion | 7 | — | STORY-53, STORY-56 |
 | STORY-61 | Owner day card (hours down, worker columns) | 3 | — | STORY-13, STORY-14, STORY-15, STORY-16, STORY-42, STORY-49 |

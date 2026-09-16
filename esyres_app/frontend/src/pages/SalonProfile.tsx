@@ -42,7 +42,12 @@ import {
   hoursRowSelected,
   hoursRowTappable,
 } from '../lib/salonHours'
-import { SALON_SEND_CLASS } from '../lib/salonSend'
+import {
+  SALON_BOOKING_ASIDE_CLASS,
+  SALON_BOOKING_MAIN_CLASS,
+  SALON_BOOKING_SPLIT_CLASS,
+  SALON_SEND_CLASS,
+} from '../lib/salonSend'
 import {
   clearIntakeToken,
   emptyIntakeSnapshot,
@@ -353,6 +358,7 @@ export function SalonProfile() {
   const picking = isPickerOpen(mode)
   const chatting = isChatOpen(mode)
   const sent = mode === 'sent'
+  const showBookingColumn = hasServices && !sent
   const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
   const showAlternate = showChatCta(salon.services.length, sent) && !chatting
@@ -579,39 +585,9 @@ export function SalonProfile() {
     }
   }
 
-  return (
+  const catalog = (
     <>
-      <TopNav />
-      <main className={`${GUEST_COLUMN_CLASS} py-8`}>
-      <header className="flex items-start justify-between gap-4">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
-          {salon.name}
-        </h1>
-        <p className="flex items-center gap-2 text-sm text-body">
-          <span className={`size-2.5 shrink-0 rounded-full ${busyBg[token]}`} aria-hidden />
-          {t(`salon.busy.${salon.busyLevel}`)}
-        </p>
-      </header>
-
-      {addressLine !== null ? <p className="mt-3 text-sm text-muted">{addressLine}</p> : null}
-
-      {hasServices && mode === 'idle' && (
-        <div className="max-w-md">
-          <button
-            type="button"
-            className={`mt-8 ${SALON_SEND_CLASS}`}
-            onClick={() => {
-              openIntake('picker')
-              setScrollPicker(true)
-            }}
-          >
-            {t('salon.send')}
-          </button>
-          <p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>
-        </div>
-      )}
-
-      <section className="mt-8">
+      <section className={showBookingColumn ? undefined : 'mt-8'}>
         <h2 className="text-sm font-semibold text-ink">{t('salon.hours')}</h2>
         <ul className="mt-3 space-y-2">
           {salon.hours.map((day) => {
@@ -672,25 +648,6 @@ export function SalonProfile() {
       </section>
 
       <div className="max-w-md">
-      {hasServices && !picking && !sent && (
-        <button
-          type="button"
-          className={`mt-8 ${SALON_SEND_CLASS}`}
-          onClick={() => openIntake('picker')}
-        >
-          {t('salon.send')}
-        </button>
-      )}
-      {showAlternate && (
-        <button
-          type="button"
-          className="mt-3 w-full px-4 py-2 text-sm text-body underline underline-offset-4"
-          onClick={() => openIntake('chat')}
-        >
-          {t('assistant.ask')}
-        </button>
-      )}
-
       {picking && !sent && (
         <>
           <form ref={pickerFormRef} className="mt-8 space-y-4" onSubmit={onSubmit}>
@@ -842,6 +799,58 @@ export function SalonProfile() {
       )}
 
       </div>
+    </>
+  )
+
+  return (
+    <>
+      <TopNav />
+      <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+      <header className="flex items-start justify-between gap-4">
+        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
+          {salon.name}
+        </h1>
+        <p className="flex items-center gap-2 text-sm text-body">
+          <span className={`size-2.5 shrink-0 rounded-full ${busyBg[token]}`} aria-hidden />
+          {t(`salon.busy.${salon.busyLevel}`)}
+        </p>
+      </header>
+
+      {addressLine !== null ? <p className="mt-3 text-sm text-muted">{addressLine}</p> : null}
+
+      {showBookingColumn ? (
+        <div className={SALON_BOOKING_SPLIT_CLASS}>
+          <aside className={SALON_BOOKING_ASIDE_CLASS}>
+            {hasServices && !picking && !sent && (
+              <button
+                type="button"
+                className={SALON_SEND_CLASS}
+                onClick={() => {
+                  openIntake('picker')
+                  setScrollPicker(true)
+                }}
+              >
+                {t('salon.send')}
+              </button>
+            )}
+            {mode === 'idle' && (
+              <p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>
+            )}
+            {showAlternate && (
+              <button
+                type="button"
+                className="mt-3 w-full px-4 py-2 text-sm text-body underline underline-offset-4"
+                onClick={() => openIntake('chat')}
+              >
+                {t('assistant.ask')}
+              </button>
+            )}
+          </aside>
+          <div className={SALON_BOOKING_MAIN_CLASS}>{catalog}</div>
+        </div>
+      ) : (
+        catalog
+      )}
       {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
       </main>
     </>

@@ -13,8 +13,8 @@
 | Goal (one sentence) | Guest `/salon/:id` has one idle send (hint + chat alternate in that block): under the title on a phone, in a sticky `w-64` sidebar on `md+`, never the STORY-47 header+lower pair. |
 | Branch name | `cursor/story-59-booking-sidebar-ad5b` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-16 |
 
 ## Pass/fail — product
 
