@@ -42,6 +42,7 @@ import {
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
+  formatOwnerDayHeading,
   formatSarajevoTime,
   hoursForDate,
   isPreferredSoon,
@@ -52,7 +53,9 @@ import {
   ownerSearchParams,
   panelCells,
   proposeErrorKey,
+  queueChipInitial,
   queueRowClock,
+  shiftOwnerDate,
   trimDeclineReason,
 } from '../lib/owner'
 
@@ -383,69 +386,90 @@ export function OwnerHome() {
             active="queue"
           />
         </div>
-        <label className="mt-6 block max-w-xs text-sm text-body">
-          {t('owner.date')}
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => onDate(e.target.value)}
-            className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
-          />
-        </label>
-        <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-          {queueLoading ? (
-            <p className="mt-8 text-sm text-body">{t('salon.loading')}</p>
-          ) : rows.length === 0 ? (
-            <p className="mt-8 text-sm text-body">{t('owner.empty')}</p>
-          ) : (
-            <ul className="mt-8 max-w-xl space-y-3">
-              {rows.map((row) => (
-                <QueueRow
-                  key={row.id}
-                  row={row}
-                  busy={busyId === row.id}
-                  error={errors[row.id]}
-                  declineOpen={declineId === row.id}
-                  dismissOpen={dismissId === row.id}
-                  reasonDraft={reasonDraft}
-                  onAccept={() => void onAccept(row)}
-                  onDeclineOpen={() => {
-                    setDeclineId(row.id)
-                    setReasonDraft('')
-                    setErrors((current) => {
-                      const next = { ...current }
-                      delete next[row.id]
-                      return next
-                    })
-                  }}
-                  onDeclineCancel={() => {
-                    setDeclineId(null)
-                    setReasonDraft('')
-                  }}
-                  onDeclineConfirm={() => void onDecline(row)}
-                  onDismissOpen={() => {
-                    setDismissId(row.id)
-                    setErrors((current) => {
-                      const next = { ...current }
-                      delete next[row.id]
-                      return next
-                    })
-                  }}
-                  onDismissCancel={() => setDismissId(null)}
-                  onDismissConfirm={() => void onDismiss(row)}
-                  onReasonChange={setReasonDraft}
-                />
-              ))}
-            </ul>
-          )}
-          <WorkerPanel
-            workers={board?.salon?.workers ?? []}
-            hours={dayHours}
-            cells={cells}
-            blocks={blocks}
-            disabled={busyId !== null}
-          />
-        </DndContext>
+        <section className="rounded-lg border border-hairline bg-canvas p-4">
+          <div className="sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-2 bg-canvas py-1">
+            <button
+              type="button"
+              aria-label={t('owner.prevDay')}
+              onClick={() => onDate(shiftOwnerDate(date, -1))}
+              className="px-1 text-lg text-ink"
+            >
+              ‹
+            </button>
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+              {formatOwnerDayHeading(date)}
+            </h2>
+            <button
+              type="button"
+              aria-label={t('owner.nextDay')}
+              onClick={() => onDate(shiftOwnerDate(date, 1))}
+              className="px-1 text-lg text-ink"
+            >
+              ›
+            </button>
+            <input
+              type="date"
+              value={date}
+              aria-label={t('owner.date')}
+              onChange={(e) => onDate(e.target.value)}
+              className="ml-auto rounded-md border border-hairline bg-canvas px-2 py-1 text-sm text-ink"
+            />
+          </div>
+          <DndContext sensors={sensors} onDragEnd={onDragEnd}>
+            {queueLoading ? (
+              <p className="mt-4 text-sm text-body">{t('salon.loading')}</p>
+            ) : rows.length === 0 ? (
+              <p className="mt-4 text-sm text-body">{t('owner.empty')}</p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {rows.map((row) => (
+                  <QueueRow
+                    key={row.id}
+                    row={row}
+                    busy={busyId === row.id}
+                    error={errors[row.id]}
+                    declineOpen={declineId === row.id}
+                    dismissOpen={dismissId === row.id}
+                    reasonDraft={reasonDraft}
+                    onAccept={() => void onAccept(row)}
+                    onDeclineOpen={() => {
+                      setDeclineId(row.id)
+                      setReasonDraft('')
+                      setErrors((current) => {
+                        const next = { ...current }
+                        delete next[row.id]
+                        return next
+                      })
+                    }}
+                    onDeclineCancel={() => {
+                      setDeclineId(null)
+                      setReasonDraft('')
+                    }}
+                    onDeclineConfirm={() => void onDecline(row)}
+                    onDismissOpen={() => {
+                      setDismissId(row.id)
+                      setErrors((current) => {
+                        const next = { ...current }
+                        delete next[row.id]
+                        return next
+                      })
+                    }}
+                    onDismissCancel={() => setDismissId(null)}
+                    onDismissConfirm={() => void onDismiss(row)}
+                    onReasonChange={setReasonDraft}
+                  />
+                ))}
+              </ul>
+            )}
+            <WorkerPanel
+              workers={board?.salon?.workers ?? []}
+              hours={dayHours}
+              cells={cells}
+              blocks={blocks}
+              disabled={busyId !== null}
+            />
+          </DndContext>
+        </section>
       </main>
     </div>
     </>
@@ -496,38 +520,44 @@ function QueueRow({
     <li
       ref={setNodeRef}
       style={style}
-      className={`rounded-lg border border-hairline bg-canvas px-4 py-3 ${isDragging ? 'opacity-60' : ''}`}
+      className={`rounded-lg border border-hairline bg-surface-soft px-4 py-3 ${isDragging ? 'opacity-60' : ''}`}
       {...listeners}
       {...attributes}
     >
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="font-semibold text-ink">{formatSarajevoTime(clock)}</p>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {chrome.tag ? (
-            <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
-              {t('owner.reschedule')}
-            </span>
-          ) : null}
-          {assistantOriginVisible(row.intake) ? (
-            <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
-              {t('owner.assistant')}
-            </span>
-          ) : null}
-          {isPreferredSoon(clock) ? (
-            <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
-              {t('owner.soon')}
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <p className="mt-1 text-sm text-ink">{row.customerName}</p>
-      <p className="mt-1 text-sm text-body">
-        {row.services.map((s) => s.name).join(', ')}
+      <div className="flex gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink">
+          {queueChipInitial(row.customerName)}
+        </span>
+        <div className="min-w-0 flex-1">
+      <p className="font-semibold text-ink">
+        {row.customerName}
         {' · '}
+        {row.services.map((s) => s.name).join(', ')}
+      </p>
+      <p className="mt-1 text-sm text-muted">
         {t('salon.duration', { n: row.durationMinutes })}
+        {' · '}
+        {formatSarajevoTime(clock)}
         {' · '}
         {row.worker ? row.worker.name : t('salon.noPreference')}
       </p>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        {chrome.tag ? (
+          <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+            {t('owner.reschedule')}
+          </span>
+        ) : null}
+        {assistantOriginVisible(row.intake) ? (
+          <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+            {t('owner.assistant')}
+          </span>
+        ) : null}
+        {isPreferredSoon(clock) ? (
+          <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
+            {t('owner.soon')}
+          </span>
+        ) : null}
+      </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {chrome.acceptReschedule || (chrome.acceptPreferred && canAcceptPreferredTime(row.worker)) ? (
           <button
@@ -628,6 +658,8 @@ function QueueRow({
         </div>
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+        </div>
+      </div>
     </li>
   )
 }

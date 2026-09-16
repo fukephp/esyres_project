@@ -77,11 +77,14 @@ test('dense panel stays queue then 15-minute WorkerPanel', () => {
   expect(panel).toMatch(/bg-cell-booked/)
   expect(panel).toMatch(/bg-cell-proposed/)
 
+  expect(panel).toMatch(/rowSpan/)
+
   const home = read('pages/OwnerHome.tsx')
-  const queueAt = home.indexOf('<ul className="mt-8 max-w-xl space-y-3">')
+  const queueAt = home.indexOf('owner.empty')
   const panelAt = home.indexOf('<WorkerPanel')
   expect(queueAt).toBeGreaterThan(-1)
   expect(panelAt).toBeGreaterThan(queueAt)
+  expect(home).toMatch(/rounded-lg border border-hairline bg-canvas p-4/)
 })
 
 test('discovery and salon stay sparse; no homepage IA', () => {

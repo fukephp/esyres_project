@@ -237,6 +237,8 @@ void i18n.use(initReactI18next).init({
           },
           salon: 'Salon',
           date: 'Datum',
+          prevDay: 'Prethodni dan',
+          nextDay: 'Sljedeći dan',
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',
           createSalon: 'Napravi salon',

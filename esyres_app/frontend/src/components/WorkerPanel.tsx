@@ -1,6 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
 import { useTranslation } from 'react-i18next'
-import type { ReactNode } from 'react'
 import type { OccupyingBlock, PanelCell, PanelHours } from '../lib/owner'
 import { canDropOnStart, cellKind, occupyingColSpan } from '../lib/owner'
 
@@ -43,21 +42,31 @@ export function WorkerPanel({
   return (
     <div className="mt-8 overflow-x-auto">
       <table className="min-w-full border-collapse text-xs">
-        <thead>
+        <thead className="sticky top-12 z-10 bg-canvas">
           <tr>
-            <th className="sticky left-0 bg-canvas px-2 py-1 text-left font-semibold text-ink">{t('salon.worker')}</th>
-            {cells.map((cell) => (
-              <th key={cell.time} className="px-0 py-1 text-center font-medium text-muted">
-                {cell.time}
+            <th className="sticky left-0 bg-canvas px-2 py-1" />
+            {workers.map((worker) => (
+              <th key={worker.id} className="min-w-24 px-2 py-1 text-left font-semibold text-ink">
+                {worker.name}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {workers.map((worker) => (
-            <tr key={worker.id}>
-              <td className="sticky left-0 bg-canvas px-2 py-1 font-medium text-ink">{worker.name}</td>
-              <WorkerCells workerId={worker.id} cells={cells} blocks={blocks} disabled={disabled} />
+          {cells.map((cell, i) => (
+            <tr key={cell.time}>
+              <td className="sticky left-0 bg-canvas px-2 py-1 font-medium text-ink">{cell.time}</td>
+              {workers.map((worker) => (
+                <TimeWorkerCell
+                  key={worker.id}
+                  workerId={worker.id}
+                  cell={cell}
+                  cellIndex={i}
+                  cells={cells}
+                  blocks={blocks}
+                  disabled={disabled}
+                />
+              ))}
             </tr>
           ))}
         </tbody>
@@ -66,58 +75,46 @@ export function WorkerPanel({
   )
 }
 
-function WorkerCells({
+function TimeWorkerCell({
   workerId,
+  cell,
+  cellIndex,
   cells,
   blocks,
   disabled,
 }: {
   workerId: string
+  cell: PanelCell
+  cellIndex: number
   cells: PanelCell[]
   blocks: OccupyingBlock[]
   disabled: boolean
 }) {
-  const nodes: ReactNode[] = []
-  let i = 0
-  while (i < cells.length) {
-    const cell = cells[i]
-    const block = blocks.find((row) => row.workerId === workerId && row.start === cell.time)
-    const kind = cellKind(cell.time, cell.off, blocks, workerId)
-    if (block !== undefined && (kind === 'booked' || kind === 'proposed')) {
-      const span = occupyingColSpan(block.durationMinutes, cells.length - i)
-      nodes.push(
-        <OccupyingJobCell key={cell.time} colSpan={span} kind={kind} label={block.label} />,
-      )
-      i += span
-      continue
-    }
-    nodes.push(
-      <PanelCellDrop
-        key={cell.time}
-        workerId={workerId}
-        time={cell.time}
-        kind={kind}
-        disabled={disabled}
-      />,
-    )
-    i += 1
+  const kind = cellKind(cell.time, cell.off, blocks, workerId)
+  const block = blocks.find((row) => row.workerId === workerId && row.start === cell.time)
+  if (block !== undefined && (kind === 'booked' || kind === 'proposed')) {
+    const span = occupyingColSpan(block.durationMinutes, cells.length - cellIndex)
+    return <OccupyingJobCell rowSpan={span} kind={kind} label={block.label} />
+  }
+  if (kind === 'booked' || kind === 'proposed') {
+    return null
   }
 
-  return nodes
+  return <PanelCellDrop workerId={workerId} time={cell.time} kind={kind} disabled={disabled} />
 }
 
 function OccupyingJobCell({
-  colSpan,
+  rowSpan,
   kind,
   label,
 }: {
-  colSpan: number
+  rowSpan: number
   kind: 'booked' | 'proposed'
   label: string
 }) {
   return (
-    <td colSpan={colSpan} className="p-0">
-      <div className={`h-8 min-w-0 truncate px-0.5 text-xs leading-8 ${KIND_CLASS[kind]} ${JOB_TEXT_CLASS[kind]}`} title={label}>
+    <td rowSpan={rowSpan} className="p-0 align-top">
+      <div className={`h-full min-h-0 break-words px-0.5 text-xs ${KIND_CLASS[kind]} ${JOB_TEXT_CLASS[kind]}`} title={label}>
         {label}
       </div>
     </td>
@@ -146,7 +143,7 @@ function PanelCellDrop({
     <td className="p-0">
       <div
         ref={setNodeRef}
-        className={`h-8 w-10 ${KIND_CLASS[kind]} ${isOver && droppable ? 'ring-2 ring-ink ring-inset' : ''}`}
+        className={`h-8 min-w-10 w-full ${KIND_CLASS[kind]} ${isOver && droppable ? 'ring-2 ring-ink ring-inset' : ''}`}
       />
     </td>
   )

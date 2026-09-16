@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-61 |
 | Epic | 3 — Worker Availability Panel & Time Proposal (Owner) |
-| Loop | — |
+| Loop | `STORY-61` |
 | Depends on | STORY-13, STORY-14, STORY-15, STORY-16, STORY-42, STORY-49 |
 
 ## User story
