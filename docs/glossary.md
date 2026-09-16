@@ -171,11 +171,11 @@ The collapsed labeled answers on Request Detail for an assistant-originated requ
 _Avoid_: chat log, message history, conversation thread, why-line (as a stored essay)
 
 **Worker Availability Panel**:
-The owner’s per-day table of workers × 15-minute cells, with that day’s pending queue above it. Home after owner login. Occupying cells show the current job. Not the pending queue alone, not Request Detail, not the salon catalog, and not the customer busy-level badge.
+The owner’s per-day 15-minute job board (hours down, workers as columns) on the same day card as that day’s pending queue. Home after owner login. Occupying cells show the current job. Not the pending queue alone, not Request Detail, not the salon catalog, and not the customer busy-level badge.
 _Avoid_: calendar, schedule grid (customer), inbox, dashboard, slot picker (guest)
 
 **Current job**:
-The occupying block on the Worker Availability Panel, labeled with that booking’s service snapshot names. The worker is the row. Confirmed and time-proposed both occupy; time-proposed is held, not in the chair. Not a now-only strip and not on the salon catalog.
+The occupying block on the Worker Availability Panel, labeled with that booking’s service snapshot names. The worker is the column. Confirmed and time-proposed both occupy; time-proposed is held, not in the chair. Not a now-only strip and not on the salon catalog.
 _Avoid_: in-chair, live job, active assistant, now-board
 
 **Counter-proposal**:

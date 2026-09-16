@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-60` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–60. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-61` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–61. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -83,3 +83,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-58 | Owner service categories | 7 | `STORY-58` | STORY-54, STORY-56, STORY-07, STORY-08, STORY-06, STORY-44 |
 | STORY-59 | One idle Pošalji zahtjev; md+ booking sidebar | 1 | — | STORY-47, STORY-48 |
 | STORY-60 | Radno vrijeme exclusive accordion | 7 | — | STORY-53, STORY-56 |
+| STORY-61 | Owner day card (hours down, worker columns) | 3 | — | STORY-13, STORY-14, STORY-15, STORY-16, STORY-42, STORY-49 |

@@ -34,9 +34,10 @@
 ## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
 
 - As an owner, I want occupying cells on the Worker Availability Panel to show which service is on that worker, so that the grid is the current-job board.
+- As an owner, I want this salon-day (queue + job board) in one Cal card with hours down and workers as columns, so that I can read the day without a one-line 15-minute strip.
 - As an owner, I want to see all pending requests for a day in one queue, sorted so urgent ones aren't buried, so that nothing slips through.
 - As an owner, I want to accept a guest's preferred time in one tap when it works, so that simple requests don't need an extra back-and-forth.
-- As an owner, I want to drag a pending request onto an open slot on a worker's row to counter-propose a different time, so that I can adjust when the preferred time doesn't fit.
+- As an owner, I want to drag a pending request onto an open slot on a worker's column to counter-propose a different time, so that I can adjust when the preferred time doesn't fit.
 - As an owner, I want a tap-based fallback to the drag interaction, so that I can still manage requests from my phone.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 

@@ -26,7 +26,7 @@ Not a WhatsApp auto-book product and not an LLM in v1. Esyres stays a two-sided 
 - Picker remains the primary salon-profile CTA; chat is the messy-intent alternate. Both call `createBooking`.
 - Coarse recommend only (hours + busy-level + worker preference → 1–3 preferred times). No live slots, no hold.
 - Same send gates as the picker (login + verified email + phone OTP).
-- Owner home stays pending queue + panel. Chat is a tab + badge for in-flight. After send, the object is the booking; transcript on Request Detail.
+- Owner home stays the day card (pending queue + panel). Chat is a tab + badge for in-flight. After send, the object is the booking; transcript on Request Detail.
 - Take-over is optional. Guest waits only after owner taps Take over. After hours / DND: take-over off; assistant always finishes. No auto-page on every chat.
 - Owner-only; worker login stays Phase 2.
 - Knowledge = live salon data only. Unknown → say so; may ping owner; guest does not wait.
@@ -37,7 +37,7 @@ The YouTube “Claude + WhatsApp” pattern is a conversation-shape guideline (a
 
 ### Homepage in the PWA, not a sibling marketing site (decided)
 
-Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. Shared Cal top-nav on `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, and as an overlay on `/owner` (ADR 0029). Guest routes share a ~1200px inner column (nav inner + main align); owner bar inner unconstrained. No persist-seen. `/salon/:id` and `GET /qr/{id}` never show the homepage page. `esyres_app/marketing/` stays gone. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. One Design 1 pack (owner keeps dense panel, Cal light chrome). Self-serve create salon is `/create-salon`, not a waitlist. An owner adds another shop from `/owner/salons/create` (name and address; does not change the public create).
+Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Pronađi salon + simple footer). Pronađi salon goes to `/salons`. Shared Cal top-nav on `/`, `/salons`, `/salon/:id`, `/create-salon`, `/bookings`, and as an overlay on `/owner` (ADR 0029). Guest routes share a ~1200px inner column (nav inner + main align); owner bar inner unconstrained. No persist-seen. `/salon/:id` and `GET /qr/{id}` never show the homepage page. `esyres_app/marketing/` stays gone. No owner waitlist, Formspree, `/invite`, public pricing page, or Awwwards/GSAP. One Design 1 pack (owner keeps dense day card, Cal light chrome). Self-serve create salon is `/create-salon`, not a waitlist. An owner adds another shop from `/owner/salons/create` (name and address; does not change the public create).
 
 ## Part 2 — Consolidated Open Questions (from existing docs)
 

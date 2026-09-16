@@ -3,12 +3,12 @@ version: alpha
 name: Esyres
 description: >-
   Index for one Cal design pack. Read refs/design-1 before UI work.
-  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense panel.
+  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense day card.
 ---
 
 ## Overview
 
-Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal Sans + Inter). Discovery, salon, and `/owner` share those tokens. Homepage hero + footer stay on `/` only; the top-nav is shared (per-route slot). Owner keeps dense queue + 15-minute grid with Cal light chrome (no dark nav).
+Esyres has **one design pack**: Design 1 (Cal — white canvas, black CTAs, Cal Sans + Inter). Discovery, salon, and `/owner` share those tokens. Homepage hero + footer stay on `/` only; the top-nav is shared (per-route slot). Owner keeps a dense day card (queue chips + hours-down 15-minute board) with Cal light chrome (no dark nav).
 
 | Design | Scope | Spec |
 |--------|--------|------|

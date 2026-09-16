@@ -5,7 +5,7 @@ description: >-
   Design 1 — Esyres Cal pack (homepage on `/`, discovery, salon, owner).
   Visual system adapted from Cal.com DESIGN.md (https://www.designmd.co/d/cal):
   white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards.
-  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense panel.
+  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense day card.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -213,7 +213,7 @@ The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black pri
 
 Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps dense queue + 15-minute grid with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge and panel cell tokens live in this pack.
+**Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps a dense day card (queue chips + hours-down × worker-columns 15-minute board) with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge and panel cell tokens live in this pack. Not a guest month-and-pills widget.
 
 ### Locked homepage IA
 
@@ -309,10 +309,10 @@ Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from t
 
 1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, name + Odjava as `button-destructive`). Not a replacement for the aside.
 2. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
-3. **Main** — pending-request queue + Worker Availability Panel (15-minute grid) on white / `{colors.surface-card}`; primary CTAs.
+3. **Main** — one `{colors.canvas}` hairline day card (`{rounded.lg}`, no heavy shadow, no grey fill on the box) spanning owner `main`: sticky Bosnian weekday+date row (prev/next + secondary native date), queue chips on `{colors.surface-soft}` (scroll away), sticky worker names, then hours-down × worker-columns 15-minute board (horizontal pan for extra workers; sticky time gutter). Card grows with the day. Chip initials ink on `{colors.surface-soft}` (not orange, not cell-green). No month grid, no now-line, no `Danas` badge, no ~480px guest widget. Primary CTAs on the chips.
 4. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
 
-Phone: collapse nav; stack queue above availability.
+Phone: collapse nav; same day card (hours down, pan worker columns — not worker tabs).
 
 ## Elevation & Depth
 
