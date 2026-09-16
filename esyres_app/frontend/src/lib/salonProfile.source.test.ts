@@ -16,8 +16,10 @@ test('salonHours does not import owner.ts', () => {
 
 test('salon profile stack is address, split aside, then hours/services/form', () => {
   const page = read('pages/SalonProfile.tsx')
-  const catalog = page.slice(page.indexOf('const catalog ='), page.indexOf('\n  return ('))
-  const view = page.slice(page.indexOf('\n  return ('))
+  const catalogStart = page.indexOf('  const catalog =')
+  const viewStart = page.lastIndexOf('\n  return (')
+  const catalog = page.slice(catalogStart, viewStart)
+  const view = page.slice(viewStart)
 
   const nameAt = view.indexOf('{salon.name}')
   const addressAt = view.indexOf('{addressLine}')
@@ -69,7 +71,9 @@ test('one aside send uses lower rules and scrolls; split gone when sent', () => 
   const sendHits = page.match(/hasServices && !picking && !sent/g) ?? []
   expect(sendHits).toHaveLength(1)
 
-  const aside = page.slice(page.indexOf('SALON_BOOKING_ASIDE_CLASS'), page.indexOf('SALON_BOOKING_MAIN_CLASS'))
+  const asideStart = page.indexOf('<aside className={SALON_BOOKING_ASIDE_CLASS}>')
+  const asideEnd = page.indexOf('<div className={SALON_BOOKING_MAIN_CLASS}>{catalog}</div>')
+  const aside = page.slice(asideStart, asideEnd)
   expect(aside).toMatch(/hasServices && !picking && !sent/)
   expect(aside).toMatch(/className=\{SALON_SEND_CLASS\}/)
   expect(aside).toMatch(/openIntake\('picker'\)/)
@@ -78,7 +82,8 @@ test('one aside send uses lower rules and scrolls; split gone when sent', () => 
   expect(aside).toMatch(/mode === 'idle'/)
   expect(aside).toMatch(/salon\.sendHint/)
   expect(aside).toMatch(/mt-2 text-sm text-muted/)
-  expect(aside).toMatch(/showChatCta\(salon\.services\.length, sent\) && !chatting/)
+  expect(aside).toMatch(/showAlternate &&/)
+  expect(page).toMatch(/showChatCta\(salon\.services\.length, sent\) && !chatting/)
   expect(aside).not.toMatch(/max-w-md/)
   expect(page).toMatch(/showBookingColumn \? \(/)
   expect(page).toMatch(/CREATE_BOOKING_MUTATION/)
@@ -86,13 +91,17 @@ test('one aside send uses lower rules and scrolls; split gone when sent', () => 
 
 test('sendHint is only in the booking aside; chat alternate stays underline', () => {
   const page = read('pages/SalonProfile.tsx')
-  const aside = page.slice(page.indexOf('SALON_BOOKING_ASIDE_CLASS'), page.indexOf('SALON_BOOKING_MAIN_CLASS'))
+  const asideStart = page.indexOf('<aside className={SALON_BOOKING_ASIDE_CLASS}>')
+  const asideEnd = page.indexOf('<div className={SALON_BOOKING_MAIN_CLASS}>{catalog}</div>')
+  const aside = page.slice(asideStart, asideEnd)
   expect(aside).toMatch(/salon\.sendHint/)
   expect(aside).toMatch(/underline underline-offset-4[\s\S]*assistant\.ask/)
   expect(aside.slice(aside.indexOf("t('assistant.ask')") - 280, aside.indexOf("t('assistant.ask')"))).not.toMatch(/SALON_SEND_CLASS/)
   expect(aside.slice(aside.indexOf("t('assistant.ask')") - 280, aside.indexOf("t('assistant.ask')"))).not.toMatch(/bg-ink/)
 
-  const catalog = page.slice(page.indexOf('const catalog ='), page.indexOf('\n  return ('))
+  const catalogStart = page.indexOf('  const catalog =')
+  const viewStart = page.lastIndexOf('\n  return (')
+  const catalog = page.slice(catalogStart, viewStart)
   expect(catalog).not.toMatch(/salon\.sendHint/)
 
   const chat = read('components/AssistantIntake.tsx')
@@ -112,7 +121,9 @@ test('hours rows use helpers; closed is muted; chat tap does not copy intake', (
   expect(page).toMatch(/bg-surface-soft/)
   expect(page).not.toMatch(/md:grid-cols-2/)
 
-  const aside = page.slice(page.indexOf('SALON_BOOKING_ASIDE_CLASS'), page.indexOf('SALON_BOOKING_MAIN_CLASS'))
+  const asideStart = page.indexOf('<aside className={SALON_BOOKING_ASIDE_CLASS}>')
+  const asideEnd = page.indexOf('<div className={SALON_BOOKING_MAIN_CLASS}>{catalog}</div>')
+  const aside = page.slice(asideStart, asideEnd)
   expect(aside).not.toMatch(/hoursRowClosed|salon\.hours|weekday/)
 
   const tapStart = page.indexOf('function onHoursTap')
