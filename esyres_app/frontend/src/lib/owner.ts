@@ -502,3 +502,207 @@ export function occupyingBlock(row: {
 
   return null
 }
+
+export const WORKER_DOT_COLORS = [
+  'bg-badge-orange',
+  'bg-badge-pink',
+  'bg-badge-violet',
+  'bg-badge-emerald',
+  'bg-brand-accent',
+  'bg-success',
+  'bg-warning',
+  'bg-error',
+] as const
+
+export type WorkerDotColor = (typeof WORKER_DOT_COLORS)[number]
+
+export function workerDotColor(id: string): WorkerDotColor {
+  let n = 0
+  for (let i = 0; i < id.length; i++) {
+    n = (n + id.charCodeAt(i) * (i + 1)) % WORKER_DOT_COLORS.length
+  }
+
+  return WORKER_DOT_COLORS[n]
+}
+
+export function ownerMonthFromYmd(ymd: string): { year: number; month: number } {
+  const [year, month] = ymd.split('-').map(Number)
+
+  return { year, month }
+}
+
+export function ownerMonthRange(year: number, month: number): { from: string; to: string } {
+  const last = new Date(Date.UTC(year, month, 0, 12))
+  const toDay = String(last.getUTCDate()).padStart(2, '0')
+  const mm = String(month).padStart(2, '0')
+
+  return { from: `${year}-${mm}-01`, to: `${year}-${mm}-${toDay}` }
+}
+
+export function shiftOwnerMonth(year: number, month: number, delta: number): { year: number; month: number } {
+  const next = new Date(Date.UTC(year, month - 1 + delta, 1, 12))
+
+  return { year: next.getUTCFullYear(), month: next.getUTCMonth() + 1 }
+}
+
+export function ownerMonthContains(year: number, month: number, ymd: string): boolean {
+  const parsed = ownerMonthFromYmd(ymd)
+
+  return parsed.year === year && parsed.month === month
+}
+
+export function ownerMonthDays(year: number, month: number): string[] {
+  const { from, to } = ownerMonthRange(year, month)
+  const days: string[] = []
+  let cursor = from
+  while (cursor <= to) {
+    days.push(cursor)
+    cursor = shiftOwnerDate(cursor, 1)
+  }
+
+  return days
+}
+
+export function ownerMonthWeekdayOffset(year: number, month: number): number {
+  const utcDay = new Date(Date.UTC(year, month - 1, 1, 12)).getUTCDay()
+
+  return (utcDay + 6) % 7
+}
+
+export function formatOwnerMonthTitle(year: number, month: number): string {
+  const formatted = new Intl.DateTimeFormat('bs-BA', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
+
+  return formatted.replace(/\.$/, '')
+}
+
+export function occupyingClockRange(start: string, durationMinutes: number): string {
+  return `${start}–${hhmm(minutes(start) + durationMinutes)}`
+}
+
+export function ownerDetailMode(status: string): 'form' | 'read' | 'bounce' {
+  if (status === 'REQUESTED') {
+    return 'form'
+  }
+  if (status === 'CONFIRMED' || status === 'TIME_PROPOSED') {
+    return 'read'
+  }
+
+  return 'bounce'
+}
+
+export function occupyingStartIso(row: {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+}): string | null {
+  if (row.status === 'TIME_PROPOSED') {
+    return row.proposedStartsAt
+  }
+  if (row.status === 'CONFIRMED') {
+    return row.preferredStartsAt
+  }
+
+  return null
+}
+
+export function occupyingSarajevoYmd(row: {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+}): string | null {
+  const iso = occupyingStartIso(row)
+  if (iso === null) {
+    return null
+  }
+
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sarajevo' }).format(new Date(iso))
+}
+
+export function occupyingDotsForDay<T extends {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string } | null
+  proposedWorker: { id: string } | null
+}>(rows: T[], ymd: string, max = 3): { workerId: string; color: WorkerDotColor }[] {
+  return rows
+    .filter((row) => occupyingSarajevoYmd(row) === ymd && occupyingBlock(row) !== null)
+    .sort((a, b) => (occupyingStartIso(a) ?? '').localeCompare(occupyingStartIso(b) ?? ''))
+    .slice(0, max)
+    .map((row) => {
+      const block = occupyingBlock(row)
+      if (block === null) {
+        return { workerId: '', color: WORKER_DOT_COLORS[0] }
+      }
+
+      return { workerId: block.workerId, color: workerDotColor(block.workerId) }
+    })
+}
+
+export function selectedDayOccupying<T extends {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string } | null
+  proposedWorker: { id: string } | null
+  services?: { name: string }[] | null
+}>(rows: T[], now = new Date()): { soon: T[]; rest: T[] } {
+  const soon: T[] = []
+  const rest: T[] = []
+  for (const row of rows) {
+    if (occupyingBlock(row) === null) {
+      continue
+    }
+    const iso = occupyingStartIso(row)
+    if (iso !== null && isPreferredSoon(iso, now)) {
+      soon.push(row)
+    } else {
+      rest.push(row)
+    }
+  }
+  const byStart = (a: T, b: T) => (occupyingStartIso(a) ?? '').localeCompare(occupyingStartIso(b) ?? '')
+  soon.sort(byStart)
+  rest.sort(byStart)
+
+  return { soon, rest }
+}
+
+export type SelectedDayRestItem<T> =
+  | { kind: 'occupying'; booking: T; start: string }
+  | { kind: 'break'; startsAt: string; endsAt: string }
+
+export function mixRestWithBreak<T extends {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string } | null
+  proposedWorker: { id: string } | null
+  services?: { name: string }[] | null
+}>(occupying: T[], breakStartsAt: string | null, breakEndsAt: string | null): SelectedDayRestItem<T>[] {
+  const items: SelectedDayRestItem<T>[] = occupying.flatMap((booking) => {
+    const block = occupyingBlock(booking)
+    if (block === null) {
+      return []
+    }
+
+    return [{ kind: 'occupying' as const, booking, start: block.start }]
+  })
+  if (breakStartsAt !== null && breakEndsAt !== null) {
+    items.push({ kind: 'break', startsAt: breakStartsAt, endsAt: breakEndsAt })
+  }
+  items.sort((a, b) => {
+    const aStart = a.kind === 'break' ? a.startsAt : a.start
+    const bStart = b.kind === 'break' ? b.startsAt : b.start
+
+    return aStart.localeCompare(bStart)
+  })
+
+  return items
+}

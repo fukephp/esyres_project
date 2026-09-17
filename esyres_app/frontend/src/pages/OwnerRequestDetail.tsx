@@ -33,6 +33,8 @@ import {
   formatSarajevoTime,
   hoursForDate,
   occupyingBlock,
+  ownerDetailMode,
+  occupyingClockRange,
   ownerQueuePath,
   panelCells,
   proposeErrorKey,
@@ -109,7 +111,7 @@ export function OwnerRequestDetail() {
       ? '/owner'
       : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
   const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
-  const bounce = forbidden || (booking !== undefined && booking.status !== 'REQUESTED')
+  const bounce = forbidden || (booking !== undefined && ownerDetailMode(booking.status) === 'bounce')
 
   async function goQueue() {
     if (booking === undefined) {
@@ -260,6 +262,34 @@ export function OwnerRequestDetail() {
         </p>
         {bounce || booking === undefined ? (
           <p className="mt-8 text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
+        ) : ownerDetailMode(booking.status) === 'read' ? (
+          <>
+            <p className="mt-8 font-semibold text-ink">
+              {occupyingBlock(booking) === null
+                ? formatSarajevoTime(booking.proposedStartsAt ?? booking.preferredStartsAt)
+                : occupyingClockRange(
+                    occupyingBlock(booking)!.start,
+                    occupyingBlock(booking)!.durationMinutes,
+                  )}
+            </p>
+            <p className="mt-1 text-sm text-ink">{booking.customerName}</p>
+            <p className="mt-1 text-sm text-body">
+              {booking.preferredDate}
+              {' · '}
+              {booking.services.map((s) => s.name).join(', ')}
+              {' · '}
+              {t('salon.duration', { n: booking.durationMinutes })}
+              {' · '}
+              {(booking.status === 'TIME_PROPOSED' ? booking.proposedWorker : booking.worker)
+                ? (booking.status === 'TIME_PROPOSED' ? booking.proposedWorker : booking.worker)?.name
+                : t('salon.noPreference')}
+            </p>
+            {booking.status === 'TIME_PROPOSED' ? (
+              <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+                {t('bookings.status.TIME_PROPOSED')}
+              </span>
+            ) : null}
+          </>
         ) : (
           <>
             <p className="mt-8 font-semibold text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>

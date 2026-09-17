@@ -38,6 +38,21 @@ import {
   hoursAccordionSummary,
   kmToFeninga,
   feningaToKm,
+  WORKER_DOT_COLORS,
+  workerDotColor,
+  ownerMonthFromYmd,
+  ownerMonthRange,
+  shiftOwnerMonth,
+  ownerMonthContains,
+  ownerMonthDays,
+  ownerMonthWeekdayOffset,
+  formatOwnerMonthTitle,
+  occupyingClockRange,
+  ownerDetailMode,
+  occupyingSarajevoYmd,
+  occupyingDotsForDay,
+  selectedDayOccupying,
+  mixRestWithBreak,
 } from './owner'
 
 test('omit or invalid date falls back to Sarajevo today', () => {
@@ -417,6 +432,10 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.closedDay')).toBe('Zatvoreno ovaj dan.')
   expect(i18n.t('owner.prevDay')).toBe('Prethodni dan')
   expect(i18n.t('owner.nextDay')).toBe('Sljedeći dan')
+  expect(i18n.t('owner.prevMonth')).toBe('Prethodni mjesec')
+  expect(i18n.t('owner.nextMonth')).toBe('Sljedeći mjesec')
+  expect(i18n.t('owner.soon')).toBe('Uskoro')
+  expect(i18n.t('owner.break')).toBe('Pauza')
   expect(i18n.exists('owner.today')).toBe(false)
   expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
   expect(i18n.exists('owner.listed')).toBe(false)
@@ -537,4 +556,75 @@ test('occupying colspan clips to remaining cells', () => {
   expect(occupyingColSpan(30, 4)).toBe(2)
   expect(occupyingColSpan(60, 1)).toBe(1)
   expect(occupyingColSpan(15, 8)).toBe(1)
+})
+
+test('worker dot color hashes id into Design 1 palette', () => {
+  expect(WORKER_DOT_COLORS).toHaveLength(8)
+  expect(workerDotColor('1')).toBe('bg-badge-pink')
+})
+
+test('owner month helpers', () => {
+  expect(ownerMonthFromYmd('2026-09-17')).toEqual({ year: 2026, month: 9 })
+  expect(ownerMonthRange(2026, 2)).toEqual({ from: '2026-02-01', to: '2026-02-28' })
+  expect(shiftOwnerMonth(2026, 1, -1)).toEqual({ year: 2025, month: 12 })
+  expect(ownerMonthContains(2026, 9, '2026-09-17')).toBe(true)
+  expect(ownerMonthContains(2026, 9, '2026-10-01')).toBe(false)
+  const days = ownerMonthDays(2026, 9)
+  expect(days).toHaveLength(30)
+  expect(days[0]).toBe('2026-09-01')
+  expect(days[29]).toBe('2026-09-30')
+  expect(ownerMonthWeekdayOffset(2026, 9)).toBe(1)
+  expect(formatOwnerMonthTitle(2026, 9)).toBe('septembar 2026')
+})
+
+test('occupying clock range and request detail mode', () => {
+  expect(occupyingClockRange('11:00', 30)).toBe('11:00–11:30')
+  expect(ownerDetailMode('REQUESTED')).toBe('form')
+  expect(ownerDetailMode('CONFIRMED')).toBe('read')
+  expect(ownerDetailMode('TIME_PROPOSED')).toBe('read')
+  expect(ownerDetailMode('DECLINED')).toBe('bounce')
+  expect(ownerDetailMode('CANCELLED')).toBe('bounce')
+})
+
+test('occupying dots and selected-day split', () => {
+  const noon = {
+    status: 'CONFIRMED',
+    preferredStartsAt: '2026-08-29T10:00:00.000Z',
+    proposedStartsAt: null,
+    durationMinutes: 30,
+    worker: { id: '1' },
+    proposedWorker: null,
+    services: [{ name: 'Šišanje' }],
+  }
+  const later = {
+    status: 'CONFIRMED',
+    preferredStartsAt: '2026-08-29T13:00:00.000Z',
+    proposedStartsAt: null,
+    durationMinutes: 30,
+    worker: { id: '2' },
+    proposedWorker: null,
+    services: [{ name: 'Boja' }],
+  }
+  const requested = {
+    status: 'REQUESTED',
+    preferredStartsAt: '2026-08-29T10:00:00.000Z',
+    proposedStartsAt: null,
+    durationMinutes: 30,
+    worker: { id: '1' },
+    proposedWorker: null,
+    services: [{ name: 'Šišanje' }],
+  }
+  expect(occupyingSarajevoYmd(noon)).toBe('2026-08-29')
+  expect(occupyingDotsForDay([requested, noon, later], '2026-08-29')).toEqual([
+    { workerId: '1', color: 'bg-badge-pink' },
+    { workerId: '2', color: workerDotColor('2') },
+  ])
+  const now = new Date('2026-08-29T10:30:00.000Z')
+  expect(selectedDayOccupying([noon, later], now)).toEqual({ soon: [noon], rest: [later] })
+  expect(mixRestWithBreak([noon, later], '13:00', '14:00').map((row) => row.kind)).toEqual([
+    'occupying',
+    'break',
+    'occupying',
+  ])
+  expect(mixRestWithBreak([noon], null, null).map((row) => row.kind)).toEqual(['occupying'])
 })

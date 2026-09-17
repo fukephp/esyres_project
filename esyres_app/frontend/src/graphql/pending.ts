@@ -8,8 +8,13 @@ export const OWNER_BOOKING_QUERY = gql`
       customerName
       preferredDate
       preferredStartsAt
+      proposedStartsAt
       durationMinutes
       worker {
+        id
+        name
+      }
+      proposedWorker {
         id
         name
       }
@@ -33,8 +38,8 @@ export const OWNER_BOOKING_QUERY = gql`
 `
 
 export const PENDING_BOOKINGS_QUERY = gql`
-  query PendingBookings($salonId: ID!, $date: String!) {
-    pendingBookings(salonId: $salonId, date: $date) {
+  query PendingBookings($salonId: ID!, $date: String!, $limit: Int) {
+    pendingBookings(salonId: $salonId, date: $date, limit: $limit) {
       id
       customerName
       preferredDate
@@ -138,6 +143,29 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
   }
 `
 
+export const OCCUPYING_BOOKINGS_RANGE_QUERY = gql`
+  query OccupyingBookingsRange($salonId: ID!, $from: String!, $to: String!) {
+    occupyingBookingsRange(salonId: $salonId, from: $from, to: $to) {
+      id
+      status
+      preferredStartsAt
+      proposedStartsAt
+      durationMinutes
+      worker {
+        id
+        name
+      }
+      proposedWorker {
+        id
+        name
+      }
+      services {
+        name
+      }
+    }
+  }
+`
+
 export const BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION = gql`
   subscription BookingCustomerResponded($salonId: ID!) {
     bookingCustomerResponded(salonId: $salonId) {
@@ -197,8 +225,10 @@ export type OwnerBooking = {
   customerName: string
   preferredDate: string
   preferredStartsAt: string
+  proposedStartsAt: string | null
   durationMinutes: number
   worker: { id: string; name: string } | null
+  proposedWorker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
   intake: BookingIntake | null
   salon: { id: string; name: string }
@@ -238,6 +268,10 @@ export type OccupyingBooking = {
 
 export type OccupyingBookingsData = {
   occupyingBookings: OccupyingBooking[]
+}
+
+export type OccupyingBookingsRangeData = {
+  occupyingBookingsRange: OccupyingBooking[]
 }
 
 export type OwnerSalonData = {
