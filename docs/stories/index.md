@@ -85,4 +85,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-60 | Radno vrijeme exclusive accordion | 7 | `STORY-60` | STORY-53, STORY-56 |
 | STORY-61 | Owner day card (hours down, worker columns) | 3 | `STORY-61` | STORY-13, STORY-14, STORY-15, STORY-16, STORY-42, STORY-49 |
 | STORY-62 | Day-first salon chrome; homepage Moje rezervacije | 1 | — | STORY-43, STORY-47, STORY-48, STORY-59, STORY-21 |
-| STORY-63 | Salon chat overlay chrome | 10 | — | STORY-62, STORY-21 |
+| STORY-63 | Salon chat overlay chrome | 10 | `STORY-63` | STORY-62, STORY-21 |

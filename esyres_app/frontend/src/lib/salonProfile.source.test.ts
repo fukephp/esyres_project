@@ -87,6 +87,7 @@ test('aside stays empty; send pill is under hours after a day', () => {
   expect(page).toMatch(/SALON_PICKER_DIALOG_CLASS/)
   expect(page).toMatch(/showModal/)
   expect(page).toMatch(/CREATE_BOOKING_MUTATION/)
+  expect(page).toMatch(/chatDialogRef/)
 })
 
 test('sendHint lives under Radno vrijeme; chat is a card not an underline', () => {
@@ -97,6 +98,9 @@ test('sendHint lives under Radno vrijeme; chat is a card not an underline', () =
   expect(catalog).toMatch(/salon\.sendHint/)
   expect(catalog).toMatch(/assistant\.nudge/)
   expect(catalog).toMatch(/SALON_CHAT_CARD_CLASS/)
+  expect(catalog).toMatch(/pointer-events-none/)
+  expect(catalog).toMatch(/aria-pressed/)
+  expect(catalog).not.toMatch(/<AssistantIntake/)
   expect(catalog).not.toMatch(/underline underline-offset-4[\s\S]*assistant\.ask/)
 
   const asideStart = page.indexOf('<aside className={SALON_BOOKING_ASIDE_CLASS}')
@@ -107,11 +111,14 @@ test('sendHint lives under Radno vrijeme; chat is a card not an underline', () =
   const chat = read('components/AssistantIntake.tsx')
   expect(chat).not.toMatch(/salon\.sendHint/)
   expect(chat).toMatch(/assistant\.prompt/)
-  expect(chat).toMatch(/rounded-3xl bg-surface-soft/)
-  expect(chat).toMatch(/rounded-3xl bg-ink/)
+  expect(chat).toMatch(/ASSISTANT_SALON_LINE_CLASS/)
+  expect(chat).toMatch(/ASSISTANT_GUEST_PILL_CLASS/)
   expect(chat).toMatch(/ASSISTANT_COMPOSER_CLASS/)
-  expect(chat).toMatch(/min-h-\[70dvh\]/)
-  expect(chat).toMatch(/w-full flex-col/)
+  expect(chat).toMatch(/flex flex-wrap/)
+  expect(chat).not.toMatch(/min-h-\[70dvh\]/)
+  expect(chat).not.toMatch(/rounded-3xl bg-ink/)
+  expect(chat).not.toMatch(/<textarea/)
+  expect(chat).not.toMatch(/esyres-mark/)
 })
 
 test('hours rows use helpers; closed is muted; chat tap does not copy intake', () => {
@@ -143,13 +150,22 @@ test('hours rows use helpers; closed is muted; chat tap does not copy intake', (
   expect(tap).not.toMatch(/chatSelected|setChatDate|setChatTime|setChatWorker|clearIntakeToken|pingIntake|onPing/)
 })
 
-test('pill opens picker modal; chat card does not', () => {
+test('pill opens picker modal; chat card opens a second dialog', () => {
   const page = read('pages/SalonProfile.tsx')
   expect(page).not.toMatch(/pickerFormRef = useRef<HTMLFormElement>\(null\)/)
   expect(page).not.toMatch(/scrollIntoView/)
   expect(page).toMatch(/pickerDialogRef = useRef<HTMLDialogElement>\(null\)/)
-  expect(page).toMatch(/SALON_CHAT_CARD_CLASS\} onClick=\{\(\) => openIntake\('chat'\)\}/)
+  expect(page).toMatch(/chatDialogRef = useRef<HTMLDialogElement>\(null\)/)
+  expect(page.match(/<dialog/g)?.length).toBe(2)
+  expect(page.match(/className=\{SALON_PICKER_DIALOG_CLASS\}/g)?.length).toBe(2)
+  expect(page).toMatch(/openIntake\('chat'\)/)
   expect(page).toMatch(/showSendPill \?[\s\S]*openIntake\('picker'\)/)
+  expect(page).toMatch(/setMode\('chat'\)/)
+  const chatDialog = page.slice(page.lastIndexOf('<dialog'))
+  expect(chatDialog).toMatch(/<AssistantIntake/)
+  expect(chatDialog).toMatch(/salon\.close/)
+  expect(chatDialog).not.toMatch(/<h2[\s\S]*\{salon\.name\}/)
+  expect(chatDialog).toMatch(/mode === 'chat'/)
 })
 
 test('loading and missing salon skip the booking split', () => {
