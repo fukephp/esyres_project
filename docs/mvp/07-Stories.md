@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-62`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-65`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -20,6 +20,7 @@
 - As a customer, I want every Pošalji zahtjev on the salon profile to look and feel like one primary action, so that sending a request is obvious and the press feels physical.
 - As a customer, I want a single send on the salon profile — under the title on a phone, in a sticky sidebar on a wide screen — so that I am not looking at two identical buttons.
 - As a customer, I want to start a salon request from Radno vrijeme and reach Moje rezervacije from the logged-in homepage, so that send is not sitting idle on load and bookings are one tap from `/`.
+- As a customer, I want Pošalji zahtjev under the weekday I picked and to see that day named in the picker modal, so that send sits on my choice and I know which date I am requesting.
 
 ## Epic 2 — Booking Request Flow (Customer)
 
@@ -88,6 +89,7 @@
 
 - As a customer, I want an alternate chat on the salon profile when I am not sure which service or time to pick, so that I can still send the same kind of request without hunting a slot grid.
 - As a customer, I want Pitaj salon to open a full-canvas chat overlay so I can talk to this salon without the hours list competing with the conversation.
+- As a customer, I want choosing a native date or time in Pitaj salon (or the picker overlay) to keep that overlay open, so I can finish the request and still use Reci nam što ti treba / Nisi sigurna? Pitaj salon after I close it.
 - As a customer, I want the chat to suggest 1–3 preferred times from hours and how busy the day looks, so that I can choose a time without seeing the owner's real calendar.
 - As a customer, I want the chat to speak as this salon in Bosnian and only use that salon's live services, prices, hours, address, workers, and busy-level, so that it does not invent policies or feel like a third brand.
 - As a customer, I want send gates to stay the same as the picker (login, verified email, phone OTP), so that the salon still gets a reachable guest. If I am already verified, I want one confirm at the end.
