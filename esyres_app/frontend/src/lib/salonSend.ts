@@ -17,3 +17,8 @@ export const SALON_CHAT_CARD_CLASS =
 export const ASSISTANT_COMPOSER_CLASS =
   'mt-3 flex w-full items-center gap-2 rounded-full border border-hairline bg-canvas py-2 pl-2 pr-4'
 
+export const ASSISTANT_SALON_LINE_CLASS = 'max-w-[85%] text-sm leading-relaxed text-ink'
+
+export const ASSISTANT_GUEST_PILL_CLASS =
+  'ml-auto max-w-[85%] rounded-3xl bg-surface-soft px-4 py-3 text-sm leading-relaxed text-ink'
+

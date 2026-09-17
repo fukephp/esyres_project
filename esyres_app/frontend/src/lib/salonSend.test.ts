@@ -8,6 +8,8 @@ import {
   SALON_BOOKING_MAIN_CLASS,
   SALON_BOOKING_SPLIT_CLASS,
   ASSISTANT_COMPOSER_CLASS,
+  ASSISTANT_GUEST_PILL_CLASS,
+  ASSISTANT_SALON_LINE_CLASS,
   SALON_CHAT_CARD_CLASS,
   SALON_PICKER_DIALOG_CLASS,
   SALON_SEND_CLASS,
@@ -52,6 +54,7 @@ test('i18n send stays Pošalji zahtjev; hours hint is day-first copy', () => {
   expect(i18n).toMatch(/send: 'Pošalji zahtjev'/)
   expect(i18n).toMatch(/sendHint: 'Odaberi dan da pošalješ zahtjev\.'/)
   expect(i18n).toMatch(/ask: 'Nisi sigurna\? Pitaj salon\.'/)
+  expect(i18n).toMatch(/hello: '\{\{name\}\} ovdje\.'/)
   expect(i18n).toMatch(/nudge: 'Reci nam što ti treba\.'/)
   expect(i18n).toMatch(/prompt: 'Kako ti možemo pomoći\?'/)
   expect(i18n).toMatch(/submit: 'Pošalji'/)
@@ -68,6 +71,16 @@ test('picker dialog and chat card classes stay Cal', () => {
   expect(ASSISTANT_COMPOSER_CLASS).toMatch(/border-hairline/)
   expect(ASSISTANT_COMPOSER_CLASS).toMatch(/\bw-full\b/)
   expect(ASSISTANT_COMPOSER_CLASS).not.toMatch(/bg-ink/)
+  expect(ASSISTANT_SALON_LINE_CLASS).toBe('max-w-[85%] text-sm leading-relaxed text-ink')
+  expect(ASSISTANT_SALON_LINE_CLASS).not.toMatch(/rounded-3xl/)
+  expect(ASSISTANT_SALON_LINE_CLASS).not.toMatch(/bg-/)
+  expect(ASSISTANT_GUEST_PILL_CLASS).toBe(
+    'ml-auto max-w-[85%] rounded-3xl bg-surface-soft px-4 py-3 text-sm leading-relaxed text-ink',
+  )
+  expect(ASSISTANT_GUEST_PILL_CLASS).toMatch(/bg-surface-soft/)
+  expect(ASSISTANT_GUEST_PILL_CLASS).toMatch(/text-ink/)
+  expect(ASSISTANT_GUEST_PILL_CLASS).not.toMatch(/bg-ink/)
+  expect(ASSISTANT_GUEST_PILL_CLASS).not.toMatch(/text-canvas/)
 })
 
 test('three Pošalji zahtjev use SALON_SEND_CLASS and salon.send', () => {

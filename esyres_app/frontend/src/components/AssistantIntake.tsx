@@ -5,7 +5,12 @@ import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
-import { ASSISTANT_COMPOSER_CLASS, SALON_SEND_CLASS } from '../lib/salonSend'
+import {
+  ASSISTANT_COMPOSER_CLASS,
+  ASSISTANT_GUEST_PILL_CLASS,
+  ASSISTANT_SALON_LINE_CLASS,
+  SALON_SEND_CLASS,
+} from '../lib/salonSend'
 import {
   assistantAddressLine,
   assistantCanSend,
@@ -64,17 +69,13 @@ type Props = {
 const chip = 'rounded-full border px-3 py-1.5 text-sm'
 const chipIdle = `${chip} border-hairline text-ink`
 const chipOn = `${chip} border-ink bg-ink text-canvas`
-const salonBubble =
-  'max-w-[85%] rounded-3xl bg-surface-soft px-4 py-3 text-sm leading-relaxed text-ink'
-const userBubble =
-  'ml-auto max-w-[85%] rounded-3xl bg-ink px-4 py-3 text-sm leading-relaxed text-canvas'
 
 function SalonLine({ children }: { children: ReactNode }) {
-  return <p className={salonBubble}>{children}</p>
+  return <p className={ASSISTANT_SALON_LINE_CLASS}>{children}</p>
 }
 
 function GuestLine({ children }: { children: ReactNode }) {
-  return <p className={userBubble}>{children}</p>
+  return <p className={ASSISTANT_GUEST_PILL_CLASS}>{children}</p>
 }
 
 export function AssistantIntake({
@@ -141,9 +142,10 @@ export function AssistantIntake({
           break: (start, end) => t('salon.break', { start, end }),
         })
   const empty = selected.length === 0 && !waiting
+  const showWorker = selected.length > 0 && workers.length > 0
 
   return (
-    <form className="mt-4 flex min-h-[70dvh] w-full flex-col" onSubmit={onSend}>
+    <form className="flex h-full min-h-0 w-full flex-col" onSubmit={onSend}>
       {empty ? (
         <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
           <p className="font-display text-[32px] font-semibold tracking-tight text-ink">
@@ -152,17 +154,22 @@ export function AssistantIntake({
           {addressLine !== null && <p className="mt-2 text-sm text-muted">{addressLine}</p>}
         </div>
       ) : (
-        <div className="flex flex-1 flex-col justify-end gap-3 overflow-y-auto">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
           <SalonLine>{t('assistant.hello', { name: assistantHelloName(salonName) })}</SalonLine>
           {addressLine !== null && <p className="text-sm text-muted">{addressLine}</p>}
           {chosen.length > 0 && <GuestLine>{chosen.map((s) => s.name).join(', ')}</GuestLine>}
-          {waiting && workerConfirmed && <GuestLine>{pickedWorker}</GuestLine>}
+          {showWorker && <SalonLine>{t('assistant.worker')}</SalonLine>}
+          {workerConfirmed && <GuestLine>{pickedWorker}</GuestLine>}
+          {(step === 'date' || timeStep) && <SalonLine>{t('assistant.date')}</SalonLine>}
+          {timeStep && !dayClosed && <SalonLine>{t('assistant.time')}</SalonLine>}
+          {step === 'send' && <SalonLine>{t('assistant.send')}</SalonLine>}
+          {(unknownShown || pinged) && !waiting && <SalonLine>{t('assistant.unknown')}</SalonLine>}
           {waiting && <SalonLine>{t('assistant.wait')}</SalonLine>}
         </div>
       )}
 
       {!waiting && (
-        <div className="mt-6 space-y-3">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <ul className="flex flex-wrap gap-2">
             {services.map((service) => {
               const on = selected.includes(service.id)
@@ -184,62 +191,54 @@ export function AssistantIntake({
             })}
           </ul>
 
-          {selected.length > 0 && workers.length > 0 && (
-            <>
-              <SalonLine>{t('assistant.worker')}</SalonLine>
-              {workerConfirmed && <GuestLine>{pickedWorker}</GuestLine>}
-              <ul className="flex flex-wrap gap-2">
-                <li>
+          {showWorker && (
+            <ul className="flex flex-wrap gap-2">
+              <li>
+                <button
+                  type="button"
+                  className={workerConfirmed && workerChoice === '' ? chipOn : chipIdle}
+                  onClick={() => onPickWorker('')}
+                >
+                  {t('salon.noPreference')}
+                </button>
+              </li>
+              {workers.map((worker) => (
+                <li key={worker.id}>
                   <button
                     type="button"
-                    className={workerConfirmed && workerChoice === '' ? chipOn : chipIdle}
-                    onClick={() => onPickWorker('')}
+                    className={workerConfirmed && workerChoice === worker.id ? chipOn : chipIdle}
+                    onClick={() => onPickWorker(worker.id)}
                   >
-                    {t('salon.noPreference')}
+                    {worker.name}
                   </button>
                 </li>
-                {workers.map((worker) => (
-                  <li key={worker.id}>
-                    <button
-                      type="button"
-                      className={workerConfirmed && workerChoice === worker.id ? chipOn : chipIdle}
-                      onClick={() => onPickWorker(worker.id)}
-                    >
-                      {worker.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </>
+              ))}
+            </ul>
           )}
 
           {(step === 'date' || timeStep) && (
-            <>
-              <SalonLine>{t('assistant.date')}</SalonLine>
-              <label className="block text-sm text-body">
-                {t('salon.date')}
-                <input
-                  type="date"
-                  required
-                  min={minDate}
-                  value={preferredDate}
-                  onChange={(e) => onDate(e.target.value)}
-                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-                />
-              </label>
-            </>
+            <label className="block w-full text-sm text-body">
+              {t('salon.date')}
+              <input
+                type="date"
+                required
+                min={minDate}
+                value={preferredDate}
+                onChange={(e) => onDate(e.target.value)}
+                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+              />
+            </label>
           )}
 
-          {timeStep && hoursLine !== null && <p className="text-sm text-muted">{hoursLine}</p>}
+          {timeStep && hoursLine !== null && <p className="w-full text-sm text-muted">{hoursLine}</p>}
 
           {timeStep && dayClosed && (
-            <p className="text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
+            <p className="w-full text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
           )}
 
           {timeStep && !dayClosed && (
             <>
-              <p className="text-sm text-muted">{t(`salon.busy.${dayBusy}`)}</p>
-              <SalonLine>{t('assistant.time')}</SalonLine>
+              <p className="w-full text-sm text-muted">{t(`salon.busy.${dayBusy}`)}</p>
               {suggestions.length > 0 && (
                 <ul className="flex flex-wrap gap-2">
                   {suggestions.map((time) => (
@@ -265,7 +264,7 @@ export function AssistantIntake({
                 </button>
               )}
               {otherTime && (
-                <label className="block text-sm text-body">
+                <label className="block w-full text-sm text-body">
                   {t('salon.time')}
                   <input
                     type="time"
@@ -280,20 +279,18 @@ export function AssistantIntake({
             </>
           )}
 
-          {step === 'send' && <SalonLine>{t('assistant.send')}</SalonLine>}
           {escapeChrome === 'shown' && (
             <button type="button" className={chipIdle} onClick={onUnknown}>
               {t('assistant.other')}
             </button>
           )}
-          {(unknownShown || pinged) && !waiting && <SalonLine>{t('assistant.unknown')}</SalonLine>}
           {pingUi === 'cta' && (
             <button type="button" className="text-sm font-medium text-ink underline underline-offset-4" onClick={onPing}>
               {t('assistant.ping')}
             </button>
           )}
-          {pingUi === 'done' && <p className="text-sm text-muted">{t('assistant.pinged')}</p>}
-          {error && <p className="text-sm text-busy-busy">{error}</p>}
+          {pingUi === 'done' && <p className="w-full text-sm text-muted">{t('assistant.pinged')}</p>}
+          {error && <p className="w-full text-sm text-busy-busy">{error}</p>}
           {step === 'send' && chrome === 'submit' && (
             <button
               type="submit"

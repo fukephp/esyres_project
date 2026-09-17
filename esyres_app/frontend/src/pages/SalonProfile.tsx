@@ -225,6 +225,7 @@ export function SalonProfile() {
   const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
   const restored = useRef(false)
   const pickerDialogRef = useRef<HTMLDialogElement>(null)
+  const chatDialogRef = useRef<HTMLDialogElement>(null)
   const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
     variables: { token: intakeToken ?? '' },
     skip: !intakeToken,
@@ -281,18 +282,25 @@ export function SalonProfile() {
   }, [intakeToken, refetchIntake])
 
   useEffect(() => {
-    const dialog = pickerDialogRef.current
-    if (dialog == null) {
-      return
-    }
-    if (mode === 'picker') {
-      if (!dialog.open) {
-        dialog.showModal()
+    const picker = pickerDialogRef.current
+    if (picker != null) {
+      if (mode === 'picker') {
+        if (!picker.open) {
+          picker.showModal()
+        }
+      } else if (picker.open) {
+        picker.close()
       }
-      return
     }
-    if (dialog.open) {
-      dialog.close()
+    const chat = chatDialogRef.current
+    if (chat != null) {
+      if (mode === 'chat') {
+        if (!chat.open) {
+          chat.showModal()
+        }
+      } else if (chat.open) {
+        chat.close()
+      }
     }
   }, [mode])
 
@@ -662,7 +670,7 @@ export function SalonProfile() {
         ) : null}
         {showChatCard ? (
           chatting ? (
-            <div className={SALON_CHAT_CARD_CLASS} aria-pressed="true">
+            <div className={`${SALON_CHAT_CARD_CLASS} pointer-events-none`} aria-pressed="true">
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-muted">{t('assistant.nudge')}</span>
                 <span className="block text-sm font-semibold text-ink">{t('assistant.ask')}</span>
@@ -672,7 +680,11 @@ export function SalonProfile() {
               </svg>
             </div>
           ) : (
-            <button type="button" className={SALON_CHAT_CARD_CLASS} onClick={() => openIntake('chat')}>
+            <button
+              type="button"
+              className={`${SALON_CHAT_CARD_CLASS}${picking ? ' pointer-events-none' : ''}`}
+              onClick={() => openIntake('chat')}
+            >
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-muted">{t('assistant.nudge')}</span>
                 <span className="block text-sm font-semibold text-ink">{t('assistant.ask')}</span>
@@ -682,64 +694,6 @@ export function SalonProfile() {
               </svg>
             </button>
           )
-        ) : null}
-        {chatting && !sent && id ? (
-          <div className="w-full">
-            <AssistantIntake
-              salonName={salon.name}
-              address={salon.address}
-              services={salon.services}
-              workers={salon.workers}
-              dayHours={hoursForDay}
-              minDate={date}
-              selected={chatSelected}
-              onToggleService={(serviceId) =>
-                setChatSelected((ids) =>
-                  ids.includes(serviceId) ? ids.filter((sid) => sid !== serviceId) : [...ids, serviceId],
-                )
-              }
-              workerChoice={chatWorker}
-              onPickWorker={(workerId) => {
-                setChatWorker(workerId)
-                setChatWorkerConfirmed(true)
-              }}
-              workerConfirmed={chatWorkerConfirmed}
-              preferredDate={chatDate}
-              onDate={(value) => {
-                const next = assistantDateChange(value)
-                setChatDate(next.preferredDate)
-                setChatTime(next.preferredTime)
-                setChatOtherTime(next.otherTime)
-              }}
-              preferredTime={chatTime}
-              onPickSuggestion={(value) => {
-                setChatTime(value)
-                setChatOtherTime(false)
-              }}
-              onNativeTime={setChatTime}
-              dayClosed={dayClosed}
-              dayBusy={salon.chatBusyLevel}
-              suggestions={suggestions}
-              showOtherTime={assistantShowOtherTime(dayClosed)}
-              otherTime={chatOtherTime}
-              onOtherTime={() => {
-                setChatOtherTime(true)
-                setChatTime('')
-              }}
-              error={error}
-              busy={busy}
-              waiting={waiting}
-              unknownShown={unknownShown}
-              pinged={pinged}
-              onUnknown={() => setUnknownShown(true)}
-              onPing={() => void onPing()}
-              needLogin={needLogin}
-              needEmail={needEmail}
-              needPhone={needPhone}
-              onSend={onSubmit}
-              onAfterAuth={() => void afterAuth()}
-            />
-          </div>
         ) : null}
       </section>
 
@@ -902,6 +856,84 @@ export function SalonProfile() {
             <AuthShell onAuthenticated={() => afterAuth()} />
           </div>
         )}
+      </dialog>
+      <dialog
+        ref={chatDialogRef}
+        className={SALON_PICKER_DIALOG_CLASS}
+        onClose={() => {
+          if (mode === 'chat') {
+            setMode('idle')
+          }
+        }}
+        onClick={(event) => {
+          if (event.target === chatDialogRef.current) {
+            setMode('idle')
+          }
+        }}
+      >
+        <div className="mb-4 flex justify-end">
+          <button type="button" className="text-sm text-body" onClick={() => setMode('idle')}>
+            {t('salon.close')}
+          </button>
+        </div>
+        {id ? (
+          <div className="flex min-h-0 flex-1 flex-col md:min-h-[70vh]">
+            <AssistantIntake
+              salonName={salon.name}
+              address={salon.address}
+              services={salon.services}
+              workers={salon.workers}
+              dayHours={hoursForDay}
+              minDate={date}
+              selected={chatSelected}
+              onToggleService={(serviceId) =>
+                setChatSelected((ids) =>
+                  ids.includes(serviceId) ? ids.filter((sid) => sid !== serviceId) : [...ids, serviceId],
+                )
+              }
+              workerChoice={chatWorker}
+              onPickWorker={(workerId) => {
+                setChatWorker(workerId)
+                setChatWorkerConfirmed(true)
+              }}
+              workerConfirmed={chatWorkerConfirmed}
+              preferredDate={chatDate}
+              onDate={(value) => {
+                const next = assistantDateChange(value)
+                setChatDate(next.preferredDate)
+                setChatTime(next.preferredTime)
+                setChatOtherTime(next.otherTime)
+              }}
+              preferredTime={chatTime}
+              onPickSuggestion={(value) => {
+                setChatTime(value)
+                setChatOtherTime(false)
+              }}
+              onNativeTime={setChatTime}
+              dayClosed={dayClosed}
+              dayBusy={salon.chatBusyLevel}
+              suggestions={suggestions}
+              showOtherTime={assistantShowOtherTime(dayClosed)}
+              otherTime={chatOtherTime}
+              onOtherTime={() => {
+                setChatOtherTime(true)
+                setChatTime('')
+              }}
+              error={error}
+              busy={busy}
+              waiting={waiting}
+              unknownShown={unknownShown}
+              pinged={pinged}
+              onUnknown={() => setUnknownShown(true)}
+              onPing={() => void onPing()}
+              needLogin={needLogin}
+              needEmail={needEmail}
+              needPhone={needPhone}
+              onSend={onSubmit}
+              onAfterAuth={() => void afterAuth()}
+            />
+          </div>
+        ) : null}
       </dialog>
       </main>
     </>

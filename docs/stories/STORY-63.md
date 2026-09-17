@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | `STORY-63` |
 | Epic | 10 — Salon Booking Assistant (scripted intake) |
-| Loop | `—` |
+| Loop | `STORY-63` |
 | Depends on | STORY-62, STORY-21 |
 
 ## User story
