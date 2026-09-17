@@ -9,7 +9,7 @@ import {
   PLACE_HEADING_CLASS,
   discoveryBrandLink,
   homepageChrome,
-  homepageDisplayName,
+  homepagePersonName,
   isBookingsPath,
   isCreateSalonPath,
   isDiscoveryHomePath,
@@ -99,13 +99,21 @@ test('topNavSlot by path', () => {
   expect(topNavSlot('/nope')).toBe('empty')
 })
 
-test('homepageDisplayName prefers trimmed name else email', () => {
-  expect(homepageDisplayName({ name: 'Ana', email: 'ana@example.com' })).toBe('Ana')
-  expect(homepageDisplayName({ name: '  Ana  ', email: 'ana@example.com' })).toBe('Ana')
-  expect(homepageDisplayName({ name: '', email: 'ana@example.com' })).toBe('ana@example.com')
-  expect(homepageDisplayName({ name: '   ', email: 'ana@example.com' })).toBe('ana@example.com')
-  expect(homepageDisplayName({ name: null, email: 'ana@example.com' })).toBe('ana@example.com')
-  expect(homepageDisplayName({ name: undefined, email: 'ana@example.com' })).toBe('ana@example.com')
+test('homepagePersonName is trimmed name or null; never email', () => {
+  const named = { name: 'Ana', email: 'x' }
+  const padded = { name: '  Ana  ', email: 'x' }
+  const empty = { name: '', email: 'x' }
+  const spaces = { name: '   ', email: 'x' }
+  const missing = { name: null, email: 'x' }
+  const unset = { name: undefined, email: 'x' }
+  expect(homepagePersonName(named)).toBe('Ana')
+  expect(homepagePersonName(padded)).toBe('Ana')
+  expect(homepagePersonName(empty)).toBe(null)
+  expect(homepagePersonName(spaces)).toBe(null)
+  expect(homepagePersonName(missing)).toBe(null)
+  expect(homepagePersonName(unset)).toBe(null)
+  expect(homepagePersonName(null)).toBe(null)
+  expect(homepagePersonName.toString()).not.toMatch(/email/)
 })
 
 test('discovery and create-salon hrefs', () => {
@@ -117,6 +125,7 @@ test('discovery and create-salon hrefs', () => {
 
 const ana = { name: 'Ana', email: 'ana@example.com', salons: [] as unknown[] }
 const owner = { name: 'Ana', email: 'ana@example.com', salons: [{ id: '1' }] }
+const nameless = { name: '  ', email: 'ana@example.com', salons: [] as unknown[] }
 const brand = { to: '/', brandKey: 'pitch.brand' } as const
 
 test('homepageChrome guest vs session uses ownerPanelCta', () => {
@@ -128,19 +137,19 @@ test('homepageChrome guest vs session uses ownerPanelCta', () => {
   })
   expect(homepageChrome(ana)).toEqual({
     kind: 'session',
-    displayName: 'Ana',
+    personName: 'Ana',
     logout: true,
     panel: { href: '/create-salon', kind: 'create' },
   })
-  expect(homepageChrome({ name: '  ', email: 'ana@example.com' })).toEqual({
+  expect(homepageChrome(nameless)).toEqual({
     kind: 'session',
-    displayName: 'ana@example.com',
+    personName: null,
     logout: true,
     panel: { href: '/create-salon', kind: 'create' },
   })
   expect(homepageChrome(owner)).toEqual({
     kind: 'session',
-    displayName: 'Ana',
+    personName: 'Ana',
     logout: true,
     panel: { href: '/owner', kind: 'panel' },
   })
@@ -157,28 +166,65 @@ test('topNavChrome brand is always home; slots match path + me', () => {
   expect(topNavChrome('/', owner)).toEqual({
     brand,
     slot: 'home-session',
-    displayName: 'Ana',
+    personName: 'Ana',
     bookings: true,
     logout: true,
     panel: { href: '/owner', kind: 'panel' },
   })
-  expect(topNavChrome('/salons', owner)).toEqual({ brand, slot: 'discovery', bookings: true })
-  expect(topNavChrome('/salon/1', null)).toEqual({ brand, slot: 'discovery', bookings: true })
-  expect(topNavChrome('/create-salon', owner)).toEqual({ brand, slot: 'empty' })
+  expect(topNavChrome('/', nameless)).toEqual({
+    brand,
+    slot: 'home-session',
+    personName: null,
+    bookings: true,
+    logout: true,
+    panel: { href: '/create-salon', kind: 'create' },
+  })
+  expect(topNavChrome('/salons', owner)).toEqual({
+    brand,
+    slot: 'discovery',
+    personName: 'Ana',
+    bookings: true,
+  })
+  expect(topNavChrome('/salons', nameless)).toEqual({
+    brand,
+    slot: 'discovery',
+    personName: null,
+    bookings: true,
+  })
+  expect(topNavChrome('/salon/1', null)).toEqual({
+    brand,
+    slot: 'discovery',
+    personName: null,
+    bookings: true,
+  })
+  expect(topNavChrome('/create-salon', owner)).toEqual({
+    brand,
+    slot: 'greeting',
+    personName: 'Ana',
+  })
+  expect(topNavChrome('/create-salon', nameless)).toEqual({ brand, slot: 'empty' })
   expect(topNavChrome('/bookings', null)).toEqual({ brand, slot: 'empty' })
   expect(topNavChrome('/bookings', ana)).toEqual({
     brand,
     slot: 'session',
-    displayName: 'Ana',
+    personName: 'Ana',
+    logout: true,
+  })
+  expect(topNavChrome('/bookings', nameless)).toEqual({
+    brand,
+    slot: 'session',
+    personName: null,
     logout: true,
   })
   expect(topNavChrome('/owner', owner)).toEqual({
     brand,
     slot: 'session',
-    displayName: 'Ana',
+    personName: 'Ana',
     logout: true,
   })
   expect(topNavChrome('/owner/chats', null)).toEqual({ brand, slot: 'empty' })
+  expect(topNavChrome('/welcome', owner)).toEqual({ brand, slot: 'empty' })
+  expect(topNavChrome('/nope', ana)).toEqual({ brand, slot: 'empty' })
 })
 
 test('discovery brand links home with Esyres wordmark key', () => {
@@ -201,6 +247,7 @@ test('homepage chrome copy is Bosnian; pitch hero strings unchanged', async () =
   expect(i18n.t('home.panel')).toBe('Panel')
   expect(i18n.t('home.logout')).toBe('Odjava')
   expect(i18n.t('nav.bookings')).toBe('Moje rezervacije')
+  expect(i18n.t('nav.welcome', { name: 'Ana' })).toBe('Dobrodošli, Ana')
   expect(i18n.t('bookings.logout')).toBe('Odjavi se')
   expect(i18n.t('home.footerCity')).toBe('Sarajevo')
   expect(i18n.t('home.footerLine')).toBe('Termini bez jurnjave.')

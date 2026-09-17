@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | `STORY-66` |
 | Epic | 1 — Salon Discovery & Profile Browsing |
-| Loop | `—` |
+| Loop | `STORY-66` |
 | Depends on | STORY-43, STORY-46, STORY-62 |
 
 ## User story

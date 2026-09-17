@@ -29,10 +29,11 @@ export type TopNavBrand = { to: typeof HOME_HREF; brandKey: typeof DISCOVERY_BRA
 
 export type TopNavChrome =
   | { brand: TopNavBrand; slot: 'home-guest'; login: true; register: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'home-session'; displayName: string; bookings: true; logout: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'discovery'; bookings: true }
+  | { brand: TopNavBrand; slot: 'home-session'; personName: string | null; bookings: true; logout: true; panel: PanelCta }
+  | { brand: TopNavBrand; slot: 'discovery'; personName: string | null; bookings: true }
+  | { brand: TopNavBrand; slot: 'greeting'; personName: string }
   | { brand: TopNavBrand; slot: 'empty' }
-  | { brand: TopNavBrand; slot: 'session'; displayName: string; logout: true }
+  | { brand: TopNavBrand; slot: 'session'; personName: string | null; logout: true }
 
 const brand: TopNavBrand = { to: HOME_HREF, brandKey: DISCOVERY_BRAND_KEY }
 
@@ -73,13 +74,16 @@ export function topNavSlot(path: string): TopNavSlot {
   return 'empty'
 }
 
-export function homepageDisplayName(me: { name: string | null | undefined; email: string }): string {
-  const name = me.name?.trim() ?? ''
-  return name !== '' ? name : me.email
+export function homepagePersonName(
+  me: { name: string | null | undefined } | null | undefined,
+): string | null {
+  const name = me?.name?.trim() ?? ''
+  return name !== '' ? name : null
 }
 
 export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
   const slot = topNavSlot(path)
+  const personName = homepagePersonName(me)
   if (slot === 'home') {
     const panel = ownerPanelCta((me?.salons?.length ?? 0) > 0)
     if (me == null) {
@@ -88,24 +92,27 @@ export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
     return {
       brand,
       slot: 'home-session',
-      displayName: homepageDisplayName(me),
+      personName,
       bookings: true,
       logout: true,
       panel,
     }
   }
   if (slot === 'discovery') {
-    return { brand, slot: 'discovery', bookings: true }
+    return { brand, slot: 'discovery', personName, bookings: true }
   }
   if (slot === 'session' && me != null) {
-    return { brand, slot: 'session', displayName: homepageDisplayName(me), logout: true }
+    return { brand, slot: 'session', personName, logout: true }
+  }
+  if (isCreateSalonPath(path) && personName != null) {
+    return { brand, slot: 'greeting', personName }
   }
   return { brand, slot: 'empty' }
 }
 
 export type HomepageChrome =
   | { kind: 'guest'; login: true; register: true; panel: PanelCta }
-  | { kind: 'session'; displayName: string; logout: true; panel: PanelCta }
+  | { kind: 'session'; personName: string | null; logout: true; panel: PanelCta }
 
 export function homepageChrome(me: TopNavMe): HomepageChrome {
   if (me == null) {
@@ -113,7 +120,7 @@ export function homepageChrome(me: TopNavMe): HomepageChrome {
   }
   return {
     kind: 'session',
-    displayName: homepageDisplayName(me),
+    personName: homepagePersonName(me),
     logout: true,
     panel: ownerPanelCta((me.salons?.length ?? 0) > 0),
   }

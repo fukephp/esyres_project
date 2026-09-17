@@ -91,6 +91,7 @@ void i18n.use(initReactI18next).init({
         },
         nav: {
           bookings: 'Moje rezervacije',
+          welcome: 'Dobrodošli, {{name}}',
         },
         home: {
           panel: 'Panel',

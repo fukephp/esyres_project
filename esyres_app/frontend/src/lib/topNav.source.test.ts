@@ -12,6 +12,15 @@ function read(rel: string): string {
 
 const forbiddenChrome = /auth\.login|auth\.register|home\.getPanel|home\.panel|home\.logout|nav\.bookings/
 
+test('homepagePersonName source does not read email', () => {
+  const homepage = read('lib/homepage.ts')
+  const personFn = homepage.match(/export function homepagePersonName[\s\S]*?\nexport function topNavChrome/)?.[0]
+  expect(personFn).toBeTruthy()
+  expect(personFn).not.toMatch(/email/)
+  expect(homepage).not.toMatch(/homepageDisplayName/)
+  expect(homepage).not.toMatch(/displayName/)
+})
+
 test('TopNav is full-bleed Cal bar with mark link home and panel primary', () => {
   const nav = read('components/TopNav.tsx')
   expect(nav).toMatch(/w-full/)
@@ -28,6 +37,7 @@ test('TopNav is full-bleed Cal bar with mark link home and panel primary', () =>
   expect(nav).toMatch(/h-10 items-center rounded-md bg-ink/)
   expect(nav).toMatch(/text-canvas/)
   expect(nav).toMatch(/text-sm text-body/)
+  expect(nav).toMatch(/nav\.welcome/)
   expect(nav).toMatch(/nav\.bookings/)
   expect(nav).toMatch(/home\.getPanel/)
   expect(nav).toMatch(/home\.panel/)
@@ -62,11 +72,29 @@ test('Odjava uses Cal button-destructive on both logged-in slots', () => {
   }
 
   const homeSession = nav.match(/chrome\.slot === 'home-session'[\s\S]*?(?=chrome\.slot === 'discovery')/)?.[0]
-  expect(homeSession).toMatch(/displayName[\s\S]*nav\.bookings[\s\S]*home\.logout[\s\S]*panelClass/)
-  expect(homeSession).toMatch(/className=\{linkClass\}>\{chrome\.displayName\}/)
+  expect(homeSession).toMatch(/nav\.welcome[\s\S]*nav\.bookings[\s\S]*home\.logout[\s\S]*panelClass/)
+  expect(homeSession).toMatch(/className=\{linkClass\}>\{t\('nav\.welcome', \{ name: chrome\.personName \}\)/)
+  expect(homeSession).not.toMatch(/chrome\.displayName/)
   expect(homeSession).toMatch(/to=\{BOOKINGS_HREF\}[\s\S]*nav\.bookings/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onLogin\}>/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onRegister\}>/)
+
+  const discoverySlot = nav.match(/chrome\.slot === 'discovery'[\s\S]*?(?=chrome\.slot === 'session')/)?.[0]
+  expect(discoverySlot).toMatch(/nav\.welcome[\s\S]*nav\.bookings/)
+  expect(discoverySlot).not.toMatch(/logoutClass/)
+  expect(discoverySlot).not.toMatch(/panelClass/)
+
+  const sessionSlot = nav.match(/chrome\.slot === 'session'[\s\S]*?(?=chrome\.slot === 'greeting')/)?.[0]
+  expect(sessionSlot).toMatch(/nav\.welcome[\s\S]*logoutClass/)
+  expect(sessionSlot).not.toMatch(/nav\.bookings/)
+  expect(sessionSlot).not.toMatch(/panelClass/)
+
+  const greetingSlot = nav.match(/chrome\.slot === 'greeting'[\s\S]*?(?=<\/nav>)/)?.[0]
+  expect(greetingSlot).toMatch(/nav\.welcome/)
+  expect(greetingSlot).not.toMatch(/nav\.bookings/)
+  expect(greetingSlot).not.toMatch(/logoutClass/)
+  expect(greetingSlot).not.toMatch(/panelClass/)
+  expect(nav).toMatch(/chrome\.slot === 'empty' \? null/)
 
   const css = read('index.css')
   expect(css).toMatch(/--color-error-strong:\s*#dc2626/)
@@ -98,9 +126,14 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   expect(page).not.toMatch(/max-w-sm[\s\S]*PLACE_HEADING_CLASS/)
 })
 
+function topNavTags(text: string): string[] {
+  return [...text.matchAll(/<TopNav[\s\S]*?\/>/g)].map((m) => m[0])
+}
+
 test('discovery and salon share TopNav discovery slot; no in-page BookingsLink', () => {
   const discovery = read('pages/DiscoveryHome.tsx')
   expect(discovery).toMatch(/<TopNav/)
+  expect(discovery).toMatch(/ME_QUERY/)
   expect(discovery).toMatch(/GUEST_COLUMN_CLASS/)
   expect(discovery).not.toMatch(/mx-auto max-w-md/)
   expect(discovery).not.toMatch(/md:grid/)
@@ -111,9 +144,16 @@ test('discovery and salon share TopNav discovery slot; no in-page BookingsLink',
   expect(discovery).not.toMatch(forbiddenChrome)
   expect(discovery).not.toMatch(/pitch\.h1/)
   expect(discovery).not.toMatch(/home\.footer/)
+  const discoveryNavs = topNavTags(discovery)
+  expect(discoveryNavs.length).toBeGreaterThan(0)
+  for (const tag of discoveryNavs) {
+    expect(tag).toMatch(/me=/)
+    expect(tag).not.toMatch(/salon\.name/)
+  }
 
   const salon = read('pages/SalonProfile.tsx')
   expect(salon).toMatch(/<TopNav/)
+  expect(salon).toMatch(/ME_QUERY/)
   expect(salon).toMatch(/GUEST_COLUMN_CLASS/)
   expect(salon).not.toMatch(/mx-auto max-w-md/)
   expect(salon).toMatch(/SALON_PICKER_DIALOG_CLASS/)
@@ -124,11 +164,22 @@ test('discovery and salon share TopNav discovery slot; no in-page BookingsLink',
   expect(salon).not.toMatch(forbiddenChrome)
   expect(salon).not.toMatch(/pitch\.h1/)
   expect(salon).not.toMatch(/home\.footer/)
+  const salonNavs = topNavTags(salon)
+  expect(salonNavs.length).toBe(3)
+  for (const tag of salonNavs) {
+    expect(tag).toMatch(/me=/)
+    expect(tag).not.toMatch(/salon\.name/)
+  }
+  const chatDialog = salon.slice(salon.lastIndexOf('<dialog'))
+  expect(chatDialog).toMatch(/salon\.close/)
+  expect(chatDialog).not.toMatch(/nav\.welcome/)
+  expect(read('components/AssistantIntake.tsx')).not.toMatch(/nav\.welcome/)
 })
 
 test('create-salon empty slot; no Brand duplicate or owner chrome', () => {
   const page = read('pages/CreateSalon.tsx')
   expect(page).toMatch(/<TopNav/)
+  expect(page).toMatch(/ME_QUERY/)
   expect(page).toMatch(/GUEST_COLUMN_CLASS/)
   expect(page).not.toMatch(/mx-auto max-w-md/)
   expect(page).toMatch(/max-w-md/)
@@ -139,6 +190,11 @@ test('create-salon empty slot; no Brand duplicate or owner chrome', () => {
   expect(page).not.toMatch(/pitch\.h1/)
   expect(page).not.toMatch(/home\.footer/)
   expect(page).not.toMatch(/nav\.bookings/)
+  const createNavs = topNavTags(page)
+  expect(createNavs.length).toBe(4)
+  for (const tag of createNavs) {
+    expect(tag).toMatch(/me=/)
+  }
 })
 
 test('bookings TopNav; AuthShell in page; no bottom Odjava or panel CTA', () => {
