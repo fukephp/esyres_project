@@ -21,6 +21,13 @@ test('busy and cell CSS variables keep Design 1 hexes; display is Cal Sans', () 
   expect(css).toMatch(/--color-cell-proposed:\s*#93c5fd/)
   expect(css).toMatch(/--color-cell-booked:\s*#1a1a1a/)
   expect(css).toMatch(/--color-cell-off:\s*#d6d3d1/)
+  expect(css).toMatch(/--color-badge-orange:\s*#fb923c/)
+  expect(css).toMatch(/--color-badge-pink:\s*#ec4899/)
+  expect(css).toMatch(/--color-badge-violet:\s*#8b5cf6/)
+  expect(css).toMatch(/--color-badge-emerald:\s*#34d399/)
+  expect(css).toMatch(/--color-brand-accent:\s*#3b82f6/)
+  expect(css).toMatch(/--color-success:\s*#10b981/)
+  expect(css).toMatch(/--color-error:\s*#ef4444/)
   expect(css).toMatch(/--font-display:\s*"Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif/)
   expect(css).toMatch(/--font-sans:\s*Inter, ui-sans-serif, system-ui, sans-serif/)
 })
@@ -69,22 +76,14 @@ test('owner chrome is Cal light; no dark nav', () => {
   }
 })
 
-test('dense panel stays queue then 15-minute WorkerPanel', () => {
-  const panel = read('components/WorkerPanel.tsx')
-  expect(panel).toMatch(/<table/)
-  expect(panel).toMatch(/bg-cell-free/)
-  expect(panel).toMatch(/bg-cell-off/)
-  expect(panel).toMatch(/bg-cell-booked/)
-  expect(panel).toMatch(/bg-cell-proposed/)
-
-  expect(panel).toMatch(/rowSpan/)
-
+test('dense owner home is month navigator plus selected-day list', () => {
   const home = read('pages/OwnerHome.tsx')
-  const queueAt = home.indexOf('owner.empty')
-  const panelAt = home.indexOf('<WorkerPanel')
-  expect(queueAt).toBeGreaterThan(-1)
-  expect(panelAt).toBeGreaterThan(queueAt)
   expect(home).toMatch(/rounded-lg border border-hairline bg-canvas p-4/)
+  expect(home).toMatch(/md:grid md:grid-cols-2/)
+  expect(home).toMatch(/occupyingBookingsRange/)
+  expect(home).not.toMatch(/WorkerPanel/)
+  expect(home).not.toMatch(/@dnd-kit/)
+  expect(home).not.toMatch(/bg-cell-free/)
 })
 
 test('discovery and salon stay sparse; no homepage IA', () => {

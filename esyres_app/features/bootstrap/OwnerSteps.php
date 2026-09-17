@@ -862,6 +862,31 @@ trait OwnerSteps
     }
 
     /**
+     * @When I query occupying bookings range from :from to :to
+     */
+    public function iQueryOccupyingBookingsRangeFromTo(string $from, string $to): void
+    {
+        $this->graphql($this->occupyingBookingsRangeQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    /**
+     * @When I query occupying bookings range as a guest from :from to :to
+     */
+    public function iQueryOccupyingBookingsRangeAsAGuestFromTo(string $from, string $to): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->occupyingBookingsRangeQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    /**
      * @Then the proposed booking matches:
      */
     public function theProposedBookingMatches(PyStringNode $payload): void
@@ -894,6 +919,20 @@ trait OwnerSteps
         $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
         $actual = [];
         foreach ($this->graphql['data']['occupyingBookings'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @Then occupying range booking names are:
+     */
+    public function occupyingRangeBookingNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['occupyingBookingsRange'] as $row) {
             $actual[] = $row['customerName'];
         }
         $this->assertSame($expected, $actual);
@@ -1508,6 +1547,23 @@ GQL;
         return <<<'GQL'
 query Occupying($salonId: ID!, $date: String!) {
   occupyingBookings(salonId: $salonId, date: $date) {
+    id
+    status
+    customerName
+    preferredStartsAt
+    proposedStartsAt
+    worker { id name }
+    proposedWorker { id name }
+  }
+}
+GQL;
+    }
+
+    private function occupyingBookingsRangeQuery(): string
+    {
+        return <<<'GQL'
+query OccupyingRange($salonId: ID!, $from: String!, $to: String!) {
+  occupyingBookingsRange(salonId: $salonId, from: $from, to: $to) {
     id
     status
     customerName

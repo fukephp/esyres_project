@@ -1,13 +1,11 @@
-import { DndContext, PointerSensor, useDraggable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
 import { TopNav } from '../components/TopNav'
-import { WorkerPanel } from '../components/WorkerPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
@@ -22,10 +20,11 @@ import {
   DECLINE_BOOKING_MUTATION,
   DISMISS_RESCHEDULE_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
+  OCCUPYING_BOOKINGS_RANGE_QUERY,
   OWNER_SALON_QUERY,
   PENDING_BOOKINGS_QUERY,
-  PROPOSE_TIME_MUTATION,
   type OccupyingBookingsData,
+  type OccupyingBookingsRangeData,
   type OccupyingBooking,
   type OwnerSalonData,
   type PendingBooking,
@@ -37,32 +36,49 @@ import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import { useOwnerPush } from '../lib/push'
+import { formatPickerDayNumeric } from '../lib/salonHours'
 import {
   acceptErrorKey,
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
-  formatOwnerDayHeading,
+  formatOwnerMonthTitle,
   formatSarajevoTime,
   hoursForDate,
   isPreferredSoon,
+  mixRestWithBreak,
   occupyingBlock,
-  overlayQueueChrome,
+  occupyingClockRange,
+  occupyingDotsForDay,
   ownerDateFromSearch,
+  ownerMonthContains,
+  ownerMonthDays,
+  ownerMonthFromYmd,
+  ownerMonthRange,
+  ownerMonthWeekdayOffset,
   ownerSalonFromSearch,
   ownerSearchParams,
-  panelCells,
-  proposeErrorKey,
+  overlayQueueChrome,
   queueChipInitial,
   queueRowClock,
-  shiftOwnerDate,
+  selectedDayOccupying,
+  shiftOwnerMonth,
+  sarajevoWeekday,
   trimDeclineReason,
+  workerDotColor,
 } from '../lib/owner'
 
 export function OwnerHome() {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const date = ownerDateFromSearch(params.get('date'))
+  const [visible, setVisible] = useState(() => ownerMonthFromYmd(date))
+  useEffect(() => {
+    if (!ownerMonthContains(visible.year, visible.month, date)) {
+      setVisible(ownerMonthFromYmd(date))
+    }
+  }, [date, visible.month, visible.year])
+  const monthSpan = ownerMonthRange(visible.year, visible.month)
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
@@ -71,7 +87,7 @@ export function OwnerHome() {
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
   const { data: queue, loading: queueLoading, refetch: refetchQueue } = useQuery<PendingBookingsData>(PENDING_BOOKINGS_QUERY, {
-    variables: { salonId: salon?.id ?? '', date },
+    variables: { salonId: salon?.id ?? '', date, limit: 50 },
     skip: !ownerReady,
   })
   const { data: board } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
@@ -82,28 +98,34 @@ export function OwnerHome() {
     variables: { salonId: salon?.id ?? '', date },
     skip: !ownerReady,
   })
+  const { data: occupyingRange, refetch: refetchRange } = useQuery<OccupyingBookingsRangeData>(OCCUPYING_BOOKINGS_RANGE_QUERY, {
+    variables: { salonId: salon?.id ?? '', from: monthSpan.from, to: monthSpan.to },
+    skip: !ownerReady,
+  })
+  function refetchAll() {
+    void refetchQueue()
+    void refetchOccupying()
+    void refetchRange()
+  }
   useSubscription(BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     onData: () => {
-      void refetchQueue()
-      void refetchOccupying()
+      refetchAll()
     },
   })
   useSubscription(BOOKING_RESCHEDULED_SUBSCRIPTION, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     onData: () => {
-      void refetchQueue()
-      void refetchOccupying()
+      refetchAll()
     },
   })
   useSubscription(BOOKING_CANCELLED_SUBSCRIPTION, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     onData: () => {
-      void refetchQueue()
-      void refetchOccupying()
+      refetchAll()
     },
   })
   const { data: chatCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
@@ -114,14 +136,12 @@ export function OwnerHome() {
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
   const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
   const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
-  const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [declineId, setDeclineId] = useState<string | null>(null)
   const [dismissId, setDismissId] = useState<string | null>(null)
   const [reasonDraft, setReasonDraft] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   function onDate(value: string) {
     setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
@@ -136,8 +156,9 @@ export function OwnerHome() {
       return []
     }
     return [
-      { query: PENDING_BOOKINGS_QUERY, variables: { salonId: salon.id, date } },
+      { query: PENDING_BOOKINGS_QUERY, variables: { salonId: salon.id, date, limit: 50 } },
       { query: OCCUPYING_BOOKINGS_QUERY, variables: { salonId: salon.id, date } },
+      { query: OCCUPYING_BOOKINGS_RANGE_QUERY, variables: { salonId: salon.id, from: monthSpan.from, to: monthSpan.to } },
     ]
   }
 
@@ -161,28 +182,6 @@ export function OwnerHome() {
       setErrors((current) => ({
         ...current,
         [row.id]: t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(error))}`),
-      }))
-    } finally {
-      setBusyId(null)
-    }
-  }
-
-  async function onPropose(bookingId: string, workerId: string, proposedTime: string) {
-    setBusyId(bookingId)
-    setErrors((current) => {
-      const next = { ...current }
-      delete next[bookingId]
-      return next
-    })
-    try {
-      await propose({
-        variables: { bookingId, workerId, proposedTime },
-        refetchQueries: refetchBoard(),
-      })
-    } catch (error) {
-      setErrors((current) => ({
-        ...current,
-        [bookingId]: t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(error))}`),
       }))
     } finally {
       setBusyId(null)
@@ -243,23 +242,6 @@ export function OwnerHome() {
     }
   }
 
-  function onDragEnd(event: DragEndEvent) {
-    const over = event.over
-    if (over === null || busyId !== null) {
-      return
-    }
-    const bookingId = String(event.active.id)
-    const dragged = (queue?.pendingBookings ?? []).find((row) => row.id === bookingId)
-    if (dragged?.reschedulePending === true) {
-      return
-    }
-    const data = over.data.current
-    if (data === undefined || typeof data.workerId !== 'string' || typeof data.time !== 'string') {
-      return
-    }
-    void onPropose(bookingId, data.workerId, data.time)
-  }
-
   if (loading) {
     return (
       <>
@@ -318,13 +300,61 @@ export function OwnerHome() {
   }
 
   const rows = queue?.pendingBookings ?? []
+  const workers = board?.salon?.workers ?? []
   const dayHours = hoursForDate(board?.salon?.hours ?? [], date)
-  const cells = panelCells(dayHours)
-  const blocks = (occupying?.occupyingBookings ?? [])
-    .map((row: OccupyingBooking) => occupyingBlock(row))
-    .filter((row) => row !== null)
+  const closed = dayHours === undefined || dayHours.closed
+  const dayOccupying = occupying?.occupyingBookings ?? []
+  const { soon, rest } = selectedDayOccupying(dayOccupying)
+  const restItems = mixRestWithBreak(rest, dayHours?.breakStartsAt ?? null, dayHours?.breakEndsAt ?? null)
+  const hasBreak = dayHours?.breakStartsAt !== null && dayHours?.breakEndsAt !== null
+  const emptyOpen = !closed && rows.length === 0 && dayOccupying.filter((row) => occupyingBlock(row) !== null).length === 0 && !hasBreak
   const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? salon.id
+  const monthDays = ownerMonthDays(visible.year, visible.month)
+  const pad = ownerMonthWeekdayOffset(visible.year, visible.month)
+  const rangeRows = occupyingRange?.occupyingBookingsRange ?? []
+
+  const pendingList = (
+    <ul className="mt-4 space-y-3">
+      {rows.map((row) => (
+        <QueueRow
+          key={row.id}
+          row={row}
+          busy={busyId === row.id}
+          error={errors[row.id]}
+          declineOpen={declineId === row.id}
+          dismissOpen={dismissId === row.id}
+          reasonDraft={reasonDraft}
+          onAccept={() => void onAccept(row)}
+          onDeclineOpen={() => {
+            setDeclineId(row.id)
+            setReasonDraft('')
+            setErrors((current) => {
+              const next = { ...current }
+              delete next[row.id]
+              return next
+            })
+          }}
+          onDeclineCancel={() => {
+            setDeclineId(null)
+            setReasonDraft('')
+          }}
+          onDeclineConfirm={() => void onDecline(row)}
+          onDismissOpen={() => {
+            setDismissId(row.id)
+            setErrors((current) => {
+              const next = { ...current }
+              delete next[row.id]
+              return next
+            })
+          }}
+          onDismissCancel={() => setDismissId(null)}
+          onDismissConfirm={() => void onDismiss(row)}
+          onReasonChange={setReasonDraft}
+        />
+      ))}
+    </ul>
+  )
 
   return (
     <>
@@ -387,92 +417,138 @@ export function OwnerHome() {
           />
         </div>
         <section className="rounded-lg border border-hairline bg-canvas p-4">
-          <div className="sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-2 bg-canvas py-1">
-            <button
-              type="button"
-              aria-label={t('owner.prevDay')}
-              onClick={() => onDate(shiftOwnerDate(date, -1))}
-              className="px-1 text-lg text-ink"
-            >
-              ‹
-            </button>
-            <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
-              {formatOwnerDayHeading(date)}
-            </h2>
-            <button
-              type="button"
-              aria-label={t('owner.nextDay')}
-              onClick={() => onDate(shiftOwnerDate(date, 1))}
-              className="px-1 text-lg text-ink"
-            >
-              ›
-            </button>
-            <input
-              type="date"
-              value={date}
-              aria-label={t('owner.date')}
-              onChange={(e) => onDate(e.target.value)}
-              className="ml-auto rounded-md border border-hairline bg-canvas px-2 py-1 text-sm text-ink"
-            />
-          </div>
-          <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-            {queueLoading ? (
-              <p className="mt-4 text-sm text-body">{t('salon.loading')}</p>
-            ) : rows.length === 0 ? (
-              <p className="mt-4 text-sm text-body">{t('owner.empty')}</p>
-            ) : (
-              <ul className="mt-4 space-y-3">
-                {rows.map((row) => (
-                  <QueueRow
-                    key={row.id}
-                    row={row}
-                    busy={busyId === row.id}
-                    error={errors[row.id]}
-                    declineOpen={declineId === row.id}
-                    dismissOpen={dismissId === row.id}
-                    reasonDraft={reasonDraft}
-                    onAccept={() => void onAccept(row)}
-                    onDeclineOpen={() => {
-                      setDeclineId(row.id)
-                      setReasonDraft('')
-                      setErrors((current) => {
-                        const next = { ...current }
-                        delete next[row.id]
-                        return next
-                      })
-                    }}
-                    onDeclineCancel={() => {
-                      setDeclineId(null)
-                      setReasonDraft('')
-                    }}
-                    onDeclineConfirm={() => void onDecline(row)}
-                    onDismissOpen={() => {
-                      setDismissId(row.id)
-                      setErrors((current) => {
-                        const next = { ...current }
-                        delete next[row.id]
-                        return next
-                      })
-                    }}
-                    onDismissCancel={() => setDismissId(null)}
-                    onDismissConfirm={() => void onDismiss(row)}
-                    onReasonChange={setReasonDraft}
-                  />
+          <div className="md:grid md:grid-cols-2 md:gap-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label={t('owner.prevMonth')}
+                  onClick={() => setVisible(shiftOwnerMonth(visible.year, visible.month, -1))}
+                  className="px-1 text-lg text-ink"
+                >
+                  ‹
+                </button>
+                <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+                  {formatOwnerMonthTitle(visible.year, visible.month)}
+                </h2>
+                <button
+                  type="button"
+                  aria-label={t('owner.nextMonth')}
+                  onClick={() => setVisible(shiftOwnerMonth(visible.year, visible.month, 1))}
+                  className="px-1 text-lg text-ink"
+                >
+                  ›
+                </button>
+              </div>
+              <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-muted">
+                {['weekday.MONDAY', 'weekday.TUESDAY', 'weekday.WEDNESDAY', 'weekday.THURSDAY', 'weekday.FRIDAY', 'weekday.SATURDAY', 'weekday.SUNDAY'].map((key) => (
+                  <div key={key}>{t(key)}</div>
                 ))}
-              </ul>
-            )}
-            <WorkerPanel
-              workers={board?.salon?.workers ?? []}
-              hours={dayHours}
-              cells={cells}
-              blocks={blocks}
-              disabled={busyId !== null}
-            />
-          </DndContext>
+              </div>
+              <div className="mt-1 grid grid-cols-7 gap-1">
+                {Array.from({ length: pad }, (_, i) => (
+                  <div key={`pad-${i}`} />
+                ))}
+                {monthDays.map((ymd) => {
+                  const selected = ymd === date
+                  const dots = occupyingDotsForDay(rangeRows, ymd)
+
+                  return (
+                    <button
+                      key={ymd}
+                      type="button"
+                      onClick={() => onDate(ymd)}
+                      className={`flex min-h-10 flex-col items-center rounded-md py-1 text-sm ${selected ? 'bg-ink text-canvas' : 'text-ink'}`}
+                    >
+                      {Number(ymd.slice(8))}
+                      <span className="mt-0.5 flex h-1.5 gap-0.5">
+                        {dots.map((dot) => (
+                          <span key={dot.workerId} className={`h-1.5 w-1.5 rounded-full ${dot.color}`} />
+                        ))}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div>
+              <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
+                {t(`weekday.${sarajevoWeekday(date)}`)}, {formatPickerDayNumeric(date)}
+              </h3>
+              {queueLoading ? (
+                <p className="mt-4 text-sm text-body">{t('salon.loading')}</p>
+              ) : rows.length > 2 ? (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-ink">
+                    {t('owner.title')} ({rows.length})
+                  </summary>
+                  {pendingList}
+                </details>
+              ) : rows.length > 0 ? (
+                pendingList
+              ) : null}
+              {workers.length === 0 ? (
+                <p className="mt-4 text-sm text-body">{t('owner.noWorkers')}</p>
+              ) : closed ? (
+                <p className="mt-4 text-sm text-body">{t('owner.closedDay')}</p>
+              ) : (
+                <>
+                  {soon.length > 0 ? (
+                    <h4 className="mt-4 text-sm font-semibold text-ink">{t('owner.soon')}</h4>
+                  ) : null}
+                  {soon.map((row) => (
+                    <OccupyingRow key={row.id} row={row} />
+                  ))}
+                  {restItems.map((item) =>
+                    item.kind === 'break' ? (
+                      <p key="break" className="mt-3 text-sm text-muted">
+                        {t('owner.break')}
+                        {' · '}
+                        {item.endsAt}
+                      </p>
+                    ) : (
+                      <OccupyingRow key={item.booking.id} row={item.booking} />
+                    ),
+                  )}
+                  {emptyOpen ? <p className="mt-4 text-sm text-body">{t('owner.empty')}</p> : null}
+                </>
+              )}
+            </div>
+          </div>
         </section>
       </main>
     </div>
     </>
+  )
+}
+
+function OccupyingRow({ row }: { row: OccupyingBooking }) {
+  const { t } = useTranslation()
+  const block = occupyingBlock(row)
+  if (block === null) {
+    return null
+  }
+  const workerName = row.status === 'TIME_PROPOSED' ? row.proposedWorker?.name : row.worker?.name
+
+  return (
+    <Link
+      to={`/owner/requests/${row.id}`}
+      className="mt-3 flex items-start gap-3 border border-hairline px-3 py-2"
+    >
+      <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${workerDotColor(block.workerId)}`} />
+      <span className="min-w-0">
+        <span className="block font-semibold text-ink">{block.label}</span>
+        <span className="mt-1 block text-sm text-muted">
+          {occupyingClockRange(block.start, block.durationMinutes)}
+          {workerName !== undefined && workerName !== '' ? ` · ${workerName}` : ''}
+        </span>
+        {row.status === 'TIME_PROPOSED' ? (
+          <span className="mt-1 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+            {t('bookings.status.TIME_PROPOSED')}
+          </span>
+        ) : null}
+      </span>
+    </Link>
   )
 }
 
@@ -510,20 +586,9 @@ function QueueRow({
   const { t } = useTranslation()
   const chrome = overlayQueueChrome(row.reschedulePending)
   const clock = queueRowClock(row)
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: row.id,
-    disabled: busy || declineOpen || dismissOpen || !chrome.draggable,
-  })
-  const style = transform === null ? undefined : { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
 
   return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className={`rounded-lg border border-hairline bg-surface-soft px-4 py-3 ${isDragging ? 'opacity-60' : ''}`}
-      {...listeners}
-      {...attributes}
-    >
+    <li className="rounded-lg border border-hairline bg-surface-soft px-4 py-3">
       <div className="flex gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink">
           {queueChipInitial(row.customerName)}
@@ -572,7 +637,6 @@ function QueueRow({
         {chrome.propose ? (
           <Link
             to={`/owner/requests/${row.id}`}
-            onPointerDown={(e) => e.stopPropagation()}
             className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink"
           >
             {t('owner.propose')}
@@ -608,7 +672,6 @@ function QueueRow({
               maxLength={255}
               disabled={busy}
               onChange={(e) => onReasonChange(e.target.value)}
-              onPointerDown={(e) => e.stopPropagation()}
               className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
               rows={2}
             />
@@ -618,7 +681,6 @@ function QueueRow({
               type="button"
               disabled={busy}
               onClick={onDeclineConfirm}
-              onPointerDown={(e) => e.stopPropagation()}
               className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
             >
               {t('owner.declineConfirm')}
@@ -627,7 +689,6 @@ function QueueRow({
               type="button"
               disabled={busy}
               onClick={onDeclineCancel}
-              onPointerDown={(e) => e.stopPropagation()}
               className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
             >
               {t('owner.declineCancel')}
@@ -641,7 +702,6 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDismissConfirm}
-            onPointerDown={(e) => e.stopPropagation()}
             className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
             {t('owner.declineConfirm')}
@@ -650,7 +710,6 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDismissCancel}
-            onPointerDown={(e) => e.stopPropagation()}
             className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
             {t('owner.declineCancel')}

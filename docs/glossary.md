@@ -159,7 +159,7 @@ The owner’s list of requested bookings and in-progress reschedules for one sal
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
-The owner’s screen for one pending request: accept preferred time, decline, or counter-propose with a form. The only counter-propose path. Not the pending queue, not the month navigator, and not the customer Time Proposed screen.
+The owner’s screen for one booking: pending requests get accept, decline, or counter-propose; occupying bookings (`confirmed` / `time_proposed`) are read-only. The only counter-propose path. Not the pending queue, not the month navigator, and not the customer Time Proposed screen.
 _Avoid_: booking detail, request modal, tap fallback (as a screen name)
 
 **Assistant-originated**:

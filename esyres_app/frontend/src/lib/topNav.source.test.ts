@@ -99,7 +99,7 @@ test('Odjava uses Cal button-destructive on both logged-in slots', () => {
   const css = read('index.css')
   expect(css).toMatch(/--color-error-strong:\s*#dc2626/)
   expect(css).toMatch(/--color-error-strong-active:\s*#b91c1c/)
-  expect(css).not.toMatch(/--color-error:/)
+  expect(css).toMatch(/--color-error:\s*#ef4444/)
   expect(css).not.toMatch(/--color-on-primary/)
 })
 

@@ -89,4 +89,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-64 | Native date/time must not trap Pitaj salon | 10 | — | STORY-63 |
 | STORY-65 | Send under selected hours row; modal names the day | 1 | `STORY-65` | STORY-62 |
 | STORY-66 | Dobrodošli + person name in every top-nav | 1 | `STORY-66` | STORY-43, STORY-46, STORY-62 |
-| STORY-67 | Zahtjevi month navigator and selected-day list | 3 | — | STORY-13, STORY-14, STORY-15, STORY-16, STORY-17, STORY-42, STORY-49, STORY-61 |
+| STORY-67 | Zahtjevi month navigator and selected-day list | 3 | `STORY-67` | STORY-13, STORY-14, STORY-15, STORY-16, STORY-17, STORY-42, STORY-49, STORY-61 |
