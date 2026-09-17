@@ -51,7 +51,9 @@ export function TopNav({
             ) : null}
             {chrome.slot === 'home-session' ? (
               <>
-                <span className={linkClass}>{chrome.displayName}</span>
+                {chrome.personName ? (
+                  <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
+                ) : null}
                 <Link to={BOOKINGS_HREF} className={linkClass}>
                   {t('nav.bookings')}
                 </Link>
@@ -64,17 +66,27 @@ export function TopNav({
               </>
             ) : null}
             {chrome.slot === 'discovery' ? (
-              <Link to={BOOKINGS_HREF} className={linkClass}>
-                {t('nav.bookings')}
-              </Link>
+              <>
+                {chrome.personName ? (
+                  <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
+                ) : null}
+                <Link to={BOOKINGS_HREF} className={linkClass}>
+                  {t('nav.bookings')}
+                </Link>
+              </>
             ) : null}
             {chrome.slot === 'session' ? (
               <>
-                <span className={linkClass}>{chrome.displayName}</span>
+                {chrome.personName ? (
+                  <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
+                ) : null}
                 <button type="button" className={logoutClass} onClick={() => void logout()}>
                   {t('home.logout')}
                 </button>
               </>
+            ) : null}
+            {chrome.slot === 'greeting' ? (
+              <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
             ) : null}
           </nav>
         )}

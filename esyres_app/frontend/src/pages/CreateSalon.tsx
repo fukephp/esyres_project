@@ -14,6 +14,7 @@ export function CreateSalon() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
+  const navMe = loading ? null : (data?.me ?? null)
   const [createSalon, { loading: saving }] = useMutation(CREATE_SALON_MUTATION, {
     refetchQueries: ['Me'],
   })
@@ -23,7 +24,7 @@ export function CreateSalon() {
   if (loading) {
     return (
       <>
-        <TopNav />
+        <TopNav me={navMe} />
         <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.loading')}</p>
         </main>
@@ -38,7 +39,7 @@ export function CreateSalon() {
   if (surface === 'auth') {
     return (
       <>
-        <TopNav />
+        <TopNav me={navMe} />
         <main className={`${GUEST_COLUMN_CLASS} py-8`}>
           <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8 max-w-md">
@@ -51,7 +52,7 @@ export function CreateSalon() {
   if (surface === 'verify') {
     return (
       <>
-        <TopNav />
+        <TopNav me={navMe} />
         <main className={`${GUEST_COLUMN_CLASS} py-8`}>
           <h1 className={PLACE_HEADING_CLASS}>{t('auth.placePanel')}</h1>
           <div className="mt-8 max-w-md">
@@ -79,7 +80,7 @@ export function CreateSalon() {
 
   return (
     <>
-      <TopNav />
+      <TopNav me={navMe} />
       <main className={`${GUEST_COLUMN_CLASS} flex min-h-svh flex-col py-8`}>
         <form className="mt-10 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
           <label className="block text-sm text-body">

@@ -186,6 +186,7 @@ test('pill opens picker modal; chat card opens a second dialog', () => {
   expect(chatDialog).toMatch(/salon\.close/)
   expect(chatDialog).not.toMatch(/<h2[\s\S]*\{salon\.name\}/)
   expect(chatDialog).not.toMatch(/formatPickerDayNumeric/)
+  expect(chatDialog).not.toMatch(/nav\.welcome/)
   expect(chatDialog).toMatch(/mode === 'chat'/)
 })
 

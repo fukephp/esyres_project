@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
+import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
   SALONS_NEARBY_QUERY,
@@ -120,6 +121,8 @@ function SalonFacts({ salon }: { salon: DiscoverySalon }) {
 
 export function DiscoveryHome() {
   const { t } = useTranslation()
+  const { data: meData, loading: meLoading } = useQuery<MeData>(ME_QUERY)
+  const navMe = meLoading ? null : (meData?.me ?? null)
   const geo = useGeo()
   const [category, setCategory] = useState<ServiceCategory | null>(null)
   const [nameDraft, setNameDraft] = useState('')
@@ -155,7 +158,7 @@ export function DiscoveryHome() {
 
   return (
     <>
-      <TopNav />
+      <TopNav me={navMe} />
       <main className={`${GUEST_COLUMN_CLASS} py-8`}>
       {source ? (
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">

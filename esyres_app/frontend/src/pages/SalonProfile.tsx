@@ -7,6 +7,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
+import { ME_QUERY, type MeData } from '../graphql/auth'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
 import {
   ASSISTANT_INTAKE_QUERY,
@@ -209,6 +210,8 @@ export function SalonProfile() {
     variables: { id, date, chosenDate: chatDate !== '' ? chatDate : date },
     skip: !id,
   })
+  const { data: meData, loading: meLoading } = useQuery<MeData>(ME_QUERY)
+  const navMe = meLoading ? null : (meData?.me ?? null)
   const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
   const [mode, setMode] = useState<ProfileMode>('idle')
   const [selected, setSelected] = useState<string[]>([])
@@ -350,7 +353,7 @@ export function SalonProfile() {
   if (loading) {
     return (
       <>
-        <TopNav />
+        <TopNav me={navMe} />
         <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.loading')}</p>
         </main>
@@ -362,7 +365,7 @@ export function SalonProfile() {
   if (!salon) {
     return (
       <>
-        <TopNav />
+        <TopNav me={navMe} />
         <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
           <p>{t('salon.notFound')}</p>
         </main>
@@ -721,7 +724,7 @@ export function SalonProfile() {
 
   return (
     <>
-      <TopNav />
+      <TopNav me={navMe} />
       <main className={`${GUEST_COLUMN_CLASS} py-8`}>
       <header className="flex items-start justify-between gap-4">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
