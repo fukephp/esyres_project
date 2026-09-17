@@ -85,6 +85,19 @@ export function showDaySendPill(input: {
   hasServices: boolean
   chatting: boolean
   sent: boolean
+  tappable: boolean
 }): boolean {
-  return input.preferredDate !== '' && input.hasServices && !input.chatting && !input.sent
+  return (
+    input.preferredDate !== '' &&
+    input.hasServices &&
+    !input.chatting &&
+    !input.sent &&
+    input.tappable
+  )
+}
+
+export function formatPickerDayNumeric(ymd: string): string {
+  const [year, month, day] = ymd.split('-').map(Number)
+
+  return `${day}. ${month}. ${year}`
 }
