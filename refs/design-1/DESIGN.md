@@ -5,7 +5,7 @@ description: >-
   Design 1 — Esyres Cal pack (homepage on `/`, discovery, salon, owner).
   Visual system adapted from Cal.com DESIGN.md (https://www.designmd.co/d/cal):
   white canvas, black primary CTAs, Cal Sans + Inter, soft ~12px cards.
-  Homepage hero/footer stay on `/` only; shared top-nav; owner stays a dense day card.
+  Homepage hero/footer stay on `/` only; shared top-nav; owner stays dense Zahtjevi.
 colors:
   primary: "#111111"
   primary-active: "#242424"
@@ -213,7 +213,7 @@ The surface is clean modern SaaS — white canvas (`{colors.canvas}`), black pri
 
 Copy is **Bosnian-first**, same as the rest of the PWA.
 
-**Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps a dense day card (queue chips + hours-down × worker-columns 15-minute board) with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge and panel cell tokens live in this pack. Not a guest month-and-pills widget.
+**Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps dense Zahtjevi (month navigator + selected-day list) with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge tokens live in this pack. Cell tokens stay documented but unused on Zahtjevi home. Not a guest month-and-pills widget.
 
 ### Locked homepage IA
 
@@ -309,10 +309,10 @@ Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from t
 
 1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, `Dobrodošli, {person name}` + Odjava as `button-destructive` when named). Not a replacement for the aside.
 2. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
-3. **Main** — one `{colors.canvas}` hairline day card (`{rounded.lg}`, no heavy shadow, no grey fill on the box) spanning owner `main`: sticky Bosnian weekday+date row (prev/next + secondary native date), queue chips on `{colors.surface-soft}` (scroll away), sticky worker names, then hours-down × worker-columns 15-minute board (horizontal pan for extra workers; sticky time gutter). Card grows with the day. Chip initials ink on `{colors.surface-soft}` (not orange, not cell-green). No month grid, no now-line, no `Danas` badge, no ~480px guest widget. Primary CTAs on the chips.
-4. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
+3. **Main** — one `{colors.canvas}` hairline card (`{rounded.lg}`, no heavy shadow, no grey fill on the box) spanning owner `main`. `md+`: month navigator left, selected-day list right. Phone: navigator stacked above the list. Month name + prev/next chevrons; tap a day to select (Cal ink/primary selected state, not screenshot blue). Occupying-only worker-colored dots (max three). Selected-day list: pending till-pile on `{colors.surface-soft}` (collapse + count when more than two), then soon occupying, then the rest including Predloženo vrijeme, plus titled Pauza / Zatvoreno. Occupying rows show current job (service names + worker). Primary CTAs on pending rows. No 15-minute board, no drag, no now-line, no `Danas` badge, no ~480px guest widget, no Past Event column, no list pagination.
+4. **No optional right rail** — the selected-day list **is** the right column. Mini-month as extra chrome is **not** a third widget; the month navigator is the left column.
 
-Phone: collapse nav; same day card (hours down, pan worker columns — not worker tabs).
+Phone: collapse nav; same card (month stacked above the selected-day list — not worker tabs, not a 15-minute board).
 
 ## Elevation & Depth
 

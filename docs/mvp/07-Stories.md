@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-66`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-67`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -34,14 +34,15 @@
 - As a customer, I want to verify my phone with OTP before my request is sent (optional earlier, required at submit), so that the salon can SMS me if push fails.
 - As a customer, I want confirmation that my request was sent and is awaiting salon response (accept or counter-propose), so that I know what to expect next.
 
-## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
+## Epic 3 — Zahtjevi & Time Proposal (Owner)
 
-- As an owner, I want occupying cells on the Worker Availability Panel to show which service is on that worker, so that the grid is the current-job board.
-- As an owner, I want this salon-day (queue + job board) in one Cal card with hours down and workers as columns, so that I can read the day without a one-line 15-minute strip.
+- As an owner, I want occupying rows on the selected-day list to show which service is on that worker, so that the list is the current-job board.
+- As an owner, I want Zahtjevi as a month navigator with worker-colored occupying dots and a selected-day list, so that I can pick a day without a 15-minute worker grid.
+- As an owner, I want pending requests for a day in a till-pile (collapse with count when more than two), then soon occupying, then the rest including changed time, so that pending is not buried in the clock.
+- As an owner, I want titled break and closed rows on that list, so that I see when chairs are off.
 - As an owner, I want to see all pending requests for a day in one queue, sorted so urgent ones aren't buried, so that nothing slips through.
 - As an owner, I want to accept a guest's preferred time in one tap when it works, so that simple requests don't need an extra back-and-forth.
-- As an owner, I want to drag a pending request onto an open slot on a worker's column to counter-propose a different time, so that I can adjust when the preferred time doesn't fit.
-- As an owner, I want a tap-based fallback to the drag interaction, so that I can still manage requests from my phone.
+- As an owner, I want to counter-propose a different time from Request Detail, so that I can adjust when the preferred time doesn't fit without dragging.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 
 ## Epic 4 — Booking Lifecycle & Customer Response

@@ -8,8 +8,8 @@ Guest-accessible discovery flow: Bosnian homepage on typed `/` (top-nav homepage
 ## Epic 2 — Booking Request Flow (Customer)
 Service selection (multi-service), worker selection (specific or "no preference"), day+time picker (simple, no availability grid), email+password account with person name at register, Rezervacije vs Panel on the auth shell, verified email + phone OTP at request submit, pending state.
 
-## Epic 3 — Worker Availability Panel & Time Proposal (Owner)
-The core owner scheduling surface: one per-day Cal card (queue chips + hours-down × worker-columns 15-minute board; occupying cells show the current job: service snapshot names), Pending Requests queue (shows preferred date/time), one-tap accept preferred time, drag-to-counter-propose (+ tap fallback), Request Detail screen, decline flow. Cal light chrome (one Design 1 pack).
+## Epic 3 — Zahtjevi & Time Proposal (Owner)
+The core owner scheduling surface on `/owner` (Zahtjevi): Cal month navigator (occupying-only worker-colored dots) plus a selected-day list (pending till-pile, then soon occupying, then the rest including changed time, with titled break/closed rows). Pending queue shows preferred date/time. One-tap accept preferred time, counter-propose from Request Detail, decline flow. No 15-minute worker board and no drag. Cal light chrome (one Design 1 pack).
 
 ## Epic 4 — Booking Lifecycle & Customer Response
 Time-Proposed screen (Approve / Reject / Ask for a different day or time on the **same** booking row — only when owner counter-proposes), status transitions through `requested → confirmed` (accept) or `requested → time_proposed → confirmed/declined` (counter-propose), My Bookings list.

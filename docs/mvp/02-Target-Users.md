@@ -31,13 +31,13 @@ Owners of make-up, hairdresser, or massage salons in Sarajevo — solo operators
 - Control over the exact appointment time (not a fully auto-booked system)
 - 24/7 intake so guests are not waiting on Instagram while the owner is with a client — the assistant finishes to a request unless the owner taps Take over
 - Simple management of services, prices, working hours, and worker schedules
-- A concrete, visible time-saving reason to promote the app to their own customers (guests write, you accept or drag-to-propose)
+- A concrete, visible time-saving reason to promote the app to their own customers (guests write, you accept or counter-propose from Request Detail)
 
-**Note on scope:** owners are the only side with a real "backend" — dashboard-style complexity (Worker Availability Panel, salon catalog / salon edit, stats, salon switcher, optional chat tab for in-flight conversations) belongs here, deliberately kept off the customer surface. Home after login is the day card (pending queue + panel); chat is a tab with a badge, not the default screen. A customer becomes an owner by creating a salon on the same account. The assistant does not give workers a login.
+**Note on scope:** owners are the only side with a real "backend" — dashboard-style complexity (Zahtjevi, salon catalog / salon edit, stats, salon switcher, optional chat tab for in-flight conversations) belongs here, deliberately kept off the customer surface. Home after login is the month navigator + selected-day list; chat is a tab with a badge, not the default screen. A customer becomes an owner by creating a salon on the same account. The assistant does not give workers a login.
 
 ## 3. Workers/Stylists (not a login-holding user at MVP)
 
-Every salon has workers, and customers can pick a specific one (or "no preference"). But **workers do not get their own login or app access at MVP** — the owner acts on their behalf from one shared Reservation Inbox / Worker Availability Panel. Worker self-service is a possible future consideration, not part of current scope.
+Every salon has workers, and customers can pick a specific one (or "no preference"). But **workers do not get their own login or app access at MVP** — the owner acts on their behalf from one shared Zahtjevi home. Worker self-service is a possible future consideration, not part of current scope.
 
 ## Out of Scope for Now
 

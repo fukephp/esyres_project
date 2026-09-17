@@ -6,7 +6,7 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 
 - Epic 1 — public `salonsNearby`, `popularInSarajevo`, salon profile, server-computed `busyLevel`
 - Epic 2 — register/login (person name required at register), email verify (signed GET + `resendVerificationEmail`), phone OTP, `createBooking` (preferred date + time)
-- Epic 3 — owner inbox, availability grid (occupying cells show current job), `acceptPreferredTime`, `proposeTime` (counter-propose), `declineBooking`
+- Epic 3 — owner inbox (Zahtjevi month + selected-day list; occupying rows show current job), `acceptPreferredTime`, `proposeTime` (counter-propose from Request Detail), `declineBooking`
 - Epic 4 — customer respond to counter-proposal; “ask other day or time” updates the **same** booking row
 - Epic 5 — reschedule (original slot stays occupied until new time approved), cancel
 - Epic 6 — queued notifications

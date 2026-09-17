@@ -13,7 +13,7 @@ Application code is in `esyres_app/` (Laravel 13 + React TypeScript PWA placehol
 | Frontend | One React TypeScript PWA (Vite), Apollo Client, GraphQL Code Generator |
 | UI | Tailwind CSS, i18next default `bs`, React Router (`/` homepage, `/salons` discovery, `/owner` owner) |
 | PWA | `vite-plugin-pwa` + Workbox, native Web Push (VAPID) |
-| Owner grid | `@dnd-kit` + tap/form fallback |
+| Owner home | Month navigator + selected-day list; Request Detail for `proposeTime` (no `@dnd-kit`) |
 | Tests | Behat GraphQL HTTP (backend); Vitest + Playwright (frontend) |
 | Local run | Docker Compose in `esyres_app/` (slim: `php` + `vite` + `mysql`; full list later) |
 

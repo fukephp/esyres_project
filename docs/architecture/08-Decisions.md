@@ -13,7 +13,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 9. **Redis from day one** — OTP, queues, cache, Reverb. Slim Compose still has no redis service (ADR 0001 / #36). OTP codes and throttle use Laravel Cache until Redis is the cache driver; see `docs/adr/0005-otp-in-laravel-cache.md`.
 10. **One PWA, lazy owner routes** — one QR host, one cookie, one service worker.
 11. **Apollo + codegen** — subscriptions and typed operations.
-12. **Tailwind, not Bootstrap** — two surfaces (funnel vs dense grid) without a generic kit.
+12. **Tailwind, not Bootstrap** — two surfaces (funnel vs dense owner) without a generic kit.
 13. **No map SDK** — geo-sorted list is enough for Sarajevo density.
 14. **Laravel Storage, GraphQL multipart** — few salon photos; no Spatie.
 15. **i18next, `bs` only** — no language switcher at MVP.
@@ -30,10 +30,10 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 26. **Full local compose list** — nginx, php, mysql, redis, worker, reverb, vite, mailpit.
 27. **Expire → declined** — no fifth status; TTL numbers placeholder.
 28. **OTP throttle in cache** — no CAPTCHA. Same Laravel Cache store as codes (Redis when that service lands). See ADR 0005.
-29. **@dnd-kit** — same mutation as tap fallback.
+29. **No `@dnd-kit`** — counter-propose is Request Detail `Predloži` only. See `docs/adr/0035-zahtjevi-month-and-selected-day-list.md`. ADR 0008 still describes drag if it returns.
 30. **Limit/offset pagination** — cap `perPage`.
 31. **Introspection local-only**.
-32. **Per-service duration, 15-min grid** — Phase 2 “salon-wide duration only” is revoked.
+32. **Per-service duration, 15-min steps** — proposeTime and hours stay on 15-minute steps. Phase 2 “salon-wide duration only” is revoked. There is no owner 15-minute **board**.
 33. **Proposal holds the slot** — `requested` does not.
 34. **Workers inherit salon hours** — per-worker vacation still Phase 2.
 35. **Assistant v1 is scripted UI + existing GraphQL** — deterministic salon-profile chat (service → worker → day/busy → 1–3 preferred times → confirm → OTP) calling the same `createBooking` as the picker. No LLM vendor, no GoHighLevel, no Meta/WhatsApp/Viber in v1. Those are explicit later decisions. `requested` still does not hold a slot.
@@ -43,10 +43,10 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 39. **Owner marks no-show after start** — stay `confirmed` + `no_show_at`; still occupying; overlay cleared. Not auto, not a sixth status, not from cancel. See `docs/adr/0021-owner-marks-no-show-after-start.md`.
 40. **Trust counters increment on the event** — `cancel_count` / `late_cancel_count` / `no_show_count` on that customer and that salon in the same transaction as cancel or mark-no-show. Booking row is the idempotency stamp. See `docs/adr/0022-trust-counters-increment-on-event.md`.
 41. **Homepage is in the PWA** — `/` is the Bosnian homepage (top-nav homepage slot + existing hero + simple footer), not a one-shot pitch gate. Pronađi salon goes to `/salons`. No `esyres_app/marketing/`, no `/welcome`, no owner waitlist. `/salon/:id` and `GET /qr/{id}` skip the homepage page. See `docs/adr/0027-homepage-not-pitch-gate.md` (supersedes same-URL pitch routing in `docs/adr/0024-company-pitch-in-pwa.md`).
-42. **One Design 1 pack** — Cal light chrome everywhere; owner keeps dense queue+grid. Busy/cell tokens live in Design 1. `refs/design-2` is retired. See `docs/adr/0026-one-design-1-pack.md`.
+42. **One Design 1 pack** — Cal light chrome everywhere; owner keeps dense Zahtjevi (month + selected-day list). Busy-badge tokens live in Design 1; cell tokens unused on Zahtjevi home. `refs/design-2` is retired. See `docs/adr/0026-one-design-1-pack.md` and `docs/adr/0035-zahtjevi-month-and-selected-day-list.md`.
 43. **Discovery lists only listed salons** — Nearby/Popular omit a salon until one open weekday and one service. `/salon/:id` still works. See `docs/adr/0028-listed-salon-on-discovery.md`.
 44. **Shared top-nav** — one full-bleed Cal bar (brand → `/`, per-route native slot) on guest and owner routes. Salon/discovery slot is Moje rezervacije, not homepage CTAs. Logged-in person name (when set) is `Dobrodošli, {name}` in every slot; never email. Owner overlay does not replace OwnerNav. See `docs/adr/0029-shared-top-nav.md`.
 45. **Discovery teaser then results** — idle `/salons` is a short card teaser from Nearby or Popular in Sarajevo; show all, a discovery chip, or name search opens hairline results (name, today’s busy, that salon’s service category names, address when set). Not a featured ranking and not photo cards. See `docs/adr/0030-discovery-teaser-then-results.md`.
-46. **Owner salon catalog** — `/owner/salons` (open now from hours). Add salon is `/owner/salons/create` (name and address; does not change `/create-salon`). Salon edit is `/owner/salons/:id` with exclusive Informacije / Radno vrijeme / Usluge / Radnici chips. Current job is occupying-cell labels on the panel, not the catalog. See `docs/adr/0031-add-salon-requires-address.md` and `docs/adr/0032-owner-salon-catalog.md`.
+46. **Owner salon catalog** — `/owner/salons` (open now from hours). Add salon is `/owner/salons/create` (name and address; does not change `/create-salon`). Salon edit is `/owner/salons/:id` with exclusive Informacije / Radno vrijeme / Usluge / Radnici chips. Current job is occupying-row labels on Zahtjevi, not the catalog. See `docs/adr/0031-add-salon-requires-address.md` and `docs/adr/0032-owner-salon-catalog.md`.
 47. **Salon-owned service categories** — owner-named groups replace the HAIR / MAKE_UP / MASSAGE enum. A service belongs to exactly one, required. Discovery chips stay the three hardcoded filters via a migrate-only legacy key (not owner UI). Guest profile + picker group by service category; chat stays flat. See `docs/adr/0033-salon-service-categories.md`.
 48. **Day-first salon chrome** — open weekday tap seeds the preferred date; `Pošalji zahtjev` sits under that selected hours row and opens a picker modal that names the seeded day (not idle on load, not in the `md+` aside). Logged-in `/` adds Moje rezervacije between `Dobrodošli, {person name}` and Odjava. See `docs/adr/0034-day-first-salon-booking-chrome.md`.

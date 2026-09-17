@@ -37,11 +37,11 @@ The owner control that chooses which of their salons is in context. Shown only w
 _Avoid_: location switcher, branch picker, store selector
 
 **Salon catalog**:
-The owner’s list of salons they own. Each row shows whether that shop is open now. Not discovery home, not the salon switcher, and not the Worker Availability Panel.
+The owner’s list of salons they own. Each row shows whether that shop is open now. Not discovery home, not the salon switcher, and not Zahtjevi.
 _Avoid_: salon list (guest), locations, dashboard, salons index (as discovery)
 
 **Salon edit**:
-The owner screen for one salon they own. One of four sections is visible at a time: name and address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not the Worker Availability Panel.
+The owner screen for one salon they own. One of four sections is visible at a time: name and address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not Zahtjevi.
 _Avoid_: settings, salon profile, admin, CMS, working days (as the hours section)
 
 **Salon profile**:
@@ -155,11 +155,11 @@ The Approve / Reject / Ask other time actions on a time-proposed booking, shown 
 _Avoid_: booking detail, proposal page, respond inbox
 
 **Pending queue**:
-The owner’s list of requested bookings and in-progress reschedules for one salon and one calendar day. Not My Bookings, not the Worker Availability Panel, and not Request Detail.
+The owner’s list of requested bookings and in-progress reschedules for one salon and one calendar day. On Zahtjevi it sits at the top of the selected-day list (collapsed when more than two). Not My Bookings, not occupying rows, and not Request Detail.
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
-The owner’s screen for one pending request: accept preferred time, decline, or counter-propose with a form. Not the pending queue, not the Worker Availability Panel, and not the customer Time Proposed screen.
+The owner’s screen for one pending request: accept preferred time, decline, or counter-propose with a form. The only counter-propose path. Not the pending queue, not the month navigator, and not the customer Time Proposed screen.
 _Avoid_: booking detail, request modal, tap fallback (as a screen name)
 
 **Assistant-originated**:
@@ -170,13 +170,21 @@ _Avoid_: chat booking (as a type), chatbot request, Cora booking, from-chat (as 
 The collapsed labeled answers on Request Detail for an assistant-originated request. They show the scripted choices that produced the preferred time. Not a message log and not the in-flight chat tab.
 _Avoid_: chat log, message history, conversation thread, why-line (as a stored essay)
 
-**Worker Availability Panel**:
-The owner’s per-day 15-minute job board (hours down, workers as columns) on the same day card as that day’s pending queue. Home after owner login. Occupying cells show the current job. Not the pending queue alone, not Request Detail, not the salon catalog, and not the customer busy-level badge.
-_Avoid_: calendar, schedule grid (customer), inbox, dashboard, slot picker (guest)
+**Zahtjevi**:
+The owner home for one salon: a month navigator and a selected-day list. OwnerNav label. Not chats, not stats, and not the salon catalog.
+_Avoid_: Worker Availability Panel, job board, inbox, calendar (as the page name), day card
+
+**Month navigator**:
+The month grid on Zahtjevi. Days with occupying bookings show worker-colored dots. Tapping a day selects it. Not a guest slot picker and not a per-worker shift calendar.
+_Avoid_: mini-month, month-and-pills, agenda, calendar (as the product)
+
+**Selected-day list**:
+That salon’s pending queue plus time-sorted occupying rows for the selected day, with titled break and closed rows. Not the month navigator, not Request Detail, and not My Bookings.
+_Avoid_: agenda, upcoming events, schedule, job board
 
 **Current job**:
-The occupying block on the Worker Availability Panel, labeled with that booking’s service snapshot names. The worker is the column. Confirmed and time-proposed both occupy; time-proposed is held, not in the chair. Not a now-only strip and not on the salon catalog.
-_Avoid_: in-chair, live job, active assistant, now-board
+The occupying row on the selected-day list, labeled with that booking’s service snapshot names and worker. Confirmed and time-proposed both occupy; time-proposed is held, not in the chair. Not a grid cell and not on the salon catalog.
+_Avoid_: in-chair, live job, active assistant, now-board, occupying cell
 
 **Counter-proposal**:
 The owner’s offered worker and clock range on a booking, instead of accepting the preferred time. It holds that range. Not a confirmed booking until the customer acts, and not the guest’s preferred time.

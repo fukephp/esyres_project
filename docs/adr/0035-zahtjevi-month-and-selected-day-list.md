@@ -1,0 +1,5 @@
+# Zahtjevi home is a month navigator plus a selected-day list
+
+The 15-minute worker-column board made occupancy spatial, and drag-to-propose needed a tap fallback on phones. Owners already run the day as a list: pending on top, then timed visits. `/owner` (Zahtjevi) is now a Cal month grid whose dots mark **occupying** bookings only (worker-colored), plus a selected-day list: pending till-pile (collapse + count when more than two), then soon occupying, then the rest including `time_proposed` as changed time, with titled break and closed rows. Empty cells only select the day. Counter-propose is Request Detail `Predloži` only. Drag and `@dnd-kit` go away. Occupancy rules do not change (`requested` still does not occupy). Rejected: keeping the board behind a toggle, Cal week/day/agenda, empty-cell create, and dots as “who is working today.”
+
+**Consequences:** ADR 0008 still describes drag if it ever returns (drop always `proposeTime`, never accept). `proposeTime` stays 15-minute and hours-bounded. Design 1 cell tokens are unused on Zahtjevi home; proposed vs booked is a row tag.
