@@ -1,0 +1,3 @@
+# Day-first salon booking chrome
+
+Idle `Pošalji zahtjev` on load (under the title / sticky sidebar) competed with Radno vrijeme. Guests now pick an open weekday first; the pill appears under hours and opens a picker **modal**. The `md+` aside stays an empty sticky gutter. Logged-in `/` adds Moje rezervacije between name and Odjava so bookings are reachable from the homepage. Pitaj salon opens a messenger-shaped scripted thread (bubbles + bottom composer chrome), not a second black primary and not LLM NLU. Rejected: instant modal on day tap; inline picker scroll; filling the aside. STORY-62 supersedes STORY-43/47/59 chrome ACs. See `docs/adr/0029-shared-top-nav.md` (homepage slot still not cloned onto `/salon/:id`).

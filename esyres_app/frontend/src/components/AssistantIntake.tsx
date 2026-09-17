@@ -1,11 +1,11 @@
-import type { FormEvent } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthShell } from './AuthShell'
 import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
 import type { SalonService, SalonWorker } from '../graphql/salon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
-import { SALON_SEND_CLASS } from '../lib/salonSend'
+import { ASSISTANT_COMPOSER_CLASS, SALON_SEND_CLASS } from '../lib/salonSend'
 import {
   assistantAddressLine,
   assistantCanSend,
@@ -64,6 +64,18 @@ type Props = {
 const chip = 'rounded-full border px-3 py-1.5 text-sm'
 const chipIdle = `${chip} border-hairline text-ink`
 const chipOn = `${chip} border-ink bg-ink text-canvas`
+const salonBubble =
+  'max-w-[85%] rounded-3xl bg-surface-soft px-4 py-3 text-sm leading-relaxed text-ink'
+const userBubble =
+  'ml-auto max-w-[85%] rounded-3xl bg-ink px-4 py-3 text-sm leading-relaxed text-canvas'
+
+function SalonLine({ children }: { children: ReactNode }) {
+  return <p className={salonBubble}>{children}</p>
+}
+
+function GuestLine({ children }: { children: ReactNode }) {
+  return <p className={userBubble}>{children}</p>
+}
 
 export function AssistantIntake({
   salonName,
@@ -128,169 +140,188 @@ export function AssistantIntake({
           closed: t('salon.closed'),
           break: (start, end) => t('salon.break', { start, end }),
         })
+  const empty = selected.length === 0 && !waiting
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={onSend}>
-      <p className="text-sm text-ink">{t('assistant.hello', { name: assistantHelloName(salonName) })}</p>
-      {addressLine !== null && <p className="text-sm text-muted">{addressLine}</p>}
-      <p className="text-sm text-ink">{t('assistant.services')}</p>
-      {chosen.length > 0 && (
-        <p className="text-sm text-muted">{chosen.map((s) => s.name).join(', ')}</p>
+    <form className="mt-4 flex min-h-[70dvh] w-full flex-col" onSubmit={onSend}>
+      {empty ? (
+        <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+          <p className="font-display text-[32px] font-semibold tracking-tight text-ink">
+            {t('assistant.hello', { name: assistantHelloName(salonName) })}
+          </p>
+          {addressLine !== null && <p className="mt-2 text-sm text-muted">{addressLine}</p>}
+        </div>
+      ) : (
+        <div className="flex flex-1 flex-col justify-end gap-3 overflow-y-auto">
+          <SalonLine>{t('assistant.hello', { name: assistantHelloName(salonName) })}</SalonLine>
+          {addressLine !== null && <p className="text-sm text-muted">{addressLine}</p>}
+          {chosen.length > 0 && <GuestLine>{chosen.map((s) => s.name).join(', ')}</GuestLine>}
+          {waiting && workerConfirmed && <GuestLine>{pickedWorker}</GuestLine>}
+          {waiting && <SalonLine>{t('assistant.wait')}</SalonLine>}
+        </div>
       )}
-      {waiting && workerConfirmed && <p className="text-sm text-muted">{pickedWorker}</p>}
-      {waiting && <p className="text-sm text-ink">{t('assistant.wait')}</p>}
+
       {!waiting && (
-        <>
-      <ul className="flex flex-wrap gap-2">
-        {services.map((service) => {
-          const on = selected.includes(service.id)
-          const chipParts = assistantServiceChipParts(service)
-          return (
-            <li key={service.id}>
-              <button
-                type="button"
-                className={on ? chipOn : chipIdle}
-                onClick={() => onToggleService(service.id)}
-              >
-                {chipParts.name}
-                <span className="ml-1 text-xs opacity-70">
-                  {t('salon.duration', { n: chipParts.durationMinutes })} · {formatFeninga(chipParts.priceFeninga)}
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-
-      {selected.length > 0 && workers.length > 0 && (
-        <>
-          <p className="text-sm text-ink">{t('assistant.worker')}</p>
-          {workerConfirmed && <p className="text-sm text-muted">{pickedWorker}</p>}
+        <div className="mt-6 space-y-3">
           <ul className="flex flex-wrap gap-2">
-            <li>
-              <button
-                type="button"
-                className={workerConfirmed && workerChoice === '' ? chipOn : chipIdle}
-                onClick={() => onPickWorker('')}
-              >
-                {t('salon.noPreference')}
-              </button>
-            </li>
-            {workers.map((worker) => (
-              <li key={worker.id}>
-                <button
-                  type="button"
-                  className={workerConfirmed && workerChoice === worker.id ? chipOn : chipIdle}
-                  onClick={() => onPickWorker(worker.id)}
-                >
-                  {worker.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {(step === 'date' || timeStep) && (
-        <>
-          <p className="text-sm text-ink">{t('assistant.date')}</p>
-          <label className="block text-sm text-body">
-            {t('salon.date')}
-            <input
-              type="date"
-              required
-              min={minDate}
-              value={preferredDate}
-              onChange={(e) => onDate(e.target.value)}
-              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-            />
-          </label>
-        </>
-      )}
-
-      {timeStep && hoursLine !== null && <p className="text-sm text-muted">{hoursLine}</p>}
-
-      {timeStep && dayClosed && (
-        <p className="text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
-      )}
-
-      {timeStep && !dayClosed && (
-        <>
-          <p className="text-sm text-muted">{t(`salon.busy.${dayBusy}`)}</p>
-          <p className="text-sm text-ink">{t('assistant.time')}</p>
-          {suggestions.length > 0 && (
-            <ul className="flex flex-wrap gap-2">
-              {suggestions.map((time) => (
-                <li key={time}>
+            {services.map((service) => {
+              const on = selected.includes(service.id)
+              const chipParts = assistantServiceChipParts(service)
+              return (
+                <li key={service.id}>
                   <button
                     type="button"
-                    className={!otherTime && preferredTime === time ? chipOn : chipIdle}
-                    onClick={() => onPickSuggestion(time)}
+                    className={on ? chipOn : chipIdle}
+                    onClick={() => onToggleService(service.id)}
                   >
-                    {time}
+                    {chipParts.name}
+                    <span className="ml-1 text-xs opacity-70">
+                      {t('salon.duration', { n: chipParts.durationMinutes })} · {formatFeninga(chipParts.priceFeninga)}
+                    </span>
                   </button>
                 </li>
-              ))}
-            </ul>
+              )
+            })}
+          </ul>
+
+          {selected.length > 0 && workers.length > 0 && (
+            <>
+              <SalonLine>{t('assistant.worker')}</SalonLine>
+              {workerConfirmed && <GuestLine>{pickedWorker}</GuestLine>}
+              <ul className="flex flex-wrap gap-2">
+                <li>
+                  <button
+                    type="button"
+                    className={workerConfirmed && workerChoice === '' ? chipOn : chipIdle}
+                    onClick={() => onPickWorker('')}
+                  >
+                    {t('salon.noPreference')}
+                  </button>
+                </li>
+                {workers.map((worker) => (
+                  <li key={worker.id}>
+                    <button
+                      type="button"
+                      className={workerConfirmed && workerChoice === worker.id ? chipOn : chipIdle}
+                      onClick={() => onPickWorker(worker.id)}
+                    >
+                      {worker.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
-          {showOtherTime && (
-            <button
-              type="button"
-              className="text-sm text-body underline underline-offset-4"
-              onClick={onOtherTime}
-            >
-              {t('assistant.otherTime')}
+
+          {(step === 'date' || timeStep) && (
+            <>
+              <SalonLine>{t('assistant.date')}</SalonLine>
+              <label className="block text-sm text-body">
+                {t('salon.date')}
+                <input
+                  type="date"
+                  required
+                  min={minDate}
+                  value={preferredDate}
+                  onChange={(e) => onDate(e.target.value)}
+                  className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                />
+              </label>
+            </>
+          )}
+
+          {timeStep && hoursLine !== null && <p className="text-sm text-muted">{hoursLine}</p>}
+
+          {timeStep && dayClosed && (
+            <p className="text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
+          )}
+
+          {timeStep && !dayClosed && (
+            <>
+              <p className="text-sm text-muted">{t(`salon.busy.${dayBusy}`)}</p>
+              <SalonLine>{t('assistant.time')}</SalonLine>
+              {suggestions.length > 0 && (
+                <ul className="flex flex-wrap gap-2">
+                  {suggestions.map((time) => (
+                    <li key={time}>
+                      <button
+                        type="button"
+                        className={!otherTime && preferredTime === time ? chipOn : chipIdle}
+                        onClick={() => onPickSuggestion(time)}
+                      >
+                        {time}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {showOtherTime && (
+                <button
+                  type="button"
+                  className="text-sm text-body underline underline-offset-4"
+                  onClick={onOtherTime}
+                >
+                  {t('assistant.otherTime')}
+                </button>
+              )}
+              {otherTime && (
+                <label className="block text-sm text-body">
+                  {t('salon.time')}
+                  <input
+                    type="time"
+                    required
+                    step={900}
+                    value={preferredTime}
+                    onChange={(e) => onNativeTime(e.target.value)}
+                    className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                  />
+                </label>
+              )}
+            </>
+          )}
+
+          {step === 'send' && <SalonLine>{t('assistant.send')}</SalonLine>}
+          {escapeChrome === 'shown' && (
+            <button type="button" className={chipIdle} onClick={onUnknown}>
+              {t('assistant.other')}
             </button>
           )}
-          {otherTime && (
-            <label className="block text-sm text-body">
-              {t('salon.time')}
-              <input
-                type="time"
-                required
-                step={900}
-                value={preferredTime}
-                onChange={(e) => onNativeTime(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-              />
-            </label>
+          {(unknownShown || pinged) && !waiting && <SalonLine>{t('assistant.unknown')}</SalonLine>}
+          {pingUi === 'cta' && (
+            <button type="button" className="text-sm font-medium text-ink underline underline-offset-4" onClick={onPing}>
+              {t('assistant.ping')}
+            </button>
           )}
-        </>
+          {pingUi === 'done' && <p className="text-sm text-muted">{t('assistant.pinged')}</p>}
+          {error && <p className="text-sm text-busy-busy">{error}</p>}
+          {step === 'send' && chrome === 'submit' && (
+            <button
+              type="submit"
+              disabled={!canSend || busy}
+              className={SALON_SEND_CLASS}
+            >
+              {t('salon.send')}
+            </button>
+          )}
+          {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}
+          {chrome === 'phone' && <PhoneOtpPanel onRetry={onAfterAuth} />}
+          {chrome === 'login' && (
+            <>
+              <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
+              <AuthShell onAuthenticated={onAfterAuth} />
+            </>
+          )}
+        </div>
       )}
 
-      {step === 'send' && <p className="text-sm text-ink">{t('assistant.send')}</p>}
-      {escapeChrome === 'shown' && (
-        <button type="button" className={chipIdle} onClick={onUnknown}>
-          {t('assistant.other')}
-        </button>
-      )}
-      {(unknownShown || pinged) && !waiting && <p className="text-sm text-ink">{t('assistant.unknown')}</p>}
-      {pingUi === 'cta' && (
-        <button type="button" className="text-sm font-medium text-ink underline underline-offset-4" onClick={onPing}>
-          {t('assistant.ping')}
-        </button>
-      )}
-      {pingUi === 'done' && <p className="text-sm text-muted">{t('assistant.pinged')}</p>}
-      {error && <p className="text-sm text-busy-busy">{error}</p>}
-      {step === 'send' && chrome === 'submit' && (
-        <button
-          type="submit"
-          disabled={!canSend || busy}
-          className={SALON_SEND_CLASS}
-        >
-          {t('salon.send')}
-        </button>
-      )}
-      {chrome === 'email' && <EmailVerifyPanel onRetry={onAfterAuth} />}
-      {chrome === 'phone' && <PhoneOtpPanel onRetry={onAfterAuth} />}
-      {chrome === 'login' && (
-        <>
-          <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
-          <AuthShell onAuthenticated={onAfterAuth} />
-        </>
-      )}
-        </>
-      )}
+      <div className={ASSISTANT_COMPOSER_CLASS}>
+        <span className="flex size-8 shrink-0 items-center justify-center text-ink" aria-hidden="true">
+          <svg className="size-4" viewBox="0 0 16 16">
+            <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+        </span>
+        <p className="flex-1 text-sm text-muted">{t('assistant.prompt')}</p>
+      </div>
     </form>
   )
 }

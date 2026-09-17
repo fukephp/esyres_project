@@ -52,6 +52,9 @@ export function TopNav({
             {chrome.slot === 'home-session' ? (
               <>
                 <span className={linkClass}>{chrome.displayName}</span>
+                <Link to={BOOKINGS_HREF} className={linkClass}>
+                  {t('nav.bookings')}
+                </Link>
                 <button type="button" className={logoutClass} onClick={() => void logout()}>
                   {t('home.logout')}
                 </button>

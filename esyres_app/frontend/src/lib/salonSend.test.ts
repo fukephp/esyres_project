@@ -7,6 +7,9 @@ import {
   SALON_BOOKING_ASIDE_CLASS,
   SALON_BOOKING_MAIN_CLASS,
   SALON_BOOKING_SPLIT_CLASS,
+  ASSISTANT_COMPOSER_CLASS,
+  SALON_CHAT_CARD_CLASS,
+  SALON_PICKER_DIALOG_CLASS,
   SALON_SEND_CLASS,
 } from './salonSend'
 
@@ -44,12 +47,27 @@ test('press hex stays arbitrary; hairline and Inter stay tokens', () => {
   expect(read('lib/salonSend.ts')).not.toMatch(/from '\.\/homepage'/)
 })
 
-test('i18n send stays Pošalji zahtjev; sendHint is idle-only copy', () => {
+test('i18n send stays Pošalji zahtjev; hours hint is day-first copy', () => {
   const i18n = read('i18n.ts')
   expect(i18n).toMatch(/send: 'Pošalji zahtjev'/)
-  expect(i18n).toMatch(/sendHint: 'Odaberi usluge, dan i vrijeme\.'/)
+  expect(i18n).toMatch(/sendHint: 'Odaberi dan da pošalješ zahtjev\.'/)
   expect(i18n).toMatch(/ask: 'Nisi sigurna\? Pitaj salon\.'/)
+  expect(i18n).toMatch(/nudge: 'Reci nam što ti treba\.'/)
+  expect(i18n).toMatch(/prompt: 'Kako ti možemo pomoći\?'/)
   expect(i18n).toMatch(/submit: 'Pošalji'/)
+})
+
+test('picker dialog and chat card classes stay Cal', () => {
+  expect(SALON_PICKER_DIALOG_CLASS).toMatch(/h-dvh/)
+  expect(SALON_PICKER_DIALOG_CLASS).toMatch(/md:max-w-md/)
+  expect(SALON_CHAT_CARD_CLASS).toMatch(/border-hairline/)
+  expect(SALON_CHAT_CARD_CLASS).toMatch(/bg-surface-soft/)
+  expect(SALON_CHAT_CARD_CLASS).toMatch(/active:scale-\[0\.98\]/)
+  expect(SALON_CHAT_CARD_CLASS).not.toMatch(/bg-ink/)
+  expect(ASSISTANT_COMPOSER_CLASS).toMatch(/rounded-full/)
+  expect(ASSISTANT_COMPOSER_CLASS).toMatch(/border-hairline/)
+  expect(ASSISTANT_COMPOSER_CLASS).toMatch(/\bw-full\b/)
+  expect(ASSISTANT_COMPOSER_CLASS).not.toMatch(/bg-ink/)
 })
 
 test('three Pošalji zahtjev use SALON_SEND_CLASS and salon.send', () => {

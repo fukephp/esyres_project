@@ -41,11 +41,14 @@ import {
   hoursRowClosed,
   hoursRowSelected,
   hoursRowTappable,
+  showDaySendPill,
 } from '../lib/salonHours'
 import {
   SALON_BOOKING_ASIDE_CLASS,
   SALON_BOOKING_MAIN_CLASS,
   SALON_BOOKING_SPLIT_CLASS,
+  SALON_CHAT_CARD_CLASS,
+  SALON_PICKER_DIALOG_CLASS,
   SALON_SEND_CLASS,
 } from '../lib/salonSend'
 import {
@@ -221,8 +224,7 @@ export function SalonProfile() {
   const [pinged, setPinged] = useState(false)
   const lastSnapshot = useRef<IntakeSnapshot>(emptyIntakeSnapshot())
   const restored = useRef(false)
-  const pickerFormRef = useRef<HTMLFormElement>(null)
-  const [scrollPicker, setScrollPicker] = useState(false)
+  const pickerDialogRef = useRef<HTMLDialogElement>(null)
   const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
     variables: { token: intakeToken ?? '' },
     skip: !intakeToken,
@@ -279,12 +281,20 @@ export function SalonProfile() {
   }, [intakeToken, refetchIntake])
 
   useEffect(() => {
-    if (!scrollPicker || mode !== 'picker') {
+    const dialog = pickerDialogRef.current
+    if (dialog == null) {
       return
     }
-    pickerFormRef.current?.scrollIntoView()
-    setScrollPicker(false)
-  }, [scrollPicker, mode])
+    if (mode === 'picker') {
+      if (!dialog.open) {
+        dialog.showModal()
+      }
+      return
+    }
+    if (dialog.open) {
+      dialog.close()
+    }
+  }, [mode])
 
   const chatSnapshot: IntakeSnapshot = {
     serviceIds: chatSelected,
@@ -361,7 +371,13 @@ export function SalonProfile() {
   const showBookingColumn = hasServices && !sent
   const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
-  const showAlternate = showChatCta(salon.services.length, sent) && !chatting
+  const showChatCard = showChatCta(salon.services.length, sent)
+  const showSendPill = showDaySendPill({
+    preferredDate,
+    hasServices,
+    chatting,
+    sent,
+  })
   const hoursForDay = chatDate === '' ? undefined : assistantHoursForDate(salon.hours, chatDate)
   const dayClosed =
     hoursForDay === undefined ||
@@ -461,12 +477,15 @@ export function SalonProfile() {
     if ('noop' in next) {
       return
     }
-    openIntake('picker')
+    if (chatting) {
+      setMode('idle')
+      setNeedLogin(false)
+      setNeedEmail(false)
+      setNeedPhone(false)
+      setError(null)
+    }
     setPreferredDate(next.preferredDate)
     setPreferredTime(next.preferredTime)
-    if (next.scroll) {
-      setScrollPicker(true)
-    }
   }
 
   function bookingInput(): CreateBookingInput | null {
@@ -589,6 +608,7 @@ export function SalonProfile() {
     <>
       <section className={showBookingColumn ? undefined : 'mt-8'}>
         <h2 className="text-sm font-semibold text-ink">{t('salon.hours')}</h2>
+        <p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>
         <ul className="mt-3 space-y-2">
           {salon.hours.map((day) => {
             const closed = hoursRowClosed(day)
@@ -597,7 +617,7 @@ export function SalonProfile() {
               hasServices,
               mode,
             })
-            const selected = hoursRowSelected({
+            const selectedRow = hoursRowSelected({
               tappable,
               rowWeekday: day.weekday,
               preferredDate,
@@ -609,7 +629,7 @@ export function SalonProfile() {
                 <li key={day.weekday}>
                   <button
                     type="button"
-                    className={`flex w-full justify-between gap-4 px-2 py-1.5 text-left text-sm text-body hover:bg-surface-soft focus:bg-surface-soft ${selected ? 'bg-surface-soft' : ''}`}
+                    className={`flex w-full justify-between gap-4 px-2 py-1.5 text-left text-sm text-body hover:bg-surface-soft focus:bg-surface-soft ${selectedRow ? 'bg-surface-soft' : ''}`}
                     onClick={() => onHoursTap(day)}
                   >
                     <span>{label}</span>
@@ -629,6 +649,98 @@ export function SalonProfile() {
             )
           })}
         </ul>
+        {showSendPill ? (
+          <div className="mt-4 max-w-md">
+            <button
+              type="button"
+              className={SALON_SEND_CLASS}
+              onClick={() => openIntake('picker')}
+            >
+              {t('salon.send')}
+            </button>
+          </div>
+        ) : null}
+        {showChatCard ? (
+          chatting ? (
+            <div className={SALON_CHAT_CARD_CLASS} aria-pressed="true">
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm text-muted">{t('assistant.nudge')}</span>
+                <span className="block text-sm font-semibold text-ink">{t('assistant.ask')}</span>
+              </span>
+              <svg className="size-4 shrink-0 text-ink" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </div>
+          ) : (
+            <button type="button" className={SALON_CHAT_CARD_CLASS} onClick={() => openIntake('chat')}>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm text-muted">{t('assistant.nudge')}</span>
+                <span className="block text-sm font-semibold text-ink">{t('assistant.ask')}</span>
+              </span>
+              <svg className="size-4 shrink-0 text-ink" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </button>
+          )
+        ) : null}
+        {chatting && !sent && id ? (
+          <div className="w-full">
+            <AssistantIntake
+              salonName={salon.name}
+              address={salon.address}
+              services={salon.services}
+              workers={salon.workers}
+              dayHours={hoursForDay}
+              minDate={date}
+              selected={chatSelected}
+              onToggleService={(serviceId) =>
+                setChatSelected((ids) =>
+                  ids.includes(serviceId) ? ids.filter((sid) => sid !== serviceId) : [...ids, serviceId],
+                )
+              }
+              workerChoice={chatWorker}
+              onPickWorker={(workerId) => {
+                setChatWorker(workerId)
+                setChatWorkerConfirmed(true)
+              }}
+              workerConfirmed={chatWorkerConfirmed}
+              preferredDate={chatDate}
+              onDate={(value) => {
+                const next = assistantDateChange(value)
+                setChatDate(next.preferredDate)
+                setChatTime(next.preferredTime)
+                setChatOtherTime(next.otherTime)
+              }}
+              preferredTime={chatTime}
+              onPickSuggestion={(value) => {
+                setChatTime(value)
+                setChatOtherTime(false)
+              }}
+              onNativeTime={setChatTime}
+              dayClosed={dayClosed}
+              dayBusy={salon.chatBusyLevel}
+              suggestions={suggestions}
+              showOtherTime={assistantShowOtherTime(dayClosed)}
+              otherTime={chatOtherTime}
+              onOtherTime={() => {
+                setChatOtherTime(true)
+                setChatTime('')
+              }}
+              error={error}
+              busy={busy}
+              waiting={waiting}
+              unknownShown={unknownShown}
+              pinged={pinged}
+              onUnknown={() => setUnknownShown(true)}
+              onPing={() => void onPing()}
+              needLogin={needLogin}
+              needEmail={needEmail}
+              needPhone={needPhone}
+              onSend={onSubmit}
+              onAfterAuth={() => void afterAuth()}
+            />
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-8">
@@ -639,7 +751,7 @@ export function SalonProfile() {
           <div className="mt-3">
             <SalonServiceGroups
               categories={salon.serviceCategories}
-              picking={picking}
+              picking={false}
               selected={selected}
               toggle={toggle}
             />
@@ -647,158 +759,6 @@ export function SalonProfile() {
         )}
       </section>
 
-      <div className="max-w-md">
-      {picking && !sent && (
-        <>
-          <form ref={pickerFormRef} className="mt-8 space-y-4" onSubmit={onSubmit}>
-            {chosen.length > 0 && (
-              <p className="text-sm text-ink">
-                {t('salon.total')}: {t('salon.duration', { n: stack.durationMinutes })} · {formatFeninga(stack.priceFeninga)}
-              </p>
-            )}
-            {salon.workers.length > 0 && (
-              <fieldset>
-                <legend className="text-sm text-body">{t('salon.worker')}</legend>
-                <ul className="mt-2 space-y-2">
-                  <li>
-                    <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
-                      <input
-                        type="radio"
-                        name="worker"
-                        value=""
-                        checked={workerChoice === ''}
-                        onChange={() => setWorkerChoice('')}
-                      />
-                      {t('salon.noPreference')}
-                    </label>
-                  </li>
-                  {salon.workers.map((worker) => (
-                    <li key={worker.id}>
-                      <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
-                        <input
-                          type="radio"
-                          name="worker"
-                          value={worker.id}
-                          checked={workerChoice === worker.id}
-                          onChange={() => setWorkerChoice(worker.id)}
-                        />
-                        {worker.name}
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              </fieldset>
-            )}
-            <label className="block text-sm text-body">
-              {t('salon.date')}
-              <input
-                type="date"
-                required
-                min={date}
-                value={preferredDate}
-                onChange={(e) => setPreferredDate(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-              />
-            </label>
-            <label className="block text-sm text-body">
-              {t('salon.time')}
-              <input
-                type="time"
-                required
-                step={900}
-                value={preferredTime}
-                onChange={(e) => setPreferredTime(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-              />
-            </label>
-            {error && <p className="text-sm text-busy-busy">{error}</p>}
-            {!needLogin && !needEmail && !needPhone && (
-              <button
-                type="submit"
-                disabled={!canSendPicker || busy}
-                className={SALON_SEND_CLASS}
-              >
-                {t('salon.send')}
-              </button>
-            )}
-          </form>
-          {needEmail && (
-            <div className="mt-8">
-              <EmailVerifyPanel onRetry={() => afterAuth()} />
-            </div>
-          )}
-          {needPhone && (
-            <div className="mt-8">
-              <PhoneOtpPanel onRetry={() => afterAuth()} />
-            </div>
-          )}
-          {needLogin && (
-            <div className="mt-8">
-              <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
-              <AuthShell onAuthenticated={() => afterAuth()} />
-            </div>
-          )}
-        </>
-      )}
-
-      {chatting && !sent && id && (
-        <AssistantIntake
-          salonName={salon.name}
-          address={salon.address}
-          services={salon.services}
-          workers={salon.workers}
-          dayHours={hoursForDay}
-          minDate={date}
-          selected={chatSelected}
-          onToggleService={(serviceId) =>
-            setChatSelected((ids) =>
-              ids.includes(serviceId) ? ids.filter((sid) => sid !== serviceId) : [...ids, serviceId],
-            )
-          }
-          workerChoice={chatWorker}
-          onPickWorker={(workerId) => {
-            setChatWorker(workerId)
-            setChatWorkerConfirmed(true)
-          }}
-          workerConfirmed={chatWorkerConfirmed}
-          preferredDate={chatDate}
-          onDate={(value) => {
-            const next = assistantDateChange(value)
-            setChatDate(next.preferredDate)
-            setChatTime(next.preferredTime)
-            setChatOtherTime(next.otherTime)
-          }}
-          preferredTime={chatTime}
-          onPickSuggestion={(value) => {
-            setChatTime(value)
-            setChatOtherTime(false)
-          }}
-          onNativeTime={setChatTime}
-          dayClosed={dayClosed}
-          dayBusy={salon.chatBusyLevel}
-          suggestions={suggestions}
-          showOtherTime={assistantShowOtherTime(dayClosed)}
-          otherTime={chatOtherTime}
-          onOtherTime={() => {
-            setChatOtherTime(true)
-            setChatTime('')
-          }}
-          error={error}
-          busy={busy}
-          waiting={waiting}
-          unknownShown={unknownShown}
-          pinged={pinged}
-          onUnknown={() => setUnknownShown(true)}
-          onPing={() => void onPing()}
-          needLogin={needLogin}
-          needEmail={needEmail}
-          needPhone={needPhone}
-          onSend={onSubmit}
-          onAfterAuth={() => void afterAuth()}
-        />
-      )}
-
-      </div>
     </>
   )
 
@@ -820,38 +780,129 @@ export function SalonProfile() {
 
       {showBookingColumn ? (
         <div className={SALON_BOOKING_SPLIT_CLASS}>
-          <aside className={SALON_BOOKING_ASIDE_CLASS}>
-            {hasServices && !picking && !sent && (
-              <button
-                type="button"
-                className={SALON_SEND_CLASS}
-                onClick={() => {
-                  openIntake('picker')
-                  setScrollPicker(true)
-                }}
-              >
-                {t('salon.send')}
-              </button>
-            )}
-            {mode === 'idle' && (
-              <p className="mt-2 text-sm text-muted">{t('salon.sendHint')}</p>
-            )}
-            {showAlternate && (
-              <button
-                type="button"
-                className="mt-3 w-full px-4 py-2 text-sm text-body underline underline-offset-4"
-                onClick={() => openIntake('chat')}
-              >
-                {t('assistant.ask')}
-              </button>
-            )}
-          </aside>
+          <aside className={SALON_BOOKING_ASIDE_CLASS} aria-hidden="true" />
           <div className={SALON_BOOKING_MAIN_CLASS}>{catalog}</div>
         </div>
       ) : (
         catalog
       )}
       {sent && <p className="mt-8 text-sm text-ink">{t('salon.success')}</p>}
+
+      <dialog
+        ref={pickerDialogRef}
+        className={SALON_PICKER_DIALOG_CLASS}
+        onClose={() => {
+          if (mode === 'picker') {
+            setMode('idle')
+          }
+        }}
+        onClick={(event) => {
+          if (event.target === pickerDialogRef.current) {
+            setMode('idle')
+          }
+        }}
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <h2 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h2>
+          <button type="button" className="text-sm text-body" onClick={() => setMode('idle')}>
+            {t('salon.close')}
+          </button>
+        </div>
+        <form className="space-y-4" onSubmit={onSubmit}>
+          <SalonServiceGroups
+            categories={salon.serviceCategories}
+            picking={true}
+            selected={selected}
+            toggle={toggle}
+          />
+          {chosen.length > 0 && (
+            <p className="text-sm text-ink">
+              {t('salon.total')}: {t('salon.duration', { n: stack.durationMinutes })} · {formatFeninga(stack.priceFeninga)}
+            </p>
+          )}
+          {salon.workers.length > 0 && (
+            <fieldset>
+              <legend className="text-sm text-body">{t('salon.worker')}</legend>
+              <ul className="mt-2 space-y-2">
+                <li>
+                  <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+                    <input
+                      type="radio"
+                      name="worker"
+                      value=""
+                      checked={workerChoice === ''}
+                      onChange={() => setWorkerChoice('')}
+                    />
+                    {t('salon.noPreference')}
+                  </label>
+                </li>
+                {salon.workers.map((worker) => (
+                  <li key={worker.id}>
+                    <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+                      <input
+                        type="radio"
+                        name="worker"
+                        value={worker.id}
+                        checked={workerChoice === worker.id}
+                        onChange={() => setWorkerChoice(worker.id)}
+                      />
+                      {worker.name}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </fieldset>
+          )}
+          <label className="block text-sm text-body">
+            {t('salon.date')}
+            <input
+              type="date"
+              required
+              min={date}
+              value={preferredDate}
+              onChange={(e) => setPreferredDate(e.target.value)}
+              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            />
+          </label>
+          <label className="block text-sm text-body">
+            {t('salon.time')}
+            <input
+              type="time"
+              required
+              step={900}
+              value={preferredTime}
+              onChange={(e) => setPreferredTime(e.target.value)}
+              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            />
+          </label>
+          {error && picking && <p className="text-sm text-busy-busy">{error}</p>}
+          {!needLogin && !needEmail && !needPhone && (
+            <button
+              type="submit"
+              disabled={!canSendPicker || busy}
+              className={SALON_SEND_CLASS}
+            >
+              {t('salon.send')}
+            </button>
+          )}
+        </form>
+        {picking && needEmail && (
+          <div className="mt-8">
+            <EmailVerifyPanel onRetry={() => afterAuth()} />
+          </div>
+        )}
+        {picking && needPhone && (
+          <div className="mt-8">
+            <PhoneOtpPanel onRetry={() => afterAuth()} />
+          </div>
+        )}
+        {picking && needLogin && (
+          <div className="mt-8">
+            <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
+            <AuthShell onAuthenticated={() => afterAuth()} />
+          </div>
+        )}
+      </dialog>
       </main>
     </>
   )

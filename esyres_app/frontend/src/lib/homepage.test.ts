@@ -158,6 +158,7 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'home-session',
     displayName: 'Ana',
+    bookings: true,
     logout: true,
     panel: { href: '/owner', kind: 'panel' },
   })

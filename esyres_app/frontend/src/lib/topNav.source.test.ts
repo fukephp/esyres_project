@@ -62,8 +62,9 @@ test('Odjava uses Cal button-destructive on both logged-in slots', () => {
   }
 
   const homeSession = nav.match(/chrome\.slot === 'home-session'[\s\S]*?(?=chrome\.slot === 'discovery')/)?.[0]
-  expect(homeSession).toMatch(/displayName[\s\S]*home\.logout[\s\S]*panelClass/)
+  expect(homeSession).toMatch(/displayName[\s\S]*nav\.bookings[\s\S]*home\.logout[\s\S]*panelClass/)
   expect(homeSession).toMatch(/className=\{linkClass\}>\{chrome\.displayName\}/)
+  expect(homeSession).toMatch(/to=\{BOOKINGS_HREF\}[\s\S]*nav\.bookings/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onLogin\}>/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onRegister\}>/)
 

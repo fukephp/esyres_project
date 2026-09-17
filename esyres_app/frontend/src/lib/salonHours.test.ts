@@ -7,6 +7,7 @@ import {
   hoursRowTappable,
   nextSarajevoDateForWeekday,
   sarajevoWeekdayFromYmd,
+  showDaySendPill,
 } from './salonHours'
 
 const today = '2026-09-13'
@@ -81,7 +82,7 @@ test('applyHoursRowTap noops when not tappable or already selected', () => {
   ).toEqual({ noop: true })
 })
 
-test('applyHoursRowTap opens picker, seeds next weekday from today, keeps time, scrolls', () => {
+test('applyHoursRowTap seeds next weekday from today and keeps time, without opening picker', () => {
   expect(
     applyHoursRowTap({
       tappable: true,
@@ -91,10 +92,8 @@ test('applyHoursRowTap opens picker, seeds next weekday from today, keeps time, 
       preferredTime: '',
     }),
   ).toEqual({
-    mode: 'picker',
     preferredDate: '2026-09-14',
     preferredTime: '',
-    scroll: true,
   })
   expect(
     applyHoursRowTap({
@@ -105,9 +104,15 @@ test('applyHoursRowTap opens picker, seeds next weekday from today, keeps time, 
       preferredTime: '10:00',
     }),
   ).toEqual({
-    mode: 'picker',
     preferredDate: '2026-09-15',
     preferredTime: '10:00',
-    scroll: true,
   })
+})
+
+test('showDaySendPill needs a selected day, services, and not chat or sent', () => {
+  expect(showDaySendPill({ preferredDate: '', hasServices: true, chatting: false, sent: false })).toBe(false)
+  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: false, sent: false })).toBe(true)
+  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: false, chatting: false, sent: false })).toBe(false)
+  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: true, sent: false })).toBe(false)
+  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: false, sent: true })).toBe(false)
 })

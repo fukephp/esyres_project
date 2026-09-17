@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-59`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-62`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -19,6 +19,7 @@
 - As a customer, I want the salon profile to show the address when it exists, a send button under the title, and tappable open hours that fill the picker’s day, so that I can start a request from what I already see.
 - As a customer, I want every Pošalji zahtjev on the salon profile to look and feel like one primary action, so that sending a request is obvious and the press feels physical.
 - As a customer, I want a single send on the salon profile — under the title on a phone, in a sticky sidebar on a wide screen — so that I am not looking at two identical buttons.
+- As a customer, I want to start a salon request from Radno vrijeme and reach Moje rezervacije from the logged-in homepage, so that send is not sitting idle on load and bookings are one tap from `/`.
 
 ## Epic 2 — Booking Request Flow (Customer)
 

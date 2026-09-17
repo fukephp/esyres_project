@@ -2,7 +2,7 @@ import { assistantHoursFacts, type AssistantDayHours, type ProfileMode } from '.
 
 export type HoursTapResult =
   | { noop: true }
-  | { mode: 'picker'; preferredDate: string; preferredTime: string; scroll: true }
+  | { preferredDate: string; preferredTime: string }
 
 export function sarajevoWeekdayFromYmd(ymd: string): string {
   const [year, month, day] = ymd.split('-').map(Number)
@@ -75,9 +75,16 @@ export function applyHoursRowTap(input: {
   }
 
   return {
-    mode: 'picker',
     preferredDate: nextSarajevoDateForWeekday(input.weekday, input.today),
     preferredTime: input.preferredTime,
-    scroll: true,
   }
+}
+
+export function showDaySendPill(input: {
+  preferredDate: string
+  hasServices: boolean
+  chatting: boolean
+  sent: boolean
+}): boolean {
+  return input.preferredDate !== '' && input.hasServices && !input.chatting && !input.sent
 }

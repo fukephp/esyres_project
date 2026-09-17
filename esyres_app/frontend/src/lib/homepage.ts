@@ -29,7 +29,7 @@ export type TopNavBrand = { to: typeof HOME_HREF; brandKey: typeof DISCOVERY_BRA
 
 export type TopNavChrome =
   | { brand: TopNavBrand; slot: 'home-guest'; login: true; register: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'home-session'; displayName: string; logout: true; panel: PanelCta }
+  | { brand: TopNavBrand; slot: 'home-session'; displayName: string; bookings: true; logout: true; panel: PanelCta }
   | { brand: TopNavBrand; slot: 'discovery'; bookings: true }
   | { brand: TopNavBrand; slot: 'empty' }
   | { brand: TopNavBrand; slot: 'session'; displayName: string; logout: true }
@@ -89,6 +89,7 @@ export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
       brand,
       slot: 'home-session',
       displayName: homepageDisplayName(me),
+      bookings: true,
       logout: true,
       panel,
     }

@@ -18,7 +18,8 @@ void i18n.use(initReactI18next).init({
           duration: '{{n}} min',
           loading: 'Učitavanje…',
           send: 'Pošalji zahtjev',
-          sendHint: 'Odaberi usluge, dan i vrijeme.',
+          sendHint: 'Odaberi dan da pošalješ zahtjev.',
+          close: 'Zatvori',
           submit: 'Pošalji',
           date: 'Datum',
           time: 'Vrijeme',
@@ -49,6 +50,8 @@ void i18n.use(initReactI18next).init({
         },
         assistant: {
           ask: 'Nisi sigurna? Pitaj salon.',
+          nudge: 'Reci nam što ti treba.',
+          prompt: 'Kako ti možemo pomoći?',
           hello: '{{name}} ovdje.',
           services: 'Koje usluge želiš?',
           worker: 'Imaš li preferenciju za radnika?',
