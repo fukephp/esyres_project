@@ -307,7 +307,7 @@ Self-host Cal Sans from the Cal.com font repo. Load Inter via CDN or self-host. 
 
 Desktop/tablet default regions (density only; ignore medical/KPI/cream IA from the former `panel-ref.jpg`):
 
-1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, name + Odjava as `button-destructive`). Not a replacement for the aside.
+1. **Top-nav overlay** — full-bleed shared bar (brand → `/`, `Dobrodošli, {person name}` + Odjava as `button-destructive` when named). Not a replacement for the aside.
 2. **Light left nav** (`{colors.canvas}`, ink text, hairline) — primary destinations; salon switcher if multi-salon. Not dark nav.
 3. **Main** — one `{colors.canvas}` hairline day card (`{rounded.lg}`, no heavy shadow, no grey fill on the box) spanning owner `main`: sticky Bosnian weekday+date row (prev/next + secondary native date), queue chips on `{colors.surface-soft}` (scroll away), sticky worker names, then hours-down × worker-columns 15-minute board (horizontal pan for extra workers; sticky time gutter). Card grows with the day. Chip initials ink on `{colors.surface-soft}` (not orange, not cell-green). No month grid, no now-line, no `Danas` badge, no ~480px guest widget. Primary CTAs on the chips.
 4. **Optional right rail** — “today’s proposed/confirmed” strip only when useful. Mini-month calendar is **not** required chrome.
@@ -330,7 +330,7 @@ Radius hierarchy: buttons/inputs `{rounded.md}` (8px); content cards `{rounded.l
 
 **Secondary button** — white fill, ink text, 1px hairline.
 
-**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Guest inner row matches the ~1200px column; owner overlay inner stays unconstrained. Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. Logged-in homepage: name → Odjava (`button-destructive`) → Panel. `/salons` and `/salon/:id`: Moje rezervacije. `/create-salon`: empty. `/bookings` and `/owner*`: name + Odjava as `button-destructive`. OwnerNav stays. No search, cart, or mega-menu.
+**Top nav** — shared full-bleed bar (target 64px, wrap allowed, not sticky). Guest inner row matches the ~1200px column; owner overlay inner stays unconstrained. Wordmark always links to `/`. Homepage slot: Prijava/Registracija text + Get your panel / Panel as `{colors.primary}` button. Logged-in homepage: `Dobrodošli, {person name}` → Moje rezervacije → Odjava (`button-destructive`) → Panel. `/salons` and `/salon/:id`: greeting (when named) then Moje rezervacije. `/create-salon`: greeting only when named, else empty. `/bookings` and `/owner*`: greeting + Odjava as `button-destructive` when named; Odjava only when nameless. Never email in the bar. OwnerNav stays. No search, cart, or mega-menu.
 
 **Owner nav** — dense panel left rail: `{colors.canvas}` floor, ink links, hairline edge. Not `{colors.surface-dark}`. Not a marketing hero/footer.
 

@@ -67,7 +67,7 @@ The permanent guest-facing `/` surface: the top-nav with the homepage slot, the 
 _Avoid_: company pitch, landing, marketing site, homepage wall, welcome tour, homepage header (the bar is the top-nav)
 
 **Top-nav**:
-The shared site bar on guest and owner pages. Brand goes home. Each page fills one native slot of actions. Not the homepage, not the owner aside, and not a catalog menu.
+The shared site bar on guest and owner pages. Brand goes home. Each page fills one native slot of actions. Logged-in identity in the bar is the person name, or nothing — never an email. Not the homepage, not the owner aside, and not a catalog menu.
 _Avoid_: homepage header, standard header, guest header, MENU, mega-menu
 
 **Discovery home**:
