@@ -116,7 +116,7 @@ test('discovery and salon share TopNav discovery slot; no in-page BookingsLink',
   expect(salon).toMatch(/<TopNav/)
   expect(salon).toMatch(/GUEST_COLUMN_CLASS/)
   expect(salon).not.toMatch(/mx-auto max-w-md/)
-  expect(salon).toMatch(/max-w-md/)
+  expect(salon).toMatch(/SALON_PICKER_DIALOG_CLASS/)
   expect(salon).not.toMatch(/md:grid-cols-2/)
   expect(salon).not.toMatch(/BookingsLink/)
   expect(salon).toMatch(/salon\.name/)

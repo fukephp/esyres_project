@@ -38,9 +38,11 @@ import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
 import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
   applyHoursRowTap,
+  formatPickerDayNumeric,
   hoursRowClosed,
   hoursRowSelected,
   hoursRowTappable,
+  sarajevoWeekdayFromYmd,
   showDaySendPill,
 } from '../lib/salonHours'
 import {
@@ -380,12 +382,6 @@ export function SalonProfile() {
   const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
   const showChatCard = showChatCta(salon.services.length, sent)
-  const showSendPill = showDaySendPill({
-    preferredDate,
-    hasServices,
-    chatting,
-    sent,
-  })
   const hoursForDay = chatDate === '' ? undefined : assistantHoursForDate(salon.hours, chatDate)
   const dayClosed =
     hoursForDay === undefined ||
@@ -632,6 +628,13 @@ export function SalonProfile() {
             })
             const label = t(`weekday.${day.weekday}`)
             const line = hoursLine(day, t)
+            const showRowPill = showDaySendPill({
+              preferredDate,
+              hasServices,
+              chatting,
+              sent,
+              tappable,
+            })
             if (tappable) {
               return (
                 <li key={day.weekday}>
@@ -643,6 +646,17 @@ export function SalonProfile() {
                     <span>{label}</span>
                     <span className="text-right">{line}</span>
                   </button>
+                  {showRowPill && selectedRow ? (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        className={SALON_SEND_CLASS}
+                        onClick={() => openIntake('picker')}
+                      >
+                        {t('salon.send')}
+                      </button>
+                    </div>
+                  ) : null}
                 </li>
               )
             }
@@ -657,17 +671,6 @@ export function SalonProfile() {
             )
           })}
         </ul>
-        {showSendPill ? (
-          <div className="mt-4 max-w-md">
-            <button
-              type="button"
-              className={SALON_SEND_CLASS}
-              onClick={() => openIntake('picker')}
-            >
-              {t('salon.send')}
-            </button>
-          </div>
-        ) : null}
         {showChatCard ? (
           chatting ? (
             <div className={`${SALON_CHAT_CARD_CLASS} pointer-events-none`} aria-pressed="true">
@@ -757,7 +760,14 @@ export function SalonProfile() {
         }}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h2>
+          <div className="min-w-0">
+            <h2 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h2>
+            {preferredDate !== '' ? (
+              <p className="mt-1 text-sm text-muted">
+                {t(`weekday.${sarajevoWeekdayFromYmd(preferredDate)}`)}, {formatPickerDayNumeric(preferredDate)}
+              </p>
+            ) : null}
+          </div>
           <button type="button" className="text-sm text-body" onClick={() => setMode('idle')}>
             {t('salon.close')}
           </button>

@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 import type { AssistantDayHours } from './assistant'
 import {
   applyHoursRowTap,
+  formatPickerDayNumeric,
   hoursRowClosed,
   hoursRowSelected,
   hoursRowTappable,
@@ -109,10 +110,23 @@ test('applyHoursRowTap seeds next weekday from today and keeps time, without ope
   })
 })
 
-test('showDaySendPill needs a selected day, services, and not chat or sent', () => {
-  expect(showDaySendPill({ preferredDate: '', hasServices: true, chatting: false, sent: false })).toBe(false)
-  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: false, sent: false })).toBe(true)
-  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: false, chatting: false, sent: false })).toBe(false)
-  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: true, sent: false })).toBe(false)
-  expect(showDaySendPill({ preferredDate: '2026-09-14', hasServices: true, chatting: false, sent: true })).toBe(false)
+test('showDaySendPill needs a selected day, services, tappable row, and not chat or sent', () => {
+  const open = {
+    preferredDate: '2026-09-14',
+    hasServices: true,
+    chatting: false,
+    sent: false,
+    tappable: true,
+  }
+  expect(showDaySendPill({ ...open, preferredDate: '' })).toBe(false)
+  expect(showDaySendPill(open)).toBe(true)
+  expect(showDaySendPill({ ...open, hasServices: false })).toBe(false)
+  expect(showDaySendPill({ ...open, chatting: true })).toBe(false)
+  expect(showDaySendPill({ ...open, sent: true })).toBe(false)
+  expect(showDaySendPill({ ...open, tappable: false })).toBe(false)
+})
+
+test('formatPickerDayNumeric is day. month. year without pad or trailing period', () => {
+  expect(formatPickerDayNumeric('2026-09-17')).toBe('17. 9. 2026')
+  expect(formatPickerDayNumeric('2026-09-07')).toBe('7. 9. 2026')
 })

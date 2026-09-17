@@ -53,6 +53,7 @@ test('i18n send stays Pošalji zahtjev; hours hint is day-first copy', () => {
   const i18n = read('i18n.ts')
   expect(i18n).toMatch(/send: 'Pošalji zahtjev'/)
   expect(i18n).toMatch(/sendHint: 'Odaberi dan da pošalješ zahtjev\.'/)
+  expect(i18n).toMatch(/WEDNESDAY: 'Srijeda'/)
   expect(i18n).toMatch(/ask: 'Nisi sigurna\? Pitaj salon\.'/)
   expect(i18n).toMatch(/hello: '\{\{name\}\} ovdje\.'/)
   expect(i18n).toMatch(/nudge: 'Reci nam što ti treba\.'/)
