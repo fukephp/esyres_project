@@ -87,6 +87,7 @@
 ## Epic 10 — Salon Booking Assistant (scripted intake)
 
 - As a customer, I want an alternate chat on the salon profile when I am not sure which service or time to pick, so that I can still send the same kind of request without hunting a slot grid.
+- As a customer, I want Pitaj salon to open a full-canvas chat overlay so I can talk to this salon without the hours list competing with the conversation.
 - As a customer, I want the chat to suggest 1–3 preferred times from hours and how busy the day looks, so that I can choose a time without seeing the owner's real calendar.
 - As a customer, I want the chat to speak as this salon in Bosnian and only use that salon's live services, prices, hours, address, workers, and busy-level, so that it does not invent policies or feel like a third brand.
 - As a customer, I want send gates to stay the same as the picker (login, verified email, phone OTP), so that the salon still gets a reachable guest. If I am already verified, I want one confirm at the end.
