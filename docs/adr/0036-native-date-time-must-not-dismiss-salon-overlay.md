@@ -1,0 +1,3 @@
+# Native date/time must not dismiss the salon overlay
+
+Native `type="date"` / `type="time"` inside the picker or Pitaj salon `<dialog>` can fire the dialog’s `cancel`/`close` (especially iOS Safari), which drops the overlay and can leave the Pitaj salon card as a `pointer-events-none` non-button. Keep the native inputs and both dialogs. Prevent that `cancel` when a date/time control is active, re-`showModal()` if the dialog still closed while `mode` is `picker` or `chat`, and idle on a real close (X / Escape / backdrop) so the card is tappable again. Rejected: replacing native date/time with text/`select` or a custom calendar; swallowing every dialog `cancel` and reimplementing Escape.
