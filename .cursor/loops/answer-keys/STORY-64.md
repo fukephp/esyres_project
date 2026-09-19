@@ -13,31 +13,43 @@
 | Goal (one sentence) | Using native date or time in the picker or Pitaj salon overlay keeps that overlay open; a real close leaves Pitaj salon tappable. |
 | Branch name | `story/STORY-64-native-datetime-overlay` |
 | Iteration cap | 8 |
-| Status | draft |
-| Approved by / date | |
+| Status | approved |
+| Approved by / date | Faruk / 2026-09-19 |
 
 ## Pass/fail — product
 
-- [ ] Helper `dialogCancelShouldClose(activeInputType: string | null): boolean` in `esyres_app/frontend/src/lib/salonDialog.ts`: `false` when `activeInputType` is `'date'` or `'time'`; `true` for `null`, `''`, `'text'`, and other types. Native `type="date"` / `type="time"` stay in the picker dialog and in `AssistantIntake` (date step + other-time). Do **not** replace them with text/`select` or a custom calendar — verify: Vitest `salonDialog.test.ts` (date/time → false; null / text → true); `SalonProfile.tsx` still has picker `type="date"` and `type="time"`; `AssistantIntake.tsx` still has `type="date"` and other-time `type="time"`
-- [ ] Both salon `<dialog>`s wire `onCancel` (Q1 A): read `document.activeElement` (`HTMLInputElement.type` or `null`); if `!dialogCancelShouldClose(...)`, `event.preventDefault()` and set a per-dialog keep-open ref. If `cancel` still closed the dialog while `mode` is `picker` (picker dialog) or `chat` (chat dialog), `showModal()` again and do **not** `setMode('idle')`. Do not `preventDefault` every `cancel` (Q1 B) — verify: Vitest reading `SalonProfile.tsx` (both dialog slices have `onCancel`; `dialogCancelShouldClose`; `preventDefault`; `showModal`; picker dialog `onCancel`/`onClose` do not call `preventDefault()` unconditionally with no `dialogCancelShouldClose`)
-- [ ] Real close still idles (Q2 A / STORY-63): X (`salon.close`), backdrop click on the dialog element, and Escape when `dialogCancelShouldClose` is true → `setMode('idle')` (card unselected). `onClose` without the keep-open ref → `setMode('idle')` when that overlay’s mode is active. Never leave `mode` as `chat`/`picker` with that dialog not open (Pitaj salon must not stay a `pointer-events-none` non-button with no overlay) — verify: Vitest reading `SalonProfile.tsx` (both dialogs keep `salon.close` → `setMode('idle')`; backdrop `event.target === …DialogRef.current` → `setMode('idle')`; `onClose` still has `setMode('idle')`; chatting card still `pointer-events-none` only while an overlay is meant to be open)
-- [ ] Copy, send path, chrome unchanged: two dialogs, `SALON_PICKER_DIALOG_CLASS`, Pitaj salon card, `CREATE_BOOKING_MUTATION`, three `Pošalji zahtjev` pills, hours helpers — verify: Vitest (`salonProfile.source.test.ts` / `salonSend.test.ts` existing two-dialog, card, send, mutation asserts still pass)
+- [x] Helper `dialogCancelShouldClose(activeInputType: string | null): boolean` in `esyres_app/frontend/src/lib/salonDialog.ts`: `false` when `activeInputType` is `'date'` or `'time'`; `true` for `null`, `''`, `'text'`, and other types. Native `type="date"` / `type="time"` stay in the picker dialog and in `AssistantIntake` (date step + other-time). Do **not** replace them with text/`select` or a custom calendar — verify: Vitest `salonDialog.test.ts` (date/time → false; null / text → true); `SalonProfile.tsx` still has picker `type="date"` and `type="time"`; `AssistantIntake.tsx` still has `type="date"` and other-time `type="time"`
+- [x] Both salon `<dialog>`s wire `onCancel` (Q1 A): read `document.activeElement` (`HTMLInputElement.type` or `null`); if `!dialogCancelShouldClose(...)`, `event.preventDefault()` and set a per-dialog keep-open ref. If `cancel` still closed the dialog while `mode` is `picker` (picker dialog) or `chat` (chat dialog), `showModal()` again and do **not** `setMode('idle')`. Do not `preventDefault` every `cancel` (Q1 B) — verify: Vitest reading `SalonProfile.tsx` (both dialog slices have `onCancel`; `dialogCancelShouldClose`; `preventDefault`; `showModal`; picker dialog `onCancel`/`onClose` do not call `preventDefault()` unconditionally with no `dialogCancelShouldClose`)
+- [x] Real close still idles (Q2 A / STORY-63): X (`salon.close`), backdrop click on the dialog element, and Escape when `dialogCancelShouldClose` is true → `setMode('idle')` (card unselected). `onClose` without the keep-open ref → `setMode('idle')` when that overlay’s mode is active. Never leave `mode` as `chat`/`picker` with that dialog not open (Pitaj salon must not stay a `pointer-events-none` non-button with no overlay) — verify: Vitest reading `SalonProfile.tsx` (both dialogs keep `salon.close` → `setMode('idle')`; backdrop `event.target === …DialogRef.current` → `setMode('idle')`; `onClose` still has `setMode('idle')`; chatting card still `pointer-events-none` only while an overlay is meant to be open)
+- [x] Copy, send path, chrome unchanged: two dialogs, `SALON_PICKER_DIALOG_CLASS`, Pitaj salon card, `CREATE_BOOKING_MUTATION`, three `Pošalji zahtjev` pills, hours helpers — verify: Vitest (`salonProfile.source.test.ts` / `salonSend.test.ts` existing two-dialog, card, send, mutation asserts still pass)
 - [ ] Phone: native date/time in either overlay does not dismiss it; after X, Pitaj salon is tappable — verify: human-only: visual at merge (not a PR screenshot gate)
 
 ## Pass/fail — architecture
 
 Cite `docs/architecture/04-Frontend.md` (`/salon/:id` native date/time must not dismiss overlay or leave Pitaj salon untappable), `08-Decisions.md` #12 #15 #35 #48 #49, `docs/mvp/04-UI-Design-Goals.md`, `docs/adr/0034-day-first-salon-booking-chrome.md`, `docs/adr/0036-native-date-time-must-not-dismiss-salon-overlay.md`.
 
-- [ ] One React PWA. CSS/Tailwind only (no GSAP, no Three.js, no new npm). No new GraphQL, REST, or booking mutations. No sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`; no new schema/feature/PHP files this PR
-- [ ] i18next `bs` only. No new copy keys. No Playwright, RTL, Pest, GraphQL codegen — verify: `i18n.ts` unchanged this PR; `package.json` unchanged deps
-- [ ] Lighthouse `/graphql` only. Classifier: skip Behat only if every `esyres_app/` path is under `esyres_app/frontend/`. Do not change `behat.yml` — verify: CONTEXT classifier at verify time; no `features/` or `behat.yml` edits this PR
-- [ ] Do not write `docs/stories/STORY-64.md`. Set `docs/stories/index.md` STORY-64 Loop to `STORY-64` — verify: no new `docs/stories/STORY-64.md`; index Loop cell is `STORY-64`
+- [x] One React PWA. CSS/Tailwind only (no GSAP, no Three.js, no new npm). No new GraphQL, REST, or booking mutations. No sibling `marketing/` — verify: `esyres_app/frontend/package.json` unchanged deps; `test ! -d esyres_app/marketing`; no new schema/feature/PHP files this PR
+- [x] i18next `bs` only. No new copy keys. No Playwright, RTL, Pest, GraphQL codegen — verify: `i18n.ts` unchanged this PR; `package.json` unchanged deps
+- [x] Lighthouse `/graphql` only. Classifier: skip Behat only if every `esyres_app/` path is under `esyres_app/frontend/`. Do not change `behat.yml` — verify: CONTEXT classifier at verify time; no `features/` or `behat.yml` edits this PR
+- [x] Do not write `docs/stories/STORY-64.md`. Set `docs/stories/index.md` STORY-64 Loop to `STORY-64` — verify: no new `docs/stories/STORY-64.md`; index Loop cell is `STORY-64`
 
 ## Verify commands
 
 Run the CONTEXT **frontend-only classifier** first (union of untracked + unstaged + staged + `main...HEAD`; if `main` is missing, `origin/main` / this repo’s `master`). Do not skip Behat from a story label. Every command in the matching set must exit 0 before the loop may open a ready PR.
 
 This story is PWA + loop/docs. Expected skip: no PHP / `features/` / `graphql/` schema edits. (`docs/` + `.cursor/` do not trigger Behat.)
+
+**This PR (2026-09-19):** Classifier skipped Behat (every `esyres_app/` path under `esyres_app/frontend/`). Vite container already up. Host `npm run test` failed (rolldown native binding); used compose exec.
+
+Passed:
+
+```text
+docker compose exec -T vite npm run typecheck
+docker compose exec -T vite npm run test
+docker compose exec -T vite npm run build
+```
+
+190 tests passed.
 
 **If skipped** — from `esyres_app/frontend/` (host npm; `docker compose exec -T vite` only if that container is already up). Do not `compose up` or run `php artisan --version`.
 

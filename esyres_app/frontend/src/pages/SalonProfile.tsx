@@ -34,6 +34,7 @@ import {
   type ProfileMode,
 } from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
+import { dialogCancelShouldClose } from '../lib/salonDialog'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
 import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
@@ -231,6 +232,8 @@ export function SalonProfile() {
   const restored = useRef(false)
   const pickerDialogRef = useRef<HTMLDialogElement>(null)
   const chatDialogRef = useRef<HTMLDialogElement>(null)
+  const keepPickerOpen = useRef(false)
+  const keepChatOpen = useRef(false)
   const { data: savedIntake, refetch: refetchIntake } = useQuery<AssistantIntakeData>(ASSISTANT_INTAKE_QUERY, {
     variables: { token: intakeToken ?? '' },
     skip: !intakeToken,
@@ -485,6 +488,7 @@ export function SalonProfile() {
       return
     }
     if (chatting) {
+      keepChatOpen.current = false
       setMode('idle')
       setNeedLogin(false)
       setNeedEmail(false)
@@ -751,13 +755,31 @@ export function SalonProfile() {
       <dialog
         ref={pickerDialogRef}
         className={SALON_PICKER_DIALOG_CLASS}
+        onCancel={(event) => {
+          if (
+            !dialogCancelShouldClose(
+              document.activeElement instanceof HTMLInputElement ? document.activeElement.type : null,
+            )
+          ) {
+            event.preventDefault()
+            keepPickerOpen.current = true
+          } else {
+            keepPickerOpen.current = false
+          }
+        }}
         onClose={() => {
+          if (keepPickerOpen.current) {
+            keepPickerOpen.current = false
+            queueMicrotask(() => pickerDialogRef.current?.showModal())
+            return
+          }
           if (mode === 'picker') {
             setMode('idle')
           }
         }}
         onClick={(event) => {
           if (event.target === pickerDialogRef.current) {
+            keepPickerOpen.current = false
             setMode('idle')
           }
         }}
@@ -771,7 +793,14 @@ export function SalonProfile() {
               </p>
             ) : null}
           </div>
-          <button type="button" className="text-sm text-body" onClick={() => setMode('idle')}>
+          <button
+            type="button"
+            className="text-sm text-body"
+            onClick={() => {
+              keepPickerOpen.current = false
+              setMode('idle')
+            }}
+          >
             {t('salon.close')}
           </button>
         </div>
@@ -873,19 +902,44 @@ export function SalonProfile() {
       <dialog
         ref={chatDialogRef}
         className={SALON_PICKER_DIALOG_CLASS}
+        onCancel={(event) => {
+          if (
+            !dialogCancelShouldClose(
+              document.activeElement instanceof HTMLInputElement ? document.activeElement.type : null,
+            )
+          ) {
+            event.preventDefault()
+            keepChatOpen.current = true
+          } else {
+            keepChatOpen.current = false
+          }
+        }}
         onClose={() => {
+          if (keepChatOpen.current) {
+            keepChatOpen.current = false
+            queueMicrotask(() => chatDialogRef.current?.showModal())
+            return
+          }
           if (mode === 'chat') {
             setMode('idle')
           }
         }}
         onClick={(event) => {
           if (event.target === chatDialogRef.current) {
+            keepChatOpen.current = false
             setMode('idle')
           }
         }}
       >
         <div className="mb-4 flex justify-end">
-          <button type="button" className="text-sm text-body" onClick={() => setMode('idle')}>
+          <button
+            type="button"
+            className="text-sm text-body"
+            onClick={() => {
+              keepChatOpen.current = false
+              setMode('idle')
+            }}
+          >
             {t('salon.close')}
           </button>
         </div>
