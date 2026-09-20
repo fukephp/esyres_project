@@ -38,6 +38,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `docs/stories/` | One-PR story inventory (`STORY-xx.md` + `index.md`). what-next and story-loop read this, not `docs/mvp/07-Stories.md`. |
 | `docs/glossary.md` | Domain glossary (lazy; domain-modeling via grill-with-docs). Not `.cursor/CONTEXT.md`. |
 | `docs/adr/` | ADRs (lazy; domain-modeling via grill-with-docs). If an ADR changes a locked stack choice, also update `docs/architecture/08-Decisions.md`. |
+| `docs/research/` | Lazy research notes from `skills/research/` (`<slug>.md`). Not product or architecture truth. |
 | `DESIGN.md` | Index for **one** pack — Design 1 Cal (homepage, discovery, salon, owner). Shared top-nav; hero/footer on `/` only. Read before UI. |
 | `refs/design-1/` | Design 1 pack: Cal tokens + composition (homepage + product chrome; busy/cell tokens live here) |
 | `rules/frontend/` | UI/PWA conventions when frontend files are in play |
@@ -47,6 +48,8 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 | `skills/story-loop/` | Story-sized Loop Engineering: answer key → Hybrid implement → Bugbot |
 | `skills/start-building-stories/` | Attended sequential drain: what-next then Local story-loop (`/start-building-stories`) |
 | `skills/deploy-staging/` | How to ship to staging |
+| `skills/research/` | Primary-source research; notes in `docs/research/` (vendored Pocock; Esyres gate) |
+| `skills/diagnosing-bugs/` | Hard-bug / perf diagnosis loop (vendored Pocock; Esyres gate) |
 | `skills/grilling/` | Default interview engine (rounds/frontier); auto before locking a plan. Opt-in `no-human-grilling` / `no-human-review` from story-create wrappers only |
 | `skills/domain-modeling/` | Glossary + ADRs as they lock (via grill-with-docs) |
 | `skills/grill-me/` | User-invoked grilling + end-of-topic persist (`/grill-me`; opt-in `no-human-grilling` / `no-human-review` on product persist) |
@@ -69,6 +72,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 5. Before UI work, read root `DESIGN.md`, then `refs/design-1/DESIGN.md`. Discovery / salon / `/owner` still follow `docs/mvp/04-UI-Design-Goals.md` and `rules/frontend/` for product UX (dense owner Zahtjevi, sparse customer). Homepage hero/footer stay on `/` only; the top-nav is shared (STORY-43). Does not override `docs/mvp/` or `rules/frontend/`.
 6. MengTo UI skills live in `.cursor/skills/`. `landing-page` runs only when the user explicitly asks for the homepage / Esyres landing on `/`. `pricing-page` stays unused (no public pricing). `build-awwwards-quality-sites` only when the user explicitly asks for homepage polish — never discovery, salon, or `/owner`. Code lives in `esyres_app/frontend/`. Never scaffold a `marketing/` folder.
 7. Story loops (Loop Engineering): use `skills/story-loop/` and `loops/PLAYBOOK.md`. Runtime is Hybrid: Local default; Cloud on `unattended` (short paste, no `briefs/` folder). Coding story loops run the **frontend-only classifier** above, then the matching verify (frontend npm only, or full Behat from `esyres_app/`). Cloud Agent: frontend-only is host npm; if Behat runs and Docker is missing or nested, host PHP + host MySQL (STORY-36) — do not apt-install dockerd; Behat still `esyres_test` only. Clear fog with **grilling** rounds; user starts `/grill-with-docs` so glossary and ADRs land on disk. `/new-story`, `/grill-me`, and `/grill-with-docs` accept opt-in `no-human-grilling` / `no-human-review` on product persist (one incremental `STORY-xx`; refuse flags on a full MVP; process/stack no-ops). Those tokens do **not** skip story-loop key approval, Bugbot, or merge; `story-loop`, `what-next`, and `start-building-stories` ignore them. Attended sequential drain is `/start-building-stories` (print what-next, then Local story-loop for Recommended; after merge, continue) — still one story → one PR, not an unattended gauntlet. Do not run unattended whole-MVP gauntlets. Foggy stories use Wayfinder-lite maps under `loops/maps/` before answer keys; sharp stories may skip the map. UI stories: ready on machine gates; visual review is you at merge (no PR screenshot gate). See playbook **UI ready rule**.
+8. Research and hard-bug diagnosis: `skills/research/` and `skills/diagnosing-bugs/` (vendored Pocock; Esyres gate). Research notes go to `docs/research/`. They do not override `docs/mvp/` or `docs/architecture/`. Diagnosis follows CONTEXT verify (frontend npm or Behat); Playwright is not a Behat substitute.
 
 ## Docs index
 
@@ -94,3 +98,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 - `docs/architecture/06-Auth-Notifications-Realtime.md`
 - `docs/architecture/07-Docker-and-Local-Dev.md`
 - `docs/architecture/08-Decisions.md`
+
+**Research (lazy)**
+
+- `docs/research/` (`<slug>.md` from `skills/research/`; not product or architecture truth)

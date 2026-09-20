@@ -6,7 +6,7 @@ This git root is the Cursor/docs workspace. Application code lives in `esyres_ap
 
 - `esyres_app/` — Laravel + PWA (all app commands run here)
 - `esyres_app/frontend/` — product PWA (Vite + React + TypeScript). Company pitch on typed `/`, then discovery.
-- `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from domain-modeling (via grill-with-docs)
+- `docs/` — product (`docs/mvp/`) and architecture (`docs/architecture/`); lazy `docs/glossary.md` and `docs/adr/` from domain-modeling (via grill-with-docs); lazy `docs/research/` from the research skill
 - `.cursor/` — rules, skills, commands, hooks
 - `AGENTS.md` — this file
 

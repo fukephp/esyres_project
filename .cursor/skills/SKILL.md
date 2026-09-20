@@ -24,6 +24,8 @@ Follow `.cursor/CONTEXT.md` first. Then open the matching skill folder.
 | [start-building-stories](start-building-stories/SKILL.md) | Attended sequential drain: what-next then Local story-loop for Recommended (`/start-building-stories`) |
 | [custom-feature-skills](custom-feature-skills/SKILL.md) | Adding or changing a product feature against MVP epics/stories |
 | [deploy-staging](deploy-staging/SKILL.md) | Deploying or preparing a staging release |
+| [research](research/SKILL.md) | Primary-source research; write `docs/research/<slug>.md` |
+| [diagnosing-bugs](diagnosing-bugs/SKILL.md) | Hard-bug / perf diagnosis loop (red-capable feedback first) |
 
 ## UI (vendored from MengTo/Skills, MIT)
 
