@@ -195,6 +195,7 @@ void i18n.use(initReactI18next).init({
           address: 'Adresa',
           save: 'Spremi',
           addSalon: 'Dodaj salon',
+          edit: 'Uredi',
           opens: 'Od',
           closes: 'Do',
           break: 'Pauza',
