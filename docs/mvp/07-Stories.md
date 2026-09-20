@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-67`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-71`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -43,6 +43,7 @@
 - As an owner, I want to see all pending requests for a day in one queue, sorted so urgent ones aren't buried, so that nothing slips through.
 - As an owner, I want to accept a guest's preferred time in one tap when it works, so that simple requests don't need an extra back-and-forth.
 - As an owner, I want to counter-propose a different time from Request Detail, so that I can adjust when the preferred time doesn't fit without dragging.
+- As an owner, I want Request Detail in the same Cal card as Zahtjevi, so that counter-propose is not a blank column after the month-and-list.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 
 ## Epic 4 — Booking Lifecycle & Customer Response
@@ -78,6 +79,7 @@
 - As an owner, I want salon edit split into exclusive sections, so I can edit one chunk at a time on a full-width page instead of a stacked skinny form.
 - As an owner, I want each weekday on Radno vrijeme collapsed until I open it, so that I can scan the week without scrolling through seven expanded editors.
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.
+- As an owner, I want to change my password on `/owner/settings`, so that I can rotate the shared credential without a founder reset.
 
 ## Epic 8 — Trust Signal Data Foundations
 

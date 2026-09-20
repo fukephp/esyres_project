@@ -12,6 +12,10 @@ _Avoid_: account (as a type), member, client user, shopper
 A user who owns at least one salon. The same person can also be a customer. They become an owner by creating a salon on the same account, not by a second user type.
 _Avoid_: merchant, vendor, admin, staff login
 
+**Owner settings**:
+The owner’s person-account page (Postavke). Password for the same person as the customer. Not salon edit and not a customer settings screen.
+_Avoid_: account settings, profile settings, admin, salon settings
+
 **Person name**:
 The person's Ime i prezime. Not the salon name, not a worker name, and not an email local-part.
 _Avoid_: display name, username, handle, full name (as a second field)
@@ -171,8 +175,8 @@ The owner’s list of requested bookings and in-progress reschedules for one sal
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
-The owner’s screen for one booking: pending requests get accept, decline, or counter-propose; occupying bookings (`confirmed` / `time_proposed`) are read-only. The only counter-propose path. Not the pending queue, not the month navigator, and not the customer Time Proposed screen.
-_Avoid_: booking detail, request modal, tap fallback (as a screen name)
+The owner’s screen for one booking, in the same Cal card chrome as Zahtjevi: pending requests get accept, decline, or counter-propose; occupying bookings (`confirmed` / `time_proposed`) are read-only. The only counter-propose path. Not the pending queue, not the month navigator, not a salon-edit panel, and not the customer Time Proposed screen.
+_Avoid_: booking detail, request modal, tap fallback (as a screen name), settings panel
 
 **Assistant-originated**:
 A request sent from the salon booking assistant, not the picker. Same request as any other. The owner sees it tagged Asistent. Not an in-flight chat and not a second inbox.
