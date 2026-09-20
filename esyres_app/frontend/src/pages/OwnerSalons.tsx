@@ -91,22 +91,32 @@ export function OwnerSalons() {
         </aside>
         <main className="flex-1 px-5 py-8">
           <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.salons')}</h1>
+          <Link
+            to={ownerSalonCreatePath()}
+            aria-label={t('owner.addSalon')}
+            className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]"
+          >
+            +
+          </Link>
           <div className="md:hidden">
             <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
           </div>
-          <ul className="mt-8 max-w-xl divide-y divide-hairline border-y border-hairline">
+          <ul className="mt-8 max-w-xl space-y-3">
             {salons.map((row) => (
-              <li key={row.id} className="flex items-baseline justify-between gap-3 py-3 text-sm">
-                <Link to={ownerSalonEditPath(row.id)} className="font-medium text-ink">
-                  {row.name}
+              <li key={row.id} className="flex items-center justify-between gap-3 border border-hairline p-5">
+                <div>
+                  <p className="font-medium text-ink">{row.name}</p>
+                  <p className="text-sm text-body">{t(salonIsOpenNow(row.hours) ? 'owner.openNow' : 'owner.closedNow')}</p>
+                </div>
+                <Link
+                  to={ownerSalonEditPath(row.id)}
+                  className="inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink"
+                >
+                  {t('owner.edit')}
                 </Link>
-                <span className="text-body">{t(salonIsOpenNow(row.hours) ? 'owner.openNow' : 'owner.closedNow')}</span>
               </li>
             ))}
           </ul>
-          <Link to={ownerSalonCreatePath()} className="mt-4 inline-block text-sm font-semibold text-ink">
-            {t('owner.addSalon')}
-          </Link>
         </main>
       </div>
     </>

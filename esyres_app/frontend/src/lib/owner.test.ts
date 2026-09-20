@@ -400,6 +400,7 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.address')).toBe('Adresa')
   expect(i18n.t('owner.save')).toBe('Spremi')
   expect(i18n.t('owner.addSalon')).toBe('Dodaj salon')
+  expect(i18n.t('owner.edit')).toBe('Uredi')
   expect(i18n.t('owner.opens')).toBe('Od')
   expect(i18n.t('owner.closes')).toBe('Do')
   expect(i18n.t('owner.break')).toBe('Pauza')
