@@ -37,12 +37,24 @@ The owner control that chooses which of their salons is in context. Shown only w
 _Avoid_: location switcher, branch picker, store selector
 
 **Salon catalog**:
-The owner’s list of salons they own. Each row shows whether that shop is open now. Not discovery home, not the salon switcher, and not Zahtjevi.
-_Avoid_: salon list (guest), locations, dashboard, salons index (as discovery)
+The owner’s list of salons they own. Each shop shows whether it is open now. Not discovery home, not the salon switcher, and not Zahtjevi.
+_Avoid_: salon list (guest), locations, dashboard, salons index (as discovery), table
 
 **Salon edit**:
-The owner screen for one salon they own. One of four sections is visible at a time: name and address, working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not Zahtjevi.
+The owner screen for one salon they own. One of four sections is visible at a time: Informacije (name, address, optional salon description, optional main image, optional gallery), working hours, services, and workers. Not the guest salon profile, not the salon catalog, and not Zahtjevi.
 _Avoid_: settings, salon profile, admin, CMS, working days (as the hours section)
+
+**Salon description**:
+Optional plain-text copy the owner writes on Informacije. Empty is allowed. Not a service description, not markdown, and not shown on the guest salon profile in this slice.
+_Avoid_: bio, about, cover copy, HTML, rich text
+
+**Main image**:
+The salon’s one optional hero file on Informacije. Not a gallery item and not a discovery card photo.
+_Avoid_: cover, hero, facade, profile photo, thumbnail
+
+**Gallery**:
+Up to six extra salon images on Informacije, in upload order, not including the main image. Not an album, not a fifth chip, and not shown on the guest salon profile in this slice.
+_Avoid_: album, carousel, photos (as a chip), media library
 
 **Salon profile**:
 The guest-facing page for one salon: name, optional address, working hours, services with prices, and busy-level. Not the owner settings screen and not the discovery list.

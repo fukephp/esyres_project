@@ -67,7 +67,9 @@
 
 - As a customer who has a salon, I want to create it on the same account from Get your panel, so that I can open the panel without a founder invite.
 - As an owner, I want a salon catalog of shops I own with whether each is open now, so that I can see all my shops without treating the switcher as a directory.
+- As an owner, I want my salon catalog as boxed shops with an Edit button and a plus under the title to add another shop, so that I can pick a shop or create one without a table list.
 - As an owner, I want to edit a salon’s name and address on `/owner/salons/:id`, so that the catalog has a place for the rest of the profile to land.
+- As an owner, I want to add a description, a main image, and a gallery on salon edit Informacije, so that the shop’s catalog copy and photos live on Esyres before guests see them.
 - As an owner, I want to add another salon I own from `/owner/salons/create` with name and address, so that I do not reuse `/create-salon` as a second factory.
 - As an owner, I want to set my working hours, breaks, and cancellation notice window, so that the system reflects how my salon actually runs.
 - As an owner, I want to add/edit services with durations and prices, so that customers see accurate options.
