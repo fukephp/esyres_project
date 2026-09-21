@@ -12,16 +12,21 @@ import {
   CREATE_SALON_WORKER_MUTATION,
   DELETE_SALON_SERVICE_CATEGORY_MUTATION,
   ME_QUERY,
+  REMOVE_SALON_GALLERY_IMAGE_MUTATION,
+  REMOVE_SALON_MAIN_IMAGE_MUTATION,
   UPDATE_SALON_HOURS_MUTATION,
   UPDATE_SALON_MUTATION,
   UPDATE_SALON_SERVICE_CATEGORY_MUTATION,
   UPDATE_SALON_SERVICE_MUTATION,
   UPDATE_SALON_WORKER_MUTATION,
+  UPLOAD_SALON_GALLERY_IMAGE_MUTATION,
+  UPLOAD_SALON_MAIN_IMAGE_MUTATION,
   type MeData,
 } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { graphqlErrorCode } from '../lib/booking'
+import { graphqlUpload } from '../lib/graphqlUpload'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
@@ -39,6 +44,12 @@ const FIELD =
   'mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink'
 const SAVE_BTN =
   'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
+const PLUS_BTN =
+  'inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]'
+const REMOVE_BTN =
+  'inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink'
+const THUMB = 'h-24 w-24 border border-hairline object-cover'
+const FILE_ACCEPT = 'image/jpeg,image/png,image/webp'
 const CHIP_IDLE = 'text-body'
 const CHIP_ON = 'font-semibold text-ink'
 const PANEL = 'mt-8 space-y-4 border border-hairline p-5'
@@ -76,6 +87,19 @@ function daysFromHours(hours: PanelHours[]): SalonHoursDayForm[] {
       breakEndsAt: row?.breakEndsAt ?? '',
     }
   })
+}
+
+function mediaFail(code: string, t: (key: string) => string): string {
+  if (code === 'INVALID_IMAGE_TYPE') {
+    return t('owner.INVALID_IMAGE_TYPE')
+  }
+  if (code === 'IMAGE_TOO_LARGE') {
+    return t('owner.IMAGE_TOO_LARGE')
+  }
+  if (code === 'GALLERY_FULL') {
+    return t('owner.GALLERY_FULL')
+  }
+  return t('salon.gate.fallback')
 }
 
 function categoryFail(code: string, t: (key: string) => string): string {
@@ -335,6 +359,8 @@ export function OwnerSalonEdit() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [updateSalon, { loading: savingSalon }] = useMutation(UPDATE_SALON_MUTATION)
   const [updateSalonHours, { loading: savingHours }] = useMutation(UPDATE_SALON_HOURS_MUTATION)
+  const [removeSalonMainImage] = useMutation(REMOVE_SALON_MAIN_IMAGE_MUTATION)
+  const [removeSalonGalleryImage] = useMutation(REMOVE_SALON_GALLERY_IMAGE_MUTATION)
   const [createSalonServiceCategory] = useMutation<{
     createSalonServiceCategory: { id: string; name: string }
   }>(CREATE_SALON_SERVICE_CATEGORY_MUTATION)
@@ -344,9 +370,11 @@ export function OwnerSalonEdit() {
   const [openWeekday, setOpenWeekday] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const [description, setDescription] = useState('')
   const [days, setDays] = useState<SalonHoursDayForm[]>(emptyWeek)
   const [notice, setNotice] = useState('24')
   const [infoError, setInfoError] = useState<string | null>(null)
+  const [mediaError, setMediaError] = useState<string | null>(null)
   const [hoursError, setHoursError] = useState<string | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState('')
   const [categoryName, setCategoryName] = useState('')
@@ -375,6 +403,7 @@ export function OwnerSalonEdit() {
     }
     setName(salon.name)
     setAddress(salon.address ?? '')
+    setDescription(salon.description ?? '')
     setDays(daysFromHours(salon.hours))
     setNotice(String(salon.cancellationNoticeHours ?? 24))
   }, [salon])
@@ -407,7 +436,7 @@ export function OwnerSalonEdit() {
     setInfoError(null)
     try {
       await updateSalon({
-        variables: { salonId: salon.id, input: { name, address } },
+        variables: { salonId: salon.id, input: { name, address, description } },
       })
       await refetch()
     } catch (err) {
@@ -416,6 +445,8 @@ export function OwnerSalonEdit() {
         setInfoError(t('owner.INVALID_NAME'))
       } else if (code === 'INVALID_ADDRESS') {
         setInfoError(t('owner.INVALID_ADDRESS'))
+      } else if (code === 'DESCRIPTION_TOO_LONG') {
+        setInfoError(t('owner.DESCRIPTION_TOO_LONG'))
       } else {
         setInfoError(t('salon.gate.fallback'))
       }
@@ -500,6 +531,58 @@ export function OwnerSalonEdit() {
       await refetch()
     } catch (err) {
       setCategoryError(categoryFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onMainFile(file: File): Promise<void> {
+    if (salon === undefined) {
+      return
+    }
+    setMediaError(null)
+    try {
+      await graphqlUpload(UPLOAD_SALON_MAIN_IMAGE_MUTATION, { salonId: salon.id }, file)
+      await refetch()
+    } catch (err) {
+      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onGalleryFile(file: File): Promise<void> {
+    if (salon === undefined) {
+      return
+    }
+    setMediaError(null)
+    try {
+      await graphqlUpload(UPLOAD_SALON_GALLERY_IMAGE_MUTATION, { salonId: salon.id }, file)
+      await refetch()
+    } catch (err) {
+      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onRemoveMain(): Promise<void> {
+    if (salon === undefined) {
+      return
+    }
+    setMediaError(null)
+    try {
+      await removeSalonMainImage({ variables: { salonId: salon.id } })
+      await refetch()
+    } catch (err) {
+      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
+    }
+  }
+
+  async function onRemoveGallery(index: number): Promise<void> {
+    if (salon === undefined) {
+      return
+    }
+    setMediaError(null)
+    try {
+      await removeSalonGalleryImage({ variables: { salonId: salon.id, index } })
+      await refetch()
+    } catch (err) {
+      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
     }
   }
 
@@ -627,6 +710,80 @@ export function OwnerSalonEdit() {
                     className={FIELD}
                   />
                 </label>
+                <label className="block text-sm text-body">
+                  {t('owner.description')}
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                    maxLength={1000}
+                    className={FIELD}
+                  />
+                </label>
+                <div className="space-y-2">
+                  <p className="text-sm text-body">{t('owner.mainImage')}</p>
+                  {salon.mainImageUrl ? (
+                    <div className="flex items-center gap-3">
+                      <img src={salon.mainImageUrl} alt="" className={THUMB} />
+                      <button type="button" className={REMOVE_BTN} onClick={() => void onRemoveMain()}>
+                        {t('owner.removeImage')}
+                      </button>
+                    </div>
+                  ) : (
+                    <label className={PLUS_BTN}>
+                      <span aria-hidden>+</span>
+                      <input
+                        type="file"
+                        accept={FILE_ACCEPT}
+                        className="hidden"
+                        aria-label={t('owner.addImage')}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          e.target.value = ''
+                          if (file) {
+                            void onMainFile(file)
+                          }
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-body">{t('owner.gallery')}</p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {salon.galleryUrls.map((url, index) => (
+                      <div key={url} className="flex items-center gap-3">
+                        <img src={url} alt="" className={THUMB} />
+                        <button
+                          type="button"
+                          className={REMOVE_BTN}
+                          onClick={() => void onRemoveGallery(index)}
+                        >
+                          {t('owner.removeImage')}
+                        </button>
+                      </div>
+                    ))}
+                    {salon.galleryUrls.length < 6 ? (
+                      <label className={PLUS_BTN}>
+                        <span aria-hidden>+</span>
+                        <input
+                          type="file"
+                          accept={FILE_ACCEPT}
+                          className="hidden"
+                          aria-label={t('owner.addImage')}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            e.target.value = ''
+                            if (file) {
+                              void onGalleryFile(file)
+                            }
+                          }}
+                        />
+                      </label>
+                    ) : null}
+                  </div>
+                </div>
+                {mediaError ? <p className="text-sm text-busy-busy">{mediaError}</p> : null}
                 {infoError ? <p className="text-sm text-busy-busy">{infoError}</p> : null}
                 <button type="submit" disabled={savingSalon} className={SAVE_BTN}>
                   {t('owner.save')}

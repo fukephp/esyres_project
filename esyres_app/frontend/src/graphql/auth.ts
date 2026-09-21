@@ -13,6 +13,9 @@ export const ME_QUERY = gql`
         id
         name
         address
+        description
+        mainImageUrl
+        galleryUrls
         cancellationNoticeHours
         hours {
           weekday
@@ -94,6 +97,47 @@ export const UPDATE_SALON_MUTATION = gql`
       id
       name
       address
+      description
+      mainImageUrl
+      galleryUrls
+    }
+  }
+`
+
+export const UPLOAD_SALON_MAIN_IMAGE_MUTATION = `mutation UploadSalonMainImage($salonId: ID!, $file: Upload!) {
+  uploadSalonMainImage(salonId: $salonId, file: $file) {
+    id
+    description
+    mainImageUrl
+    galleryUrls
+  }
+}`
+
+export const REMOVE_SALON_MAIN_IMAGE_MUTATION = gql`
+  mutation RemoveSalonMainImage($salonId: ID!) {
+    removeSalonMainImage(salonId: $salonId) {
+      id
+      mainImageUrl
+      galleryUrls
+    }
+  }
+`
+
+export const UPLOAD_SALON_GALLERY_IMAGE_MUTATION = `mutation UploadSalonGalleryImage($salonId: ID!, $file: Upload!) {
+  uploadSalonGalleryImage(salonId: $salonId, file: $file) {
+    id
+    description
+    mainImageUrl
+    galleryUrls
+  }
+}`
+
+export const REMOVE_SALON_GALLERY_IMAGE_MUTATION = gql`
+  mutation RemoveSalonGalleryImage($salonId: ID!, $index: Int!) {
+    removeSalonGalleryImage(salonId: $salonId, index: $index) {
+      id
+      mainImageUrl
+      galleryUrls
     }
   }
 `
@@ -219,6 +263,9 @@ export type MeData = {
       id: string
       name: string
       address: string | null
+      description: string | null
+      mainImageUrl: string | null
+      galleryUrls: string[]
       cancellationNoticeHours: number
       hours: {
         weekday: string

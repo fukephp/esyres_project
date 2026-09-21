@@ -4,6 +4,7 @@ namespace App\GraphQL\Queries;
 
 use App\GraphQL\OwnerAccess;
 use App\Models\Salon;
+use App\SalonMedia\SalonImages;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class SalonOwnerField
@@ -48,5 +49,31 @@ final class SalonOwnerField
         OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
 
         return (int) ($salon->fresh()?->late_cancel_count ?? 0);
+    }
+
+    public function description(Salon $salon, array $args, GraphQLContext $context): ?string
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        $value = $salon->description;
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    public function mainImageUrl(Salon $salon, array $args, GraphQLContext $context): ?string
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return SalonImages::publicUrl(is_string($salon->main_image_path) ? $salon->main_image_path : null);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function galleryUrls(Salon $salon, array $args, GraphQLContext $context): array
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return SalonImages::galleryUrls($salon);
     }
 }

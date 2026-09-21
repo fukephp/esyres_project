@@ -9,7 +9,9 @@ use App\SalonHours\WeeklyHours;
 use Behat\Gherkin\Node\PyStringNode;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LocalDemoSeeder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 trait OwnerSteps
 {
@@ -1770,6 +1772,7 @@ mutation UpdateSalon($salonId: ID!, $input: UpdateSalonInput!) {
     id
     name
     address
+    description
   }
 }
 GQL;
@@ -2061,5 +2064,337 @@ GQL;
         $this->assertNotNull($proposed->proposed_starts_at);
         $this->assertNotNull($proposed->proposed_worker_id);
         $this->assertNotNull($confirmed->worker_id);
+    }
+
+    /**
+     * @When I query my salon media
+     */
+    public function iQueryMySalonMedia(): void
+    {
+        $this->graphql($this->mySalonMediaQuery());
+    }
+
+    /**
+     * @When I query salon media as a guest
+     */
+    public function iQuerySalonMediaAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonMediaQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I upload a :kind main image
+     */
+    public function iUploadAMainImage(string $kind): void
+    {
+        $this->graphqlMultipart($this->uploadMainMutation(), [
+            'salonId' => (string) $this->salon->id,
+        ], $this->fakeImage($kind));
+        $this->salon = $this->salon->fresh();
+    }
+
+    /**
+     * @When I upload a main image as a guest
+     */
+    public function iUploadAMainImageAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphqlMultipart($this->uploadMainMutation(), [
+            'salonId' => (string) $this->salon->id,
+        ], $this->fakeImage('jpeg'));
+    }
+
+    /**
+     * @When I upload a gallery jpeg
+     */
+    public function iUploadAGalleryJpeg(): void
+    {
+        $this->graphqlMultipart($this->uploadGalleryMutation(), [
+            'salonId' => (string) $this->salon->id,
+        ], $this->fakeImage('jpeg'));
+        $this->salon = $this->salon->fresh();
+    }
+
+    /**
+     * @When I upload a gallery jpeg 6 times
+     */
+    public function iUploadAGalleryJpeg6Times(): void
+    {
+        for ($i = 0; $i < 6; $i++) {
+            $this->iUploadAGalleryJpeg();
+            $this->assertNoGraphqlErrors();
+        }
+    }
+
+    /**
+     * @When I remove the main image
+     */
+    public function iRemoveTheMainImage(): void
+    {
+        $this->graphql($this->removeMainMutation(), ['salonId' => (string) $this->salon->id]);
+        $this->salon = $this->salon->fresh();
+    }
+
+    /**
+     * @When I remove gallery index :index
+     */
+    public function iRemoveGalleryIndex(string $index): void
+    {
+        $this->graphql($this->removeGalleryMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'index' => (int) $index,
+        ]);
+        $this->salon = $this->salon->fresh();
+    }
+
+    /**
+     * @When I remember the main image path
+     */
+    public function iRememberTheMainImagePath(): void
+    {
+        $this->rememberedMainPath = $this->salon->fresh()?->main_image_path;
+        if (! is_string($this->rememberedMainPath) || $this->rememberedMainPath === '') {
+            throw new RuntimeException('Expected a stored main image path');
+        }
+    }
+
+    /**
+     * @Then the remembered main image is gone
+     */
+    public function theRememberedMainImageIsGone(): void
+    {
+        if (! is_string($this->rememberedMainPath) || $this->rememberedMainPath === '') {
+            throw new RuntimeException('No remembered main image path');
+        }
+        $this->assertFalse(Storage::disk('public')->exists($this->rememberedMainPath));
+    }
+
+    /**
+     * @Then the salon has no description
+     */
+    public function theSalonHasNoDescription(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->mySalonMediaRow();
+        $this->assertNull($row['description']);
+        $this->assertNull($this->salon->fresh()?->description);
+    }
+
+    /**
+     * @Then my salon description is :text
+     */
+    public function mySalonDescriptionIs(string $text): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($text, $this->mySalonMediaRow()['description']);
+        $this->assertSame($text, $this->salon->fresh()?->description);
+    }
+
+    /**
+     * @Then updateSalon has no description
+     */
+    public function updateSalonHasNoDescription(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNull($this->graphql['data']['updateSalon']['description']);
+    }
+
+    /**
+     * @Then updateSalon description is :text
+     */
+    public function updateSalonDescriptionIs(string $text): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($text, $this->graphql['data']['updateSalon']['description']);
+    }
+
+    /**
+     * @When I update the salon description to 1001 characters
+     */
+    public function iUpdateTheSalonDescriptionTo1001Characters(): void
+    {
+        $this->graphql($this->updateSalonMutation(), [
+            'salonId' => (string) $this->salon->id,
+            'input' => [
+                'name' => 'Kosa Studio',
+                'address' => 'Ferhadija 12',
+                'description' => str_repeat('x', 1001),
+            ],
+        ]);
+    }
+
+    /**
+     * @Then my salon main image is empty
+     */
+    public function mySalonMainImageIsEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNull($this->mySalonMediaRow()['mainImageUrl']);
+        $this->assertNull($this->salon->fresh()?->main_image_path);
+    }
+
+    /**
+     * @Then my salon gallery is empty
+     */
+    public function mySalonGalleryIsEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->mySalonMediaRow()['galleryUrls']);
+    }
+
+    /**
+     * @Then salon main image is on disk
+     */
+    public function salonMainImageIsOnDisk(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $path = $this->salon->fresh()?->main_image_path;
+        $this->assertIsString($path);
+        $this->assertTrue(Storage::disk('public')->exists($path));
+        $fromUpload = $this->graphql['data']['uploadSalonMainImage']['mainImageUrl'] ?? null;
+        $url = is_string($fromUpload) ? $fromUpload : $this->mySalonMediaRow()['mainImageUrl'];
+        $this->assertIsString($url);
+        $this->assertStringStartsWith('/storage/', $url);
+    }
+
+    /**
+     * @Then salon gallery count is :count
+     */
+    public function salonGalleryCountIs(string $count): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->iQueryMySalonMedia();
+        $this->assertNoGraphqlErrors();
+        $this->assertCount((int) $count, $this->mySalonMediaRow()['galleryUrls']);
+        foreach ($this->mySalonMediaRow()['galleryUrls'] as $url) {
+            $this->assertStringStartsWith('/storage/', $url);
+        }
+    }
+
+    /**
+     * @Then salon name is still :name
+     */
+    public function salonNameIsStill(string $name): void
+    {
+        $this->assertSame($name, $this->salon->fresh()?->name);
+    }
+
+    private function fakeImage(string $kind): UploadedFile
+    {
+        return match ($kind) {
+            'jpeg' => UploadedFile::fake()->createWithContent(
+                'main.jpg',
+                (string) hex2bin('ffd8ffe000104a46494600010100000100010000ffdb004300080606070605080707070909080a0c140d0c0b0b0c1912130f141d1a1f1e1d1a1c1c20242e2720222c232c2c28003c32383a3c3e3b3c3a3d40484c45403a3d3e3f4141414141414141414141414141ffc0000b080001000101011100ffc400140001000000000000000000000000000008ffc400141001000000000000000000000000000000ffda0008010100003f0037ffd9'),
+            ),
+            'png' => UploadedFile::fake()->createWithContent('main.png', (string) base64_decode(
+                'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+                true,
+            )),
+            'webp' => UploadedFile::fake()->createWithContent('main.webp', (string) base64_decode(
+                'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA',
+                true,
+            )),
+            'gif' => UploadedFile::fake()->create('main.gif', 20, 'image/gif'),
+            'oversize' => UploadedFile::fake()->create('big.jpg', 5121, 'image/jpeg'),
+            default => throw new RuntimeException('Unknown image kind '.$kind),
+        };
+    }
+
+    /**
+     * @return array{description: mixed, mainImageUrl: mixed, galleryUrls: mixed}
+     */
+    private function mySalonMediaRow(): array
+    {
+        $list = $this->graphql['data']['me']['salons'] ?? null;
+        if (! is_array($list)) {
+            throw new RuntimeException('Expected me.salons, got '.json_encode($this->graphql));
+        }
+        foreach ($list as $row) {
+            if ((string) ($row['id'] ?? '') === (string) $this->salon->id) {
+                return $row;
+            }
+        }
+        throw new RuntimeException('Salon missing from me.salons');
+    }
+
+    private function mySalonMediaQuery(): string
+    {
+        return <<<'GQL'
+query MeSalonMedia {
+  me {
+    salons {
+      id
+      description
+      mainImageUrl
+      galleryUrls
+    }
+  }
+}
+GQL;
+    }
+
+    private function salonMediaQuery(): string
+    {
+        return <<<'GQL'
+query SalonMedia($id: ID!) {
+  salon(id: $id) {
+    id
+    description
+    mainImageUrl
+    galleryUrls
+  }
+}
+GQL;
+    }
+
+    private function uploadMainMutation(): string
+    {
+        return <<<'GQL'
+mutation UploadMain($salonId: ID!, $file: Upload!) {
+  uploadSalonMainImage(salonId: $salonId, file: $file) {
+    id
+    description
+    mainImageUrl
+    galleryUrls
+  }
+}
+GQL;
+    }
+
+    private function uploadGalleryMutation(): string
+    {
+        return <<<'GQL'
+mutation UploadGallery($salonId: ID!, $file: Upload!) {
+  uploadSalonGalleryImage(salonId: $salonId, file: $file) {
+    id
+    galleryUrls
+  }
+}
+GQL;
+    }
+
+    private function removeMainMutation(): string
+    {
+        return <<<'GQL'
+mutation RemoveMain($salonId: ID!) {
+  removeSalonMainImage(salonId: $salonId) {
+    id
+    mainImageUrl
+  }
+}
+GQL;
+    }
+
+    private function removeGalleryMutation(): string
+    {
+        return <<<'GQL'
+mutation RemoveGallery($salonId: ID!, $index: Int!) {
+  removeSalonGalleryImage(salonId: $salonId, index: $index) {
+    id
+    galleryUrls
+  }
+}
+GQL;
     }
 }

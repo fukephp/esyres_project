@@ -29,6 +29,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/graphql': api,
+      '/storage': api,
       '/sanctum': api,
       '/qr': api,
       '/app': {
