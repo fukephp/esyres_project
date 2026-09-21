@@ -34,7 +34,10 @@ input UpdateSalonHoursInput {
 input UpdateSalonInput {
     name: String!
     address: String!
+    description: String
 }
+
+scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
 enum BusyLevel {
     LOW
@@ -195,6 +198,9 @@ type Salon {
     noShowCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@noShowCount")
     cancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@cancelCount")
     lateCancelCount: Int! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@lateCancelCount")
+    description: String @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@description")
+    mainImageUrl: String @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@mainImageUrl")
+    galleryUrls: [String!]! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@galleryUrls")
     hours: [DayHours!]! @method(name: "dayHours")
     serviceCategories: [SalonServiceCategory!]! @method(name: "serviceCategoryList")
     services: [Service!]! @method(name: "serviceList")
@@ -255,6 +261,10 @@ type Mutation {
     createSalon(name: String!): Salon!
     addSalon(name: String!, address: String!): Salon!
     updateSalon(salonId: ID!, input: UpdateSalonInput!): Salon!
+    uploadSalonMainImage(salonId: ID!, file: Upload!): Salon!
+    removeSalonMainImage(salonId: ID!): Salon!
+    uploadSalonGalleryImage(salonId: ID!, file: Upload!): Salon!
+    removeSalonGalleryImage(salonId: ID!, index: Int!): Salon!
     createSalonService(salonId: ID!, input: CreateSalonServiceInput!): Service
     updateSalonService(id: ID!, input: UpdateSalonServiceInput!): Service
     createSalonServiceCategory(salonId: ID!, input: CreateSalonServiceCategoryInput!): SalonServiceCategory

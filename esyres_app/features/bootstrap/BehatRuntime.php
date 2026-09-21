@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\UploadedFile;
 
 trait BehatRuntime
 {
@@ -85,6 +86,8 @@ trait BehatRuntime
 
     protected ?string $rememberedPhoneVerifiedAt = null;
 
+    protected ?string $rememberedMainPath = null;
+
     /** @BeforeScenario */
     public function bootApplication(): void
     {
@@ -116,6 +119,7 @@ trait BehatRuntime
         $this->rememberedNoShowAt = null;
         $this->rememberedEmailVerifiedAt = null;
         $this->rememberedPhoneVerifiedAt = null;
+        $this->rememberedMainPath = null;
 
         if (BehatKernel::$app === null) {
             $this->bootEnvironment();
@@ -220,6 +224,39 @@ trait BehatRuntime
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $variables
+     */
+    protected function graphqlMultipart(string $query, array $variables, UploadedFile $file, string $fileField = 'file'): void
+    {
+        $this->forgetRequestUser();
+        $variables[$fileField] = null;
+        $response = $this->call(
+            'POST',
+            '/graphql',
+            [
+                'operations' => json_encode(['query' => $query, 'variables' => $variables], JSON_THROW_ON_ERROR),
+                'map' => json_encode(['0' => ['variables.'.$fileField]], JSON_THROW_ON_ERROR),
+            ],
+            [],
+            ['0' => $file],
+            $this->transformHeadersToServerVars([
+                'Accept' => 'application/json',
+                'X-Requested-With' => 'XMLHttpRequest',
+                'Content-Type' => 'multipart/form-data',
+            ]),
+        );
+        if ($response->status() === 419) {
+            throw new RuntimeException('CSRF mismatch on /graphql');
+        }
+        $this->rememberCookies($response);
+        $this->withHeader('X-CSRF-TOKEN', $this->app['session']->token());
+        $this->graphql = $response->json() ?? [
+            'raw' => $response->getContent(),
+            'status' => $response->status(),
+        ];
+    }
+
     protected function rememberCookies(\Illuminate\Testing\TestResponse $response): void
     {
         $this->lastSetCookies = $response->headers->getCookies();
@@ -265,6 +302,41 @@ trait BehatRuntime
     {
         if ($value === null) {
             throw new RuntimeException('Expected not null');
+        }
+    }
+
+    protected function assertNull(mixed $value): void
+    {
+        if ($value !== null) {
+            throw new RuntimeException('Expected null, got '.json_encode($value));
+        }
+    }
+
+    protected function assertFalse(mixed $value): void
+    {
+        if ($value !== false) {
+            throw new RuntimeException('Expected false');
+        }
+    }
+
+    protected function assertIsString(mixed $value): void
+    {
+        if (! is_string($value)) {
+            throw new RuntimeException('Expected string, got '.json_encode($value));
+        }
+    }
+
+    protected function assertCount(int $expected, mixed $value): void
+    {
+        if (! is_array($value) || count($value) !== $expected) {
+            throw new RuntimeException('Expected count '.$expected.', got '.json_encode($value));
+        }
+    }
+
+    protected function assertStringStartsWith(string $prefix, mixed $value): void
+    {
+        if (! is_string($value) || ! str_starts_with($value, $prefix)) {
+            throw new RuntimeException('Expected prefix '.$prefix.', got '.json_encode($value));
         }
     }
 

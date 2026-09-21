@@ -83,6 +83,13 @@ test('address is optional text line; no maps', () => {
   expect(page).not.toMatch(/\blat\b|\blng\b/)
 })
 
+test('public salon query stays photoless', () => {
+  const query = read('graphql/salon.ts')
+  expect(query).not.toMatch(/description/)
+  expect(query).not.toMatch(/mainImageUrl/)
+  expect(query).not.toMatch(/galleryUrls/)
+})
+
 test('aside stays empty; send pill is under hours after a day', () => {
   const page = read('pages/SalonProfile.tsx')
   const asideStart = page.indexOf('<aside className={SALON_BOOKING_ASIDE_CLASS}')

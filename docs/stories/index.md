@@ -91,6 +91,6 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-66 | Dobrodošli + person name in every top-nav | 1 | `STORY-66` | STORY-43, STORY-46, STORY-62 |
 | STORY-67 | Zahtjevi month navigator and selected-day list | 3 | `STORY-67` | STORY-13, STORY-14, STORY-15, STORY-16, STORY-17, STORY-42, STORY-49, STORY-61 |
 | STORY-68 | Salon catalog boxed shops, Uredi, header plus | 7 | `STORY-68` | STORY-50, STORY-51, STORY-52 |
-| STORY-69 | Description, main image, and gallery on Informacije | 7 | — | STORY-56 |
+| STORY-69 | Description, main image, and gallery on Informacije | 7 | `STORY-69` | STORY-56 |
 | STORY-70 | Request Detail Cal card | 3 | — | STORY-16, STORY-67 |
 | STORY-71 | Owner settings password | 7 | — | STORY-10, STORY-50 |

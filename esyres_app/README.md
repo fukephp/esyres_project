@@ -33,7 +33,7 @@ docker compose exec -T vite npm run build
 
 Behat loads `.env.behat` (`esyres_test` only; never the seeded `esyres` app DB). Do not `migrate:fresh` on `esyres`. Cloud Agent: frontend-only is host npm from `frontend/` (no PHP/MySQL). If Behat runs without a real Docker daemon: host PHP + host MySQL (same Behat flags); do not nest `docker.io`.
 
-First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`.
+First time: `docker compose build php`. If MySQL was created before `docker/mysql/init.sql` existed, recreate it: `docker compose down -v` then `docker compose up -d`. Frontend `node_modules`: vite installs on first start if missing, or `docker compose exec -T vite npm install`. Owner salon photos (`public` disk) need the storage symlink once: `docker compose exec -T php php artisan storage:link`. Vite proxies `/storage` to the php service.
 
 If `up` fails on 5173 or 8000, stop leftover `php-run-*` / `node-run-*` one-offs first. Reuse those ports; do not publish 5174/8001. Reverb is :8080. MySQL is :3310.
 
