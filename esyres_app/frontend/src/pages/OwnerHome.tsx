@@ -547,6 +547,11 @@ function OccupyingRow({ row }: { row: OccupyingBooking }) {
             {t('bookings.status.TIME_PROPOSED')}
           </span>
         ) : null}
+        {row.noShowAt ? (
+          <span className="mt-1 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+            {t('owner.noShow')}
+          </span>
+        ) : null}
       </span>
     </Link>
   )

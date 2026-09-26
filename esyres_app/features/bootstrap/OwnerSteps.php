@@ -731,6 +731,80 @@ trait OwnerSteps
     }
 
     /**
+     * @When I query prior confirmed bookings for this booking
+     */
+    public function iQueryPriorConfirmedBookingsForThisBooking(): void
+    {
+        $this->graphql(<<<'GQL'
+query OwnerBooking($id: ID!) {
+  ownerBooking(id: $id) {
+    id
+    priorConfirmedBookings {
+      preferredDate
+      noShowAt
+      services { name }
+    }
+  }
+}
+GQL, ['id' => (string) $this->booking->id]);
+    }
+
+    /**
+     * @Then prior confirmed booking dates are :dates
+     */
+    public function priorConfirmedBookingDatesAre(string $dates): void
+    {
+        $this->assertNoGraphqlErrors();
+        $rows = $this->graphql['data']['ownerBooking']['priorConfirmedBookings'];
+        $actual = array_map(static fn (array $row): string => $row['preferredDate'], $rows);
+        $expected = array_map('trim', explode(',', $dates));
+        $this->assertSame($expected, $actual);
+        foreach ($rows as $row) {
+            $this->assertSame(['Šišanje'], array_column($row['services'], 'name'));
+        }
+    }
+
+    /**
+     * @Then there are no prior confirmed bookings
+     */
+    public function thereAreNoPriorConfirmedBookings(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['ownerBooking']['priorConfirmedBookings']);
+    }
+
+    /**
+     * @Then the prior booking on :date has a no-show stamp
+     */
+    public function thePriorBookingOnHasANoShowStamp(string $date): void
+    {
+        $this->assertNotNull($this->priorBookingOn($date)['noShowAt']);
+    }
+
+    /**
+     * @Then the prior booking on :date has no no-show stamp
+     */
+    public function thePriorBookingOnHasNoNoShowStamp(string $date): void
+    {
+        $this->assertNull($this->priorBookingOn($date)['noShowAt']);
+    }
+
+    /**
+     * @return array{preferredDate: string, noShowAt: ?string, services: list<array{name: string}>}
+     */
+    private function priorBookingOn(string $date): array
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->graphql['data']['ownerBooking']['priorConfirmedBookings'] as $row) {
+            if ($row['preferredDate'] === $date) {
+                return $row;
+            }
+        }
+
+        throw new RuntimeException("Expected prior booking on {$date}");
+    }
+
+    /**
      * @Then the owner booking matches:
      */
     public function theOwnerBookingMatches(PyStringNode $payload): void

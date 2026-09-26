@@ -11,12 +11,14 @@ import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../g
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   DECLINE_BOOKING_MUTATION,
+  MARK_NO_SHOW_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
   OWNER_BOOKING_QUERY,
   OWNER_SALON_QUERY,
   PROPOSE_TIME_MUTATION,
   type OccupyingBookingsData,
   type OccupyingBooking,
+  type OwnerBooking,
   type OwnerBookingData,
   type OwnerSalonData,
 } from '../graphql/pending'
@@ -55,6 +57,7 @@ export function OwnerRequestDetail() {
     data: bookingData,
     loading: bookingLoading,
     error: bookingError,
+    refetch: refetchBooking,
   } = useQuery<OwnerBookingData>(OWNER_BOOKING_QUERY, {
     variables: { id },
     skip: !ownerReady || id === '',
@@ -81,12 +84,14 @@ export function OwnerRequestDetail() {
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
+  const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
   const [workerId, setWorkerId] = useState('')
   const [time, setTime] = useState('')
   const [busy, setBusy] = useState(false)
   const [declineOpen, setDeclineOpen] = useState(false)
   const [reasonDraft, setReasonDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [noShowError, setNoShowError] = useState<string | null>(null)
 
   useEffect(() => {
     if (booking === undefined) {
@@ -97,10 +102,11 @@ export function OwnerRequestDetail() {
     setDeclineOpen(false)
     setReasonDraft('')
     setError(null)
+    setNoShowError(null)
   }, [booking?.id, booking?.worker?.id])
 
   const workers = board?.salon?.workers ?? []
-  const dayHours = hoursForDate(board?.salon?.hours ?? [], date)
+  const dayHours = date === '' ? undefined : hoursForDate(board?.salon?.hours ?? [], date)
   const cells = panelCells(dayHours)
   const blocks = (occupying?.occupyingBookings ?? [])
     .map((row: OccupyingBooking) => occupyingBlock(row))
@@ -164,6 +170,22 @@ export function OwnerRequestDetail() {
       await goQueue()
     } catch (caught) {
       setError(t(`owner.declineError.${declineErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onNoShow() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy(true)
+    setNoShowError(null)
+    try {
+      await markNoShow({ variables: { bookingId: booking.id } })
+      await refetchBooking()
+    } catch {
+      setNoShowError(t('owner.noShowError'))
     } finally {
       setBusy(false)
     }
@@ -284,6 +306,7 @@ export function OwnerRequestDetail() {
                 ? (booking.status === 'TIME_PROPOSED' ? booking.proposedWorker : booking.worker)?.name
                 : t('salon.noPreference')}
             </p>
+            <PriorMemory booking={booking} busy={busy} error={noShowError} onMark={() => void onNoShow()} />
             {booking.status === 'TIME_PROPOSED' ? (
               <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
                 {t('bookings.status.TIME_PROPOSED')}
@@ -303,6 +326,7 @@ export function OwnerRequestDetail() {
               {' · '}
               {booking.worker ? booking.worker.name : t('salon.noPreference')}
             </p>
+            <PriorMemory booking={booking} busy={busy} error={noShowError} onMark={() => void onNoShow()} />
             {assistantOriginVisible(booking.intake) ? (
               <>
                 <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
@@ -452,5 +476,55 @@ export function OwnerRequestDetail() {
       </main>
     </div>
     </>
+  )
+}
+
+function PriorMemory({
+  booking,
+  busy,
+  error,
+  onMark,
+}: {
+  booking: OwnerBooking
+  busy: boolean
+  error: string | null
+  onMark: () => void
+}) {
+  const { t } = useTranslation()
+  const rows = booking.priorConfirmedBookings ?? []
+  const stamped = booking.noShowAt != null && booking.noShowAt !== ''
+  const canMark =
+    booking.status === 'CONFIRMED' && !stamped && Date.parse(booking.preferredStartsAt) <= Date.now()
+
+  return (
+    <div className="mt-4">
+      {stamped ? <p className="text-sm font-semibold text-ink">{t('owner.noShow')}</p> : null}
+      {canMark ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onMark}
+          className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+        >
+          {t('owner.noShow')}
+        </button>
+      ) : null}
+      {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+      <p className="mt-4 text-sm font-semibold text-ink">{t('owner.priorBookings')}</p>
+      {rows.length === 0 ? (
+        <p className="mt-1 text-sm text-muted">{t('owner.priorEmpty')}</p>
+      ) : (
+        <ul className="mt-1 space-y-1">
+          {rows.map((row) => (
+            <li key={row.id} className="text-sm text-body">
+              {row.preferredDate}
+              {' · '}
+              {row.services.map((service) => service.name).join(', ')}
+              {row.noShowAt ? ` · ${t('owner.noShow')}` : ''}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }

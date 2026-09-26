@@ -129,6 +129,7 @@ type Booking {
     cancelledAt: String @method(name: "cancelledAtIso")
     lateCancel: Boolean! @method(name: "lateCancel")
     noShowAt: String @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@noShowAt")
+    priorConfirmedBookings: [Booking!]! @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@priorConfirmedBookings")
 }
 
 input CreateBookingInput {

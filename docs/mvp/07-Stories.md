@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-71`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-72`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -85,6 +85,7 @@
 
 - As an owner, I want to see when a returning customer physically scanned my QR code and verified, so that I know they're a real repeat visitor, not just a remote favorite.
 - As the platform, I want to capture response-time and no-show data from day one, so that trust badges can be computed later without a backfill gap.
+- As an owner, I want this guest's other confirmed bookings and a no-show mark on Request Detail, so that I know who already came before I accept, without a customers screen.
 
 ## Epic 9 — Basic Stats & Owner Insights
 

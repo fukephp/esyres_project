@@ -8,7 +8,8 @@ import * as intake from './intake'
 import * as pending from './pending'
 import * as salon from './salon'
 
-const banned = ['markNoShow', 'noShowCount', 'cancelCount', 'lateCancelCount', 'noShowAt']
+const counters = ['noShowCount', 'cancelCount', 'lateCancelCount']
+const ownerMemory = ['markNoShow', 'noShowAt']
 
 const modules: Record<string, Record<string, unknown>> = {
   auth,
@@ -35,8 +36,13 @@ test('PWA GraphQL documents omit trust capture fields', () => {
     const texts = Object.values(mod).filter(isDocument).map(print)
     expect(texts.length, `${file} has GraphQL documents`).toBeGreaterThan(0)
     const text = texts.join('\n')
-    for (const name of banned) {
+    for (const name of counters) {
       expect(text, `${file} contains ${name}`).not.toMatch(new RegExp(`\\b${name}\\b`))
+    }
+    if (file !== 'pending') {
+      for (const name of ownerMemory) {
+        expect(text, `${file} contains ${name}`).not.toMatch(new RegExp(`\\b${name}\\b`))
+      }
     }
   }
 })

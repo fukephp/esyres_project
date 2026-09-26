@@ -33,6 +33,15 @@ export const OWNER_BOOKING_QUERY = gql`
         id
         name
       }
+      noShowAt
+      priorConfirmedBookings {
+        id
+        preferredDate
+        noShowAt
+        services {
+          name
+        }
+      }
     }
   }
 `
@@ -94,6 +103,16 @@ export const DECLINE_BOOKING_MUTATION = gql`
   }
 `
 
+export const MARK_NO_SHOW_MUTATION = gql`
+  mutation MarkNoShow($bookingId: ID!) {
+    markNoShow(bookingId: $bookingId) {
+      id
+      status
+      noShowAt
+    }
+  }
+`
+
 export const OWNER_SALON_QUERY = gql`
   query OwnerSalon($id: ID!) {
     salon(id: $id) {
@@ -139,6 +158,7 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
       services {
         name
       }
+      noShowAt
     }
   }
 `
@@ -219,6 +239,13 @@ export type BookingIntake = {
   preferredTime: string | null
 }
 
+export type PriorConfirmedBooking = {
+  id: string
+  preferredDate: string
+  noShowAt: string | null
+  services: { name: string }[]
+}
+
 export type OwnerBooking = {
   id: string
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'
@@ -232,6 +259,8 @@ export type OwnerBooking = {
   services: { name: string; durationMinutes: number }[]
   intake: BookingIntake | null
   salon: { id: string; name: string }
+  noShowAt: string | null
+  priorConfirmedBookings: PriorConfirmedBooking[]
 }
 
 export type OwnerBookingData = {
@@ -264,6 +293,7 @@ export type OccupyingBooking = {
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null
   services: { name: string }[]
+  noShowAt?: string | null
 }
 
 export type OccupyingBookingsData = {

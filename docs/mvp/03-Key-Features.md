@@ -36,13 +36,13 @@
 - **Service & Pricing Management** — add/edit owner-named service categories and services (duration, KM price) on salon edit; default service duration 30 min. A service belongs to exactly one category. No delete of services; delete a category only when empty.
 - **Staff/Worker Management** — add/edit workers by name on salon edit; each worker has a stable color on Zahtjevi occupying dots and rows. Workers inherit salon hours (no per-worker shift editor or vacation calendar at MVP). Worker↔service assignment is later, not this slice.
 - **Salon switcher** — an owner may have more than one salon, each a separate customer-facing profile (hours, workers, QR, busy-level). `?salon=` on queue, chats, and stats only. Not a chain “one brand, many locations” product.
-- **Customer History** — booking history, no-show tracking, notes, plus the QR-confirmed "visited" marker.
+- **Request Detail memory** — on `/owner/requests/:id`, other confirmed bookings for this customer at this salon (newest first; date, service snapshot names, and **Nije došao** when that row is stamped). The open request is excluded. Cancelled, declined, and still-requested stay out. **Nije došao** on the open card calls `markNoShow` (after start, status stays `confirmed`, one tap, no undo). No notes, no QR-visit chrome, no `/owner/customers`.
 - **Basic Stats** — bookings per week, busiest hours/days, cancellation rate, day-level busy %, QR scan and scan→verified-visit stats.
 - **Notifications** — web push, real-time, for new requests, customer responses, and reschedule requests.
 
 ## Shared / Cross-Cutting (MVP)
 
-- **QR Reconnect Loop** — the existing front-counter acquisition QR code gets a second job: a ~7 day guest cookie holds the last scanned salon; once a customer verifies, the scan silently bookmarks the salon as "visited" and adds a reciprocal marker on the owner's customer history. No second sticker, no popups.
+- **QR Reconnect Loop** — the existing front-counter acquisition QR code gets a second job: a ~7 day guest cookie holds the last scanned salon; once a customer verifies, the scan silently bookmarks the salon as a Favorite and records a QR visit. That visit stays data (Statistika), not Request Detail chrome. No second sticker, no popups.
 - **Trust signal data capture** — response-time timestamps, no-show/cancellation counters, QR scan events, and verification status (`email_verified_at`, `phone_verified_at`) are captured from MVP launch, even though badge display is Phase 2.
 - **Owner onboarding** — self-serve **create salon** on the same account (`/create-salon`, name only). An owner **adds** another shop from the salon catalog (`/owner/salons/create`, name and address). Not invite-only. Not a waitlist. Not a second user type.
 - **Multi-service, multi-category salons** — a salon may have several owner-named service categories from day one. A service belongs to exactly one. Not a locked HAIR / MAKE_UP / MASSAGE enum. Discovery chips stay Kosa / Šminka / Masaža until a later story. See `docs/adr/0033-salon-service-categories.md`.

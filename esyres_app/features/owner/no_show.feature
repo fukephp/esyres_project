@@ -133,3 +133,28 @@ Feature: Owner marks a no-show after start
     When I log in as "owner@example.com" with password "secret-pass"
     And I mark no-show for booking id "999999"
     Then the GraphQL error code is "FORBIDDEN"
+
+  Scenario: Prior confirmed bookings are this customer at this salon
+    And the salon has a requested booking on "2026-07-01" at "10:00" for "Ana"
+    And that booking is for the salon worker
+    And that booking is confirmed
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I mark the booking as no-show
+    And the same customer has a booking on "2026-08-20" at "12:00"
+    And that booking is confirmed
+    And the same customer has a booking on "2026-08-10" at "09:00"
+    And that booking is declined
+    And another customer "Berta" has a confirmed booking on "2026-08-15" at "15:00"
+    And another verified owner "other@example.com" with password "secret-pass" owns salon "Other"
+    And the same customer has a confirmed booking at the other salon on "2026-08-18" at "10:00"
+    And the same customer has a booking on "2026-08-28" at "11:00"
+    And I query prior confirmed bookings for this booking
+    Then prior confirmed booking dates are "2026-08-20,2026-07-01"
+    And the prior booking on "2026-07-01" has a no-show stamp
+    And the prior booking on "2026-08-20" has no no-show stamp
+
+  Scenario: Open request with no other confirmed bookings
+    And the salon has a requested booking on "2026-08-28" at "11:00" for "Ana"
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query prior confirmed bookings for this booking
+    Then there are no prior confirmed bookings

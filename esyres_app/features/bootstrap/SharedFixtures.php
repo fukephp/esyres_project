@@ -112,6 +112,40 @@ trait SharedFixtures
     }
 
     /**
+     * @Given the same customer has a booking on :date at :time
+     */
+    public function theSameCustomerHasABookingOnAt(string $date, string $time): void
+    {
+        $customer = User::query()->findOrFail($this->booking->customer_id);
+        $this->insertCustomerBooking($customer, $this->salon, $date, $time);
+    }
+
+    /**
+     * @Given another customer :name has a confirmed booking on :date at :time
+     */
+    public function anotherCustomerHasAConfirmedBooking(string $name, string $date, string $time): void
+    {
+        $open = $this->booking;
+        $this->insertRequestedBooking($this->salon, $date, $time, $name, null);
+        $this->booking->status = Booking::CONFIRMED;
+        $this->booking->save();
+        $this->booking = $open;
+    }
+
+    /**
+     * @Given the same customer has a confirmed booking at the other salon on :date at :time
+     */
+    public function theSameCustomerHasAConfirmedBookingAtTheOtherSalon(string $date, string $time): void
+    {
+        $customer = User::query()->findOrFail($this->booking->customer_id);
+        $open = $this->booking;
+        $this->insertCustomerBooking($customer, $this->otherSalon, $date, $time);
+        $this->booking->status = Booking::CONFIRMED;
+        $this->booking->save();
+        $this->booking = $open;
+    }
+
+    /**
      * @Given that booking is for the salon worker
      */
     public function thatBookingIsForTheSalonWorker(): void
