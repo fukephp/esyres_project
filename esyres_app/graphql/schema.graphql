@@ -254,6 +254,7 @@ type Mutation {
     subscribePush(endpoint: String!, p256dh: String!, auth: String!): Boolean!
     login(email: String!, password: String!): User!
     register(name: String!, email: String!, password: String!, phone: String): User!
+    changePassword(currentPassword: String!, password: String!): User!
     logout: Boolean!
     resendVerificationEmail: Boolean!
     requestPhoneOtp(phone: String!): Boolean!

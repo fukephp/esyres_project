@@ -19,6 +19,10 @@ trait GuestSteps
 {
     private const DEFAULT_REGISTER_NAME = 'Ana';
 
+    private ?string $keptSessionId = null;
+
+    private ?string $keptCsrf = null;
+
     /**
      * @When I register as :email with password :password
      */
@@ -74,6 +78,68 @@ trait GuestSteps
     public function iQueryMe(): void
     {
         $this->graphql($this->meQuery());
+    }
+
+    /**
+     * @When I change my password from :current to :password
+     */
+    public function iChangeMyPassword(string $current, string $password): void
+    {
+        $this->graphql(<<<'GQL'
+mutation ChangePassword($currentPassword: String!, $password: String!) {
+  changePassword(currentPassword: $currentPassword, password: $password) {
+    id
+    email
+  }
+}
+GQL, [
+            'currentPassword' => $current,
+            'password' => $password,
+        ]);
+    }
+
+    /**
+     * @Then change password succeeds
+     */
+    public function changePasswordSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($this->user->email, $this->graphql['data']['changePassword']['email']);
+    }
+
+    /**
+     * @When I remember this session
+     */
+    public function iRememberThisSession(): void
+    {
+        $this->keptSessionId = $this->app['session']->getId();
+        $this->keptCsrf = $this->app['session']->token();
+    }
+
+    /**
+     * @Then the session cookie changed
+     */
+    public function theSessionCookieChanged(): void
+    {
+        $after = $this->app['session']->getId();
+        if (! is_string($this->keptSessionId) || $this->keptSessionId === '' || $this->keptSessionId === $after) {
+            throw new RuntimeException('Expected session id to change');
+        }
+    }
+
+    /**
+     * @When I restore the remembered session
+     */
+    public function iRestoreTheRememberedSession(): void
+    {
+        if (! is_string($this->keptSessionId) || $this->keptSessionId === '') {
+            throw new RuntimeException('No remembered session');
+        }
+        $this->app['session']->flush();
+        $this->withCookie((string) config('session.cookie'), $this->keptSessionId);
+        if (is_string($this->keptCsrf) && $this->keptCsrf !== '') {
+            $this->withHeader('X-CSRF-TOKEN', $this->keptCsrf);
+        }
     }
 
     /**

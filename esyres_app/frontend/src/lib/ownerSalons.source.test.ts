@@ -64,9 +64,13 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerSalons.tsx',
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
+    'pages/OwnerSettings.tsx',
   ]) {
     expect(read(file), file).toMatch(/<OwnerNav/)
   }
+  expect(nav.indexOf('owner.salons')).toBeLessThan(nav.indexOf('owner.settings'))
+  expect(nav).toMatch(/active === 'settings'/)
+  expect(nav).toMatch(/OWNER_SETTINGS_PATH/)
 })
 
 test('catalog overlay has boxed shops, header plus, Uredi; not-owner keeps create-salon', () => {

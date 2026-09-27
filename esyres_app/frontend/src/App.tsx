@@ -21,6 +21,7 @@ const OwnerSalonCreate = lazy(() =>
 const OwnerSalonEdit = lazy(() =>
   import('./pages/OwnerSalonEdit').then((m) => ({ default: m.OwnerSalonEdit })),
 )
+const OwnerSettings = lazy(() => import('./pages/OwnerSettings').then((m) => ({ default: m.OwnerSettings })))
 
 export default function App() {
   return (
@@ -84,6 +85,14 @@ export default function App() {
           element={
             <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
               <OwnerSalonEdit />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/owner/settings"
+          element={
+            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
+              <OwnerSettings />
             </Suspense>
           }
         />

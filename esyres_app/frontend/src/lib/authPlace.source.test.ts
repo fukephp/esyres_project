@@ -70,6 +70,7 @@ test('owner logged-out and email-verify use Panel; session titles return; login-
     'pages/OwnerSalons.tsx',
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
+    'pages/OwnerSettings.tsx',
   ]
   for (const file of files) {
     const text = read(file)
@@ -85,4 +86,5 @@ test('owner logged-out and email-verify use Panel; session titles return; login-
   expect(read('pages/OwnerSalons.tsx')).toMatch(/owner\.salons/)
   expect(read('pages/OwnerSalonCreate.tsx')).toMatch(/owner\.addSalon/)
   expect(read('pages/OwnerSalonEdit.tsx')).toMatch(/owner\.salonName/)
+  expect(read('pages/OwnerSettings.tsx')).toMatch(/owner\.settings/)
 })

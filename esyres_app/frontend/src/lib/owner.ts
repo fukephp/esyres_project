@@ -432,6 +432,8 @@ export function ownerStatsPath(salonId: string | null = null, firstOwnedId: stri
 
 export const OWNER_SALONS_PATH = '/owner/salons'
 
+export const OWNER_SETTINGS_PATH = '/owner/settings'
+
 export function ownerSalonsPath(): string {
   return OWNER_SALONS_PATH
 }
