@@ -38,6 +38,7 @@
 
 - As an owner, I want occupying rows on the selected-day list to show which service is on that worker, so that the list is the current-job board.
 - As an owner, I want Zahtjevi as a month navigator with worker-colored occupying dots and a selected-day list, so that I can pick a day without a 15-minute worker grid.
+- As an owner, I want that selected-day list to read as a diary (one clock gutter, hairline occupying rows, Inter day heading), so that I can scan start times down one column.
 - As an owner, I want pending requests for a day in a till-pile (collapse with count when more than two), then soon occupying, then the rest including changed time, so that pending is not buried in the clock.
 - As an owner, I want titled break and closed rows on that list, so that I see when chairs are off.
 - As an owner, I want to see all pending requests for a day in one queue, sorted so urgent ones aren't buried, so that nothing slips through.

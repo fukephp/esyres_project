@@ -4,7 +4,7 @@ Design-first prompts for homepage `/` and owner Zahtjevi, plus five proposal fra
 
 Source: [docs/research/owner-panel.md](../../docs/research/owner-panel.md). That file is not product truth. Product stays in `docs/mvp/`. Do not add routes, mutations, or stories from the frames below.
 
-Homepage and Zahtjevi match the current PWA. Do not restyle them from this file. Frames are not pages.
+Homepage Prompt 1 matches the current PWA. Prompt 2 is the Zahtjevi selected-day list target (STORY-73): one shared clock gutter. Frames below are not pages.
 
 ## Prompt 1 — Homepage `/`
 
@@ -73,12 +73,16 @@ FORMAT
 LAYOUT (wireframe in words)
 - Top-nav overlay, light left OwnerNav, one canvas hairline card.
 - Nav: Zahtjevi, Razgovori, Statistika, Saloni, Postavke.
-- List order: pending till-pile, soon occupying, then the rest (Predloženo vrijeme, Pauza, Zatvoreno).
+- Month navigator stays. The day list has one clock gutter on the left. Pending cards and occupying rows sit to the right of that column. Times stay the existing 2-digit HH:mm.
+- Pending: surface-soft rounded hairline card. Gutter is the preferred start, or the reschedule start. Meta is duration and worker (or Bez preferencije). Initial, tags, and Prihvati / Predloži / Odbi stay. Collapse + count when more than two.
+- Occupying: no box. Hairline under the full row (gutter and content). Gutter is the start. Meta is –15:30 · worker (same en-dash, start not repeated). Worker dot, job name, Predloženo vrijeme, and the no-show tag stay.
+- Pauza and Zatvoreno: muted lines, no clock gutter.
+- List order: pending till-pile, soon occupying, then the rest.
 - Primary actions only on pending rows. Hierarchy: pending pile → day list → month.
 
 TYPE SYSTEM
-- Card and nav: Inter. Titles 600, body 400.
-- No Cal Sans on the card.
+- Day heading (weekday, numeric date): Inter 600, current size. Body 400. Nav: Inter.
+- Month title stays Cal Sans.
 
 COLOR + MATERIAL
 - Card: canvas #ffffff, hairline #e5e7eb, radius 12px. No heavy shadow, no grey fill on the box.
@@ -97,15 +101,15 @@ COPY (render EXACTLY)
 - Pending actions stay the existing accept and Predloži labels
 
 CONSTRAINTS (change 1–2 things only)
-- FONT: Inter
+- FONT: Inter on the day heading. Month title stays Cal Sans.
 - STYLE: minimal
 - MODE: light
 
 NEGATIVE PROMPT
-- No 15-minute board, drag, payments, worker logins
+- No 15-minute board, drag, staff columns, payments, worker logins
 - No client database on this screen
-- No dark nav, no homepage hero or footer
-- No logos, no extra chrome text
+- No dark nav, no homepage hero or footer, no Booksy marketing page
+- No logos, no extra chrome text, no new end-time word (the en-dash is the end)
 ```
 
 ## Frames only
