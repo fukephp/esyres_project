@@ -117,7 +117,6 @@ export function OwnerRequestDetail() {
       ? '/owner'
       : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
   const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
-  const bounce = forbidden || (booking !== undefined && ownerDetailMode(booking.status) === 'bounce')
 
   async function goQueue() {
     if (booking === undefined) {
@@ -266,7 +265,7 @@ export function OwnerRequestDetail() {
           active="queue"
         />
       </aside>
-      <main className="mx-auto w-full max-w-xl flex-1 px-5 py-8">
+      <main className="flex-1 px-5 py-8">
         <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
         <p className="mt-1 text-sm text-body md:hidden">{booking?.salon.name ?? ''}</p>
         <div className="md:hidden">
@@ -282,11 +281,28 @@ export function OwnerRequestDetail() {
             {t('owner.back')}
           </Link>
         </p>
-        {bounce || booking === undefined ? (
-          <p className="mt-8 text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
+        <section className="mt-4 rounded-lg border border-hairline bg-canvas p-4">
+        {forbidden || booking === undefined ? (
+          <p className="text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
+        ) : ownerDetailMode(booking.status) === 'bounce' ? (
+          <>
+            <p className="font-semibold text-ink">{booking.customerName}</p>
+            <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
+            <p className="mt-1 text-sm text-body">
+              {booking.preferredDate}
+              {' · '}
+              {booking.services.map((s) => s.name).join(', ')}
+              {' · '}
+              {t('salon.duration', { n: booking.durationMinutes })}
+              {' · '}
+              {booking.worker ? booking.worker.name : t('salon.noPreference')}
+            </p>
+            <p className="mt-4 text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
+          </>
         ) : ownerDetailMode(booking.status) === 'read' ? (
           <>
-            <p className="mt-8 font-semibold text-ink">
+            <p className="font-semibold text-ink">{booking.customerName}</p>
+            <p className="mt-1 text-sm text-ink">
               {occupyingBlock(booking) === null
                 ? formatSarajevoTime(booking.proposedStartsAt ?? booking.preferredStartsAt)
                 : occupyingClockRange(
@@ -294,7 +310,6 @@ export function OwnerRequestDetail() {
                     occupyingBlock(booking)!.durationMinutes,
                   )}
             </p>
-            <p className="mt-1 text-sm text-ink">{booking.customerName}</p>
             <p className="mt-1 text-sm text-body">
               {booking.preferredDate}
               {' · '}
@@ -313,10 +328,10 @@ export function OwnerRequestDetail() {
               </span>
             ) : null}
           </>
-        ) : (
+        ) : ownerDetailMode(booking.status) === 'form' ? (
           <>
-            <p className="mt-8 font-semibold text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
-            <p className="mt-1 text-sm text-ink">{booking.customerName}</p>
+            <p className="font-semibold text-ink">{booking.customerName}</p>
+            <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
             <p className="mt-1 text-sm text-body">
               {booking.preferredDate}
               {' · '}
@@ -472,7 +487,8 @@ export function OwnerRequestDetail() {
             ) : null}
             {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
           </>
-        )}
+        ) : null}
+        </section>
       </main>
     </div>
     </>
