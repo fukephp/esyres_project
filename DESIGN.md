@@ -19,6 +19,7 @@ Product UX still wins via `docs/mvp/` and `.cursor/rules/frontend/` when it conf
 ## Which file to read
 
 - Any PWA UI → `refs/design-1/DESIGN.md`, then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX (sparse customer, dense owner).
+- Homepage `/` and owner Zahtjevi, plus proposal-only frames → `refs/design-1/owner-homepage-plan.md` (not a second pack; frames are not routes).
 - Unsure → this index first.
 
 ## Skills (homepage on `/` only)

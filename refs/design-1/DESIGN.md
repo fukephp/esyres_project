@@ -215,6 +215,8 @@ Copy is **Bosnian-first**, same as the rest of the PWA.
 
 **Homepage IA (hero + footer) stays on `/` only.** The top-nav is shared (per-route slot). Discovery and salon stay sparse customer. `/owner` keeps dense Zahtjevi (month navigator + selected-day list) with Cal light chrome (no dark nav); top-nav overlays above aside + OwnerNav. Busy-badge tokens live in this pack. Cell tokens stay documented but unused on Zahtjevi home. Not a guest month-and-pills widget.
 
+Homepage `/` and Zahtjevi prompts, plus proposal-only frames, live in [`owner-homepage-plan.md`](owner-homepage-plan.md). That file does not add routes or a second pack.
+
 ### Locked homepage IA
 
 Short scroll on `/`:
