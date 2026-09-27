@@ -76,6 +76,15 @@ export const REGISTER_MUTATION = gql`
   }
 `
 
+export const CHANGE_PASSWORD_MUTATION = gql`
+  mutation ChangePassword($currentPassword: String!, $password: String!) {
+    changePassword(currentPassword: $currentPassword, password: $password) {
+      id
+      email
+    }
+  }
+`
+
 export const LOGOUT_MUTATION = gql`
   mutation Logout {
     logout

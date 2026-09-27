@@ -638,3 +638,16 @@ test('occupying dots and selected-day split', () => {
   ])
   expect(mixRestWithBreak([noon], null, null).map((row) => row.kind)).toEqual(['occupying'])
 })
+
+test('owner settings copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.settings')).toBe('Postavke')
+  expect(i18n.t('owner.passwordCurrent')).toBe('Trenutna lozinka')
+  expect(i18n.t('owner.passwordNew')).toBe('Nova lozinka')
+  expect(i18n.t('owner.passwordConfirm')).toBe('Ponovi lozinku')
+  expect(i18n.t('owner.passwordMismatch')).toBe('Lozinke se ne poklapaju.')
+  expect(i18n.t('owner.passwordChanged')).toBe('Lozinka je promijenjena.')
+  expect(i18n.t('owner.passwordError.INVALID_CURRENT_PASSWORD')).toBe('Pogrešna trenutna lozinka.')
+  expect(i18n.t('auth.gate.WEAK_PASSWORD')).toBe('Lozinka mora imati najmanje 8 karaktera.')
+  expect(i18n.t('owner.save')).toBe('Spremi')
+})
