@@ -676,6 +676,15 @@ export function occupyingClockRange(start: string, durationMinutes: number): str
   return `${start}–${hhmm(minutes(start) + durationMinutes)}`
 }
 
+export function occupyingDiaryMeta(start: string, durationMinutes: number, workerName?: string): string {
+  const end = `–${hhmm(minutes(start) + durationMinutes)}`
+  if (workerName !== undefined && workerName !== '') {
+    return `${end} · ${workerName}`
+  }
+
+  return end
+}
+
 export function ownerDetailMode(status: string): 'form' | 'read' | 'bounce' {
   if (status === 'REQUESTED') {
     return 'form'

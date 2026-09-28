@@ -95,6 +95,6 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-70 | Request Detail Cal card | 3 | `STORY-70` | STORY-16, STORY-67 |
 | STORY-71 | Owner settings password | 7 | `STORY-71` | STORY-10, STORY-50 |
 | STORY-72 | Request Detail memory | 8 | — | STORY-35, STORY-70 |
-| STORY-73 | Zahtjevi diary day list | 3 | — | STORY-67 |
+| STORY-73 | Zahtjevi diary day list | 3 | `STORY-73` | STORY-67 |
 | STORY-74 | Phone booking | 3 | `STORY-74` | STORY-01, STORY-02, STORY-03, STORY-67, STORY-70, STORY-72 |
 | STORY-75 | Zapisi | 3 | — | STORY-74, STORY-25 |

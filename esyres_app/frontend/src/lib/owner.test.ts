@@ -51,6 +51,7 @@ import {
   ownerMonthWeekdayOffset,
   formatOwnerMonthTitle,
   occupyingClockRange,
+  occupyingDiaryMeta,
   ownerDetailMode,
   occupyingSarajevoYmd,
   occupyingDotsForDay,
@@ -637,6 +638,10 @@ test('owner month helpers', () => {
 
 test('occupying clock range and request detail mode', () => {
   expect(occupyingClockRange('11:00', 30)).toBe('11:00–11:30')
+  expect(occupyingDiaryMeta('11:00', 30, 'Ana')).toBe('–11:30 · Ana')
+  expect(occupyingDiaryMeta('11:00', 30)).toBe('–11:30')
+  expect(occupyingDiaryMeta('11:00', 30, '')).toBe('–11:30')
+  expect(occupyingDiaryMeta('11:00', 30).slice(0, 1)).toBe(occupyingClockRange('11:00', 30).slice(5, 6))
   expect(ownerDetailMode('REQUESTED')).toBe('form')
   expect(ownerDetailMode('CONFIRMED')).toBe('read')
   expect(ownerDetailMode('TIME_PROPOSED')).toBe('read')
