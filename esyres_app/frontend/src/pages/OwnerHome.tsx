@@ -48,7 +48,7 @@ import {
   isPreferredSoon,
   mixRestWithBreak,
   occupyingBlock,
-  occupyingClockRange,
+  occupyingDiaryMeta,
   occupyingDotsForDay,
   ownerDateFromSearch,
   ownerMonthContains,
@@ -481,7 +481,7 @@ export function OwnerHome() {
               </div>
             </div>
             <div>
-              <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
+              <h3 className="text-lg font-semibold tracking-tight text-ink">
                 {t(`weekday.${sarajevoWeekday(date)}`)}, {formatPickerDayNumeric(date)}
               </h3>
               {queueLoading ? (
@@ -542,14 +542,15 @@ function OccupyingRow({ row }: { row: OccupyingBooking }) {
   return (
     <Link
       to={`/owner/requests/${row.id}`}
-      className="mt-3 flex items-start gap-3 border border-hairline px-3 py-2"
+      className="mt-3 grid grid-cols-[3.5rem_minmax(0,1fr)] items-start border-b border-hairline py-2"
     >
-      <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${workerDotColor(block.workerId)}`} />
-      <span className="min-w-0">
+      <span className="text-sm tabular-nums text-ink">{block.start}</span>
+      <span className="flex min-w-0 items-start gap-3">
+        <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${workerDotColor(block.workerId)}`} />
+        <span className="min-w-0">
         <span className="block font-semibold text-ink">{block.label}</span>
         <span className="mt-1 block text-sm text-muted">
-          {occupyingClockRange(block.start, block.durationMinutes)}
-          {workerName !== undefined && workerName !== '' ? ` · ${workerName}` : ''}
+          {occupyingDiaryMeta(block.start, block.durationMinutes, workerName)}
         </span>
         {row.status === 'TIME_PROPOSED' ? (
           <span className="mt-1 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
@@ -561,6 +562,7 @@ function OccupyingRow({ row }: { row: OccupyingBooking }) {
             {t('owner.noShow')}
           </span>
         ) : null}
+        </span>
       </span>
     </Link>
   )
@@ -602,7 +604,9 @@ function QueueRow({
   const clock = queueRowClock(row)
 
   return (
-    <li className="rounded-lg border border-hairline bg-surface-soft px-4 py-3">
+    <li className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start">
+      <span className="text-sm tabular-nums text-ink">{formatSarajevoTime(clock)}</span>
+      <div className="min-w-0 rounded-lg border border-hairline bg-surface-soft px-4 py-3">
       <div className="flex gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink">
           {queueChipInitial(row.customerName)}
@@ -615,8 +619,6 @@ function QueueRow({
       </p>
       <p className="mt-1 text-sm text-muted">
         {t('salon.duration', { n: row.durationMinutes })}
-        {' · '}
-        {formatSarajevoTime(clock)}
         {' · '}
         {row.worker ? row.worker.name : t('salon.noPreference')}
       </p>
@@ -732,6 +734,7 @@ function QueueRow({
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
         </div>
+      </div>
       </div>
     </li>
   )

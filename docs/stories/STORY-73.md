@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | `STORY-73` |
 | Epic | 3 — Zahtjevi & Time Proposal (Owner) |
-| Loop | — |
+| Loop | `STORY-73` |
 | Depends on | STORY-67 |
 
 ## User story
