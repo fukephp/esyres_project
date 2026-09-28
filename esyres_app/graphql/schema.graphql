@@ -102,6 +102,12 @@ enum BookingStatus {
     CANCELLED
 }
 
+enum BookingOrigin {
+    PICKER
+    ASSISTANT
+    PHONE
+}
+
 type BookingService {
     name: String!
     durationMinutes: Int! @rename(attribute: "duration_minutes")
@@ -130,6 +136,20 @@ type Booking {
     lateCancel: Boolean! @method(name: "lateCancel")
     noShowAt: String @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@noShowAt")
     priorConfirmedBookings: [Booking!]! @field(resolver: "App\\GraphQL\\Queries\\BookingOwnerField@priorConfirmedBookings")
+    origin: BookingOrigin! @method(name: "graphqlOrigin")
+    callerPhone: String @rename(attribute: "caller_phone")
+    callerNote: String @rename(attribute: "caller_note")
+}
+
+input CreatePhoneBookingInput {
+    salonId: ID!
+    serviceIds: [ID!]!
+    preferredDate: String!
+    preferredTime: String!
+    workerId: ID!
+    callerName: String!
+    callerPhone: String
+    callerNote: String
 }
 
 input CreateBookingInput {
@@ -275,6 +295,8 @@ type Mutation {
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
     createBooking(input: CreateBookingInput!): Booking!
+    createPhoneBooking(input: CreatePhoneBookingInput!): Booking!
+    cancelPhoneBooking(bookingId: ID!): Booking!
     upsertAssistantIntake(input: UpsertAssistantIntakeInput!): AssistantIntake!
     pingAssistantIntake(salonId: ID!, token: String): AssistantIntake!
     takeOverAssistantIntake(id: ID!): AssistantIntake!

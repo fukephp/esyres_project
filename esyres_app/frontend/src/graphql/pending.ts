@@ -42,6 +42,9 @@ export const OWNER_BOOKING_QUERY = gql`
           name
         }
       }
+      origin
+      callerPhone
+      callerNote
     }
   }
 `
@@ -113,6 +116,25 @@ export const MARK_NO_SHOW_MUTATION = gql`
   }
 `
 
+export const CREATE_PHONE_BOOKING_MUTATION = gql`
+  mutation CreatePhoneBooking($input: CreatePhoneBookingInput!) {
+    createPhoneBooking(input: $input) {
+      id
+      preferredDate
+      status
+    }
+  }
+`
+
+export const CANCEL_PHONE_BOOKING_MUTATION = gql`
+  mutation CancelPhoneBooking($bookingId: ID!) {
+    cancelPhoneBooking(bookingId: $bookingId) {
+      id
+      status
+    }
+  }
+`
+
 export const OWNER_SALON_QUERY = gql`
   query OwnerSalon($id: ID!) {
     salon(id: $id) {
@@ -134,6 +156,15 @@ export const OWNER_SALON_QUERY = gql`
       services {
         id
         name
+      }
+      serviceCategories {
+        id
+        name
+        services {
+          id
+          name
+          durationMinutes
+        }
       }
     }
   }
@@ -261,6 +292,9 @@ export type OwnerBooking = {
   salon: { id: string; name: string }
   noShowAt: string | null
   priorConfirmedBookings: PriorConfirmedBooking[]
+  origin: 'PICKER' | 'ASSISTANT' | 'PHONE'
+  callerPhone: string | null
+  callerNote: string | null
 }
 
 export type OwnerBookingData = {
@@ -319,5 +353,10 @@ export type OwnerSalonData = {
     dnd: boolean
     takeoverAllowed: boolean
     services: { id: string; name: string }[]
+    serviceCategories: {
+      id: string
+      name: string
+      services: { id: string; name: string; durationMinutes: number }[]
+    }[]
   } | null
 }

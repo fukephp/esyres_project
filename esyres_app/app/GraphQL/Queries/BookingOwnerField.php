@@ -32,6 +32,9 @@ final class BookingOwnerField
         if ((int) $booking->salon->owner_id !== (int) $user->id) {
             throw new ClientError('FORBIDDEN');
         }
+        if ($booking->customer_id === null) {
+            return new Collection;
+        }
 
         return Booking::query()
             ->where('salon_id', $booking->salon_id)

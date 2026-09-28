@@ -71,6 +71,7 @@ test('owner logged-out and email-verify use Panel; session titles return; login-
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
+    'pages/OwnerPhoneBooking.tsx',
   ]
   for (const file of files) {
     const text = read(file)

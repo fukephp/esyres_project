@@ -22,6 +22,9 @@ const OwnerSalonEdit = lazy(() =>
   import('./pages/OwnerSalonEdit').then((m) => ({ default: m.OwnerSalonEdit })),
 )
 const OwnerSettings = lazy(() => import('./pages/OwnerSettings').then((m) => ({ default: m.OwnerSettings })))
+const OwnerPhoneBooking = lazy(() =>
+  import('./pages/OwnerPhoneBooking').then((m) => ({ default: m.OwnerPhoneBooking })),
+)
 
 export default function App() {
   return (
@@ -93,6 +96,14 @@ export default function App() {
           element={
             <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
               <OwnerSettings />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/owner/phone"
+          element={
+            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
+              <OwnerPhoneBooking />
             </Suspense>
           }
         />

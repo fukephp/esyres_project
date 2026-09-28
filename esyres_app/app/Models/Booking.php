@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at', 'cancelled_at', 'late_cancel', 'reminder_day_sent_at', 'reminder_hour_sent_at'])]
+#[Fillable(['salon_id', 'customer_id', 'worker_id', 'preferred_date', 'preferred_starts_at', 'status', 'duration_minutes', 'owner_responded_at', 'proposed_starts_at', 'proposed_worker_id', 'decline_reason', 'reschedule_date', 'reschedule_starts_at', 'cancelled_at', 'late_cancel', 'reminder_day_sent_at', 'reminder_hour_sent_at', 'origin', 'caller_name', 'caller_phone', 'caller_note'])]
 class Booking extends Model
 {
     public const REQUESTED = 'requested';
@@ -20,6 +20,12 @@ class Booking extends Model
     public const DECLINED = 'declined';
 
     public const CANCELLED = 'cancelled';
+
+    public const ORIGIN_PICKER = 'picker';
+
+    public const ORIGIN_ASSISTANT = 'assistant';
+
+    public const ORIGIN_PHONE = 'phone';
 
     /**
      * @return array<string, string>
@@ -103,6 +109,11 @@ class Booking extends Model
         return strtoupper($this->status);
     }
 
+    public function graphqlOrigin(): string
+    {
+        return strtoupper((string) $this->origin);
+    }
+
     public function preferredDateString(): string
     {
         return $this->preferred_date->format('Y-m-d');
@@ -133,6 +144,10 @@ class Booking extends Model
 
     public function customerName(): string
     {
+        if ($this->origin === self::ORIGIN_PHONE) {
+            return (string) $this->caller_name;
+        }
+
         return $this->customer->name;
     }
 

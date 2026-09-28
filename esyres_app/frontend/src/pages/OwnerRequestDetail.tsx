@@ -12,6 +12,7 @@ import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   DECLINE_BOOKING_MUTATION,
   MARK_NO_SHOW_MUTATION,
+  CANCEL_PHONE_BOOKING_MUTATION,
   OCCUPYING_BOOKINGS_QUERY,
   OWNER_BOOKING_QUERY,
   OWNER_SALON_QUERY,
@@ -39,6 +40,7 @@ import {
   occupyingClockRange,
   ownerQueuePath,
   panelCells,
+  phoneErrorKey,
   proposeErrorKey,
   proposeStartTimes,
   trimDeclineReason,
@@ -85,6 +87,7 @@ export function OwnerRequestDetail() {
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
+  const [cancelPhone] = useMutation(CANCEL_PHONE_BOOKING_MUTATION)
   const [workerId, setWorkerId] = useState('')
   const [time, setTime] = useState('')
   const [busy, setBusy] = useState(false)
@@ -92,6 +95,7 @@ export function OwnerRequestDetail() {
   const [reasonDraft, setReasonDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [noShowError, setNoShowError] = useState<string | null>(null)
+  const [phoneCancelOpen, setPhoneCancelOpen] = useState(false)
 
   useEffect(() => {
     if (booking === undefined) {
@@ -185,6 +189,22 @@ export function OwnerRequestDetail() {
       await refetchBooking()
     } catch {
       setNoShowError(t('owner.noShowError'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onPhoneCancel() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await cancelPhone({ variables: { bookingId: booking.id } })
+      navigate(queuePath)
+    } catch (err) {
+      setError(t(`owner.phone.error.${phoneErrorKey(graphqlErrorCode(err))}`))
     } finally {
       setBusy(false)
     }
@@ -321,6 +341,20 @@ export function OwnerRequestDetail() {
                 ? (booking.status === 'TIME_PROPOSED' ? booking.proposedWorker : booking.worker)?.name
                 : t('salon.noPreference')}
             </p>
+            {booking.origin === 'PHONE' && booking.callerPhone ? (
+              <p className="mt-1 text-sm text-body">{booking.callerPhone}</p>
+            ) : null}
+            {booking.origin === 'PHONE' && booking.callerNote ? (
+              <p className="mt-1 text-sm text-body">{booking.callerNote}</p>
+            ) : null}
+            <PhoneCancel
+              booking={booking}
+              busy={busy}
+              open={phoneCancelOpen}
+              onOpen={() => setPhoneCancelOpen(true)}
+              onClose={() => setPhoneCancelOpen(false)}
+              onConfirm={() => void onPhoneCancel()}
+            />
             <PriorMemory booking={booking} busy={busy} error={noShowError} onMark={() => void onNoShow()} />
             {booking.status === 'TIME_PROPOSED' ? (
               <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
@@ -526,20 +560,80 @@ function PriorMemory({
         </button>
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
-      <p className="mt-4 text-sm font-semibold text-ink">{t('owner.priorBookings')}</p>
-      {rows.length === 0 ? (
-        <p className="mt-1 text-sm text-muted">{t('owner.priorEmpty')}</p>
+      {booking.origin === 'PHONE' ? null : (
+        <>
+          <p className="mt-4 text-sm font-semibold text-ink">{t('owner.priorBookings')}</p>
+          {rows.length === 0 ? (
+            <p className="mt-1 text-sm text-muted">{t('owner.priorEmpty')}</p>
+          ) : (
+            <ul className="mt-1 space-y-1">
+              {rows.map((row) => (
+                <li key={row.id} className="text-sm text-body">
+                  {row.preferredDate}
+                  {' · '}
+                  {row.services.map((service) => service.name).join(', ')}
+                  {row.noShowAt ? ` · ${t('owner.noShow')}` : ''}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function PhoneCancel({
+  booking,
+  busy,
+  open,
+  onOpen,
+  onClose,
+  onConfirm,
+}: {
+  booking: OwnerBooking
+  busy: boolean
+  open: boolean
+  onOpen: () => void
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  const { t } = useTranslation()
+  const beforeStart = booking.status === 'CONFIRMED' && Date.parse(booking.preferredStartsAt) > Date.now()
+  if (booking.origin !== 'PHONE' || !beforeStart) {
+    return null
+  }
+
+  return (
+    <div className="mt-4">
+      {open ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onConfirm}
+            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+          >
+            {t('bookings.cancelBooking')}
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onClose}
+            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {t('owner.declineCancel')}
+          </button>
+        </div>
       ) : (
-        <ul className="mt-1 space-y-1">
-          {rows.map((row) => (
-            <li key={row.id} className="text-sm text-body">
-              {row.preferredDate}
-              {' · '}
-              {row.services.map((service) => service.name).join(', ')}
-              {row.noShowAt ? ` · ${t('owner.noShow')}` : ''}
-            </li>
-          ))}
-        </ul>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onOpen}
+          className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+        >
+          {t('owner.phone.cancel')}
+        </button>
       )}
     </div>
   )

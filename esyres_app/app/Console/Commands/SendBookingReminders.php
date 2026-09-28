@@ -22,7 +22,7 @@ final class SendBookingReminders extends Command
 
         foreach ($bookings as $booking) {
             $customer = $booking->customer;
-            if ($customer->email_verified_at === null) {
+            if ($customer === null || $customer->email_verified_at === null) {
                 continue;
             }
             $start = $booking->preferred_starts_at;
