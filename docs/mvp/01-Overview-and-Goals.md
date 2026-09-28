@@ -14,9 +14,9 @@ The customer picks a service, optionally a worker (or "no preference"), and a pr
 
 The salon owner **accepts** the preferred time in one tap when it works, or **counter-proposes** a different time from Request Detail. The customer confirms only when the salon proposes a different time; they can approve, reject, or ask for a different day or time.
 
-Status flow: `requested → confirmed` (owner accepts preferred time), `requested → declined` (owner decline), or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts)
+Status flow: `requested → confirmed` (owner accepts preferred time), `requested → declined` (owner decline), or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts). A phone booking is the exception: the owner writes it already `confirmed` for a caller who is not a customer. It occupies a worker immediately. The owner may end it before the start; that becomes `cancelled` with no trust counters.
 
-This keeps the customer experience light (state a preference, no slot hunting) while concentrating scheduling authority on the owner side, where it belongs. The assistant’s job is 24/7 intake into that inbox, not auto-confirm.
+This keeps the customer experience light (state a preference, no slot hunting) while concentrating scheduling authority on the owner side, where it belongs. The assistant’s job is 24/7 intake into that inbox, not auto-confirm. The phone booking is how the salon records a call without a worker login. Voice capture and an agent that books from those rows are future.
 
 ## Business Goals
 
@@ -28,7 +28,7 @@ This keeps the customer experience light (state a preference, no slot hunting) w
 ## Product Goals
 
 - Replace phone tag and Instagram DM waiting with a structured request-and-propose flow.
-- Give owners one shared workspace (Zahtjevi: month navigator + selected-day list) to manage all incoming requests and worker schedules without needing per-worker logins. Owner habit stays this home; the in-PWA assistant fills the pending queue 24/7 so opening the app is worth it.
+- Give owners one shared workspace (Zahtjevi: month navigator + selected-day list) to manage all incoming requests and worker schedules without needing per-worker logins. From that home they can write a phone booking when the caller is not in the app. Owner habit stays this home; the in-PWA assistant fills the pending queue 24/7 so opening the app is worth it.
 - Capture the data needed for trust signals (verification, response speed, reliability) from day one, even where the UI to display it is a later phase.
 - A guest who typed `/` sees the Bosnian homepage, then Pronađi salon to discovery at `/salons` (teaser, then results) — no separate marketing site.
 

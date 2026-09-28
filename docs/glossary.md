@@ -223,8 +223,20 @@ The customer’s no to a time-proposed booking. The booking becomes declined wit
 _Avoid_: decline (customer), cancel (as time-proposed)
 
 **Confirmed booking**:
-A booking locked to a worker and a clock range, either because the owner accepted the preferred time or because both sides agreed after a counter-proposal. Not a request.
+A booking locked to a worker and a clock range. That happens when the owner accepts the preferred time, when both sides agree after a counter-proposal, or when the owner writes a phone booking. Not a request.
 _Avoid_: reservation, appointment (as the request), hold
+
+**Phone booking**:
+A confirmed booking the owner writes for a caller. Not a request and not an assistant-originated booking.
+_Avoid_: easy reservation, reservation, walk-in, desk booking
+
+**Caller**:
+The name on a phone booking, with an optional phone and an optional note. Not a customer and not a user.
+_Avoid_: client, guest account, walk-in, customer
+
+**Booking origin**:
+How a booking was created: the guest picker, the salon booking assistant, or a phone booking. Not an in-flight chat.
+_Avoid_: channel, source, walk-in, reservation type
 
 **Time-proposed booking**:
 A booking the owner has counter-proposed. It holds the offered range on that worker. Not a request and not confirmed until the customer acts.
@@ -251,8 +263,12 @@ The owner’s no to an in-progress reschedule. The confirmed booking stays at th
 _Avoid_: decline, reject, cancel (as confirmed)
 
 **Cancel**:
-The customer’s end of a confirmed booking, including one with an in-progress reschedule. It frees the occupied range. Not owner Decline, not reject of a time-proposed booking, and not withdraw of a request.
+The customer’s end of a confirmed booking, including one with an in-progress reschedule. It frees the occupied range. Not owner Decline, not reject of a time-proposed booking, not a phone booking cancel, and not withdraw of a request.
 _Avoid_: decline, reject, expire, withdraw request
+
+**Phone booking cancel**:
+The owner’s removal of a phone booking before its start. It ends as a cancelled booking. Not Cancel, not Decline, and not a no-show.
+_Avoid_: cancel (as the customer), delete, withdraw request
 
 **Late cancel**:
 A cancel inside the salon’s cancellation notice window. The customer sees a warning; the cancel still happens. Not a hard block and not a no-show.
@@ -275,7 +291,7 @@ A booking the owner declined, the customer rejected after a counter-proposal, or
 _Avoid_: cancelled (as requested), expired (as a fifth status), rejected appointment
 
 **Cancelled booking**:
-A confirmed booking the customer cancelled. It does not occupy a clock slot. Not declined, not expired, and not a no-show.
+A confirmed booking ended by the customer (Cancel) or by the owner (Phone booking cancel). It does not occupy a clock slot. Not declined, not expired, and not a no-show.
 _Avoid_: declined, expired, rejected, no-show
 
 **No-show**:

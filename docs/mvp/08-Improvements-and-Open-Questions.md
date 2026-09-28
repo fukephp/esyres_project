@@ -63,6 +63,7 @@ Typed `/` is the Bosnian homepage (top-nav homepage slot + existing hero + Prona
 **Phase 2 (parked, but worth remembering)**
 - Viber vs. WhatsApp vs. both — no BiH-specific quote obtained yet from either. Assistant v1 is in-PWA only; those channels would reuse the same `createBooking` contract later.
 - Whether an LLM later parses messy chat text into the same scripted steps (no free-form answers outside live salon data) — not v1.
+- Bosnian voice on a phone booking, a bubble transcript, and an agent that creates the booking from that audio — future. Zapisi keeps the saved choices so that training set can exist later. Not this slice.
 - `marketing_consent` field needed before any Phase 2 marketing message — platform-wide or per-salon opt-in not decided.
 - Message sender identity for a multi-tenant platform (one platform-level account, salon name via template variables) — directionally clear, not confirmed with a messaging partner.
 
