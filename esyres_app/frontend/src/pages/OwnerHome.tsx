@@ -58,6 +58,7 @@ import {
   ownerMonthWeekdayOffset,
   ownerSalonFromSearch,
   ownerSearchParams,
+  ownerPhonePath,
   overlayQueueChrome,
   queueChipInitial,
   queueRowClock,
@@ -417,6 +418,14 @@ export function OwnerHome() {
           />
         </div>
         <section className="rounded-lg border border-hairline bg-canvas p-4">
+          <div className="mb-4 flex justify-end">
+            <Link
+              to={ownerPhonePath(date, sarajevoToday(), salon.id, salons[0]?.id ?? null)}
+              className="text-sm font-medium text-ink"
+            >
+              {t('owner.phone.button')}
+            </Link>
+          </div>
           <div className="md:grid md:grid-cols-2 md:gap-6">
             <div>
               <div className="flex items-center gap-2">

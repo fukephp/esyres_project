@@ -65,6 +65,7 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
+    'pages/OwnerPhoneBooking.tsx',
   ]) {
     expect(read(file), file).toMatch(/<OwnerNav/)
   }

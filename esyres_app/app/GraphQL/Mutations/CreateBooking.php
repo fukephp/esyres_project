@@ -56,6 +56,7 @@ final class CreateBooking
             $booking->preferred_starts_at = $starts;
             $booking->status = Booking::REQUESTED;
             $booking->duration_minutes = $duration;
+            $booking->origin = Booking::ORIGIN_PICKER;
             $booking->save();
 
             foreach ($services as $service) {
@@ -67,7 +68,10 @@ final class CreateBooking
                 $row->save();
             }
 
-            $this->attachIntake($salon->id, $input['intakeToken'] ?? null, $booking->id);
+            if ($this->attachIntake($salon->id, $input['intakeToken'] ?? null, $booking->id)) {
+                $booking->origin = Booking::ORIGIN_ASSISTANT;
+                $booking->save();
+            }
 
             return $booking->load('services');
         });
@@ -146,20 +150,22 @@ final class CreateBooking
         return $worker->id;
     }
 
-    private function attachIntake(int $salonId, mixed $token, int $bookingId): void
+    private function attachIntake(int $salonId, mixed $token, int $bookingId): bool
     {
         if (! is_string($token) || $token === '' || ! Str::isUuid($token)) {
-            return;
+            return false;
         }
         $row = AssistantIntake::query()
             ->where('salon_id', $salonId)
             ->where('token', $token)
             ->first();
         if ($row === null || ! $row->isInFlight()) {
-            return;
+            return false;
         }
         $row->booking_id = $bookingId;
         $row->save();
+
+        return true;
     }
 
     private function assertIntakeNotTakenOver(int $salonId, mixed $token): void

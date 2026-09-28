@@ -408,6 +408,97 @@ export function ownerQueuePath(
   return query === '' ? '/owner' : `/owner?${query}`
 }
 
+export function ownerPhonePath(
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+): string {
+  const query = ownerSearchParams(date, today, salonId, firstOwnedId).toString()
+  return query === '' ? '/owner/phone' : `/owner/phone?${query}`
+}
+
+export function phoneErrorKey(
+  code: string | null,
+): 'SALON_CLOSED' | 'OUTSIDE_HOURS' | 'SLOT_TAKEN' | 'INVALID_WORKER' | 'INVALID_SERVICES' | 'DURING_BREAK' | 'INVALID_CALLER_NAME' | 'fallback' {
+  if (
+    code === 'SALON_CLOSED' ||
+    code === 'OUTSIDE_HOURS' ||
+    code === 'SLOT_TAKEN' ||
+    code === 'INVALID_WORKER' ||
+    code === 'INVALID_SERVICES' ||
+    code === 'DURING_BREAK' ||
+    code === 'INVALID_CALLER_NAME'
+  ) {
+    return code
+  }
+
+  return 'fallback'
+}
+
+export function phoneRangeOpen(day: PanelHours | undefined, time: string, durationMinutes: number): boolean {
+  if (day === undefined || day.closed || day.opensAt === null || day.closesAt === null) {
+    return false
+  }
+  if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+    return false
+  }
+  const start = minutes(time)
+  const end = start + durationMinutes
+  if (start < minutes(day.opensAt) || end > minutes(day.closesAt)) {
+    return false
+  }
+  if (day.breakStartsAt !== null && day.breakEndsAt !== null) {
+    const breakStart = minutes(day.breakStartsAt)
+    const breakEnd = minutes(day.breakEndsAt)
+    if (start < breakEnd && breakStart < end) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function phoneFreeWorkerIds(
+  workers: { id: string }[],
+  occupying: {
+    status: string
+    preferredStartsAt: string
+    proposedStartsAt: string | null
+    durationMinutes: number
+    worker: { id: string } | null
+    proposedWorker: { id: string } | null
+  }[],
+  time: string,
+  durationMinutes: number,
+  open: boolean,
+): string[] {
+  if (!open) {
+    return []
+  }
+  const start = minutes(time)
+  const end = start + durationMinutes
+
+  return workers
+    .filter((worker) => {
+      return !occupying.some((row) => {
+        const id = row.status === 'TIME_PROPOSED' ? row.proposedWorker?.id : row.worker?.id
+        if (id !== worker.id) {
+          return false
+        }
+        const raw = row.status === 'TIME_PROPOSED' ? row.proposedStartsAt : row.preferredStartsAt
+        if (raw === null) {
+          return false
+        }
+        const otherStart = minutes(formatSarajevoTime(raw))
+        const otherEnd = otherStart + row.durationMinutes
+
+        return start < otherEnd && otherStart < end
+      })
+    })
+    .map((worker) => worker.id)
+}
+
 export function ownerChatSearchParams(
   salonId: string | null = null,
   firstOwnedId: string | null = null,

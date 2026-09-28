@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Salon;
 use App\Models\SalonServiceCategory;
@@ -10,6 +11,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LocalDemoSeeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -2467,6 +2469,323 @@ mutation RemoveGallery($salonId: ID!, $index: Int!) {
   removeSalonGalleryImage(salonId: $salonId, index: $index) {
     id
     galleryUrls
+  }
+}
+GQL;
+    }
+
+    /**
+     * @Given customer :email has phone :phone
+     */
+    public function customerHasPhone(string $email, string $phone): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $user->phone = $phone;
+        $user->phone_verified_at = now();
+        $user->save();
+    }
+
+    /**
+     * @When I query my bookings
+     */
+    public function iQueryMyBookings(): void
+    {
+        $this->graphql(<<<'GQL'
+query {
+  myBookings {
+    id
+  }
+}
+GQL);
+    }
+
+    /**
+     * @Then my bookings are empty
+     */
+    public function myBookingsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['myBookings']);
+    }
+
+    /**
+     * @When I create a phone booking on :date at :time for :name
+     */
+    public function iCreateAPhoneBookingOnAtFor(string $date, string $time, string $name): void
+    {
+        $this->postPhoneBooking($date, $time, $name, '061 123 456', 'kod ulaza', [(string) $this->service->id], (string) $this->worker->id);
+    }
+
+    /**
+     * @When I create a phone booking on :date at :time for :name with phone :phone
+     */
+    public function iCreateAPhoneBookingWithPhone(string $date, string $time, string $name, string $phone): void
+    {
+        $this->postPhoneBooking($date, $time, $name, $phone, 'kod ulaza', [(string) $this->service->id], (string) $this->worker->id);
+    }
+
+    /**
+     * @When I create a phone booking on :date at :time for :name with no services
+     */
+    public function iCreateAPhoneBookingWithNoServices(string $date, string $time, string $name): void
+    {
+        $this->postPhoneBooking($date, $time, $name, '', '', [], (string) $this->worker->id);
+    }
+
+    /**
+     * @When I create a phone booking on :date at :time for :name with worker :workerId
+     */
+    public function iCreateAPhoneBookingWithWorker(string $date, string $time, string $name, string $workerId): void
+    {
+        $this->postPhoneBooking($date, $time, $name, '', '', [(string) $this->service->id], $workerId);
+    }
+
+    /**
+     * @When I create a phone booking as a guest on :date at :time for :name
+     */
+    public function iCreateAPhoneBookingAsAGuest(string $date, string $time, string $name): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iCreateAPhoneBookingOnAtFor($date, $time, $name);
+    }
+
+    /**
+     * @When I cancel the phone booking
+     */
+    public function iCancelThePhoneBooking(): void
+    {
+        $this->graphql($this->cancelPhoneBookingMutation(), [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @Then the stored booking origin is :origin
+     */
+    public function theStoredBookingOriginIs(string $origin): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($origin, $this->booking->origin);
+    }
+
+    /**
+     * @Then the phone booking has no customer and no owner response
+     */
+    public function thePhoneBookingHasNoCustomerAndNoOwnerResponse(): void
+    {
+        $row = $this->booking->fresh();
+        $this->assertNull($row->customer_id);
+        $this->assertNull($row->owner_responded_at);
+        $this->assertSame(Booking::CONFIRMED, $row->status);
+        $this->assertSame(Booking::ORIGIN_PHONE, $row->origin);
+        $created = $this->graphql['data']['createPhoneBooking'] ?? null;
+        if (is_array($created)) {
+            $this->assertSame($row->caller_name, $created['customerName']);
+            $this->assertSame([], $created['priorConfirmedBookings']);
+            $this->assertSame('PHONE', $created['origin']);
+        }
+    }
+
+    /**
+     * @Then the phone booking caller name is :name and phone is :phone and note is :note
+     */
+    public function thePhoneBookingCallerIs(string $name, string $phone, string $note): void
+    {
+        $row = $this->booking->fresh();
+        $this->assertSame($name, $row->caller_name);
+        $this->assertSame($phone === '' ? null : $phone, $row->caller_phone);
+        $this->assertSame($note === '' ? null : $note, $row->caller_note);
+    }
+
+    /**
+     * @Then the phone booking is cancelled without a late snapshot
+     */
+    public function thePhoneBookingIsCancelledWithoutALateSnapshot(): void
+    {
+        $row = $this->booking->fresh();
+        $this->assertSame(Booking::CANCELLED, $row->status);
+        $this->assertNotNull($row->cancelled_at);
+        $this->assertFalse((bool) $row->late_cancel);
+    }
+
+    /**
+     * @Then every user no_show_count is :count
+     */
+    public function everyUserNoShowCountIs(string $count): void
+    {
+        $this->assertSame((int) $count, (int) User::query()->sum('no_show_count'));
+    }
+
+    /**
+     * @Given an intake points at this booking
+     */
+    public function anIntakePointsAtThisBooking(): void
+    {
+        AssistantIntake::factory()->create([
+            'salon_id' => $this->salon->id,
+            'booking_id' => $this->booking->id,
+        ]);
+        $this->booking->origin = Booking::ORIGIN_PICKER;
+        $this->booking->save();
+    }
+
+    /**
+     * @When I backfill booking origins
+     */
+    public function iBackfillBookingOrigins(): void
+    {
+        DB::update('update bookings inner join assistant_intakes on assistant_intakes.booking_id = bookings.id set bookings.origin = ?', ['assistant']);
+        $this->booking->refresh();
+    }
+
+    /**
+     * @Then no booking reminder exists
+     */
+    public function noBookingReminderExists(): void
+    {
+        \Illuminate\Support\Facades\Notification::assertNothingSent();
+    }
+
+    /**
+     * @When I query salon busy level :date as a guest
+     */
+    public function iQuerySalonBusyLevelAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql(<<<'GQL'
+query SalonBusy($id: ID!, $date: String!) {
+  salon(id: $id) {
+    id
+    busyLevel(date: $date)
+  }
+}
+GQL, [
+            'id' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then busy level is :level
+     */
+    public function busyLevelIs(string $level): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($level, $this->graphql['data']['salon']['busyLevel']);
+    }
+
+    /**
+     * @When I cancel the booking
+     */
+    public function iCancelTheBooking(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation CancelBooking($bookingId: ID!) {
+  cancelBooking(bookingId: $bookingId) {
+    id
+    status
+  }
+}
+GQL, [
+            'bookingId' => (string) $this->booking->id,
+        ]);
+    }
+
+    /**
+     * @When I request reschedule :date at :time
+     */
+    public function iRequestReschedule(string $date, string $time): void
+    {
+        $this->graphql(<<<'GQL'
+mutation RequestReschedule($bookingId: ID!, $preferredDate: String!, $preferredTime: String!) {
+  requestReschedule(bookingId: $bookingId, preferredDate: $preferredDate, preferredTime: $preferredTime) {
+    id
+    status
+  }
+}
+GQL, [
+            'bookingId' => (string) $this->booking->id,
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ]);
+    }
+
+    /**
+     * @When I upsert a new assistant intake as a guest
+     */
+    public function iUpsertANewAssistantIntakeAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $ids = [];
+        foreach ($this->services as $service) {
+            $ids[] = (string) $service->id;
+        }
+        $this->graphql(<<<'GQL'
+mutation UpsertIntake($input: UpsertAssistantIntakeInput!) {
+  upsertAssistantIntake(input: $input) {
+    token
+  }
+}
+GQL, [
+            'input' => [
+                'salonId' => (string) $this->salon->id,
+                'serviceIds' => $ids === [] ? [] : [$ids[0]],
+                'workerConfirmed' => false,
+            ],
+        ]);
+        $token = $this->graphql['data']['upsertAssistantIntake']['token'] ?? null;
+        if (is_string($token)) {
+            $this->intakeToken = $token;
+        }
+    }
+
+    /**
+     * @param  list<string>  $serviceIds
+     */
+    private function postPhoneBooking(string $date, string $time, string $name, string $phone, string $note, array $serviceIds, string $workerId): void
+    {
+        $this->graphql($this->createPhoneBookingMutation(), [
+            'input' => [
+                'salonId' => (string) $this->salon->id,
+                'serviceIds' => $serviceIds,
+                'preferredDate' => $date,
+                'preferredTime' => $time,
+                'workerId' => $workerId,
+                'callerName' => $name,
+                'callerPhone' => $phone,
+                'callerNote' => $note,
+            ],
+        ]);
+        $id = $this->graphql['data']['createPhoneBooking']['id'] ?? null;
+        if (is_string($id) || is_int($id)) {
+            $this->booking = Booking::query()->find($id);
+        }
+    }
+
+    private function createPhoneBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation CreatePhoneBooking($input: CreatePhoneBookingInput!) {
+  createPhoneBooking(input: $input) {
+    id
+    status
+    origin
+    customerName
+    callerPhone
+    callerNote
+    priorConfirmedBookings { id }
+  }
+}
+GQL;
+    }
+
+    private function cancelPhoneBookingMutation(): string
+    {
+        return <<<'GQL'
+mutation CancelPhoneBooking($bookingId: ID!) {
+  cancelPhoneBooking(bookingId: $bookingId) {
+    id
+    status
   }
 }
 GQL;

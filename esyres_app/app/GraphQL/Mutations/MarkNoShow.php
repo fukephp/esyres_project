@@ -43,9 +43,23 @@ final class MarkNoShow
                 return $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
             }
 
-            $customer = User::query()->whereKey($booking->customer_id)->lockForUpdate()->first();
             $salon = Salon::query()->whereKey($booking->salon_id)->lockForUpdate()->first();
-            if ($customer === null || $salon === null) {
+            if ($salon === null) {
+                throw new ClientError('FORBIDDEN');
+            }
+            if ($booking->customer_id === null) {
+                $booking->no_show_at = now();
+                $booking->reschedule_date = null;
+                $booking->reschedule_starts_at = null;
+                $booking->save();
+                $salon->no_show_count = (int) $salon->no_show_count + 1;
+                $salon->save();
+
+                return $booking->load(['customer', 'worker', 'proposedWorker', 'services', 'salon']);
+            }
+
+            $customer = User::query()->whereKey($booking->customer_id)->lockForUpdate()->first();
+            if ($customer === null) {
                 throw new ClientError('FORBIDDEN');
             }
 

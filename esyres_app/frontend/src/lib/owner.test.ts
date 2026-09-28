@@ -14,6 +14,9 @@ import {
   overlayQueueChrome,
   ownerDateFromSearch,
   ownerQueuePath,
+  ownerPhonePath,
+  phoneFreeWorkerIds,
+  phoneRangeOpen,
   queueChipInitial,
   shiftOwnerDate,
   ownerChatPath,
@@ -211,6 +214,51 @@ test('propose start times are droppable starts for that worker', () => {
 test('owner queue path omits today', () => {
   expect(ownerQueuePath('2026-08-29', '2026-08-29')).toBe('/owner')
   expect(ownerQueuePath('2026-08-30', '2026-08-29')).toBe('/owner?date=2026-08-30')
+})
+
+test('owner phone path keeps the return day and omits the first salon', () => {
+  expect(ownerPhonePath('2026-08-29', '2026-08-29')).toBe('/owner/phone')
+  expect(ownerPhonePath('2026-08-30', '2026-08-29', '1', '1')).toBe('/owner/phone?date=2026-08-30')
+  expect(ownerPhonePath('2026-08-29', '2026-08-29', '2', '1')).toBe('/owner/phone?salon=2')
+})
+
+test('phone copy and free workers', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.phone.button')).toBe('Telefon')
+  expect(i18n.t('owner.phone.title')).toBe('Telefon')
+  expect(i18n.t('owner.phone.next')).toBe('Dalje')
+  expect(i18n.t('owner.phone.caller')).toBe('Pozivalac')
+  expect(i18n.t('owner.phone.note')).toBe('Bilješka (opcionalno)')
+  expect(i18n.t('owner.phone.noWorker')).toBe('Nema slobodnog radnika.')
+  expect(i18n.t('owner.phone.cancel')).toBe('Otkaži termin')
+  expect(i18n.t('owner.phone.error.INVALID_CALLER_NAME')).toBe('Unesi ime.')
+  expect(i18n.t('owner.phone.error.DURING_BREAK')).toBe('Termin pada u pauzu.')
+  expect(i18n.t('owner.phone.error.SALON_CLOSED')).toBe('Salon je zatvoren taj dan.')
+  expect(i18n.t('owner.phone.error.OUTSIDE_HOURS')).toBe('Van radnog vremena.')
+  expect(i18n.t('owner.phone.error.SLOT_TAKEN')).toBe('Taj termin je zauzet.')
+  expect(i18n.t('owner.phone.error.INVALID_WORKER')).toBe('Odaberi radnika ovog salona.')
+  const day = {
+    weekday: 'SATURDAY',
+    closed: false,
+    opensAt: '08:00',
+    closesAt: '17:00',
+    breakStartsAt: '13:00',
+    breakEndsAt: '14:00',
+  }
+  expect(phoneRangeOpen(day, '10:00', 30)).toBe(true)
+  expect(phoneRangeOpen(day, '13:30', 30)).toBe(false)
+  const occupying = [
+    {
+      status: 'CONFIRMED',
+      preferredStartsAt: '2026-08-29T08:00:00.000Z',
+      proposedStartsAt: null,
+      durationMinutes: 30,
+      worker: { id: '1' },
+      proposedWorker: null,
+    },
+  ]
+  const ids = phoneFreeWorkerIds([{ id: '1' }, { id: '2' }], occupying, '10:00', 30, true)
+  expect(ids).toEqual(['2'])
 })
 
 test('salon from search falls back to first owned', () => {
