@@ -330,6 +330,10 @@ void i18n.use(initReactI18next).init({
             caller: 'Pozivalac',
             next: 'Dalje',
             note: 'Bilješka (opcionalno)',
+            today: 'Danas',
+            tomorrow: 'Sutra',
+            otherDay: 'Drugi dan',
+            noStart: 'Nema slobodnog termina.',
             noWorker: 'Nema slobodnog radnika.',
             cancel: 'Otkaži termin',
             error: {

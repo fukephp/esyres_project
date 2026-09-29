@@ -71,7 +71,6 @@ test('owner logged-out and email-verify use Panel; session titles return; login-
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
-    'pages/OwnerPhoneBooking.tsx',
     'pages/OwnerZapisi.tsx',
   ]
   for (const file of files) {

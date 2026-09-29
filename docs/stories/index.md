@@ -98,4 +98,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-73 | Zahtjevi diary day list | 3 | `STORY-73` | STORY-67 |
 | STORY-74 | Phone booking | 3 | `STORY-74` | STORY-01, STORY-02, STORY-03, STORY-67, STORY-70, STORY-72 |
 | STORY-75 | Zapisi | 3 | — | STORY-74, STORY-25 |
-| STORY-76 | Telefon modal | 3 | — | STORY-74 |
+| STORY-76 | Telefon modal | 3 | `STORY-76` | STORY-74 |

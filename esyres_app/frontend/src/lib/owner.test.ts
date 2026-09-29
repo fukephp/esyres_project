@@ -19,6 +19,11 @@ import {
   requestFromZapisiPath,
   zapisiOriginFromSearch,
   phoneFreeWorkerIds,
+  phoneLegalStarts,
+  phoneSkipDate,
+  phoneDayChip,
+  phoneAfterServiceChange,
+  phoneWorkerSelection,
   phoneRangeOpen,
   queueChipInitial,
   shiftOwnerDate,
@@ -249,6 +254,10 @@ test('phone copy and free workers', async () => {
   expect(i18n.t('owner.phone.caller')).toBe('Pozivalac')
   expect(i18n.t('owner.phone.note')).toBe('Bilješka (opcionalno)')
   expect(i18n.t('owner.phone.noWorker')).toBe('Nema slobodnog radnika.')
+  expect(i18n.t('owner.phone.today')).toBe('Danas')
+  expect(i18n.t('owner.phone.tomorrow')).toBe('Sutra')
+  expect(i18n.t('owner.phone.otherDay')).toBe('Drugi dan')
+  expect(i18n.t('owner.phone.noStart')).toBe('Nema slobodnog termina.')
   expect(i18n.t('owner.phone.cancel')).toBe('Otkaži termin')
   expect(i18n.t('owner.phone.error.INVALID_CALLER_NAME')).toBe('Unesi ime.')
   expect(i18n.t('owner.phone.error.DURING_BREAK')).toBe('Termin pada u pauzu.')
@@ -278,6 +287,52 @@ test('phone copy and free workers', async () => {
   ]
   const ids = phoneFreeWorkerIds([{ id: '1' }, { id: '2' }], occupying, '10:00', 30, true)
   expect(ids).toEqual(['2'])
+  const openDay = {
+    weekday: 'SATURDAY',
+    closed: false,
+    opensAt: '08:00',
+    closesAt: '12:00',
+    breakStartsAt: null,
+    breakEndsAt: null,
+  }
+  const starts = phoneLegalStarts(openDay, [{ id: '1' }], occupying, 30)
+  expect(starts).toContain('08:00')
+  expect(starts).not.toContain('10:00')
+  expect(starts).toContain('10:30')
+  expect(starts.every((start) => /:(00|15|30|45)$/.test(start))).toBe(true)
+  const breakDay = {
+    weekday: 'SATURDAY',
+    closed: false,
+    opensAt: '08:00',
+    closesAt: '17:00',
+    breakStartsAt: '13:00',
+    breakEndsAt: '14:00',
+  }
+  const withBreak = phoneLegalStarts(breakDay, [{ id: '2' }], [], 30)
+  expect(withBreak).not.toContain('12:45')
+  expect(withBreak).not.toContain('13:00')
+  expect(withBreak).toContain('14:00')
+  expect(phoneLegalStarts({ ...openDay, closed: true }, [{ id: '1' }], [], 30)).toEqual([])
+  const seen: string[] = []
+  expect(
+    phoneSkipDate('2026-09-29', (date) => {
+      seen.push(date)
+      return date === '2026-10-01'
+    }),
+  ).toBe('2026-10-01')
+  expect(seen[0]).toBe('2026-09-29')
+  expect(seen).not.toContain('2026-09-28')
+  expect(phoneSkipDate('2026-09-29', () => false)).toBe('2026-09-29')
+  expect(phoneDayChip('2026-09-29', '2026-09-29')).toBe('today')
+  expect(phoneDayChip('2026-09-30', '2026-09-29')).toBe('tomorrow')
+  expect(phoneDayChip('2026-10-01', '2026-09-29')).toBe('other')
+  expect(phoneDayChip('2026-09-28', '2026-09-29')).toBe('other')
+  expect(phoneAfterServiceChange('10:30', '1', ['10:30', '11:00'])).toEqual({ time: '10:30', workerId: '1' })
+  expect(phoneAfterServiceChange('10:00', '1', ['10:30'])).toEqual({ time: '', workerId: '' })
+  expect(phoneWorkerSelection(['1'], '')).toBe('1')
+  expect(phoneWorkerSelection(['1', '2'], '')).toBe('')
+  expect(phoneWorkerSelection(['1', '2'], '2')).toBe('2')
+  expect(phoneWorkerSelection([], '1')).toBe('')
 })
 
 test('salon from search falls back to first owned', () => {
