@@ -223,6 +223,7 @@ test('owner overlay TopNav above aside+main; OwnerNav stays; no bookings or pane
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
     'pages/OwnerPhoneBooking.tsx',
+    'pages/OwnerZapisi.tsx',
   ]
   for (const file of files) {
     const text = read(file)
@@ -245,6 +246,7 @@ test('owner overlay TopNav above aside+main; OwnerNav stays; no bookings or pane
   expect(read('pages/OwnerSalonEdit.tsx')).toMatch(/<OwnerNav/)
   expect(read('pages/OwnerSettings.tsx')).toMatch(/<OwnerNav/)
   expect(read('pages/OwnerPhoneBooking.tsx')).toMatch(/<OwnerNav/)
+  expect(read('pages/OwnerZapisi.tsx')).toMatch(/<OwnerNav/)
   expect(read('components/OwnerNav.tsx')).toMatch(/owner\.title/)
   expect(read('components/OwnerNav.tsx')).toMatch(/owner\.salons/)
 })

@@ -15,6 +15,9 @@ import {
   ownerDateFromSearch,
   ownerQueuePath,
   ownerPhonePath,
+  ownerZapisiPath,
+  requestFromZapisiPath,
+  zapisiOriginFromSearch,
   phoneFreeWorkerIds,
   phoneRangeOpen,
   queueChipInitial,
@@ -217,6 +220,19 @@ test('propose start times are droppable starts for that worker', () => {
 test('owner queue path omits today', () => {
   expect(ownerQueuePath('2026-08-29', '2026-08-29')).toBe('/owner')
   expect(ownerQueuePath('2026-08-30', '2026-08-29')).toBe('/owner?date=2026-08-30')
+})
+
+test('owner zapisi path omits today, first salon, and Svi', () => {
+  expect(ownerZapisiPath('2026-08-29', '2026-08-29')).toBe('/owner/zapisi')
+  expect(ownerZapisiPath('2026-08-30', '2026-08-29', '1', '1')).toBe('/owner/zapisi?date=2026-08-30')
+  expect(ownerZapisiPath('2026-08-29', '2026-08-29', '2', '1')).toBe('/owner/zapisi?salon=2')
+  expect(ownerZapisiPath('2026-08-29', '2026-08-29', '2', '1', 'phone')).toBe('/owner/zapisi?salon=2&origin=phone')
+  expect(zapisiOriginFromSearch('nope')).toBeNull()
+  expect(zapisiOriginFromSearch('assistant')).toBe('assistant')
+  expect(requestFromZapisiPath('9', '2026-08-30', '2026-08-29', '2', '1', 'picker')).toBe(
+    '/owner/requests/9?from=zapisi&date=2026-08-30&salon=2&origin=picker',
+  )
+  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9?from=zapisi')
 })
 
 test('owner phone path keeps the return day and omits the first salon', () => {
@@ -694,6 +710,21 @@ test('occupying dots and selected-day split', () => {
     'occupying',
   ])
   expect(mixRestWithBreak([noon], null, null).map((row) => row.kind)).toEqual(['occupying'])
+})
+
+test('zapisi copy is Bosnian', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.zapisi')).toBe('Zapisi')
+  expect(i18n.t('owner.originAll')).toBe('Svi')
+  expect(i18n.t('owner.originGuest')).toBe('Gost')
+  expect(i18n.t('owner.date')).toBe('Datum')
+  expect(i18n.t('owner.assistant')).toBe('Asistent')
+  expect(i18n.t('owner.phone.button')).toBe('Telefon')
+  expect(i18n.t('bookings.status.REQUESTED')).toBe('Na čekanju')
+  expect(i18n.t('bookings.status.CONFIRMED')).toBe('Potvrđeno')
+  expect(i18n.t('bookings.status.TIME_PROPOSED')).toBe('Predloženo vrijeme')
+  expect(i18n.t('bookings.status.DECLINED')).toBe('Odbijeno')
+  expect(i18n.t('bookings.status.CANCELLED')).toBe('Otkazano')
 })
 
 test('owner settings copy is Bosnian', async () => {

@@ -185,6 +185,9 @@ void i18n.use(initReactI18next).init({
         },
         owner: {
           title: 'Zahtjevi',
+          zapisi: 'Zapisi',
+          originAll: 'Svi',
+          originGuest: 'Gost',
           chat: 'Chat',
           stats: 'Statistika',
           salons: 'Saloni',

@@ -411,6 +411,57 @@ export function ownerQueuePath(
   return query === '' ? '/owner' : `/owner?${query}`
 }
 
+export type ZapisiOrigin = 'picker' | 'assistant' | 'phone'
+
+export function zapisiOriginFromSearch(param: string | null): ZapisiOrigin | null {
+  if (param === 'picker' || param === 'assistant' || param === 'phone') {
+    return param
+  }
+
+  return null
+}
+
+export function ownerZapisiSearchParams(
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+  origin: ZapisiOrigin | null = null,
+): URLSearchParams {
+  const params = ownerSearchParams(date, today, salonId, firstOwnedId)
+  if (origin !== null) {
+    params.set('origin', origin)
+  }
+
+  return params
+}
+
+export function ownerZapisiPath(
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+  origin: ZapisiOrigin | null = null,
+): string {
+  const query = ownerZapisiSearchParams(date, today, salonId, firstOwnedId, origin).toString()
+
+  return query === '' ? '/owner/zapisi' : `/owner/zapisi?${query}`
+}
+
+export function requestFromZapisiPath(
+  bookingId: string,
+  date: string,
+  today = sarajevoToday(),
+  salonId: string | null = null,
+  firstOwnedId: string | null = null,
+  origin: ZapisiOrigin | null = null,
+): string {
+  const list = ownerZapisiPath(date, today, salonId, firstOwnedId, origin)
+  const extra = list.includes('?') ? `&${list.slice(list.indexOf('?') + 1)}` : ''
+
+  return `/owner/requests/${bookingId}?from=zapisi${extra}`
+}
+
 export function ownerPhonePath(
   date: string,
   today = sarajevoToday(),

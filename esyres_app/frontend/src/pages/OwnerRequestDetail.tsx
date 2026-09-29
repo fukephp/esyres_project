@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
@@ -36,9 +36,12 @@ import {
   formatSarajevoTime,
   hoursForDate,
   occupyingBlock,
+  ownerDateFromSearch,
   ownerDetailMode,
   occupyingClockRange,
   ownerQueuePath,
+  ownerZapisiPath,
+  zapisiOriginFromSearch,
   panelCells,
   phoneErrorKey,
   proposeErrorKey,
@@ -50,6 +53,7 @@ import { useOwnerPush } from '../lib/push'
 export function OwnerRequestDetail() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
+  const [search] = useSearchParams()
   const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
@@ -120,6 +124,16 @@ export function OwnerRequestDetail() {
     booking === undefined
       ? '/owner'
       : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
+  const leavePath =
+    search.get('from') === 'zapisi'
+      ? ownerZapisiPath(
+          ownerDateFromSearch(search.get('date')),
+          sarajevoToday(),
+          search.get('salon'),
+          firstOwnedId,
+          zapisiOriginFromSearch(search.get('origin')),
+        )
+      : queuePath
   const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
 
   async function goQueue() {
@@ -297,7 +311,7 @@ export function OwnerRequestDetail() {
           />
         </div>
         <p className="mt-6">
-          <Link to={queuePath} className="text-sm font-medium text-ink underline">
+          <Link to={leavePath} className="text-sm font-medium text-ink underline">
             {t('owner.back')}
           </Link>
         </p>
