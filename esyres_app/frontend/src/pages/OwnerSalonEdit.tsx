@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { OwnerPageSkeleton, OwnerSalonEditSkeleton } from '../components/Skeleton'
 import {
   CREATE_SALON_SERVICE_CATEGORY_MUTATION,
   CREATE_SALON_SERVICE_MUTATION,
@@ -588,12 +589,9 @@ export function OwnerSalonEdit() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <OwnerSalonEditSkeleton />
+      </OwnerPageSkeleton>
     )
   }
 

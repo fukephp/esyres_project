@@ -90,6 +90,7 @@ Self-hosted via Fontsource (OFL): `@fontsource-variable/bricolage-grotesque`, `@
 | `StepCard` | Pastel block with a number chip, a short title, one line of copy. |
 | `AudienceCard` | Large `rounded-3xl` block, pink (Za goste) or blue (Za salone), title + 2 bullets + CTA. |
 | `FaqItem` | Native `<details>` on `canvas`, `rounded-2xl`, hairline. |
+| `Skeleton` | Loading stand-in shaped like the content (rows, cards, tiles, pills, week grid). Blocks `surface-card` (on the dark shell `surface-dark-elevated`), radius of the thing they replace, `motion-safe:animate-pulse`, no shadow or pastel. Hidden until ~150ms. Wrapper `role="status"` + `aria-busy`, sr-only `Učitavanje…`. Owner routes load inside a ghost `OwnerShell` (no links). |
 
 ## Surfaces
 

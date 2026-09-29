@@ -10,6 +10,7 @@ import {
   type OccupyingBookingsData,
   type OccupyingBookingsRangeData,
 } from '../graphql/pending'
+import { PillsSkeleton } from '../components/Skeleton'
 import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
 import {
@@ -338,7 +339,7 @@ export function PhoneBookingDialog({
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-ink">{t('owner.phone.when')}</h3>
           {waitingSkip ? (
-            <p className="text-sm text-body">{t('salon.loading')}</p>
+            <PillsSkeleton />
           ) : (
             <>
               <div className="flex flex-wrap gap-2">
@@ -391,9 +392,7 @@ export function PhoneBookingDialog({
                   ) : null}
                 </>
               ) : null}
-              {resolved !== '' && rows === null && !windowFailed ? (
-                <p className="text-sm text-body">{t('salon.loading')}</p>
-              ) : null}
+              {resolved !== '' && rows === null && !windowFailed ? <PillsSkeleton /> : null}
               {dayClosed && manualBlock === null ? <p className="text-sm text-body">{t('owner.phone.error.SALON_CLOSED')}</p> : null}
               {dayEmpty ? <p className="text-sm text-body">{t('owner.phone.noStart')}</p> : null}
               {chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length > 0 ? (

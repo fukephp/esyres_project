@@ -216,7 +216,7 @@ test('pill opens picker modal; chat card opens a second dialog', () => {
 test('loading and missing salon skip the booking split', () => {
   const page = read('pages/SalonProfile.tsx')
   const loading = page.slice(page.indexOf('if (loading)'), page.indexOf('const salon = data?.salon'))
-  expect(loading).toMatch(/GUEST_COLUMN_CLASS/)
+  expect(loading).toMatch(/<GuestPageSkeleton>/)
   expect(loading).not.toMatch(/SALON_BOOKING_SPLIT_CLASS/)
   const missing = page.slice(page.indexOf('if (!salon)'), page.indexOf('const token = busyToken'))
   expect(missing).toMatch(/GUEST_COLUMN_CLASS/)

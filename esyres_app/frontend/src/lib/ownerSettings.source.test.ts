@@ -14,7 +14,7 @@ test('settings is a lazy owner route', () => {
   const app = read('App.tsx')
   expect(app).toMatch(/const OwnerSettings = lazy\(/)
   expect(app).toMatch(/path="\/owner\/settings"/)
-  expect(app).toMatch(/salon\.loading/)
+  expect(app).toMatch(/OwnerPageSkeleton/)
 })
 
 test('settings sits in OwnerShell like the catalog', () => {

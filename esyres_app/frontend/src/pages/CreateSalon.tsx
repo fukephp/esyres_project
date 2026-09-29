@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
+import { FormSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { CREATE_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
 import { createSalonSurface } from '../lib/createSalon'
@@ -25,9 +26,9 @@ export function CreateSalon() {
     return (
       <>
         <TopNav me={navMe} />
-        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
-          <p>{t('salon.loading')}</p>
-        </main>
+        <GuestPageSkeleton>
+          <FormSkeleton />
+        </GuestPageSkeleton>
       </>
     )
   }

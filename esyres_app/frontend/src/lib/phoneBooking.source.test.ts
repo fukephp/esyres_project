@@ -82,7 +82,7 @@ test('phone modal is four steps with day chips and quarter pills', () => {
   expect(dialog).not.toMatch(/\bmin=/)
   expect(dialog).not.toMatch(/<select/)
   expect(dialog).toMatch(/aria-pressed/)
-  expect(dialog).toMatch(/salon\.loading/)
+  expect(dialog).toMatch(/<PillsSkeleton/)
   expect(dialog).toMatch(/OCCUPYING_BOOKINGS_RANGE_QUERY/)
   const skipAt = dialog.indexOf('phoneSkipDate(today')
   expect(dialog.slice(skipAt - 220, skipAt)).toMatch(/windowRows === undefined/)

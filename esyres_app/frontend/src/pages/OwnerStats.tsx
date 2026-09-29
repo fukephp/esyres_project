@@ -5,6 +5,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { OwnerPageSkeleton, TilesSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import {
@@ -57,12 +58,9 @@ export function OwnerStats() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <TilesSkeleton />
+      </OwnerPageSkeleton>
     )
   }
 
@@ -119,7 +117,7 @@ export function OwnerStats() {
         onSalon={onSalon}
       >
         {(statsLoading && stats === null) || (qrLoading && qr === undefined) ? (
-          <p className="text-sm text-body">{t('salon.loading')}</p>
+          <TilesSkeleton className="max-w-3xl" />
         ) : (
           <div className="max-w-3xl">
             {stats === null ? null : (

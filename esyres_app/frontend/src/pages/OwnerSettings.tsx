@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { OwnerPageSkeleton, FormSkeleton } from '../components/Skeleton'
 import {
   CHANGE_PASSWORD_MUTATION,
   ME_QUERY,
@@ -86,12 +87,9 @@ export function OwnerSettings() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <FormSkeleton />
+      </OwnerPageSkeleton>
     )
   }
 

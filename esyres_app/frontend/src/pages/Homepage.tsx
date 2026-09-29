@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { TopNav } from '../components/TopNav'
+import { PopularSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { POPULAR_IN_SARAJEVO_QUERY, type PopularInSarajevoData } from '../graphql/discovery'
 import { sarajevoToday } from '../lib/format'
@@ -23,7 +24,7 @@ export function Homepage() {
   const { t } = useTranslation()
   const { data } = useQuery<MeData>(ME_QUERY)
   const [authOpen, setAuthOpen] = useState<'login' | 'register' | null>(null)
-  const { data: popular } = useQuery<PopularInSarajevoData>(POPULAR_IN_SARAJEVO_QUERY, {
+  const { data: popular, loading: popularLoading } = useQuery<PopularInSarajevoData>(POPULAR_IN_SARAJEVO_QUERY, {
     variables: { date: sarajevoToday(), category: null, name: null },
     skip: authOpen !== null,
   })
@@ -101,7 +102,9 @@ export function Homepage() {
               />
             </section>
 
-            {salons.length > 0 ? (
+            {popularLoading ? (
+              <PopularSkeleton />
+            ) : salons.length > 0 ? (
               <section className="mt-16">
                 <div className="flex items-end justify-between gap-4">
                   <h2 className={SECTION_TITLE_CLASS}>{t('home.popularTitle')}</h2>

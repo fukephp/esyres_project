@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { TopNav } from '../components/TopNav'
+import { CardsSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ASK_OTHER_TIME_MUTATION,
@@ -352,9 +353,9 @@ export function MyBookings() {
     return (
       <>
         <TopNav me={navMe} />
-        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
-          <p>{t('salon.loading')}</p>
-        </main>
+        <GuestPageSkeleton>
+          <CardsSkeleton />
+        </GuestPageSkeleton>
       </>
     )
   }
@@ -396,7 +397,7 @@ export function MyBookings() {
         </div>
       )}
       {listLoading ? (
-        <p className="mt-8 text-sm text-body">{t('salon.loading')}</p>
+        <CardsSkeleton className="mt-8" />
       ) : rows.length === 0 ? (
         <p className="mt-8 text-sm text-body">{t('bookings.empty')}</p>
       ) : (

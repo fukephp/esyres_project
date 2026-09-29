@@ -1,6 +1,16 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import i18n from './i18n'
+import {
+  CardsSkeleton,
+  FormSkeleton,
+  OwnerPageSkeleton,
+  OwnerSalonEditSkeleton,
+  OwnerSalonsSkeleton,
+  OwnerWeekSkeleton,
+  RequestDetailSkeleton,
+  RowsSkeleton,
+  TilesSkeleton,
+} from './components/Skeleton'
 import { CREATE_SALON_PATH } from './lib/createSalon'
 import { CreateSalon } from './pages/CreateSalon'
 import { DiscoveryHome } from './pages/DiscoveryHome'
@@ -27,6 +37,10 @@ const OwnerPhoneBooking = lazy(() =>
 )
 const OwnerZapisi = lazy(() => import('./pages/OwnerZapisi').then((m) => ({ default: m.OwnerZapisi })))
 
+function owner(page: ReactNode, preset: ReactNode) {
+  return <Suspense fallback={<OwnerPageSkeleton>{preset}</OwnerPageSkeleton>}>{page}</Suspense>
+}
+
 export default function App() {
   return (
     <div className="min-h-svh bg-canvas">
@@ -36,86 +50,16 @@ export default function App() {
         <Route path={CREATE_SALON_PATH} element={<CreateSalon />} />
         <Route path="/salon/:id" element={<SalonProfile />} />
         <Route path="/bookings" element={<MyBookings />} />
-        <Route
-          path="/owner"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerHome />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/chats"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerChats />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/stats"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerStats />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/requests/:id"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerRequestDetail />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/salons"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerSalons />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/salons/create"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerSalonCreate />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/salons/:id"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerSalonEdit />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/settings"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerSettings />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/zapisi"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerZapisi />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/owner/phone"
-          element={
-            <Suspense fallback={<p className="px-5 py-8 text-body">{i18n.t('salon.loading')}</p>}>
-              <OwnerPhoneBooking />
-            </Suspense>
-          }
-        />
+        <Route path="/owner" element={owner(<OwnerHome />, <OwnerWeekSkeleton />)} />
+        <Route path="/owner/chats" element={owner(<OwnerChats />, <RowsSkeleton count={4} />)} />
+        <Route path="/owner/stats" element={owner(<OwnerStats />, <TilesSkeleton />)} />
+        <Route path="/owner/requests/:id" element={owner(<OwnerRequestDetail />, <RequestDetailSkeleton />)} />
+        <Route path="/owner/salons" element={owner(<OwnerSalons />, <OwnerSalonsSkeleton />)} />
+        <Route path="/owner/salons/create" element={owner(<OwnerSalonCreate />, <FormSkeleton />)} />
+        <Route path="/owner/salons/:id" element={owner(<OwnerSalonEdit />, <OwnerSalonEditSkeleton />)} />
+        <Route path="/owner/settings" element={owner(<OwnerSettings />, <FormSkeleton />)} />
+        <Route path="/owner/zapisi" element={owner(<OwnerZapisi />, <RowsSkeleton count={4} />)} />
+        <Route path="/owner/phone" element={owner(<OwnerPhoneBooking />, <CardsSkeleton />)} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
