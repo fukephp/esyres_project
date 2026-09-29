@@ -6,6 +6,7 @@ import { AssistantIntake } from '../components/AssistantIntake'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
+import { GuestPageSkeleton, SalonProfileSkeleton } from '../components/Skeleton'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
@@ -357,9 +358,9 @@ export function SalonProfile() {
     return (
       <>
         <TopNav me={navMe} />
-        <main className={`${GUEST_COLUMN_CLASS} py-8 text-body`}>
-          <p>{t('salon.loading')}</p>
-        </main>
+        <GuestPageSkeleton>
+          <SalonProfileSkeleton />
+        </GuestPageSkeleton>
       </>
     )
   }

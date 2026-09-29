@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
+import { RowsSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   POPULAR_IN_SARAJEVO_QUERY,
@@ -197,7 +198,7 @@ export function DiscoveryHome() {
         />
       </div>
       {loading || !source ? (
-        <p className="mt-6 text-sm text-body">{t('salon.loading')}</p>
+        <RowsSkeleton className="mt-6" />
       ) : !salons || salons.length === 0 ? (
         <p className="mt-6 text-sm text-muted">{t(discoveryEmptyKey(source, filtered))}</p>
       ) : listMode === 'teaser' ? (

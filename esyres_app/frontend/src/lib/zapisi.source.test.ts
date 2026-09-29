@@ -14,7 +14,7 @@ test('zapisi is a lazy owner route', () => {
   const app = read('App.tsx')
   expect(app).toMatch(/const OwnerZapisi = lazy\(/)
   expect(app).toMatch(/path="\/owner\/zapisi"/)
-  expect(app).toMatch(/salon\.loading/)
+  expect(app).toMatch(/OwnerPageSkeleton/)
 })
 
 test('OwnerNav puts Zapisi under Zahtjevi', () => {

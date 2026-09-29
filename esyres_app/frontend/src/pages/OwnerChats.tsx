@@ -5,6 +5,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { OwnerPageSkeleton, RowsSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
@@ -75,12 +76,9 @@ export function OwnerChats() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <RowsSkeleton count={4} />
+      </OwnerPageSkeleton>
     )
   }
 
@@ -151,7 +149,7 @@ export function OwnerChats() {
           {t('owner.dnd')}
         </label>
         {listLoading ? (
-          <p className="mt-8 text-sm text-body">{t('salon.loading')}</p>
+          <RowsSkeleton count={4} className="mt-8 max-w-xl" />
         ) : rows.length === 0 ? (
           <p className="mt-8 text-sm text-body">{t('owner.chatsEmpty')}</p>
         ) : (

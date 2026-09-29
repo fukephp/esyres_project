@@ -7,6 +7,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { ColumnSkeleton, OwnerPageSkeleton, OwnerWeekSkeleton, WeekGridSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
@@ -239,12 +240,9 @@ export function OwnerHome() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <OwnerWeekSkeleton />
+      </OwnerPageSkeleton>
     )
   }
 
@@ -382,13 +380,15 @@ export function OwnerHome() {
             {closedFor(date) ? <p className="mt-1 text-sm text-muted">{t('owner.closedDay')}</p> : null}
             <KanbanBoard>
               <BoardColumn column="pending" count={rows.length}>
-                {queueLoading ? <p className="px-1 text-sm text-body">{t('salon.loading')}</p> : pendingList}
+                {queueLoading ? <ColumnSkeleton /> : pendingList}
               </BoardColumn>
               {(['proposed', 'confirmed', 'done'] as const).map((column) => (
                 <BoardColumn key={column} column={column} count={groups[column].length}>
-                  {groups[column].map((row) => (
-                    <BookingCard key={row.id} row={row} to={`/owner/requests/${row.id}`} />
-                  ))}
+                  {dayBookings === undefined ? (
+                    <ColumnSkeleton />
+                  ) : (
+                    groups[column].map((row) => <BookingCard key={row.id} row={row} to={`/owner/requests/${row.id}`} />)
+                  )}
                 </BoardColumn>
               ))}
             </KanbanBoard>
@@ -399,7 +399,11 @@ export function OwnerHome() {
               <WeekHeader days={days} onShift={(delta) => onDate(shiftOwnerDate(date, delta))} />
               <DayChips days={days} date={date} closedFor={closedFor} onDate={onDate} className="mt-4 md:hidden" />
               {workers.length === 0 ? <p className="mt-4 text-sm text-body">{t('owner.noWorkers')}</p> : null}
-              <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} />
+              {occupyingRange === undefined ? (
+                <WeekGridSkeleton className="mt-4" />
+              ) : (
+                <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} />
+              )}
             </section>
             <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">
               <h3 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-ink">
@@ -408,7 +412,7 @@ export function OwnerHome() {
               </h3>
               <div className="mt-4">
                 {queueLoading ? (
-                  <p className="text-sm text-body">{t('salon.loading')}</p>
+                  <ColumnSkeleton count={3} />
                 ) : rows.length === 0 ? (
                   <p className="text-sm text-muted">{t('owner.noPending')}</p>
                 ) : (

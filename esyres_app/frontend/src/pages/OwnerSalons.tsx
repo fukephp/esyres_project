@@ -5,6 +5,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { OwnerPageSkeleton, OwnerSalonsSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
@@ -30,12 +31,9 @@ export function OwnerSalons() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <OwnerSalonsSkeleton />
+      </OwnerPageSkeleton>
     )
   }
 

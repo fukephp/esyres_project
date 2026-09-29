@@ -6,6 +6,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekHeader } from '../components/OwnerBoards'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { KanbanSkeleton, OwnerPageSkeleton, RowsSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { SALON_DAY_BOOKINGS_QUERY, type SalonDayBookingsData } from '../graphql/pending'
@@ -68,12 +69,9 @@ export function OwnerZapisi() {
 
   if (loading) {
     return (
-      <>
-        <TopNav me={navMe} />
-        <main className="px-5 py-8 text-body">
-          <p>{t('salon.loading')}</p>
-        </main>
-      </>
+      <OwnerPageSkeleton>
+        <RowsSkeleton count={4} />
+      </OwnerPageSkeleton>
     )
   }
 
@@ -163,7 +161,11 @@ export function OwnerZapisi() {
           </div>
           <DayChips days={days} date={date} closedFor={() => false} onDate={(ymd) => write(ymd, salon.id, origin)} className="mt-4" />
           {listLoading && listData === undefined ? (
-            <p className="mt-6 text-sm text-body">{t('salon.loading')}</p>
+            kanban ? (
+              <KanbanSkeleton className="mt-6" />
+            ) : (
+              <RowsSkeleton count={4} className="mt-6" />
+            )
           ) : kanban ? (
             <KanbanBoard>
               {KANBAN_COLUMNS.map((column) => (
