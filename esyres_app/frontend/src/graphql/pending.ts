@@ -229,6 +229,7 @@ export const OCCUPYING_BOOKINGS_RANGE_QUERY = gql`
     occupyingBookingsRange(salonId: $salonId, from: $from, to: $to) {
       id
       status
+      preferredDate
       preferredStartsAt
       proposedStartsAt
       durationMinutes
@@ -351,6 +352,7 @@ export type PendingBookingsData = {
 export type OccupyingBooking = {
   id: string
   status: 'CONFIRMED' | 'TIME_PROPOSED'
+  preferredDate?: string
   preferredStartsAt: string
   proposedStartsAt: string | null
   durationMinutes: number

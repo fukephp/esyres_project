@@ -2,6 +2,7 @@ import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
+import { PhoneBookingDialog } from './OwnerPhoneBooking'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerNav } from '../components/OwnerNav'
@@ -58,7 +59,6 @@ import {
   ownerMonthWeekdayOffset,
   ownerSalonFromSearch,
   ownerSearchParams,
-  ownerPhonePath,
   overlayQueueChrome,
   queueChipInitial,
   queueRowClock,
@@ -143,12 +143,14 @@ export function OwnerHome() {
   const [dismissId, setDismissId] = useState<string | null>(null)
   const [reasonDraft, setReasonDraft] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [phoneOpen, setPhoneOpen] = useState(false)
 
   function onDate(value: string) {
     setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
   }
 
   function onSalon(id: string) {
+    setPhoneOpen(false)
     setParams(ownerSearchParams(date, sarajevoToday(), id, salons[0]?.id ?? null))
   }
 
@@ -419,12 +421,13 @@ export function OwnerHome() {
         </div>
         <section className="rounded-lg border border-hairline bg-canvas p-4">
           <div className="mb-4 flex justify-end">
-            <Link
-              to={ownerPhonePath(date, sarajevoToday(), salon.id, salons[0]?.id ?? null)}
+            <button
+              type="button"
+              onClick={() => setPhoneOpen(true)}
               className="inline-flex h-10 items-center rounded-md bg-ink px-5 text-sm font-semibold text-canvas active:bg-[#242424]"
             >
               {t('owner.phone.button')}
-            </Link>
+            </button>
           </div>
           <div className="md:grid md:grid-cols-2 md:gap-6">
             <div>
@@ -527,6 +530,20 @@ export function OwnerHome() {
         </section>
       </main>
     </div>
+      <PhoneBookingDialog
+        open={phoneOpen}
+        salonId={salon.id}
+        hours={board?.salon == null ? null : board.salon.hours}
+        workers={board?.salon?.workers ?? []}
+        categories={board?.salon?.serviceCategories ?? []}
+        onClose={() => setPhoneOpen(false)}
+        onSaved={(saved) => {
+          setPhoneOpen(false)
+          setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          void refetchOccupying({ salonId: salon.id, date: saved })
+          void refetchRange()
+        }}
+      />
     </>
   )
 }

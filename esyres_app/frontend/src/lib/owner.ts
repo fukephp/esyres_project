@@ -553,6 +553,78 @@ export function phoneFreeWorkerIds(
     .map((worker) => worker.id)
 }
 
+type PhoneOccupying = {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string } | null
+  proposedWorker: { id: string } | null
+}
+
+export function phoneLegalStarts(
+  day: PanelHours | undefined,
+  workers: { id: string }[],
+  occupying: PhoneOccupying[],
+  durationMinutes: number,
+): string[] {
+  const starts: string[] = []
+  for (let total = 0; total < 24 * 60; total += 15) {
+    const time = hhmm(total)
+    const open = phoneRangeOpen(day, time, durationMinutes) && durationMinutes > 0
+    if (phoneFreeWorkerIds(workers, occupying, time, durationMinutes, open).length > 0) {
+      starts.push(time)
+    }
+  }
+
+  return starts
+}
+
+export function phoneSkipDate(today: string, hasLegalStart: (date: string) => boolean): string {
+  for (let offset = 0; offset < 7; offset += 1) {
+    const date = shiftOwnerDate(today, offset)
+    if (hasLegalStart(date)) {
+      return date
+    }
+  }
+
+  return today
+}
+
+export function phoneDayChip(date: string, today: string): 'today' | 'tomorrow' | 'other' {
+  if (date === today) {
+    return 'today'
+  }
+  if (date === shiftOwnerDate(today, 1)) {
+    return 'tomorrow'
+  }
+
+  return 'other'
+}
+
+export function phoneAfterServiceChange(
+  time: string,
+  workerId: string,
+  legalStarts: string[],
+): { time: string; workerId: string } {
+  if (time !== '' && !legalStarts.includes(time)) {
+    return { time: '', workerId: '' }
+  }
+
+  return { time, workerId }
+}
+
+export function phoneWorkerSelection(freeIds: string[], current: string): string {
+  if (freeIds.length === 1) {
+    return freeIds[0]
+  }
+  if (freeIds.includes(current)) {
+    return current
+  }
+
+  return ''
+}
+
 export function ownerChatSearchParams(
   salonId: string | null = null,
   firstOwnedId: string | null = null,

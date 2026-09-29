@@ -43,7 +43,6 @@ test('owner chrome is Cal light; no dark nav', () => {
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
-    'pages/OwnerPhoneBooking.tsx',
     'pages/OwnerZapisi.tsx',
   ]
   for (const file of files) {
@@ -72,7 +71,6 @@ test('owner chrome is Cal light; no dark nav', () => {
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
     'pages/OwnerSettings.tsx',
-    'pages/OwnerPhoneBooking.tsx',
     'pages/OwnerZapisi.tsx',
   ]) {
     const text = read(file)
