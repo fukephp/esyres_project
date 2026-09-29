@@ -274,6 +274,9 @@ export function toSalonHoursInput(days: SalonHoursDayForm[]): PanelHours[] {
 }
 
 export function hoursForDate(hours: PanelHours[], date: string): PanelHours | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return undefined
+  }
   const weekday = sarajevoWeekday(date)
 
   return hours.find((row) => row.weekday === weekday)
@@ -642,6 +645,13 @@ export function ownerMonthContains(year: number, month: number, ymd: string): bo
   const parsed = ownerMonthFromYmd(ymd)
 
   return parsed.year === year && parsed.month === month
+}
+
+export function ownerVisibleMonth(
+  visible: { year: number; month: number },
+  date: string,
+): { year: number; month: number } {
+  return ownerMonthContains(visible.year, visible.month, date) ? visible : ownerMonthFromYmd(date)
 }
 
 export function ownerMonthDays(year: number, month: number): string[] {

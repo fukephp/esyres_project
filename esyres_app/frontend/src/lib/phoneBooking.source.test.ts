@@ -21,6 +21,7 @@ test('Zahtjevi links Telefon with the return day', () => {
   const home = read('pages/OwnerHome.tsx')
   expect(home).toMatch(/owner\.phone\.button/)
   expect(home).toMatch(/ownerPhonePath/)
+  expect(home).toMatch(/ownerPhonePath[\s\S]{0,240}bg-ink px-5/)
   expect(home).not.toMatch(/Zapisi/)
 })
 

@@ -47,6 +47,7 @@ import {
   ownerMonthRange,
   shiftOwnerMonth,
   ownerMonthContains,
+  ownerVisibleMonth,
   ownerMonthDays,
   ownerMonthWeekdayOffset,
   formatOwnerMonthTitle,
@@ -187,6 +188,7 @@ test('grid window from hours', () => {
     '09:45:on',
   ])
   expect(hoursForDate([open], '2026-08-29')).toEqual(open)
+  expect(hoursForDate([open], '')).toBeUndefined()
 })
 
 test('start cell droppable only when free', () => {
@@ -628,6 +630,8 @@ test('owner month helpers', () => {
   expect(shiftOwnerMonth(2026, 1, -1)).toEqual({ year: 2025, month: 12 })
   expect(ownerMonthContains(2026, 9, '2026-09-17')).toBe(true)
   expect(ownerMonthContains(2026, 9, '2026-10-01')).toBe(false)
+  expect(ownerVisibleMonth({ year: 2026, month: 9 }, '2026-09-28')).toEqual({ year: 2026, month: 9 })
+  expect(ownerVisibleMonth({ year: 2026, month: 9 }, '2026-10-15')).toEqual({ year: 2026, month: 10 })
   const days = ownerMonthDays(2026, 9)
   expect(days).toHaveLength(30)
   expect(days[0]).toBe('2026-09-01')

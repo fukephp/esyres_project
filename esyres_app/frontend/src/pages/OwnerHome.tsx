@@ -51,9 +51,9 @@ import {
   occupyingDiaryMeta,
   occupyingDotsForDay,
   ownerDateFromSearch,
-  ownerMonthContains,
   ownerMonthDays,
   ownerMonthFromYmd,
+  ownerVisibleMonth,
   ownerMonthRange,
   ownerMonthWeekdayOffset,
   ownerSalonFromSearch,
@@ -75,10 +75,8 @@ export function OwnerHome() {
   const date = ownerDateFromSearch(params.get('date'))
   const [visible, setVisible] = useState(() => ownerMonthFromYmd(date))
   useEffect(() => {
-    if (!ownerMonthContains(visible.year, visible.month, date)) {
-      setVisible(ownerMonthFromYmd(date))
-    }
-  }, [date, visible.month, visible.year])
+    setVisible((current) => ownerVisibleMonth(current, date))
+  }, [date])
   const monthSpan = ownerMonthRange(visible.year, visible.month)
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
@@ -98,10 +96,12 @@ export function OwnerHome() {
   const { data: occupying, refetch: refetchOccupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
     variables: { salonId: salon?.id ?? '', date },
     skip: !ownerReady,
+    fetchPolicy: 'cache-and-network',
   })
   const { data: occupyingRange, refetch: refetchRange } = useQuery<OccupyingBookingsRangeData>(OCCUPYING_BOOKINGS_RANGE_QUERY, {
     variables: { salonId: salon?.id ?? '', from: monthSpan.from, to: monthSpan.to },
     skip: !ownerReady,
+    fetchPolicy: 'cache-and-network',
   })
   function refetchAll() {
     void refetchQueue()
@@ -421,7 +421,7 @@ export function OwnerHome() {
           <div className="mb-4 flex justify-end">
             <Link
               to={ownerPhonePath(date, sarajevoToday(), salon.id, salons[0]?.id ?? null)}
-              className="text-sm font-medium text-ink"
+              className="inline-flex h-10 items-center rounded-md bg-ink px-5 text-sm font-semibold text-canvas active:bg-[#242424]"
             >
               {t('owner.phone.button')}
             </Link>
