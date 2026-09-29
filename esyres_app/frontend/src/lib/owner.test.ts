@@ -20,6 +20,8 @@ import {
   zapisiOriginFromSearch,
   phoneFreeWorkerIds,
   phoneLegalStarts,
+  phoneQuarterChoices,
+  phoneManualTimeBlock,
   phoneSkipDate,
   phoneDayChip,
   phoneAfterServiceChange,
@@ -258,6 +260,7 @@ test('phone copy and free workers', async () => {
   expect(i18n.t('owner.phone.tomorrow')).toBe('Sutra')
   expect(i18n.t('owner.phone.otherDay')).toBe('Drugi dan')
   expect(i18n.t('owner.phone.noStart')).toBe('Nema slobodnog termina.')
+  expect(i18n.t('owner.phone.booked')).toBe('Zauzet')
   expect(i18n.t('owner.phone.cancel')).toBe('Otkaži termin')
   expect(i18n.t('owner.phone.error.INVALID_CALLER_NAME')).toBe('Unesi ime.')
   expect(i18n.t('owner.phone.error.DURING_BREAK')).toBe('Termin pada u pauzu.')
@@ -313,6 +316,16 @@ test('phone copy and free workers', async () => {
   expect(withBreak).not.toContain('13:00')
   expect(withBreak).toContain('14:00')
   expect(phoneLegalStarts({ ...openDay, closed: true }, [{ id: '1' }], [], 30)).toEqual([])
+  const choices = phoneQuarterChoices(openDay, [{ id: '1' }], occupying, 30)
+  expect(choices.find((row) => row.time === '10:00')).toEqual({ time: '10:00', booked: true })
+  expect(choices.find((row) => row.time === '10:30')).toEqual({ time: '10:30', booked: false })
+  expect(choices.some((row) => row.time === '07:00')).toBe(false)
+  expect(phoneManualTimeBlock(openDay, [{ id: '1' }], occupying, '10:00', 30)).toBe('taken')
+  expect(phoneManualTimeBlock(openDay, [{ id: '1' }], occupying, '10:30', 30)).toBe('ok')
+  expect(phoneManualTimeBlock(openDay, [{ id: '1' }], occupying, '10:07', 30)).toBe('offgrid')
+  expect(phoneManualTimeBlock(openDay, [{ id: '1' }], occupying, '07:00', 30)).toBe('outside')
+  expect(phoneManualTimeBlock(breakDay, [{ id: '2' }], [], '13:00', 30)).toBe('break')
+  expect(phoneManualTimeBlock({ ...openDay, closed: true }, [{ id: '1' }], [], '10:00', 30)).toBe('closed')
   const seen: string[] = []
   expect(
     phoneSkipDate('2026-09-29', (date) => {

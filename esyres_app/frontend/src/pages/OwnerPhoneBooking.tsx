@@ -21,14 +21,30 @@ import {
   phoneErrorKey,
   phoneFreeWorkerIds,
   phoneLegalStarts,
+  phoneManualTimeBlock,
+  phoneQuarterChoices,
   phoneRangeOpen,
+  type PhoneTimeBlock,
   phoneSkipDate,
   phoneWorkerSelection,
   shiftOwnerDate,
   type PanelHours,
 } from '../lib/owner'
 import { SALON_PICKER_DIALOG_CLASS } from '../lib/salonSend'
-import { dialogCancelShouldClose } from '../lib/salonDialog'
+
+function manualErrorKey(block: PhoneTimeBlock): 'SLOT_TAKEN' | 'OUTSIDE_HOURS' | 'DURING_BREAK' | 'SALON_CLOSED' {
+  if (block === 'taken') {
+    return 'SLOT_TAKEN'
+  }
+  if (block === 'break') {
+    return 'DURING_BREAK'
+  }
+  if (block === 'closed') {
+    return 'SALON_CLOSED'
+  }
+
+  return 'OUTSIDE_HOURS'
+}
 
 const NEXT_CLASS = 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40'
 
@@ -57,7 +73,7 @@ export function PhoneBookingDialog({
 }) {
   const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const keepOpen = useRef(false)
+  const allowClose = useRef(false)
   const salonSeen = useRef(salonId)
   const wasOpen = useRef(false)
   const [step, setStep] = useState(0)
@@ -112,17 +128,23 @@ export function PhoneBookingDialog({
 
   const rows = resolved === '' ? [] : rowsFor(resolved)
   const dayHours = hours === null || resolved === '' ? undefined : hoursForDate(hours, resolved)
-  const starts =
+  const choices =
     rows === null || hours === null || resolved === ''
       ? []
-      : phoneLegalStarts(dayHours, workers, rows, duration)
+      : phoneQuarterChoices(dayHours, workers, rows, duration)
+  const starts = choices.filter((row) => !row.booked).map((row) => row.time)
   const rangeOpen = phoneRangeOpen(dayHours, time, duration) && duration > 0
   const freeIds =
     time === '' || rows === null ? [] : phoneFreeWorkerIds(workers, rows, time, duration, rangeOpen)
   const freeWorkers = workers.filter((worker) => freeIds.includes(worker.id))
   const waitingSkip = !skipped && !windowFailed && (hours === null || windowRows === undefined || windowLoading)
   const dayClosed = resolved !== '' && rows !== null && (dayHours === undefined || dayHours.closed)
-  const dayEmpty = resolved !== '' && rows !== null && !dayClosed && starts.length === 0
+  const dayEmpty = chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length === 0
+  const manualBlock =
+    chip === 'other' && resolved !== '' && time !== '' && rows !== null
+      ? phoneManualTimeBlock(dayHours, workers, rows, time, duration)
+      : null
+  const whenReady = chip === 'other' ? manualBlock === 'ok' : time !== '' && starts.includes(time)
 
   useEffect(() => {
     if (salonSeen.current === salonId) {
@@ -138,10 +160,12 @@ export function PhoneBookingDialog({
       return
     }
     if (open) {
+      allowClose.current = false
       if (!dialog.open) {
         dialog.showModal()
       }
     } else if (dialog.open) {
+      allowClose.current = true
       dialog.close()
     }
   }, [open])
@@ -175,9 +199,7 @@ export function PhoneBookingDialog({
     const picked = phoneSkipDate(today, (day) => {
       return phoneLegalStarts(hoursForDate(hours, day), workers, windowRows.filter((row) => row.preferredDate === day), duration).length > 0
     })
-    const nextChip = phoneDayChip(picked, today)
-    setChip(nextChip)
-    setOtherDate(nextChip === 'other' ? picked : '')
+    setChip(phoneDayChip(picked, today))
     setSkipped(true)
   }, [open, step, skipped, hours, windowRows, duration, today, workers])
 
@@ -194,12 +216,13 @@ export function PhoneBookingDialog({
   }
 
   function onChip(next: Chip) {
-    if (next === 'other' && otherDate === '') {
+    if (next === 'other') {
       setChip('other')
+      setOtherDate('')
       clearSlot()
       return
     }
-    const nextDay = next === 'today' ? today : next === 'tomorrow' ? shiftOwnerDate(today, 1) : otherDate
+    const nextDay = next === 'today' ? today : shiftOwnerDate(today, 1)
     if (nextDay !== resolved) {
       clearSlot()
     }
@@ -276,29 +299,14 @@ export function PhoneBookingDialog({
       ref={dialogRef}
       className={SALON_PICKER_DIALOG_CLASS}
       onCancel={(event) => {
-        if (
-          !dialogCancelShouldClose(
-            document.activeElement instanceof HTMLInputElement ? document.activeElement.type : null,
-          )
-        ) {
-          event.preventDefault()
-          keepOpen.current = true
-        } else {
-          keepOpen.current = false
-        }
+        event.preventDefault()
       }}
       onClose={() => {
-        if (keepOpen.current) {
-          keepOpen.current = false
-          queueMicrotask(() => dialogRef.current?.showModal())
+        if (allowClose.current) {
+          allowClose.current = false
           return
         }
-        onClose()
-      }}
-      onClick={(event) => {
-        if (event.target === dialogRef.current) {
-          onClose()
-        }
+        queueMicrotask(() => dialogRef.current?.showModal())
       }}
     >
       <div className="mb-4 flex items-start justify-between gap-4">
@@ -321,14 +329,9 @@ export function PhoneBookingDialog({
               ))}
             </div>
           ))}
-          <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="text-sm font-medium text-ink">
-              {t('owner.back')}
-            </button>
-            <button type="button" disabled={serviceIds.length === 0} onClick={() => setStep(1)} className={NEXT_CLASS}>
-              {t('owner.phone.next')}
-            </button>
-          </div>
+          <button type="button" disabled={serviceIds.length === 0} onClick={() => setStep(1)} className={NEXT_CLASS}>
+            {t('owner.phone.next')}
+          </button>
         </div>
       ) : null}
       {step === 1 ? (
@@ -356,41 +359,68 @@ export function PhoneBookingDialog({
                 ))}
               </div>
               {chip === 'other' ? (
-                <label className="block text-sm text-body">
-                  {t('salon.date')}
-                  <input
-                    type="date"
-                    value={otherDate}
-                    onChange={(event) => onOtherDate(event.target.value)}
-                    className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
-                  />
-                </label>
+                <>
+                  <label className="block text-sm text-body">
+                    {t('salon.date')}
+                    <input
+                      type="date"
+                      value={otherDate}
+                      onChange={(event) => onOtherDate(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                    />
+                  </label>
+                  <label className="block text-sm text-body">
+                    {t('salon.time')}
+                    <input
+                      type="time"
+                      step={900}
+                      value={time}
+                      onChange={(event) => {
+                        const raw = event.target.value
+                        const next = raw.length === 8 ? raw.slice(0, 5) : raw
+                        if (next !== time) {
+                          setWorkerId('')
+                        }
+                        setTime(next)
+                      }}
+                      className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                    />
+                  </label>
+                  {manualBlock !== null && manualBlock !== 'ok' ? (
+                    <p className="text-sm text-busy-busy">{t(`owner.phone.error.${manualErrorKey(manualBlock)}`)}</p>
+                  ) : null}
+                </>
               ) : null}
               {resolved !== '' && rows === null && !windowFailed ? (
                 <p className="text-sm text-body">{t('salon.loading')}</p>
               ) : null}
-              {dayClosed ? <p className="text-sm text-body">{t('owner.phone.error.SALON_CLOSED')}</p> : null}
+              {dayClosed && manualBlock === null ? <p className="text-sm text-body">{t('owner.phone.error.SALON_CLOSED')}</p> : null}
               {dayEmpty ? <p className="text-sm text-body">{t('owner.phone.noStart')}</p> : null}
-              {resolved !== '' && rows !== null && !dayClosed && starts.length > 0 ? (
+              {chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {starts.map((start) => (
+                  {choices.map((choice) => (
                     <button
-                      key={start}
+                      key={choice.time}
                       type="button"
-                      aria-pressed={time === start}
+                      disabled={choice.booked}
+                      aria-pressed={time === choice.time}
+                      aria-label={choice.booked ? `${choice.time}, ${t('owner.phone.booked')}` : undefined}
                       onClick={() => {
-                        if (start !== time) {
-                          setWorkerId('')
+                        if (choice.booked || choice.time === time) {
+                          return
                         }
-                        setTime(start)
+                        setWorkerId('')
+                        setTime(choice.time)
                       }}
                       className={
-                        time === start
-                          ? 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas'
-                          : 'rounded-full border border-hairline px-3 py-1.5 text-sm text-ink'
+                        choice.booked
+                          ? 'rounded-full border border-hairline px-3 py-1.5 text-sm text-muted disabled:opacity-40'
+                          : time === choice.time
+                            ? 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas'
+                            : 'rounded-full border border-hairline px-3 py-1.5 text-sm text-ink'
                       }
                     >
-                      {start}
+                      {choice.time}
                     </button>
                   ))}
                 </div>
@@ -401,7 +431,7 @@ export function PhoneBookingDialog({
             <button type="button" onClick={() => setStep(0)} className="text-sm font-medium text-ink">
               {t('owner.back')}
             </button>
-            <button type="button" disabled={time === ''} onClick={() => setStep(2)} className={NEXT_CLASS}>
+            <button type="button" disabled={!whenReady} onClick={() => setStep(2)} className={NEXT_CLASS}>
               {t('owner.phone.next')}
             </button>
           </div>

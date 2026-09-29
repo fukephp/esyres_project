@@ -538,10 +538,14 @@ export function OwnerHome() {
         categories={board?.salon?.serviceCategories ?? []}
         onClose={() => setPhoneOpen(false)}
         onSaved={(saved) => {
+          const month = ownerMonthFromYmd(saved)
+          const span = ownerMonthRange(month.year, month.month)
           setPhoneOpen(false)
+          setVisible(ownerMonthFromYmd(saved))
           setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
           void refetchOccupying({ salonId: salon.id, date: saved })
-          void refetchRange()
+          void refetchRange({ salonId: salon.id, from: span.from, to: span.to })
         }}
       />
     </>

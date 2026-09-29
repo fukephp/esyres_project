@@ -562,22 +562,76 @@ type PhoneOccupying = {
   proposedWorker: { id: string } | null
 }
 
+export function phoneQuarterChoices(
+  day: PanelHours | undefined,
+  workers: { id: string }[],
+  occupying: PhoneOccupying[],
+  durationMinutes: number,
+): { time: string; booked: boolean }[] {
+  if (durationMinutes <= 0) {
+    return []
+  }
+  const choices: { time: string; booked: boolean }[] = []
+  for (let total = 0; total < 24 * 60; total += 15) {
+    const time = hhmm(total)
+    if (!phoneRangeOpen(day, time, durationMinutes)) {
+      continue
+    }
+    choices.push({
+      time,
+      booked: phoneFreeWorkerIds(workers, occupying, time, durationMinutes, true).length === 0,
+    })
+  }
+
+  return choices
+}
+
 export function phoneLegalStarts(
   day: PanelHours | undefined,
   workers: { id: string }[],
   occupying: PhoneOccupying[],
   durationMinutes: number,
 ): string[] {
-  const starts: string[] = []
-  for (let total = 0; total < 24 * 60; total += 15) {
-    const time = hhmm(total)
-    const open = phoneRangeOpen(day, time, durationMinutes) && durationMinutes > 0
-    if (phoneFreeWorkerIds(workers, occupying, time, durationMinutes, open).length > 0) {
-      starts.push(time)
+  return phoneQuarterChoices(day, workers, occupying, durationMinutes)
+    .filter((row) => !row.booked)
+    .map((row) => row.time)
+}
+
+export type PhoneTimeBlock = 'ok' | 'taken' | 'outside' | 'break' | 'closed' | 'offgrid'
+
+export function phoneManualTimeBlock(
+  day: PanelHours | undefined,
+  workers: { id: string }[],
+  occupying: PhoneOccupying[],
+  time: string,
+  durationMinutes: number,
+): PhoneTimeBlock {
+  if (!/^(?:[01]\d|2[0-3]):(00|15|30|45)$/.test(time)) {
+    return 'offgrid'
+  }
+  if (day === undefined || day.closed || day.opensAt === null || day.closesAt === null) {
+    return 'closed'
+  }
+  if (durationMinutes <= 0) {
+    return 'outside'
+  }
+  const start = minutes(time)
+  const end = start + durationMinutes
+  if (start < minutes(day.opensAt) || end > minutes(day.closesAt)) {
+    return 'outside'
+  }
+  if (day.breakStartsAt !== null && day.breakEndsAt !== null) {
+    const breakStart = minutes(day.breakStartsAt)
+    const breakEnd = minutes(day.breakEndsAt)
+    if (start < breakEnd && breakStart < end) {
+      return 'break'
     }
   }
+  if (phoneFreeWorkerIds(workers, occupying, time, durationMinutes, true).length === 0) {
+    return 'taken'
+  }
 
-  return starts
+  return 'ok'
 }
 
 export function phoneSkipDate(today: string, hasLegalStart: (date: string) => boolean): string {

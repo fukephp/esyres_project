@@ -333,6 +333,7 @@ void i18n.use(initReactI18next).init({
             today: 'Danas',
             tomorrow: 'Sutra',
             otherDay: 'Drugi dan',
+            booked: 'Zauzet',
             noStart: 'Nema slobodnog termina.',
             noWorker: 'Nema slobodnog radnika.',
             cancel: 'Otkaži termin',
