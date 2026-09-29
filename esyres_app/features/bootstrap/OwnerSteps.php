@@ -20,6 +20,58 @@ trait OwnerSteps
     private ?\Throwable $seederException = null;
 
     /**
+     * @When I set my owner view to :view
+     */
+    public function iSetMyOwnerViewTo(string $view): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateOwnerView($view: OwnerView!) {
+  updateOwnerView(view: $view) {
+    id
+    ownerView
+  }
+}
+GQL, ['view' => $view]);
+    }
+
+    /**
+     * @When I query my owner view
+     */
+    public function iQueryMyOwnerView(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeOwnerView {
+  me {
+    id
+    ownerView
+  }
+}
+GQL);
+    }
+
+    /**
+     * @Then my owner view is :view
+     */
+    public function myOwnerViewIs(string $view): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['updateOwnerView'] ?? $this->graphql['data']['me'] ?? null;
+        if (! is_array($row)) {
+            throw new RuntimeException('Expected updateOwnerView or me, got '.json_encode($this->graphql));
+        }
+        $this->assertSame($view, $row['ownerView']);
+    }
+
+    /**
+     * @Then the stored owner view of :email is :view
+     */
+    public function theStoredOwnerViewOfIs(string $email, string $view): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $this->assertSame($view, $user->owner_view);
+    }
+
+    /**
      * @When I subscribe to booking customer responded
      */
     public function iSubscribeToBookingCustomerResponded(): void

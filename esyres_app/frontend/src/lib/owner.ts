@@ -962,6 +962,76 @@ export function selectedDayOccupying<T extends {
   return { soon, rest }
 }
 
+export function ownerWeekDays(ymd: string): string[] {
+  const [year, month, day] = ymd.split('-').map(Number)
+  const offset = (new Date(Date.UTC(year, month - 1, day, 12)).getUTCDay() + 6) % 7
+  const monday = shiftOwnerDate(ymd, -offset)
+
+  return Array.from({ length: 7 }, (_, i) => shiftOwnerDate(monday, i))
+}
+
+export function occupyingByDay<T extends {
+  status: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  durationMinutes: number
+  worker: { id: string } | null
+  proposedWorker: { id: string } | null
+}>(rows: T[], ymd: string): T[] {
+  return rows
+    .filter((row) => occupyingSarajevoYmd(row) === ymd && occupyingBlock(row) !== null)
+    .sort((a, b) => (occupyingStartIso(a) ?? '').localeCompare(occupyingStartIso(b) ?? ''))
+}
+
+export type KanbanColumn = 'pending' | 'proposed' | 'confirmed' | 'done'
+
+export const KANBAN_COLUMNS: KanbanColumn[] = ['pending', 'proposed', 'confirmed', 'done']
+
+export const STATUS_CARD_CLASS: Record<KanbanColumn, string> = {
+  pending: 'bg-status-pending',
+  proposed: 'bg-status-proposed',
+  confirmed: 'bg-status-confirmed',
+  done: 'bg-status-done',
+}
+
+export function bookingStartIso(row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null }): string {
+  if (row.status === 'TIME_PROPOSED' && row.proposedStartsAt !== null) {
+    return row.proposedStartsAt
+  }
+
+  return row.preferredStartsAt
+}
+
+export function kanbanColumn(
+  row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null },
+  now = new Date(),
+): KanbanColumn {
+  if (row.status === 'REQUESTED') {
+    return 'pending'
+  }
+  if (row.status === 'TIME_PROPOSED') {
+    return 'proposed'
+  }
+  if (row.status === 'CONFIRMED' && new Date(row.preferredStartsAt).getTime() >= now.getTime()) {
+    return 'confirmed'
+  }
+
+  return 'done'
+}
+
+export function kanbanGroups<T extends { status: string; preferredStartsAt: string; proposedStartsAt: string | null }>(
+  rows: T[],
+  now = new Date(),
+): Record<KanbanColumn, T[]> {
+  const groups: Record<KanbanColumn, T[]> = { pending: [], proposed: [], confirmed: [], done: [] }
+  const sorted = [...rows].sort((a, b) => bookingStartIso(a).localeCompare(bookingStartIso(b)))
+  for (const row of sorted) {
+    groups[kanbanColumn(row, now)].push(row)
+  }
+
+  return groups
+}
+
 export type SelectedDayRestItem<T> =
   | { kind: 'occupying'; booking: T; start: string }
   | { kind: 'break'; startsAt: string; endsAt: string }

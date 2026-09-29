@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ADD_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
@@ -118,17 +118,16 @@ export function OwnerSalonCreate() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-        <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-          <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-        </aside>
-        <main className="flex-1 px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.addSalon')}</h1>
-          <div className="md:hidden">
-            <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-          </div>
-          <form className="mt-8 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.addSalon')}
+        salons={data.me.salons}
+        salonId={firstOwnedId}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="salons"
+      >
+          <form className="max-w-md space-y-4 rounded-3xl bg-canvas p-5 md:p-6" onSubmit={(e) => void onSubmit(e)}>
             <label className="block text-sm text-body">
               {t('owner.salonName')}
               <input
@@ -156,8 +155,7 @@ export function OwnerSalonCreate() {
               {t('owner.save')}
             </button>
           </form>
-        </main>
-      </div>
+      </OwnerShell>
     </>
   )
 }

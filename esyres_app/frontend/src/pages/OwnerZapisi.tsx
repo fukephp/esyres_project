@@ -3,25 +3,26 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekHeader } from '../components/OwnerBoards'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
-import {
-  SALON_DAY_BOOKINGS_QUERY,
-  type SalonDayBookingsData,
-  type ZapisiBooking,
-} from '../graphql/pending'
+import { SALON_DAY_BOOKINGS_QUERY, type SalonDayBookingsData } from '../graphql/pending'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { formatSarajevoTime, sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
-  currentJobLabel,
+  KANBAN_COLUMNS,
+  bookingStartIso,
+  kanbanGroups,
   ownerDateFromSearch,
   ownerSalonFromSearch,
+  ownerWeekDays,
   ownerZapisiSearchParams,
   requestFromZapisiPath,
+  shiftOwnerDate,
   zapisiOriginFromSearch,
   type ZapisiOrigin,
 } from '../lib/owner'
@@ -57,6 +58,9 @@ export function OwnerZapisi() {
   })
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
   const rows = listData?.salonDayBookings ?? []
+  const kanban = data?.me?.ownerView === 'KANBAN'
+  const days = ownerWeekDays(date)
+  const groups = kanbanGroups(rows)
 
   function write(nextDate: string, nextSalon: string, nextOrigin: ZapisiOrigin | null) {
     setParams(ownerZapisiSearchParams(nextDate, today, nextSalon, firstOwnedId, nextOrigin))
@@ -125,122 +129,67 @@ export function OwnerZapisi() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-        <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-          <Switcher salons={salons} salon={salon} onSalon={(id) => write(date, id, origin)} />
-          <OwnerNav salonId={salon.id} firstOwnedId={firstOwnedId} date={date} badge={badge} active="zapisi" />
-        </aside>
-        <main className="flex-1 px-5 py-8 text-ink">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.zapisi')}</h1>
-          <div className="md:hidden">
-            <Switcher salons={salons} salon={salon} onSalon={(id) => write(date, id, origin)} />
-            <OwnerNav salonId={salon.id} firstOwnedId={firstOwnedId} date={date} badge={badge} active="zapisi" />
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.zapisi')}
+        salons={salons}
+        salonId={salon.id}
+        firstOwnedId={firstOwnedId}
+        date={date}
+        badge={badge}
+        active="zapisi"
+        onSalon={(id) => write(date, id, origin)}
+      >
+        <section className="rounded-3xl bg-canvas p-4 md:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <WeekHeader days={days} onShift={(delta) => write(shiftOwnerDate(date, delta), salon.id, origin)} />
+            <div className="flex flex-wrap gap-1.5 text-sm">
+              {chips.map((chip) => (
+                <button
+                  key={chip.label}
+                  type="button"
+                  aria-pressed={origin === chip.id}
+                  onClick={() => write(date, salon.id, chip.id)}
+                  className={
+                    origin === chip.id
+                      ? 'rounded-full bg-ink px-4 py-1.5 font-semibold text-canvas'
+                      : 'rounded-full bg-surface-card px-4 py-1.5 text-body'
+                  }
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <label className="mt-6 block text-sm">
-            {t('owner.date')}
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => {
-                if (e.target.value !== '') {
-                  write(e.target.value, salon.id, origin)
-                }
-              }}
-              className="mt-1 block rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
-            />
-          </label>
-          <div className="mt-4 flex gap-3 text-sm">
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={() => write(date, salon.id, chip.id)}
-                className={origin === chip.id ? 'font-semibold text-ink' : 'text-body'}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+          <DayChips days={days} date={date} closedFor={() => false} onDate={(ymd) => write(ymd, salon.id, origin)} className="mt-4" />
           {listLoading && listData === undefined ? (
             <p className="mt-6 text-sm text-body">{t('salon.loading')}</p>
-          ) : (
-            <ul className="mt-6">
-              {rows.map((row) => (
-                <li key={row.id}>
-                  <Link
-                    to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)}
-                    className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 border-b border-hairline py-2 text-sm"
-                  >
-                    <span className="tabular-nums text-ink">{formatSarajevoTime(rowStart(row))}</span>
-                    <span className="min-w-0">
-                      <span className="block font-semibold text-ink">{row.customerName}</span>
-                      <span className="mt-1 block text-body">
-                        {originLabel(t, row.origin)}
-                        {' · '}
-                        {currentJobLabel(row.services)}
-                        {' · '}
-                        {t(`bookings.status.${row.status}`)}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
+          ) : kanban ? (
+            <KanbanBoard>
+              {KANBAN_COLUMNS.map((column) => (
+                <BoardColumn key={column} column={column} count={groups[column].length}>
+                  {groups[column].map((row) => (
+                    <BookingCard key={row.id} row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
+                  ))}
+                </BoardColumn>
               ))}
+            </KanbanBoard>
+          ) : rows.length === 0 ? (
+            <p className="mt-6 text-sm text-muted">{t('owner.noBookings')}</p>
+          ) : (
+            <ul className="mt-5 space-y-2">
+              {[...rows]
+                .sort((a, b) => bookingStartIso(a).localeCompare(bookingStartIso(b)))
+                .map((row) => (
+                  <li key={row.id} className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start gap-2">
+                    <span className="pt-3 text-sm tabular-nums text-muted">{formatSarajevoTime(bookingStartIso(row))}</span>
+                    <BookingCard row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
+                  </li>
+                ))}
             </ul>
           )}
-        </main>
-      </div>
+        </section>
+      </OwnerShell>
     </>
   )
-}
-
-function rowStart(row: ZapisiBooking): string {
-  if (row.status === 'TIME_PROPOSED' && row.proposedStartsAt !== null) {
-    return row.proposedStartsAt
-  }
-
-  return row.preferredStartsAt
-}
-
-function originLabel(t: (key: string) => string, origin: ZapisiBooking['origin']): string {
-  if (origin === 'ASSISTANT') {
-    return t('owner.assistant')
-  }
-  if (origin === 'PHONE') {
-    return t('owner.phone.button')
-  }
-
-  return t('owner.originGuest')
-}
-
-function Switcher({
-  salons,
-  salon,
-  onSalon,
-}: {
-  salons: { id: string; name: string }[]
-  salon: { id: string; name: string }
-  onSalon: (id: string) => void
-}) {
-  const { t } = useTranslation()
-  if (salons.length > 1) {
-    return (
-      <label className="block text-sm">
-        {t('owner.salon')}
-        <select
-          value={salon.id}
-          onChange={(e) => onSalon(e.target.value)}
-          className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
-        >
-          {salons.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-      </label>
-    )
-  }
-
-  return <p className="text-sm font-semibold">{salon.name}</p>
 }

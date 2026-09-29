@@ -34,7 +34,7 @@ test('TopNav is full-bleed Cal bar with mark link home and panel primary', () =>
   expect(nav).toMatch(/\/esyres-mark\.svg/)
   expect(nav).toMatch(/width=\{24\}/)
   expect(nav).toMatch(/to=\{chrome\.brand\.to\}/)
-  expect(nav).toMatch(/h-10 items-center rounded-md bg-ink/)
+  expect(nav).toMatch(/h-10 items-center rounded-full bg-ink/)
   expect(nav).toMatch(/text-canvas/)
   expect(nav).toMatch(/text-sm text-body/)
   expect(nav).toMatch(/nav\.welcome/)
@@ -50,14 +50,14 @@ test('TopNav is full-bleed Cal bar with mark link home and panel primary', () =>
   expect(nav).not.toMatch(/country/)
 })
 
-test('Odjava uses Cal button-destructive on both logged-in slots', () => {
+test('Odjava is the Design 2 destructive pill on both logged-in slots', () => {
   const nav = read('components/TopNav.tsx')
   const logoutClass = nav.match(/const logoutClass =\s*'([^']+)'/)?.[1]
   expect(logoutClass).toBe(
-    'inline-flex h-10 items-center rounded-md bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active',
+    'inline-flex h-10 items-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active',
   )
   expect(logoutClass).not.toMatch(/hover:/)
-  expect(logoutClass).not.toMatch(/rounded-full/)
+  expect(logoutClass).not.toMatch(/rounded-md/)
   expect(logoutClass).not.toMatch(/busy-busy/)
   expect(logoutClass).not.toMatch(/bg-ink/)
   expect(nav).toMatch(/LOGOUT_MUTATION/)
@@ -212,7 +212,7 @@ test('bookings TopNav; AuthShell in page; no bottom Odjava or panel CTA', () => 
   expect(page).not.toMatch(/home\.footer/)
 })
 
-test('owner overlay TopNav above aside+main; OwnerNav stays; no bookings or panel CTA', () => {
+test('owner ready state is OwnerShell; TopNav only on gate states; no bookings or panel CTA', () => {
   const files = [
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
@@ -227,7 +227,9 @@ test('owner overlay TopNav above aside+main; OwnerNav stays; no bookings or pane
   for (const file of files) {
     const text = read(file)
     expect(text, file).toMatch(/<TopNav/)
-    expect(text, file).toMatch(/min-h-svh md:flex/)
+    expect(text, file).toMatch(/<OwnerShell/)
+    expect(text, file).not.toMatch(/<OwnerNav/)
+    expect(text.slice(text.lastIndexOf('<OwnerShell')), file).not.toMatch(/<TopNav/)
     expect(text, file).not.toMatch(/GUEST_COLUMN_CLASS/)
     expect(text, file).not.toMatch(/nav\.bookings/)
     expect(text, file).not.toMatch(/home\.getPanel/)
@@ -236,15 +238,14 @@ test('owner overlay TopNav above aside+main; OwnerNav stays; no bookings or pane
     expect(text, file).not.toMatch(/home\.footer/)
     expect(text, file).not.toMatch(/pitch\.cta/)
   }
-  expect(read('pages/OwnerHome.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerChats.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerStats.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerRequestDetail.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerSalons.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerSalonCreate.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerSalonEdit.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerSettings.tsx')).toMatch(/<OwnerNav/)
-  expect(read('pages/OwnerZapisi.tsx')).toMatch(/<OwnerNav/)
+  const shell = read('components/OwnerShell.tsx')
+  expect(shell).toMatch(/variant="sidebar"/)
+  expect(shell).toMatch(/variant="tabs"/)
+  expect(shell).toMatch(/nav\.welcome/)
+  expect(shell).toMatch(/LOGOUT_MUTATION/)
+  expect(shell).toMatch(/bg-error-strong/)
+  expect(shell).not.toMatch(/nav\.bookings/)
+  expect(shell).not.toMatch(/home\.panel/)
   expect(read('components/OwnerNav.tsx')).toMatch(/owner\.title/)
   expect(read('components/OwnerNav.tsx')).toMatch(/owner\.salons/)
 })

@@ -50,6 +50,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return app()->environment('local') || $this->phone_verified_at !== null;
     }
 
+    public function graphqlOwnerView(): string
+    {
+        return strtoupper((string) ($this->owner_view ?? 'calendar'));
+    }
+
     /**
      * @return HasMany<Salon, $this>
      */

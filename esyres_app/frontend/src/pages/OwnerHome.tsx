@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
@@ -20,17 +20,17 @@ import {
   BOOKING_CANCELLED_SUBSCRIPTION,
   DECLINE_BOOKING_MUTATION,
   DISMISS_RESCHEDULE_MUTATION,
-  OCCUPYING_BOOKINGS_QUERY,
   OCCUPYING_BOOKINGS_RANGE_QUERY,
   OWNER_SALON_QUERY,
   PENDING_BOOKINGS_QUERY,
-  type OccupyingBookingsData,
+  SALON_DAY_BOOKINGS_QUERY,
   type OccupyingBookingsRangeData,
-  type OccupyingBooking,
   type OwnerSalonData,
   type PendingBooking,
   type PendingBookingsData,
+  type SalonDayBookingsData,
 } from '../graphql/pending'
+import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekGrid, WeekHeader } from '../components/OwnerBoards'
 import { graphqlErrorCode } from '../lib/booking'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
@@ -43,42 +43,30 @@ import {
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
-  formatOwnerMonthTitle,
   formatSarajevoTime,
   hoursForDate,
   isPreferredSoon,
-  mixRestWithBreak,
-  occupyingBlock,
-  occupyingDiaryMeta,
-  occupyingDotsForDay,
+  kanbanGroups,
   ownerDateFromSearch,
-  ownerMonthDays,
-  ownerMonthFromYmd,
-  ownerVisibleMonth,
-  ownerMonthRange,
-  ownerMonthWeekdayOffset,
   ownerSalonFromSearch,
   ownerSearchParams,
+  ownerWeekDays,
   overlayQueueChrome,
   queueChipInitial,
   queueRowClock,
-  selectedDayOccupying,
-  shiftOwnerMonth,
+  shiftOwnerDate,
   sarajevoWeekday,
   trimDeclineReason,
-  workerDotColor,
 } from '../lib/owner'
 
 export function OwnerHome() {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const date = ownerDateFromSearch(params.get('date'))
-  const [visible, setVisible] = useState(() => ownerMonthFromYmd(date))
-  useEffect(() => {
-    setVisible((current) => ownerVisibleMonth(current, date))
-  }, [date])
-  const monthSpan = ownerMonthRange(visible.year, visible.month)
+  const days = ownerWeekDays(date)
+  const week = { from: days[0], to: days[6] }
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
+  const kanban = data?.me?.ownerView === 'KANBAN'
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
   const salonId = ownerSalonFromSearch(params.get('salon'), salons)
@@ -93,20 +81,23 @@ export function OwnerHome() {
     variables: { id: salon?.id ?? '' },
     skip: !ownerReady,
   })
-  const { data: occupying, refetch: refetchOccupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
-    variables: { salonId: salon?.id ?? '', date },
-    skip: !ownerReady,
+  const { data: occupyingRange, refetch: refetchRange } = useQuery<OccupyingBookingsRangeData>(OCCUPYING_BOOKINGS_RANGE_QUERY, {
+    variables: { salonId: salon?.id ?? '', from: week.from, to: week.to },
+    skip: !ownerReady || kanban,
     fetchPolicy: 'cache-and-network',
   })
-  const { data: occupyingRange, refetch: refetchRange } = useQuery<OccupyingBookingsRangeData>(OCCUPYING_BOOKINGS_RANGE_QUERY, {
-    variables: { salonId: salon?.id ?? '', from: monthSpan.from, to: monthSpan.to },
-    skip: !ownerReady,
+  const { data: dayBookings, refetch: refetchDay } = useQuery<SalonDayBookingsData>(SALON_DAY_BOOKINGS_QUERY, {
+    variables: { salonId: salon?.id ?? '', date, origin: null },
+    skip: !ownerReady || !kanban,
     fetchPolicy: 'cache-and-network',
   })
   function refetchAll() {
     void refetchQueue()
-    void refetchOccupying()
-    void refetchRange()
+    if (kanban) {
+      void refetchDay()
+    } else {
+      void refetchRange()
+    }
   }
   useSubscription(BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION, {
     variables: { salonId: salon?.id ?? '' },
@@ -160,8 +151,9 @@ export function OwnerHome() {
     }
     return [
       { query: PENDING_BOOKINGS_QUERY, variables: { salonId: salon.id, date, limit: 50 } },
-      { query: OCCUPYING_BOOKINGS_QUERY, variables: { salonId: salon.id, date } },
-      { query: OCCUPYING_BOOKINGS_RANGE_QUERY, variables: { salonId: salon.id, from: monthSpan.from, to: monthSpan.to } },
+      kanban
+        ? { query: SALON_DAY_BOOKINGS_QUERY, variables: { salonId: salon.id, date, origin: null } }
+        : { query: OCCUPYING_BOOKINGS_RANGE_QUERY, variables: { salonId: salon.id, from: week.from, to: week.to } },
     ]
   }
 
@@ -304,21 +296,22 @@ export function OwnerHome() {
 
   const rows = queue?.pendingBookings ?? []
   const workers = board?.salon?.workers ?? []
-  const dayHours = hoursForDate(board?.salon?.hours ?? [], date)
-  const closed = dayHours === undefined || dayHours.closed
-  const dayOccupying = occupying?.occupyingBookings ?? []
-  const { soon, rest } = selectedDayOccupying(dayOccupying)
-  const restItems = mixRestWithBreak(rest, dayHours?.breakStartsAt ?? null, dayHours?.breakEndsAt ?? null)
-  const hasBreak = dayHours?.breakStartsAt !== null && dayHours?.breakEndsAt !== null
-  const emptyOpen = !closed && rows.length === 0 && dayOccupying.filter((row) => occupyingBlock(row) !== null).length === 0 && !hasBreak
+  const hours = board?.salon?.hours ?? null
+  function closedFor(ymd: string): boolean {
+    if (hours === null) {
+      return false
+    }
+    const day = hoursForDate(hours, ymd)
+    return day === undefined || day.closed
+  }
   const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? salon.id
-  const monthDays = ownerMonthDays(visible.year, visible.month)
-  const pad = ownerMonthWeekdayOffset(visible.year, visible.month)
   const rangeRows = occupyingRange?.occupyingBookingsRange ?? []
+  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'))
+  const dayTitle = `${t(`weekday.${sarajevoWeekday(date)}`)}, ${formatPickerDayNumeric(date)}`
 
   const pendingList = (
-    <ul className="mt-4 space-y-3">
+    <ul className="space-y-3">
       {rows.map((row) => (
         <QueueRow
           key={row.id}
@@ -361,175 +354,71 @@ export function OwnerHome() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-        {salons.length > 1 ? (
-          <label className="block text-sm">
-            {t('owner.salon')}
-            <select
-              value={salon.id}
-              onChange={(e) => onSalon(e.target.value)}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
-            >
-              {salons.map((row) => (
-                <option key={row.id} value={row.id}>
-                  {row.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : (
-          <p className="text-sm font-semibold">{salon.name}</p>
-        )}
-        <OwnerNav
-          salonId={salon.id}
-          firstOwnedId={firstOwnedId}
-          date={date}
-          badge={badge}
-          active="queue"
-        />
-      </aside>
-      <main className="flex-1 px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
-        {salons.length > 1 ? (
-          <label className="mt-1 block max-w-xs text-sm text-body md:hidden">
-            {t('owner.salon')}
-            <select
-              value={salon.id}
-              onChange={(e) => onSalon(e.target.value)}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
-            >
-              {salons.map((row) => (
-                <option key={row.id} value={row.id}>
-                  {row.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : (
-          <p className="mt-1 text-sm text-body md:hidden">{salon.name}</p>
-        )}
-        <div className="md:hidden">
-          <OwnerNav
-            salonId={salon.id}
-            firstOwnedId={firstOwnedId}
-            date={date}
-            badge={badge}
-            active="queue"
-          />
-        </div>
-        <section className="rounded-lg border border-hairline bg-canvas p-4">
-          <div className="mb-4 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setPhoneOpen(true)}
-              className="inline-flex h-10 items-center rounded-md bg-ink px-5 text-sm font-semibold text-canvas active:bg-[#242424]"
-            >
-              {t('owner.phone.button')}
-            </button>
-          </div>
-          <div className="md:grid md:grid-cols-2 md:gap-6">
-            <div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  aria-label={t('owner.prevMonth')}
-                  onClick={() => setVisible(shiftOwnerMonth(visible.year, visible.month, -1))}
-                  className="px-1 text-lg text-ink"
-                >
-                  ‹
-                </button>
-                <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
-                  {formatOwnerMonthTitle(visible.year, visible.month)}
-                </h2>
-                <button
-                  type="button"
-                  aria-label={t('owner.nextMonth')}
-                  onClick={() => setVisible(shiftOwnerMonth(visible.year, visible.month, 1))}
-                  className="px-1 text-lg text-ink"
-                >
-                  ›
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-muted">
-                {['weekday.MONDAY', 'weekday.TUESDAY', 'weekday.WEDNESDAY', 'weekday.THURSDAY', 'weekday.FRIDAY', 'weekday.SATURDAY', 'weekday.SUNDAY'].map((key) => (
-                  <div key={key}>{t(key)}</div>
-                ))}
-              </div>
-              <div className="mt-1 grid grid-cols-7 gap-1">
-                {Array.from({ length: pad }, (_, i) => (
-                  <div key={`pad-${i}`} />
-                ))}
-                {monthDays.map((ymd) => {
-                  const selected = ymd === date
-                  const dots = occupyingDotsForDay(rangeRows, ymd)
-
-                  return (
-                    <button
-                      key={ymd}
-                      type="button"
-                      onClick={() => onDate(ymd)}
-                      className={`flex min-h-10 flex-col items-center rounded-md py-1 text-sm ${selected ? 'bg-ink text-canvas' : 'text-ink'}`}
-                    >
-                      {Number(ymd.slice(8))}
-                      <span className="mt-0.5 flex h-1.5 gap-0.5">
-                        {dots.map((dot) => (
-                          <span key={dot.workerId} className={`h-1.5 w-1.5 rounded-full ${dot.color}`} />
-                        ))}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold tracking-tight text-ink">
-                {t(`weekday.${sarajevoWeekday(date)}`)}, {formatPickerDayNumeric(date)}
-              </h3>
-              {queueLoading ? (
-                <p className="mt-4 text-sm text-body">{t('salon.loading')}</p>
-              ) : rows.length > 2 ? (
-                <details className="mt-4">
-                  <summary className="cursor-pointer text-sm font-semibold text-ink">
-                    {t('owner.title')} ({rows.length})
-                  </summary>
-                  {pendingList}
-                </details>
-              ) : rows.length > 0 ? (
-                pendingList
-              ) : null}
-              {workers.length === 0 ? (
-                <p className="mt-4 text-sm text-body">{t('owner.noWorkers')}</p>
-              ) : closed ? (
-                <p className="mt-4 text-sm text-body">{t('owner.closedDay')}</p>
-              ) : (
-                <>
-                  {soon.length > 0 ? (
-                    <h4 className="mt-4 text-sm font-semibold text-ink">{t('owner.soon')}</h4>
-                  ) : null}
-                  {soon.map((row) => (
-                    <OccupyingRow key={row.id} row={row} />
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.title')}
+        salons={salons}
+        salonId={salon.id}
+        firstOwnedId={firstOwnedId}
+        date={date}
+        badge={badge}
+        active="queue"
+        onSalon={onSalon}
+        action={
+          <button
+            type="button"
+            onClick={() => setPhoneOpen(true)}
+            className="inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-canvas active:scale-[0.98] active:bg-[#242424]"
+          >
+            {t('owner.phone.button')}
+          </button>
+        }
+      >
+        {kanban ? (
+          <section className="rounded-3xl bg-canvas p-4 md:p-6">
+            <WeekHeader days={days} onShift={(delta) => onDate(shiftOwnerDate(date, delta))} />
+            <DayChips days={days} date={date} closedFor={closedFor} onDate={onDate} className="mt-4" />
+            <h3 className="mt-5 text-lg font-semibold tracking-tight text-ink">{dayTitle}</h3>
+            {closedFor(date) ? <p className="mt-1 text-sm text-muted">{t('owner.closedDay')}</p> : null}
+            <KanbanBoard>
+              <BoardColumn column="pending" count={rows.length}>
+                {queueLoading ? <p className="px-1 text-sm text-body">{t('salon.loading')}</p> : pendingList}
+              </BoardColumn>
+              {(['proposed', 'confirmed', 'done'] as const).map((column) => (
+                <BoardColumn key={column} column={column} count={groups[column].length}>
+                  {groups[column].map((row) => (
+                    <BookingCard key={row.id} row={row} to={`/owner/requests/${row.id}`} />
                   ))}
-                  {restItems.map((item) =>
-                    item.kind === 'break' ? (
-                      <p key="break" className="mt-3 text-sm text-muted">
-                        {t('owner.break')}
-                        {' · '}
-                        {item.endsAt}
-                      </p>
-                    ) : (
-                      <OccupyingRow key={item.booking.id} row={item.booking} />
-                    ),
-                  )}
-                  {emptyOpen ? <p className="mt-4 text-sm text-body">{t('owner.empty')}</p> : null}
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
+                </BoardColumn>
+              ))}
+            </KanbanBoard>
+          </section>
+        ) : (
+          <>
+            <section className="rounded-3xl bg-canvas p-4 md:p-6">
+              <WeekHeader days={days} onShift={(delta) => onDate(shiftOwnerDate(date, delta))} />
+              <DayChips days={days} date={date} closedFor={closedFor} onDate={onDate} className="mt-4 md:hidden" />
+              {workers.length === 0 ? <p className="mt-4 text-sm text-body">{t('owner.noWorkers')}</p> : null}
+              <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} />
+            </section>
+            <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">
+              <h3 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-ink">
+                {t('owner.pendingFor')} · {dayTitle}
+                <span className="rounded-full bg-pastel-pink px-2 py-0.5 text-xs tabular-nums">{rows.length}</span>
+              </h3>
+              <div className="mt-4">
+                {queueLoading ? (
+                  <p className="text-sm text-body">{t('salon.loading')}</p>
+                ) : rows.length === 0 ? (
+                  <p className="text-sm text-muted">{t('owner.noPending')}</p>
+                ) : (
+                  pendingList
+                )}
+              </div>
+            </section>
+          </>
+        )}
+      </OwnerShell>
       <PhoneBookingDialog
         open={phoneOpen}
         salonId={salon.id}
@@ -538,54 +427,18 @@ export function OwnerHome() {
         categories={board?.salon?.serviceCategories ?? []}
         onClose={() => setPhoneOpen(false)}
         onSaved={(saved) => {
-          const month = ownerMonthFromYmd(saved)
-          const span = ownerMonthRange(month.year, month.month)
+          const savedWeek = ownerWeekDays(saved)
           setPhoneOpen(false)
-          setVisible(ownerMonthFromYmd(saved))
           setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
           void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
-          void refetchOccupying({ salonId: salon.id, date: saved })
-          void refetchRange({ salonId: salon.id, from: span.from, to: span.to })
+          if (kanban) {
+            void refetchDay({ salonId: salon.id, date: saved, origin: null })
+          } else {
+            void refetchRange({ salonId: salon.id, from: savedWeek[0], to: savedWeek[6] })
+          }
         }}
       />
     </>
-  )
-}
-
-function OccupyingRow({ row }: { row: OccupyingBooking }) {
-  const { t } = useTranslation()
-  const block = occupyingBlock(row)
-  if (block === null) {
-    return null
-  }
-  const workerName = row.status === 'TIME_PROPOSED' ? row.proposedWorker?.name : row.worker?.name
-
-  return (
-    <Link
-      to={`/owner/requests/${row.id}`}
-      className="mt-3 grid grid-cols-[3.5rem_minmax(0,1fr)] items-start border-b border-hairline py-2"
-    >
-      <span className="text-sm tabular-nums text-ink">{block.start}</span>
-      <span className="flex min-w-0 items-start gap-3">
-        <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${workerDotColor(block.workerId)}`} />
-        <span className="min-w-0">
-        <span className="block font-semibold text-ink">{block.label}</span>
-        <span className="mt-1 block text-sm text-muted">
-          {occupyingDiaryMeta(block.start, block.durationMinutes, workerName)}
-        </span>
-        {row.status === 'TIME_PROPOSED' ? (
-          <span className="mt-1 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
-            {t('bookings.status.TIME_PROPOSED')}
-          </span>
-        ) : null}
-        {row.noShowAt ? (
-          <span className="mt-1 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
-            {t('owner.noShow')}
-          </span>
-        ) : null}
-        </span>
-      </span>
-    </Link>
   )
 }
 
@@ -625,37 +478,36 @@ function QueueRow({
   const clock = queueRowClock(row)
 
   return (
-    <li className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start">
-      <span className="text-sm tabular-nums text-ink">{formatSarajevoTime(clock)}</span>
-      <div className="min-w-0 rounded-lg border border-hairline bg-surface-soft px-4 py-3">
+    <li className="min-w-0 rounded-2xl bg-status-pending p-3 md:p-4">
       <div className="flex gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink">
           {queueChipInitial(row.customerName)}
         </span>
         <div className="min-w-0 flex-1">
+      <p className="text-xs font-semibold tabular-nums text-ink">{formatSarajevoTime(clock)}</p>
       <p className="font-semibold text-ink">
         {row.customerName}
         {' · '}
         {row.services.map((s) => s.name).join(', ')}
       </p>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 text-sm text-body">
         {t('salon.duration', { n: row.durationMinutes })}
         {' · '}
         {row.worker ? row.worker.name : t('salon.noPreference')}
       </p>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         {chrome.tag ? (
-          <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+          <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-xs font-semibold text-ink">
             {t('owner.reschedule')}
           </span>
         ) : null}
         {assistantOriginVisible(row.intake) ? (
-          <span className="rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+          <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-xs font-semibold text-ink">
             {t('owner.assistant')}
           </span>
         ) : null}
         {isPreferredSoon(clock) ? (
-          <span className="rounded-sm bg-cell-pending px-2 py-0.5 text-xs font-semibold text-ink">
+          <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-semibold text-canvas">
             {t('owner.soon')}
           </span>
         ) : null}
@@ -674,7 +526,7 @@ function QueueRow({
         {chrome.propose ? (
           <Link
             to={`/owner/requests/${row.id}`}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink"
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink"
           >
             {t('owner.propose')}
           </Link>
@@ -684,7 +536,7 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDeclineOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
             {t('owner.decline')}
           </button>
@@ -694,7 +546,7 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDismissOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
             {t('owner.keepOriginal')}
           </button>
@@ -726,7 +578,7 @@ function QueueRow({
               type="button"
               disabled={busy}
               onClick={onDeclineCancel}
-              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+              className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
             >
               {t('owner.declineCancel')}
             </button>
@@ -747,7 +599,7 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDismissCancel}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
             {t('owner.declineCancel')}
           </button>
@@ -755,7 +607,6 @@ function QueueRow({
       ) : null}
       {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
         </div>
-      </div>
       </div>
     </li>
   )

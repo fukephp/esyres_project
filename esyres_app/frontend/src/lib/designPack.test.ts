@@ -10,31 +10,45 @@ function read(rel: string): string {
   return readFileSync(join(src, rel), 'utf8')
 }
 
-test('busy and cell CSS variables keep Design 1 hexes; display is Cal Sans', () => {
+test('Design 2 tokens: cream page, pastels, status, busy unchanged; Bricolage + Manrope', () => {
   const css = read('index.css')
-  expect(css).toMatch(/--color-surface-soft:\s*#f8f9fa/)
+  expect(css).toMatch(/--color-page:\s*#faf4ea/)
+  expect(css).toMatch(/--color-canvas:\s*#fffcf6/)
+  expect(css).toMatch(/background:\s*var\(--color-page\)/)
+  expect(css).toMatch(/--color-pastel-pink:\s*#f5b8db/)
+  expect(css).toMatch(/--color-pastel-green:\s*#9aab63/)
+  expect(css).toMatch(/--color-pastel-blue:\s*#b6caeb/)
+  expect(css).toMatch(/--color-pastel-yellow:\s*#f5d867/)
+  expect(css).toMatch(/--color-status-pending:\s*#f5b8db/)
+  expect(css).toMatch(/--color-status-proposed:\s*#b6caeb/)
+  expect(css).toMatch(/--color-status-confirmed:\s*#f5d867/)
+  expect(css).toMatch(/--color-status-done:\s*#efe7da/)
   expect(css).toMatch(/--color-busy-free:\s*#22c55e/)
   expect(css).toMatch(/--color-busy-moderate:\s*#eab308/)
   expect(css).toMatch(/--color-busy-busy:\s*#ef4444/)
-  expect(css).toMatch(/--color-cell-free:\s*#86efac/)
-  expect(css).toMatch(/--color-cell-pending:\s*#fcd34d/)
-  expect(css).toMatch(/--color-cell-proposed:\s*#93c5fd/)
-  expect(css).toMatch(/--color-cell-booked:\s*#1a1a1a/)
-  expect(css).toMatch(/--color-cell-off:\s*#d6d3d1/)
-  expect(css).toMatch(/--color-badge-orange:\s*#fb923c/)
-  expect(css).toMatch(/--color-badge-pink:\s*#ec4899/)
-  expect(css).toMatch(/--color-badge-violet:\s*#8b5cf6/)
-  expect(css).toMatch(/--color-badge-emerald:\s*#34d399/)
-  expect(css).toMatch(/--color-brand-accent:\s*#3b82f6/)
-  expect(css).toMatch(/--color-success:\s*#10b981/)
-  expect(css).toMatch(/--color-error:\s*#ef4444/)
-  expect(css).toMatch(/--font-display:\s*"Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif/)
-  expect(css).toMatch(/--font-sans:\s*Inter, ui-sans-serif, system-ui, sans-serif/)
+  expect(css).toMatch(/--color-error-strong:\s*#dc2626/)
+  expect(css).toMatch(/--font-display:\s*"Bricolage Grotesque Variable"/)
+  expect(css).toMatch(/--font-sans:\s*"Manrope Variable"/)
+  expect(css).not.toMatch(/Cal Sans/)
+  expect(css).not.toMatch(/Inter/)
+
+  const main = read('main.tsx')
+  expect(main).toMatch(/@fontsource-variable\/bricolage-grotesque/)
+  expect(main).toMatch(/@fontsource-variable\/manrope/)
 })
 
-test('owner chrome is Cal light; no dark nav', () => {
+test('owner chrome is the Design 2 shell: dark sidebar and dark bottom tabs', () => {
+  const shell = read('components/OwnerShell.tsx')
+  expect(shell).toMatch(/bg-surface-dark px-4 py-6 text-on-dark/)
+  expect(shell).toMatch(/fixed inset-x-0 bottom-0 z-20 bg-surface-dark md:hidden/)
+  expect(shell).toMatch(/bg-page/)
+  expect(shell).toMatch(/font-display/)
+  const nav = read('components/OwnerNav.tsx')
+  expect(nav).toMatch(/bg-canvas font-semibold text-ink/)
+  expect(nav).toMatch(/text-on-dark-soft/)
+  expect(nav).toMatch(/bg-pastel-pink/)
+
   const files = [
-    'components/OwnerNav.tsx',
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
     'pages/OwnerStats.tsx',
@@ -56,12 +70,6 @@ test('owner chrome is Cal light; no dark nav', () => {
     expect(text, file).not.toMatch(/['"]pitch\./)
   }
 
-  const nav = read('components/OwnerNav.tsx')
-  expect(nav).not.toMatch(/\btone\b/)
-  expect(nav).toMatch(/text-body/)
-  expect(nav).toMatch(/font-semibold text-ink/)
-  expect(nav).toMatch(/bg-ink text-canvas/)
-
   for (const file of [
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
@@ -76,15 +84,23 @@ test('owner chrome is Cal light; no dark nav', () => {
     const text = read(file)
     expect(text, file).toMatch(/bg-canvas/)
     expect(text, file).toMatch(/text-ink/)
-    expect(text, file).toMatch(/border-hairline/)
+    expect(text, file).toMatch(/<OwnerShell/)
   }
 })
 
-test('dense owner home is month navigator plus selected-day list', () => {
+test('dense owner home is Kalendar week grid or status Kanban on pastel cards', () => {
   const home = read('pages/OwnerHome.tsx')
-  expect(home).toMatch(/rounded-lg border border-hairline bg-canvas p-4/)
-  expect(home).toMatch(/md:grid md:grid-cols-2/)
+  expect(home).toMatch(/rounded-3xl bg-canvas p-4 md:p-6/)
+  expect(home).toMatch(/<WeekGrid/)
+  expect(home).toMatch(/<KanbanBoard/)
   expect(home).toMatch(/occupyingBookingsRange/)
+  expect(home).toMatch(/bg-status-pending/)
+  const boards = read('components/OwnerBoards.tsx')
+  expect(boards).toMatch(/md:grid-cols-7/)
+  expect(boards).toMatch(/md:grid-cols-4/)
+  expect(boards).toMatch(/snap-x snap-mandatory/)
+  expect(boards).toMatch(/STATUS_CARD_CLASS/)
+  expect(boards).not.toMatch(/draggable|@dnd-kit/)
   expect(home).not.toMatch(/WorkerPanel/)
   expect(home).not.toMatch(/@dnd-kit/)
   expect(home).not.toMatch(/bg-cell-free/)

@@ -6,9 +6,9 @@ import { BOOKINGS_HREF, GUEST_COLUMN_CLASS, isOwnerPath, topNavChrome, type TopN
 
 const linkClass = 'text-sm text-body'
 const panelClass =
-  'inline-flex h-10 items-center rounded-md bg-ink px-5 text-sm font-semibold text-canvas active:bg-[#242424]'
+  'inline-flex h-10 items-center rounded-full bg-ink px-5 text-sm font-semibold text-canvas active:bg-[#242424]'
 const logoutClass =
-  'inline-flex h-10 items-center rounded-md bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active'
+  'inline-flex h-10 items-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active'
 
 export function TopNav({
   me = null,

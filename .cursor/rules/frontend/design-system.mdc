@@ -1,5 +1,5 @@
 ---
-description: Read DESIGN.md index, then Design 1 — one Cal pack
+description: Read DESIGN.md index, then Design 2 — one pastel pack
 globs: esyres_app/frontend/**
 alwaysApply: false
 ---
@@ -8,8 +8,8 @@ alwaysApply: false
 
 Before generating or changing visual UI:
 
-1. Read root `DESIGN.md` (one Cal pack).
-2. Open [`refs/design-1/DESIGN.md`](refs/design-1/DESIGN.md), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX.
+1. Read root `DESIGN.md` (one Design 2 pack).
+2. Open [`refs/design-2/DESIGN.md`](refs/design-2/DESIGN.md) and [`refs/design-2/wireframes.md`](refs/design-2/wireframes.md), then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` for product UX.
 
-- Design 1 is locked (Cal-based clean SaaS — white canvas, black CTAs, Cal Sans + Inter). `/` is a short-scroll homepage; owner keeps dense Zahtjevi with light chrome. Busy-badge tokens live in Design 1; cell tokens unused on Zahtjevi home; do not keep a second pack.
+- Design 2 is locked (cream `page` canvas, warm-white `canvas` cards, black primary pill, pastel status fills, Bricolage Grotesque + Manrope). Owner routes use `OwnerShell` (black sidebar `md+`, black bottom tabs on phone). Busy badge stays 🟢/🟡/🔴; pastels are owner status only. `refs/design-1` is history; do not keep a second live pack.
 - Product UX still comes from `docs/mvp/` and `.cursor/rules/frontend/`.

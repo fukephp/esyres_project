@@ -17,11 +17,11 @@ test('settings is a lazy owner route', () => {
   expect(app).toMatch(/salon\.loading/)
 })
 
-test('settings overlay matches the catalog shell', () => {
+test('settings sits in OwnerShell like the catalog', () => {
   const page = read('pages/OwnerSettings.tsx')
   expect(page).toMatch(/<TopNav/)
-  expect(page).toMatch(/min-h-svh md:flex/)
-  expect(page).toMatch(/md:hidden/)
+  expect(page).toMatch(/<OwnerShell/)
+  expect(page).not.toMatch(/<OwnerNav/)
   expect(page).toMatch(/active="settings"/)
   expect(page).toMatch(/useOwnerPush\(ownerReady\)/)
   expect(page).toMatch(/inFlightIntakeCount/)
@@ -38,7 +38,22 @@ test('settings overlay matches the catalog shell', () => {
   expect(page).toMatch(/owner\.title/)
 })
 
-test('settings form is password-only and mismatch returns before the mutation', () => {
+test('Prikaz toggle saves CALENDAR or KANBAN on the account above the password card', () => {
+  const page = read('pages/OwnerSettings.tsx')
+  expect(page).toMatch(/UPDATE_OWNER_VIEW_MUTATION/)
+  expect(page).toMatch(/role="radiogroup"/)
+  expect(page).toMatch(/\['CALENDAR', 'KANBAN'\]/)
+  expect(page).toMatch(/owner\.viewCalendar/)
+  expect(page).toMatch(/owner\.viewKanban/)
+  expect(page).toMatch(/aria-checked=\{on\}/)
+  expect(page.indexOf("t('owner.view')")).toBeLessThan(page.indexOf("t('owner.passwordTitle')"))
+  const auth = read('graphql/auth.ts')
+  expect(auth).toMatch(/mutation UpdateOwnerView\(\$view: OwnerView!\)/)
+  expect(auth).toMatch(/query Me \{[\s\S]*ownerView[\s\S]*salons \{/)
+  expect(auth).toMatch(/ownerView: OwnerView/)
+})
+
+test('settings password form keeps three fields and mismatch returns before the mutation', () => {
   const page = read('pages/OwnerSettings.tsx')
   expect(page).toMatch(/owner\.settings/)
   expect(page).toMatch(/text-body[\s\S]*data\.me\.email/)

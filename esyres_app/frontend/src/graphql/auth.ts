@@ -9,6 +9,7 @@ export const ME_QUERY = gql`
       emailVerified
       phone
       phoneVerified
+      ownerView
       salons {
         id
         name
@@ -84,6 +85,17 @@ export const CHANGE_PASSWORD_MUTATION = gql`
     }
   }
 `
+
+export const UPDATE_OWNER_VIEW_MUTATION = gql`
+  mutation UpdateOwnerView($view: OwnerView!) {
+    updateOwnerView(view: $view) {
+      id
+      ownerView
+    }
+  }
+`
+
+export type OwnerView = 'CALENDAR' | 'KANBAN'
 
 export const LOGOUT_MUTATION = gql`
   mutation Logout {
@@ -268,6 +280,7 @@ export type MeData = {
     emailVerified: boolean
     phone: string | null
     phoneVerified: boolean
+    ownerView: OwnerView
     salons: {
       id: string
       name: string

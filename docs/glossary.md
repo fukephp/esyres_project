@@ -187,8 +187,20 @@ The collapsed labeled answers on Request Detail for an assistant-originated requ
 _Avoid_: chat log, message history, conversation thread, why-line (as a stored essay)
 
 **Zahtjevi**:
-The owner home for one salon: a month navigator and a selected-day list. OwnerNav label. Not chats, not stats, and not the salon catalog.
+The owner home for one salon, rendered in the owner's Prikaz (Kalendar or Kanban). Owner shell label. Not chats, not stats, and not the salon catalog.
 _Avoid_: Worker Availability Panel, job board, inbox, calendar (as the page name), day card
+
+**Prikaz**:
+The owner's chosen way to see Zahtjevi and Zapisi: Kalendar or Kanban. Set in Postavke, stored on the person account, same for every salon they own. Not a salon setting and not a per-device toggle.
+_Avoid_: template (in UI copy), theme, layout, view mode
+
+**Kalendar**:
+The Prikaz that shows one week as seven day columns of occupying bookings, plus the selected day's pending queue. Read-only; tap opens Request Detail. Not a guest slot picker, not drag-to-move, and not a 15-minute board.
+_Avoid_: schedule, agenda, timeline board
+
+**Kanban**:
+The Prikaz that shows one selected day's bookings in four status columns: Zahtjevi, Predloženo, Potvrđeno, Završeno i otkazano. Cards do not move by drag; status changes only through accept, decline, counter-propose, and the customer's answer. Not a worker board.
+_Avoid_: pipeline, board (alone), columns view
 
 **Month navigator**:
 The month grid on Zahtjevi. Days with occupying bookings show worker-colored dots. Tapping a day selects it. Not a guest slot picker and not a per-worker shift calendar.

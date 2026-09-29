@@ -1,58 +1,68 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #ffffff;
+  --color-page: #faf4ea;
+  --color-canvas: #fffcf6;
   --color-ink: #111111;
-  --color-body: #374151;
-  --color-muted: #6b7280;
-  --color-hairline: #e5e7eb;
-  --color-surface-card: #f5f5f5;
-  --color-surface-soft: #f8f9fa;
-  --color-surface-dark: #101010;
+  --color-body: #3f3a33;
+  --color-muted: #7a7266;
+  --color-hairline: #e8dece;
+  --color-surface-card: #efe7da;
+  --color-surface-soft: #f4ede2;
+  --color-surface-dark: #0e0e0e;
+  --color-surface-dark-elevated: #1c1c1c;
   --color-on-dark: #ffffff;
+  --color-on-dark-soft: #a1a1aa;
+  --color-pastel-pink: #f5b8db;
+  --color-pastel-green: #9aab63;
+  --color-pastel-blue: #b6caeb;
+  --color-pastel-yellow: #f5d867;
+  --color-status-pending: #f5b8db;
+  --color-status-proposed: #b6caeb;
+  --color-status-confirmed: #f5d867;
+  --color-status-done: #efe7da;
   --color-warning: #f59e0b;
   --color-badge-orange: #fb923c;
   --color-badge-pink: #ec4899;
   --color-badge-violet: #8b5cf6;
   --color-badge-emerald: #34d399;
-  --color-brand-accent: #3b82f6;
+  --color-brand-accent: #f5b8db;
   --color-success: #10b981;
   --color-error: #ef4444;
-  --color-cell-pending: #fcd34d;
+  --color-cell-pending: #f5b8db;
   --color-cell-free: #86efac;
   --color-cell-off: #d6d3d1;
   --color-cell-booked: #1a1a1a;
-  --color-cell-proposed: #93c5fd;
+  --color-cell-proposed: #b6caeb;
   --color-busy-free: #22c55e;
   --color-busy-moderate: #eab308;
   --color-busy-busy: #ef4444;
   --color-error-strong: #dc2626;
   --color-error-strong-active: #b91c1c;
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   font-family: var(--font-sans);
-  background: var(--color-canvas);
+  background: var(--color-page);
   color: var(--color-ink);
 }
 
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 
-@font-face {
-  font-family: "Cal Sans";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400 700;
-  src: url("/fonts/CalSansVF.woff2") format("woff2");
-}
-
-.homepage .pitch-display {
-  font-family: "Cal Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+.pitch-display {
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
+}
+
+.micro-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

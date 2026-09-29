@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import {
   CREATE_SALON_SERVICE_CATEGORY_MUTATION,
@@ -50,9 +50,9 @@ const REMOVE_BTN =
   'inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink'
 const THUMB = 'h-24 w-24 border border-hairline object-cover'
 const FILE_ACCEPT = 'image/jpeg,image/png,image/webp'
-const CHIP_IDLE = 'text-body'
-const CHIP_ON = 'font-semibold text-ink'
-const PANEL = 'mt-8 space-y-4 border border-hairline p-5'
+const CHIP_IDLE = 'rounded-full bg-surface-card px-4 py-2 text-body'
+const CHIP_ON = 'rounded-full bg-ink px-4 py-2 font-semibold text-canvas'
+const PANEL = 'mt-6 space-y-4 rounded-3xl bg-canvas p-5 md:p-6'
 
 type SalonEditSection = 'info' | 'hours' | 'services' | 'workers'
 
@@ -642,23 +642,20 @@ export function OwnerSalonEdit() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-        <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-          <OwnerNav salonId={navSalonId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-        </aside>
-        <main className="flex-1 px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">
-            {salon?.name ?? t('owner.FORBIDDEN')}
-          </h1>
-          <div className="md:hidden">
-            <OwnerNav salonId={navSalonId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-          </div>
+      <OwnerShell
+        personName={data.me.name}
+        title={salon?.name ?? t('owner.FORBIDDEN')}
+        salons={data.me.salons}
+        salonId={navSalonId}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="salons"
+      >
           {salon === undefined ? (
-            <p className="mt-8 text-sm text-body">{t('owner.FORBIDDEN')}</p>
+            <p className="text-sm text-body">{t('owner.FORBIDDEN')}</p>
           ) : (
             <>
-              <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                 <button
                   type="button"
                   className={section === 'info' ? CHIP_ON : CHIP_IDLE}
@@ -1029,8 +1026,7 @@ export function OwnerSalonEdit() {
               </section>
             </>
           )}
-        </main>
-      </div>
+      </OwnerShell>
     </>
   )
 }

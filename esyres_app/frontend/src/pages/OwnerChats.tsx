@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
@@ -130,29 +130,17 @@ export function OwnerChats() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-        <Switcher salons={salons} salon={salon} onSalon={onSalon} />
-        <OwnerNav
-          salonId={salon.id}
-          firstOwnedId={firstOwnedId}
-          badge={badge}
-          active="chats"
-        />
-      </aside>
-      <main className="flex-1 px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.chat')}</h1>
-        <div className="md:hidden">
-          <Switcher salons={salons} salon={salon} onSalon={onSalon} />
-          <OwnerNav
-            salonId={salon.id}
-            firstOwnedId={firstOwnedId}
-            badge={badge}
-            active="chats"
-          />
-        </div>
-        <label className="mt-6 flex items-center gap-2 text-sm text-body">
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.chat')}
+        salons={salons}
+        salonId={salon.id}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="chats"
+        onSalon={onSalon}
+      >
+        <label className="flex items-center gap-2 text-sm text-body">
           <input
             type="checkbox"
             checked={dnd}
@@ -181,42 +169,9 @@ export function OwnerChats() {
             ))}
           </ul>
         )}
-      </main>
-    </div>
+      </OwnerShell>
     </>
   )
-}
-
-function Switcher({
-  salons,
-  salon,
-  onSalon,
-}: {
-  salons: { id: string; name: string }[]
-  salon: { id: string; name: string }
-  onSalon: (id: string) => void
-}) {
-  const { t } = useTranslation()
-  if (salons.length > 1) {
-    return (
-      <label className="block text-sm">
-        {t('owner.salon')}
-        <select
-          value={salon.id}
-          onChange={(e) => onSalon(e.target.value)}
-          className="mt-1 w-full rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm text-ink"
-        >
-          {salons.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-      </label>
-    )
-  }
-
-  return <p className="text-sm font-semibold">{salon.name}</p>
 }
 
 function IntakeRow({
@@ -242,7 +197,7 @@ function IntakeRow({
   const chrome = takeoverRowChrome({ takeoverAllowed, takenOver: row.takenOver })
 
   return (
-    <li className="rounded-lg border border-hairline bg-canvas px-4 py-3">
+    <li className="rounded-2xl border border-hairline bg-canvas px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="font-semibold text-ink">{row.customerName}</p>
         <p className="text-xs text-muted">{formatSarajevoDateTime(row.updatedAt)}</p>

@@ -41,10 +41,10 @@ test('booking split/aside/main classes are compact sticky sidebar chrome', () =>
   expect(SALON_BOOKING_ASIDE_CLASS.split(/\s+/)).not.toContain('sticky')
 })
 
-test('press hex stays arbitrary; hairline and Inter stay tokens', () => {
+test('press hex stays arbitrary; hairline and Manrope stay tokens', () => {
   const css = read('index.css')
-  expect(css).toMatch(/--color-hairline:\s*#e5e7eb/)
-  expect(css).toMatch(/--font-sans:\s*Inter/)
+  expect(css).toMatch(/--color-hairline:\s*#e8dece/)
+  expect(css).toMatch(/--font-sans:\s*"Manrope Variable"/)
   expect(css).not.toMatch(/--color-ink-press/)
   expect(read('lib/salonSend.ts')).not.toMatch(/from '\.\/homepage'/)
 })

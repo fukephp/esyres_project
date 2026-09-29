@@ -53,7 +53,7 @@ test('App lazy-loads catalog then create then /owner/salons/:id', () => {
 test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
   const nav = read('components/OwnerNav.tsx')
   expect(nav).toMatch(/OWNER_SALONS_PATH/)
-  expect(nav).toMatch(/active === 'salons'/)
+  expect(nav).toMatch(/key: 'salons'/)
   expect(nav).toMatch(/owner\.salons/)
   expect(nav).not.toMatch(/\?salon=/)
   for (const file of [
@@ -67,10 +67,11 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerSettings.tsx',
     'pages/OwnerZapisi.tsx',
   ]) {
-    expect(read(file), file).toMatch(/<OwnerNav/)
+    expect(read(file), file).toMatch(/<OwnerShell/)
   }
+  expect(read('components/OwnerShell.tsx')).toMatch(/<OwnerNav/)
   expect(nav.indexOf('owner.salons')).toBeLessThan(nav.indexOf('owner.settings'))
-  expect(nav).toMatch(/active === 'settings'/)
+  expect(nav).toMatch(/key: 'settings'/)
   expect(nav).toMatch(/OWNER_SETTINGS_PATH/)
 })
 
@@ -85,20 +86,18 @@ test('catalog overlay has boxed shops, header plus, Uredi; not-owner keeps creat
   expect(page).toMatch(/ownerSalonEditPath\(row\.id\)/)
   expect(page).toMatch(/ownerSalonCreatePath\(\)/)
   expect(page).toMatch(/aria-label=\{t\('owner\.addSalon'\)\}/)
-  expect(page).toMatch(/h-10 w-10/)
+  expect(page).toMatch(/h-11 w-11/)
   expect(page).toMatch(/owner\.edit/)
   expect(page).toMatch(/\{row\.name\}/)
-  expect(page).toMatch(/<ul className="mt-8 max-w-xl space-y-3"/)
-  expect(page).toMatch(/border border-hairline p-5/)
-  expect(page).toMatch(/border border-hairline bg-canvas px-5/)
-  const heading = page.indexOf("t('owner.salons')")
+  expect(page).toMatch(/<ul className="max-w-xl space-y-3"/)
+  expect(page).toMatch(/rounded-2xl bg-canvas p-5/)
+  expect(page).toMatch(/rounded-full bg-surface-card px-5/)
+  const heading = page.indexOf("title={t('owner.salons')}")
   const plus = page.indexOf("aria-label={t('owner.addSalon')}")
-  const phoneNav = page.indexOf('md:hidden')
-  const list = page.indexOf('<ul className="mt-8 max-w-xl space-y-3"')
+  const list = page.indexOf('<ul className="max-w-xl space-y-3"')
   expect(heading).toBeGreaterThan(-1)
   expect(heading).toBeLessThan(plus)
-  expect(plus).toBeLessThan(phoneNav)
-  expect(phoneNav).toBeLessThan(list)
+  expect(plus).toBeLessThan(list)
   expect(page.slice(page.indexOf('</ul>'))).not.toMatch(/ownerSalonCreatePath/)
   expect(page).not.toMatch(/divide-y divide-hairline/)
   expect(page).not.toMatch(/rounded-lg/)
@@ -123,11 +122,11 @@ test('salon edit loads from me.salons; exclusive chips; split Spremi', () => {
   expect(page).toMatch(/useState<SalonEditSection>\('info'\)/)
   expect(page).toMatch(/owner\.info/)
   expect(page).toMatch(/flex flex-wrap/)
-  expect(page).toMatch(/font-semibold text-ink/)
-  expect(page).toMatch(/text-body/)
+  expect(page).toMatch(/bg-ink px-4 py-2 font-semibold text-canvas/)
+  expect(page).toMatch(/bg-surface-card px-4 py-2 text-body/)
   expect(page).toMatch(/type="button"/)
   expect(page).toMatch(/hidden/)
-  expect(page).toMatch(/border border-hairline p-5/)
+  expect(page).toMatch(/space-y-4 rounded-3xl bg-canvas p-5/)
   expect(page).not.toMatch(/useSearchParams/)
   expect(page).not.toMatch(/\?tab=/)
   expect(page).not.toMatch(/location\.hash/)
@@ -317,9 +316,9 @@ test('add salon overlay form calls addSalon and lands on edit', () => {
   expect(page).not.toMatch(/updateSalonDnd/)
 })
 
-test('request detail has OwnerNav and no salon switcher', () => {
+test('request detail has OwnerShell and no salon switcher', () => {
   const page = read('pages/OwnerRequestDetail.tsx')
-  expect(page).toMatch(/<OwnerNav/)
+  expect(page).toMatch(/<OwnerShell/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/onSalon/)
 })

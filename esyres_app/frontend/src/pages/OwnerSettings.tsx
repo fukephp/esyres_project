@@ -4,9 +4,15 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
-import { CHANGE_PASSWORD_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
+import {
+  CHANGE_PASSWORD_MUTATION,
+  ME_QUERY,
+  UPDATE_OWNER_VIEW_MUTATION,
+  type MeData,
+  type OwnerView,
+} from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { graphqlErrorCode } from '../lib/booking'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
@@ -18,6 +24,8 @@ export function OwnerSettings() {
   const { t } = useTranslation()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [changePassword, { loading: saving }] = useMutation(CHANGE_PASSWORD_MUTATION)
+  const [updateOwnerView, { loading: savingView }] = useMutation(UPDATE_OWNER_VIEW_MUTATION)
+  const [viewError, setViewError] = useState(false)
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -34,6 +42,18 @@ export function OwnerSettings() {
     fetchPolicy: 'network-only',
   })
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
+
+  async function chooseView(view: OwnerView) {
+    if (savingView || data?.me?.ownerView === view) {
+      return
+    }
+    setViewError(false)
+    try {
+      await updateOwnerView({ variables: { view } })
+    } catch {
+      setViewError(true)
+    }
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -120,25 +140,53 @@ export function OwnerSettings() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-        <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-          <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="settings" />
-        </aside>
-        <main className="flex-1 px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.settings')}</h1>
-          <p className="mt-2 text-sm text-body">{data.me.email}</p>
-          <div className="md:hidden">
-            <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="settings" />
-          </div>
-          <form className="mt-8 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.settings')}
+        salons={salons}
+        salonId={firstOwnedId}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="settings"
+      >
+        <p className="text-sm text-body">{data.me.email}</p>
+        <div className="mt-6 grid max-w-3xl gap-4">
+          <section className="space-y-3 rounded-3xl bg-canvas p-5 md:p-6">
+            <h2 className="micro-label text-muted">{t('owner.view')}</h2>
+            <div role="radiogroup" aria-label={t('owner.view')} className="inline-flex rounded-full bg-surface-card p-1">
+              {(['CALENDAR', 'KANBAN'] as const).map((view) => {
+                const on = data.me?.ownerView === view
+                return (
+                  <button
+                    key={view}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    disabled={savingView}
+                    onClick={() => void chooseView(view)}
+                    className={
+                      on
+                        ? 'h-10 rounded-full bg-ink px-5 text-sm font-semibold text-canvas'
+                        : 'h-10 rounded-full px-5 text-sm text-body disabled:opacity-40'
+                    }
+                  >
+                    {t(view === 'CALENDAR' ? 'owner.viewCalendar' : 'owner.viewKanban')}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-sm text-muted">{t('owner.viewHint')}</p>
+            {viewError ? <p className="text-sm text-busy-busy">{t('owner.viewError')}</p> : null}
+          </section>
+          <form className="space-y-4 rounded-3xl bg-canvas p-5 md:p-6" onSubmit={(e) => void onSubmit(e)}>
+            <h2 className="micro-label text-muted">{t('owner.passwordTitle')}</h2>
             <label className="block text-sm text-body">
               {t('owner.passwordCurrent')}
               <input
                 type="password"
                 value={current}
                 onChange={(e) => setCurrent(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
               />
             </label>
             <label className="block text-sm text-body">
@@ -147,7 +195,7 @@ export function OwnerSettings() {
                 type="password"
                 value={next}
                 onChange={(e) => setNext(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
               />
             </label>
             <label className="block text-sm text-body">
@@ -156,7 +204,7 @@ export function OwnerSettings() {
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
               />
             </label>
             {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
@@ -164,13 +212,13 @@ export function OwnerSettings() {
             <button
               type="submit"
               disabled={saving}
-              className="h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
+              className="h-11 w-fit rounded-full bg-ink px-6 text-sm font-semibold text-canvas disabled:opacity-40 active:scale-[0.98] active:bg-[#242424]"
             >
               {t('owner.save')}
             </button>
           </form>
-        </main>
-      </div>
+        </div>
+      </OwnerShell>
     </>
   )
 }

@@ -193,7 +193,7 @@ export function DiscoveryHome() {
           onChange={(e) => setNameDraft(e.target.value)}
           placeholder={t('discovery.searchPlaceholder')}
           aria-label={t('discovery.searchPlaceholder')}
-          className="w-full rounded-md border border-hairline bg-canvas py-3 pl-10 pr-3 text-sm text-ink placeholder:text-muted"
+          className="w-full rounded-full border border-hairline bg-canvas py-3 pl-10 pr-4 text-sm text-ink placeholder:text-muted"
         />
       </div>
       {loading || !source ? (

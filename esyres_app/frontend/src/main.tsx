@@ -4,6 +4,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { apolloClient } from './apollo.ts'
 import App from './App.tsx'
+import '@fontsource-variable/bricolage-grotesque'
+import '@fontsource-variable/manrope'
 import './i18n.ts'
 import './index.css'
 

@@ -1,5 +1,9 @@
 import { expect, test } from 'vitest'
 import {
+  kanbanColumn,
+  kanbanGroups,
+  occupyingByDay,
+  ownerWeekDays,
   acceptErrorKey,
   canAcceptPreferredTime,
   canDropOnStart,
@@ -806,4 +810,56 @@ test('owner settings copy is Bosnian', async () => {
   expect(i18n.t('owner.passwordError.INVALID_CURRENT_PASSWORD')).toBe('Pogrešna trenutna lozinka.')
   expect(i18n.t('auth.gate.WEAK_PASSWORD')).toBe('Lozinka mora imati najmanje 8 karaktera.')
   expect(i18n.t('owner.save')).toBe('Spremi')
+})
+
+test('ownerWeekDays is Monday to Sunday around the date', () => {
+  expect(ownerWeekDays('2026-09-29')).toEqual([
+    '2026-09-28',
+    '2026-09-29',
+    '2026-09-30',
+    '2026-10-01',
+    '2026-10-02',
+    '2026-10-03',
+    '2026-10-04',
+  ])
+  expect(ownerWeekDays('2026-10-04')[0]).toBe('2026-09-28')
+  expect(ownerWeekDays('2026-09-28')[6]).toBe('2026-10-04')
+})
+
+test('kanbanColumn maps status and past confirmed starts', () => {
+  const now = new Date('2026-09-29T10:00:00Z')
+  const base = { preferredStartsAt: '2026-09-29T12:00:00Z', proposedStartsAt: null }
+  expect(kanbanColumn({ ...base, status: 'REQUESTED' }, now)).toBe('pending')
+  expect(kanbanColumn({ ...base, status: 'TIME_PROPOSED' }, now)).toBe('proposed')
+  expect(kanbanColumn({ ...base, status: 'CONFIRMED' }, now)).toBe('confirmed')
+  expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z' }, now)).toBe('done')
+  expect(kanbanColumn({ ...base, status: 'DECLINED' }, now)).toBe('done')
+  expect(kanbanColumn({ ...base, status: 'CANCELLED' }, now)).toBe('done')
+})
+
+test('kanbanGroups sorts each column by effective start', () => {
+  const now = new Date('2026-09-29T06:00:00Z')
+  const groups = kanbanGroups(
+    [
+      { id: 'b', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T11:00:00Z', proposedStartsAt: null },
+      { id: 'a', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T09:00:00Z', proposedStartsAt: null },
+      { id: 'p', status: 'TIME_PROPOSED', preferredStartsAt: '2026-09-29T07:00:00Z', proposedStartsAt: '2026-09-29T13:00:00Z' },
+    ],
+    now,
+  )
+  expect(groups.confirmed.map((row) => row.id)).toEqual(['a', 'b'])
+  expect(groups.proposed.map((row) => row.id)).toEqual(['p'])
+  expect(groups.pending).toEqual([])
+  expect(groups.done).toEqual([])
+})
+
+test('occupyingByDay keeps that Sarajevo day in start order', () => {
+  const worker = { id: 'w1', name: 'Ana' }
+  const rows = [
+    { id: '2', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T12:00:00Z', proposedStartsAt: null, durationMinutes: 30, worker, proposedWorker: null },
+    { id: '1', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z', proposedStartsAt: null, durationMinutes: 30, worker, proposedWorker: null },
+    { id: '3', status: 'CONFIRMED', preferredStartsAt: '2026-09-30T08:00:00Z', proposedStartsAt: null, durationMinutes: 30, worker, proposedWorker: null },
+    { id: '4', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T09:00:00Z', proposedStartsAt: null, durationMinutes: 30, worker: null, proposedWorker: null },
+  ]
+  expect(occupyingByDay(rows, '2026-09-29').map((row) => row.id)).toEqual(['1', '2'])
 })

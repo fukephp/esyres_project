@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
@@ -84,41 +84,48 @@ export function OwnerSalons() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-        <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-          <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-        </aside>
-        <main className="flex-1 px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.salons')}</h1>
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.salons')}
+        salons={salons}
+        salonId={firstOwnedId}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="salons"
+        action={
           <Link
             to={ownerSalonCreatePath()}
             aria-label={t('owner.addSalon')}
-            className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink text-lg font-semibold text-canvas active:scale-[0.98] active:bg-[#242424]"
           >
             +
           </Link>
-          <div className="md:hidden">
-            <OwnerNav salonId={firstOwnedId} firstOwnedId={firstOwnedId} badge={badge} active="salons" />
-          </div>
-          <ul className="mt-8 max-w-xl space-y-3">
-            {salons.map((row) => (
-              <li key={row.id} className="flex items-center justify-between gap-3 border border-hairline p-5">
+        }
+      >
+        <ul className="max-w-xl space-y-3">
+          {salons.map((row) => {
+            const open = salonIsOpenNow(row.hours)
+
+            return (
+              <li key={row.id} className="flex items-center justify-between gap-3 rounded-2xl bg-canvas p-5">
                 <div>
-                  <p className="font-medium text-ink">{row.name}</p>
-                  <p className="text-sm text-body">{t(salonIsOpenNow(row.hours) ? 'owner.openNow' : 'owner.closedNow')}</p>
+                  <p className="font-display text-lg font-semibold text-ink">{row.name}</p>
+                  <p className="mt-1 inline-flex items-center gap-2 text-sm text-body">
+                    <span className={`h-2 w-2 rounded-full ${open ? 'bg-busy-free' : 'bg-muted'}`} />
+                    {t(open ? 'owner.openNow' : 'owner.closedNow')}
+                  </p>
                 </div>
                 <Link
                   to={ownerSalonEditPath(row.id)}
-                  className="inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink"
+                  className="inline-flex h-10 shrink-0 items-center rounded-full bg-surface-card px-5 text-sm font-semibold text-ink"
                 >
                   {t('owner.edit')}
                 </Link>
               </li>
-            ))}
-          </ul>
-        </main>
-      </div>
+            )
+          })}
+        </ul>
+      </OwnerShell>
     </>
   )
 }

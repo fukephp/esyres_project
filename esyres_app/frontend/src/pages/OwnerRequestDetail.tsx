@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerNav } from '../components/OwnerNav'
+import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
@@ -288,34 +288,21 @@ export function OwnerRequestDetail() {
 
   return (
     <>
-      <TopNav me={navMe} />
-      <div className="min-h-svh md:flex">
-      <aside className="hidden border-r border-hairline bg-canvas px-5 py-8 text-ink md:flex md:w-56 md:shrink-0 md:flex-col">
-        <p className="text-sm font-semibold">{booking?.salon.name ?? ''}</p>
-        <OwnerNav
-          salonId={navSalonId}
-          firstOwnedId={firstOwnedId}
-          badge={badge}
-          active="queue"
-        />
-      </aside>
-      <main className="flex-1 px-5 py-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink md:hidden">{t('owner.title')}</h1>
-        <p className="mt-1 text-sm text-body md:hidden">{booking?.salon.name ?? ''}</p>
-        <div className="md:hidden">
-          <OwnerNav
-            salonId={navSalonId}
-            firstOwnedId={firstOwnedId}
-            badge={badge}
-            active="queue"
-          />
-        </div>
-        <p className="mt-6">
-          <Link to={leavePath} className="text-sm font-medium text-ink underline">
-            {t('owner.back')}
+      <OwnerShell
+        personName={data.me.name}
+        title={t('owner.title')}
+        salons={booking === undefined ? [] : [booking.salon]}
+        salonId={navSalonId}
+        firstOwnedId={firstOwnedId}
+        badge={badge}
+        active="queue"
+      >
+        <p>
+          <Link to={leavePath} className="inline-flex h-9 items-center rounded-full bg-surface-card px-4 text-sm font-medium text-ink">
+            ← {t('owner.back')}
           </Link>
         </p>
-        <section className="mt-4 rounded-lg border border-hairline bg-canvas p-4">
+        <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">
         {forbidden || booking === undefined ? (
           <p className="text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
         ) : ownerDetailMode(booking.status) === 'bounce' ? (
@@ -537,8 +524,7 @@ export function OwnerRequestDetail() {
           </>
         ) : null}
         </section>
-      </main>
-    </div>
+      </OwnerShell>
     </>
   )
 }
