@@ -607,6 +607,112 @@ trait OwnerSteps
     }
 
     /**
+     * @Given that booking is time proposed on :date at :time
+     */
+    public function thatBookingIsTimeProposedOn(string $date, string $time): void
+    {
+        $start = \Carbon\CarbonImmutable::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $this->booking->status = Booking::TIME_PROPOSED;
+        $this->booking->proposed_starts_at = $start->utc();
+        $this->booking->proposed_worker_id = $this->worker->id;
+        $this->booking->save();
+    }
+
+    /**
+     * @When I query zapisi for date :date
+     */
+    public function iQueryZapisiForDate(string $date): void
+    {
+        $this->graphql($this->salonDayBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @When I query zapisi for date :date origin :origin
+     */
+    public function iQueryZapisiForDateOrigin(string $date, string $origin): void
+    {
+        $this->graphql($this->salonDayBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+            'origin' => $origin,
+        ]);
+    }
+
+    /**
+     * @When I query zapisi as a guest for date :date
+     */
+    public function iQueryZapisiAsAGuest(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->iQueryZapisiForDate($date);
+    }
+
+    /**
+     * @When I query zapisi for the other salon on date :date
+     */
+    public function iQueryZapisiForTheOtherSalon(string $date): void
+    {
+        $this->graphql($this->salonDayBookingsQuery(), [
+            'salonId' => (string) $this->otherSalon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then zapisi includes this booking as :status origin :origin named :name
+     */
+    public function zapisiIncludesThisBooking(string $status, string $origin, string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $id = (string) $this->booking->id;
+        foreach ($this->graphql['data']['salonDayBookings'] as $row) {
+            if ((string) $row['id'] !== $id) {
+                continue;
+            }
+            $this->assertSame($status, $row['status']);
+            $this->assertSame($origin, $row['origin']);
+            $this->assertSame($name, $row['customerName']);
+            $this->assertSame('Šišanje', $row['services'][0]['name']);
+
+            return;
+        }
+        throw new RuntimeException("Expected booking {$id} in salonDayBookings");
+    }
+
+    /**
+     * @Then zapisi does not include this booking
+     */
+    public function zapisiDoesNotIncludeThisBooking(): void
+    {
+        $this->assertBookingListed('salonDayBookings', null, false);
+    }
+
+    /**
+     * @Then zapisi is empty
+     */
+    public function zapisiIsEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->graphql['data']['salonDayBookings']);
+    }
+
+    /**
+     * @Then zapisi names are :names
+     */
+    public function zapisiNamesAre(string $names): void
+    {
+        $this->assertNoGraphqlErrors();
+        $actual = [];
+        foreach ($this->graphql['data']['salonDayBookings'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame(array_map('trim', explode(',', $names)), $actual);
+    }
+
+    /**
      * @Given a verified customer :email with password :password
      */
     public function aVerifiedCustomer(string $email, string $password): void
@@ -618,6 +724,23 @@ trait OwnerSteps
             'phone' => '+38761'.substr(sha1($email), 0, 6),
             'phone_verified_at' => now(),
         ]);
+    }
+
+    /**
+     * @Given that customer is named :name
+     */
+    public function thatCustomerIsNamed(string $name): void
+    {
+        $this->user->name = $name;
+        $this->user->save();
+    }
+
+    /**
+     * @Given the customer has a requested booking on :date at :time
+     */
+    public function theCustomerHasARequestedBooking(string $date, string $time): void
+    {
+        $this->insertCustomerBooking($this->user, $this->salon, $date, $time);
     }
 
     /**
@@ -1529,7 +1652,7 @@ GQL;
     }
 
     /**
-     * @param  'occupyingBookings'|'pendingBookings'  $field
+     * @param  'occupyingBookings'|'pendingBookings'|'salonDayBookings'  $field
      */
     private function assertBookingListed(string $field, ?string $status, bool $present): void
     {
@@ -1710,6 +1833,23 @@ query OwnerBooking($id: ID!) {
       preferredDate
       preferredTime
     }
+  }
+}
+GQL;
+    }
+
+    private function salonDayBookingsQuery(): string
+    {
+        return <<<'GQL'
+query SalonDayBookings($salonId: ID!, $date: String!, $origin: BookingOrigin) {
+  salonDayBookings(salonId: $salonId, date: $date, origin: $origin) {
+    id
+    status
+    origin
+    customerName
+    preferredStartsAt
+    proposedStartsAt
+    services { name }
   }
 }
 GQL;

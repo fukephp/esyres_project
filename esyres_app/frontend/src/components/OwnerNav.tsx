@@ -1,20 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { sarajevoToday } from '../lib/format'
-import { OWNER_SALONS_PATH, OWNER_SETTINGS_PATH, ownerChatPath, ownerQueuePath, ownerStatsPath } from '../lib/owner'
+import { OWNER_SALONS_PATH, OWNER_SETTINGS_PATH, ownerChatPath, ownerQueuePath, ownerStatsPath, ownerZapisiPath } from '../lib/owner'
 
 type Props = {
   salonId: string
   firstOwnedId: string
   date?: string
   badge: number | null
-  active: 'queue' | 'chats' | 'stats' | 'salons' | 'settings'
+  active: 'queue' | 'zapisi' | 'chats' | 'stats' | 'salons' | 'settings'
 }
 
 export function OwnerNav({ salonId, firstOwnedId, date, badge, active }: Props) {
   const { t } = useTranslation()
   const today = sarajevoToday()
   const queue = ownerQueuePath(date ?? today, today, salonId, firstOwnedId)
+  const zapisi = ownerZapisiPath(date ?? today, today, salonId, firstOwnedId)
   const chats = ownerChatPath(salonId, firstOwnedId)
   const stats = ownerStatsPath(salonId, firstOwnedId)
   const idle = 'text-body'
@@ -25,6 +26,9 @@ export function OwnerNav({ salonId, firstOwnedId, date, badge, active }: Props) 
     <nav className="mt-6 flex flex-col gap-2 text-sm">
       <Link to={queue} className={active === 'queue' ? on : idle}>
         {t('owner.title')}
+      </Link>
+      <Link to={zapisi} className={active === 'zapisi' ? on : idle}>
+        {t('owner.zapisi')}
       </Link>
       <Link to={chats} className={active === 'chats' ? on : idle}>
         {t('owner.chat')}

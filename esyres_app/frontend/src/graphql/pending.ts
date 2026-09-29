@@ -170,6 +170,36 @@ export const OWNER_SALON_QUERY = gql`
   }
 `
 
+export const SALON_DAY_BOOKINGS_QUERY = gql`
+  query SalonDayBookings($salonId: ID!, $date: String!, $origin: BookingOrigin) {
+    salonDayBookings(salonId: $salonId, date: $date, origin: $origin) {
+      id
+      status
+      origin
+      customerName
+      preferredStartsAt
+      proposedStartsAt
+      services {
+        name
+      }
+    }
+  }
+`
+
+export type ZapisiBooking = {
+  id: string
+  status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED' | 'CANCELLED'
+  origin: 'PICKER' | 'ASSISTANT' | 'PHONE'
+  customerName: string
+  preferredStartsAt: string
+  proposedStartsAt: string | null
+  services: { name: string }[]
+}
+
+export type SalonDayBookingsData = {
+  salonDayBookings: ZapisiBooking[]
+}
+
 export const OCCUPYING_BOOKINGS_QUERY = gql`
   query OccupyingBookings($salonId: ID!, $date: String!) {
     occupyingBookings(salonId: $salonId, date: $date) {
