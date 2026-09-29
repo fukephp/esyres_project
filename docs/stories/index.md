@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-81` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–81. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-82` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–82. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -104,3 +104,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-79 | Prikaz setting | 3 | — | STORY-71, STORY-78 |
 | STORY-80 | Kalendar and Kanban on Zahtjevi and Zapisi | 3 | — | STORY-79, STORY-67, STORY-75, STORY-76 |
 | STORY-81 | Homepage sections and guest re-skin | 1 | — | STORY-77, STORY-40, STORY-44 |
+| STORY-82 | Skeleton loading | 3 | — | STORY-77, STORY-78, STORY-80, STORY-81 |

@@ -18,7 +18,7 @@ As an owner, I want one clear navigation (a sidebar on a laptop, bottom tabs on 
 - Phone: compact header (brand, salon name or switcher, Odjava) and a fixed black bottom tab bar with Zahtjevi, Zapisi, Chats (badge), Saloni, Postavke. Statistika stays reachable from the header link. Content keeps bottom padding so the bar does not cover it.
 - Header shows `Dobrodošli, {person name}` as the display heading when the person has a name; otherwise the page title. An optional action slot (Telefon on Zahtjevi).
 - Links keep today's targets and `?salon=` / `?date=` rules (`ownerQueuePath`, `ownerZapisiPath`, `ownerChatPath`, `ownerStatsPath`, `OWNER_SALONS_PATH`, `OWNER_SETTINGS_PATH`).
-- Loading, logged-out (AuthShell), unverified, and not-an-owner states keep the guest TopNav.
+- Loading, logged-out (AuthShell), unverified, and not-an-owner states keep the guest TopNav. (Loading superseded by STORY-82: ghost `OwnerShell`.)
 
 ## Out of scope
 

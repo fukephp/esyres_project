@@ -11,6 +11,8 @@ Two-sided salon reservation PWA for Sarajevo. Customer picks service(s), optiona
 - MVP captures trust data (response time, no-show, QR scan, QR visit, verification). Owner marks no-show after start (stay `confirmed`) on Request Detail, which also lists that guest's other confirmed bookings at this salon. No customers screen. Cancel and no-show increment salon + customer counters. Badge **display** is Phase 2.
 - Not MVP: native apps, in-app payments, worker logins, reviews, Viber/WhatsApp/Instagram DM messaging, LLM NLU, chain multi-location, receptionist roles, sibling marketing site, public owner waitlist, public pricing page.
 
+Loading is a Design 2 skeleton (page frame + per-list ghosts, gentle pulse, static under reduced motion, only after ~150ms; sr-only `Učitavanje…`), not bare text. Owner routes load inside a ghost `OwnerShell` (no tappable links until `me` lands). Salon busy keep-last and picker/chat overlays never swap to a skeleton; Request Detail loading stays uncarded.
+
 Bosnian-first UI. Prices in KM (integer feninga in the data model). QR sticker is `/qr/{id}` then the salon profile (hold cookie); Instagram-bio and organic `/salon/:id` do not set the hold and never show the homepage. Preserve that browse → request path.
 
 ## Architecture (locked)
