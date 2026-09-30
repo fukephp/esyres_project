@@ -251,6 +251,11 @@ type SalonStatsHour {
     bookingsCount: Int!
 }
 
+type QuarterStart {
+    time: String!
+    booked: Boolean!
+}
+
 type SalonStats {
     fromDate: String!
     toDate: String!
@@ -265,6 +270,7 @@ type Query {
     vapidPublicKey: String!
     me: User
     salon(id: ID!): Salon
+    quarterStarts(salonId: ID!, date: String!, serviceIds: [ID!]!, workerId: ID): [QuarterStart!]! @field(resolver: "App\\GraphQL\\Queries\\QuarterStarts")
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!

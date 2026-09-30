@@ -39,8 +39,16 @@ void i18n.use(initReactI18next).init({
             PAST_TIME: 'Odaberi vrijeme u budućnosti.',
             INVALID_DATE: 'Neispravan datum ili vrijeme.',
             INVALID_TIME: 'Neispravan datum ili vrijeme.',
+            INVALID_TIME_STEP: 'Neispravan datum ili vrijeme.',
+            OUTSIDE_HOURS: 'Van radnog vremena.',
+            DURING_BREAK: 'Termin pada u pauzu.',
+            SLOT_TAKEN: 'Taj termin je zauzet.',
             INVALID_CREDENTIALS: 'Pogrešan email ili lozinka.',
             fallback: 'Zahtjev nije poslan.',
+          },
+          quarter: {
+            booked: 'Zauzet',
+            none: 'Nema slobodnog termina.',
           },
           busy: {
             LOW: 'Slobodnije',

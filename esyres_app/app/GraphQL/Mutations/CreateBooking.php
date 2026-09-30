@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Mutations;
 
+use App\Booking\QuarterStarts;
 use App\Exceptions\ClientError;
 use App\Models\AssistantIntake;
 use App\Models\Booking;
@@ -46,6 +47,12 @@ final class CreateBooking
         $services = $this->services($salon, $input['serviceIds']);
         $workerId = $this->workerId($salon, $input['workerId'] ?? null);
         $duration = Booking::roundUp15(array_sum(array_map(fn (Service $s): int => $s->duration_minutes, $services)));
+        if (! $this->willAttachIntake($salon->id, $input['intakeToken'] ?? null)) {
+            $block = QuarterStarts::pickerBlock($salon, $starts, $duration, $workerId);
+            if ($block !== null) {
+                throw new ClientError($block);
+            }
+        }
 
         $booking = DB::transaction(function () use ($user, $salon, $services, $workerId, $starts, $input, $duration): Booking {
             $booking = new Booking;
@@ -148,6 +155,19 @@ final class CreateBooking
         }
 
         return $worker->id;
+    }
+
+    private function willAttachIntake(int $salonId, mixed $token): bool
+    {
+        if (! is_string($token) || $token === '' || ! Str::isUuid($token)) {
+            return false;
+        }
+        $row = AssistantIntake::query()
+            ->where('salon_id', $salonId)
+            ->where('token', $token)
+            ->first();
+
+        return $row !== null && $row->isInFlight();
     }
 
     private function attachIntake(int $salonId, mixed $token, int $bookingId): bool

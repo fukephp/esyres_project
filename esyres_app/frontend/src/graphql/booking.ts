@@ -1,5 +1,18 @@
 import { gql } from '@apollo/client'
 
+export const QUARTER_STARTS_QUERY = gql`
+  query QuarterStarts($salonId: ID!, $date: String!, $serviceIds: [ID!]!, $workerId: ID) {
+    quarterStarts(salonId: $salonId, date: $date, serviceIds: $serviceIds, workerId: $workerId) {
+      time
+      booked
+    }
+  }
+`
+
+export type QuarterStartsData = {
+  quarterStarts: { time: string; booked: boolean }[]
+}
+
 export const CREATE_BOOKING_MUTATION = gql`
   mutation CreateBooking($input: CreateBookingInput!) {
     createBooking(input: $input) {

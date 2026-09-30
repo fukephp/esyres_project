@@ -603,6 +603,142 @@ GQL, [
     }
 
     /**
+     * @When I create a booking on :date at :time with service :name
+     */
+    public function iCreateABookingWithService(string $date, string $time, string $name): void
+    {
+        $service = Service::query()->where('salon_id', $this->salon->id)->where('name', $name)->firstOrFail();
+        $this->postCreateBooking($date, $time, [(string) $service->id], null);
+    }
+
+    /**
+     * @When I query quarter starts on :date for the salon services
+     */
+    public function iQueryQuarterStarts(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, $this->salonServiceIds(), null);
+    }
+
+    /**
+     * @When I query quarter starts on :date for service :name
+     */
+    public function iQueryQuarterStartsForService(string $date, string $name): void
+    {
+        $service = Service::query()->where('salon_id', $this->salon->id)->where('name', $name)->firstOrFail();
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, [(string) $service->id], null);
+    }
+
+    /**
+     * @When I query quarter starts on :date for service :service and worker :worker
+     */
+    public function iQueryQuarterStartsForServiceAndWorker(string $date, string $serviceName, string $workerName): void
+    {
+        $service = Service::query()->where('salon_id', $this->salon->id)->where('name', $serviceName)->firstOrFail();
+        $worker = Worker::query()->where('salon_id', $this->salon->id)->where('name', $workerName)->firstOrFail();
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, [(string) $service->id], (string) $worker->id);
+    }
+
+    /**
+     * @When I query quarter starts on :date for the salon services and worker :name
+     */
+    public function iQueryQuarterStartsForWorker(string $date, string $name): void
+    {
+        $worker = Worker::query()->where('salon_id', $this->salon->id)->where('name', $name)->firstOrFail();
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, $this->salonServiceIds(), (string) $worker->id);
+    }
+
+    /**
+     * @When I query quarter starts on :date for the salon services and the other salon worker
+     */
+    public function iQueryQuarterStartsForOtherWorker(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, $this->salonServiceIds(), (string) $this->otherWorker->id);
+    }
+
+    /**
+     * @When I query quarter starts on :date for an unknown salon
+     */
+    public function iQueryQuarterStartsForUnknownSalon(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->quarterStartsQuery(), [
+            'salonId' => '999999',
+            'date' => $date,
+            'serviceIds' => $this->salonServiceIds(),
+            'workerId' => null,
+        ]);
+    }
+
+    /**
+     * @When I query quarter starts on :date for the salon services with no services
+     */
+    public function iQueryQuarterStartsWithNoServices(string $date): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->queryQuarterStarts($date, [], null);
+    }
+
+    /**
+     * @Then quarter start :time is booked
+     */
+    public function quarterStartIsBooked(string $time): void
+    {
+        $this->assertQuarterStart($time, true);
+    }
+
+    /**
+     * @Then quarter start :time is free
+     */
+    public function quarterStartIsFree(string $time): void
+    {
+        $this->assertQuarterStart($time, false);
+    }
+
+    /**
+     * @Then quarter start :time is absent
+     */
+    public function quarterStartIsAbsent(string $time): void
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->quarterStartRows() as $row) {
+            if ($row['time'] === $time) {
+                throw new RuntimeException("Expected {$time} to be absent");
+            }
+        }
+    }
+
+    /**
+     * @Then quarter starts are empty
+     */
+    public function quarterStartsAreEmpty(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame([], $this->quarterStartRows());
+    }
+
+    /**
+     * @Then quarter starts have no customer fields
+     */
+    public function quarterStartsHaveNoCustomerFields(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $json = json_encode($this->graphql['data']['quarterStarts']);
+        $this->assertIsString($json);
+        $this->assertFalse(str_contains($json, 'customer'));
+        $this->assertFalse(str_contains($json, 'name'));
+        foreach ($this->quarterStartRows() as $row) {
+            $keys = array_keys($row);
+            sort($keys);
+            $this->assertSame(['booked', 'time'], $keys);
+        }
+    }
+
+    /**
      * @When I upsert a new assistant intake as a guest
      */
     public function iUpsertANewAssistantIntakeAsAGuest(): void
@@ -1259,6 +1395,57 @@ GQL;
             $input['intakeToken'] = $intakeToken;
         }
         $this->graphql($this->createBookingMutation(), ['input' => $input]);
+    }
+
+    /**
+     * @param  list<string>  $serviceIds
+     */
+    private function queryQuarterStarts(string $date, array $serviceIds, ?string $workerId): void
+    {
+        $this->graphql($this->quarterStartsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+            'serviceIds' => $serviceIds,
+            'workerId' => $workerId,
+        ]);
+    }
+
+    /** @return list<array{time: string, booked: bool}> */
+    private function quarterStartRows(): array
+    {
+        $rows = $this->graphql['data']['quarterStarts'] ?? null;
+        if (! is_array($rows)) {
+            throw new RuntimeException('quarterStarts payload missing');
+        }
+
+        return $rows;
+    }
+
+    private function assertQuarterStart(string $time, bool $booked): void
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->quarterStartRows() as $row) {
+            if ($row['time'] !== $time) {
+                continue;
+            }
+            $this->assertSame($booked, $row['booked']);
+
+            return;
+        }
+
+        throw new RuntimeException("Quarter {$time} was not listed");
+    }
+
+    private function quarterStartsQuery(): string
+    {
+        return <<<'GQL'
+query QuarterStarts($salonId: ID!, $date: String!, $serviceIds: [ID!]!, $workerId: ID) {
+  quarterStarts(salonId: $salonId, date: $date, serviceIds: $serviceIds, workerId: $workerId) {
+    time
+    booked
+  }
+}
+GQL;
     }
 
     private function postUpsertIntake(?string $token): void

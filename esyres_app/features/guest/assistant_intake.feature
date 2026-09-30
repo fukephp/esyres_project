@@ -107,6 +107,33 @@ Feature: Guest assistant intake persistence
     When I query the assistant intake
     Then the assistant intake is null
 
+  Scenario: Intake createBooking still accepts a break, an outside hour, an off-quarter, and an overlap
+    Given the salon has a worker:
+      """
+      {"name": "Ana"}
+      """
+    And the salon has a requested booking on "2026-08-31" at "10:00" for "Lejla"
+    And that booking is for the salon worker
+    And that booking is confirmed
+    And a verified customer "ana@example.com" with password "secret-pass"
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "13:30" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I create a booking on "2026-08-31" at "21:00" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I create a booking on "2026-08-31" at "10:07" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+    When I upsert a new assistant intake as a guest
+    Then the intake token is a uuid
+    When I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    Then the booking status is "REQUESTED"
+
   Scenario: Unknown intake token still creates the booking
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I log in as "ana@example.com" with password "secret-pass"
