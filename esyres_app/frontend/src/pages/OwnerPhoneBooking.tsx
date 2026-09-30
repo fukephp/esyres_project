@@ -374,6 +374,7 @@ export function PhoneBookingDialog({
                     {t('salon.time')}
                     <input
                       type="time"
+                      lang="bs-BA"
                       step={900}
                       value={time}
                       onChange={(event) => {

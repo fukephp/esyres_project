@@ -268,6 +268,7 @@ export function AssistantIntake({
                   {t('salon.time')}
                   <input
                     type="time"
+                    lang="bs-BA"
                     required
                     step={900}
                     value={preferredTime}

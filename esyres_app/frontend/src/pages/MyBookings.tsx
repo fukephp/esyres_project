@@ -233,6 +233,7 @@ function BookingRow({
             {t('salon.time')}
             <input
               type="time"
+              lang="bs-BA"
               step={900}
               value={askTime}
               disabled={busy}

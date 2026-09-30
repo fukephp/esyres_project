@@ -27,7 +27,7 @@ import {
 import { graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
-import { sarajevoToday } from '../lib/format'
+import { formatCivilDate, sarajevoToday } from '../lib/format'
 import {
   acceptErrorKey,
   assistantOriginVisible,
@@ -305,7 +305,7 @@ export function OwnerRequestDetail() {
             <p className="font-semibold text-ink">{booking.customerName}</p>
             <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
             <p className="mt-1 text-sm text-body">
-              {booking.preferredDate}
+              {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
               {' · '}
@@ -327,7 +327,7 @@ export function OwnerRequestDetail() {
                   )}
             </p>
             <p className="mt-1 text-sm text-body">
-              {booking.preferredDate}
+              {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
               {' · '}
@@ -363,7 +363,7 @@ export function OwnerRequestDetail() {
             <p className="font-semibold text-ink">{booking.customerName}</p>
             <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
             <p className="mt-1 text-sm text-body">
-              {booking.preferredDate}
+              {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
               {' · '}
@@ -564,7 +564,7 @@ function PriorMemory({
             <ul className="mt-1 space-y-1">
               {rows.map((row) => (
                 <li key={row.id} className="text-sm text-body">
-                  {row.preferredDate}
+                  {formatCivilDate(row.preferredDate)}
                   {' · '}
                   {row.services.map((service) => service.name).join(', ')}
                   {row.noShowAt ? ` · ${t('owner.noShow')}` : ''}

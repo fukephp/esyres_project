@@ -842,6 +842,7 @@ export function OwnerSalonEdit() {
                                     {t('owner.opens')}
                                     <input
                                       type="time"
+                                      lang="bs-BA"
                                       step={900}
                                       value={day.opensAt}
                                       onChange={(e) =>
@@ -854,6 +855,7 @@ export function OwnerSalonEdit() {
                                     {t('owner.closes')}
                                     <input
                                       type="time"
+                                      lang="bs-BA"
                                       step={900}
                                       value={day.closesAt}
                                       onChange={(e) =>
@@ -885,6 +887,7 @@ export function OwnerSalonEdit() {
                                   <div className="grid grid-cols-2 gap-2">
                                     <input
                                       type="time"
+                                      lang="bs-BA"
                                       step={900}
                                       value={day.breakStartsAt}
                                       onChange={(e) =>
@@ -894,6 +897,7 @@ export function OwnerSalonEdit() {
                                     />
                                     <input
                                       type="time"
+                                      lang="bs-BA"
                                       step={900}
                                       value={day.breakEndsAt}
                                       onChange={(e) =>

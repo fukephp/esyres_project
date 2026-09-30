@@ -30,7 +30,6 @@ import {
   formatAssistantHoursLine,
   isChatOpen,
   isPickerOpen,
-  showChatCta,
   suggestPreferredTimes,
   type ProfileMode,
 } from '../lib/assistant'
@@ -52,7 +51,7 @@ import {
   SALON_BOOKING_ASIDE_CLASS,
   SALON_BOOKING_MAIN_CLASS,
   SALON_BOOKING_SPLIT_CLASS,
-  SALON_CHAT_CARD_CLASS,
+  // SALON_CHAT_CARD_CLASS,
   SALON_PICKER_DIALOG_CLASS,
   SALON_SEND_CLASS,
 } from '../lib/salonSend'
@@ -388,7 +387,6 @@ export function SalonProfile() {
   const showBookingColumn = hasServices && !sent
   const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
-  const showChatCard = showChatCta(salon.services.length, sent)
   const hoursForDay = chatDate === '' ? undefined : assistantHoursForDate(salon.hours, chatDate)
   const dayClosed =
     hoursForDay === undefined ||
@@ -679,6 +677,7 @@ export function SalonProfile() {
             )
           })}
         </ul>
+        {/* Reci nam što ti treba — only Pošalji zahtjev for now
         {showChatCard ? (
           chatting ? (
             <div className={`${SALON_CHAT_CARD_CLASS} pointer-events-none`} aria-pressed="true">
@@ -706,6 +705,7 @@ export function SalonProfile() {
             </button>
           )
         ) : null}
+        */}
       </section>
 
       <section className="mt-8">
@@ -865,6 +865,7 @@ export function SalonProfile() {
             {t('salon.time')}
             <input
               type="time"
+              lang="bs-BA"
               required
               step={900}
               value={preferredTime}
