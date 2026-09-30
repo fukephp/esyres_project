@@ -121,8 +121,16 @@ _Avoid_: trending, featured, curated homepage, popular ranking
 ## Request paths
 
 **Picker**:
-The primary request path on a salon profile. The guest chooses services, optional worker, and a preferred day and time, then sends. Not the assistant.
+The primary request path on a salon profile. The guest chooses services, optional worker, a day, and a quarter start, then sends. Not the assistant.
 _Avoid_: form, booking widget, slot picker, calendar
+
+**Quarter start**:
+A preferred clock on the quarter inside that day’s open range, for the services the guest already chose. On the picker it is how the guest states a time. Not a hold, and not a time the guest types.
+_Avoid_: slot, free slot, availability cell, custom time
+
+**Zauzet**:
+A quarter start the guest can see and cannot tap, because that service range overlaps an occupying booking for the named worker, or for every worker when the guest has no preference. A pending request is not Zauzet. A salon with no workers has no Zauzet quarters. Not a closed day and not a past quarter.
+_Avoid_: booked slot, held, unavailable grid
 
 **Salon Booking Assistant**:
 The scripted alternate on a salon profile for messy intent. Speaks as that salon. Completing it is the same request as the picker. Not a customer inbox, not WhatsApp, and not a named platform bot.
@@ -133,7 +141,7 @@ The assistant’s guided steps on that profile. The guest answers with taps, not
 _Avoid_: wizard (as a separate product), NLU flow, conversation inbox
 
 **Preferred-time suggestion**:
-One of at most three coarse preferred clocks the assistant offers from working hours and that day’s busy-level. Not a live slot, not a hold, and not the picker’s native time control.
+One of at most three coarse preferred clocks the assistant offers from working hours and that day’s busy-level. Not a quarter start, not a hold, and not Zauzet.
 _Avoid_: slot offer, free slot, availability chip, recommended slot
 
 **Unknown**:

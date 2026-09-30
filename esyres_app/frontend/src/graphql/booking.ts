@@ -24,12 +24,15 @@ export const MY_BOOKINGS_QUERY = gql`
       status
       preferredDate
       preferredStartsAt
+      preferredStartsAtLabel
       durationMinutes
       worker {
         id
         name
       }
       proposedStartsAt
+      proposedStartsAtLabel
+      proposedDate
       proposedWorker {
         id
         name
@@ -37,6 +40,7 @@ export const MY_BOOKINGS_QUERY = gql`
       declineReason
       rescheduleDate
       rescheduleStartsAt
+      rescheduleStartsAtLabel
       reschedulePending
       lateToCancel
       lateCancel
@@ -67,13 +71,17 @@ export type MyBooking = {
   status: 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED' | 'CANCELLED'
   preferredDate: string
   preferredStartsAt: string
+  preferredStartsAtLabel: string
   durationMinutes: number
   worker: { id: string; name: string } | null
   proposedStartsAt: string | null
+  proposedStartsAtLabel: string | null
+  proposedDate: string | null
   proposedWorker: { id: string; name: string } | null
   declineReason: string | null
   rescheduleDate: string | null
   rescheduleStartsAt: string | null
+  rescheduleStartsAtLabel: string | null
   reschedulePending: boolean
   lateToCancel: boolean
   lateCancel: boolean

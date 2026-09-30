@@ -16,6 +16,12 @@ Vendored from [mattpocock/skills diagnosing-bugs](https://github.com/mattpocock/
 - Backend gate is Behat (`esyres_test` only, never `esyres`). Do not `php artisan test` as the backend gate. Do not use Playwright as a Behat substitute. Playwright / Puppeteer / IDE browser as a Phase 1 loop for a UI bug is allowed; it does not skip CONTEXT verify.
 - Never `docker compose down -v`. Never `migrate:fresh` or seed `esyres`.
 - HITL template: [scripts/hitl-loop.template.sh](scripts/hitl-loop.template.sh) (copy, edit, run). Local app is `:5173` / `:8000` / `:8080`, not `:3000`.
+- **Persist before done** (including an early stop). Chat is not the record.
+  1. Write git-root `docs/research/<slug>.md` (create the folder if needed). Redact secrets. Shape: symptom, evidence, cause or "still open", fix or "not fixed". First line under the title: **Not product or architecture truth.** Do not update `docs/mvp/`, `docs/architecture/`, `docs/glossary.md`, or `docs/adr/` from a diagnosis unless the user asks.
+  2. Bug still open when the skill ends: also `gh issue create` from the git root. Title is the symptom. Body links `docs/research/<slug>.md` and states cause if known. Same redaction.
+  3. Bug fixed in this session: the note is enough. No issue unless the user asks.
+  4. If `gh` fails or there is no remote, say so. The Markdown file still counts.
+  5. Tell the user the path, and the issue URL when one was opened.
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 

@@ -20,7 +20,7 @@ Short ADRs so later sessions do not re-litigate the stack. Product patches live 
 16. **Busy-level on the server** — one place for thresholds.
 17. **Behat + Vitest + Playwright** — Behat-only backend gate (no Pest, no parallel PHPUnit suite). Behat is GraphQL-over-HTTP, not Mink; verify with `vendor/bin/behat --format=progress --stop-on-failure` (CLI flags; not `behat.yml`). PWA-only diffs skip Behat (CONTEXT frontend-only classifier); Playwright is not a substitute gate. No Storybook.
 18. **SMS as an interface** — vendor not contracted in docs.
-19. **Sarajevo dates, UTC datetimes** — day-level booking must not shift at midnight UTC.
+19. **Sarajevo dates, UTC datetimes** — day-level booking must not shift at midnight UTC. GraphQL exposes Carbon `HH:mm` labels in `Europe/Sarajevo` for preferred, proposed, and reschedule starts; clients render those labels and do not rezone the instants. See `docs/adr/0041-guest-quarter-starts.md` for the guest quarter list.
 20. **Integer feninga** — no float money.
 21. **Bigint IDs** — no UUID PK at this size.
 22. **Owner salon switcher** — many `Salon` rows, each a separate customer profile. Not chain multi-location (shared workers). Receptionist roles still Phase 2.

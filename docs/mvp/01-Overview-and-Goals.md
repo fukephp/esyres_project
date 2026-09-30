@@ -10,13 +10,13 @@ A two-sided salon reservation marketplace, mobile-first PWA, connecting customer
 
 ## Core Booking Philosophy
 
-The customer picks a service, optionally a worker (or "no preference"), and a preferred **day and time** — no availability grid. Two guest paths, one booking contract: the **picker** is the fast path; a **scripted salon-profile chat** (Salon Booking Assistant) is the messy-intent alternate. Both call the same `createBooking` and create a `requested` row. Chat may suggest 1–3 preferred times from salon hours, day busy-level, and worker preference only — never a live slot grid, never a held clock slot.
+The customer picks a service, optionally a worker (or "no preference"), and a preferred **day and quarter start**. On Pošalji zahtjev those starts are the day’s open quarters; one already covered by an occupying booking is Zauzet and cannot be sent. Two guest paths, one booking contract: the **picker** is the fast path; a **scripted salon-profile chat** (Salon Booking Assistant) is the messy-intent alternate. Both call the same `createBooking` and create a `requested` row. Chat may suggest 1–3 preferred times from salon hours, day busy-level, and worker preference only — never live quarters, never a held clock. The day badge stays coarse.
 
 The salon owner **accepts** the preferred time in one tap when it works, or **counter-proposes** a different time from Request Detail. The customer confirms only when the salon proposes a different time; they can approve, reject, or ask for a different day or time.
 
 Status flow: `requested → confirmed` (owner accepts preferred time), `requested → declined` (owner decline), or `requested → time_proposed → confirmed / declined` (owner counter-proposes, then customer acts). A phone booking is the exception: the owner writes it already `confirmed` for a caller who is not a customer. It occupies a worker immediately. The owner may end it before the start; that becomes `cancelled` with no trust counters.
 
-This keeps the customer experience light (state a preference, no slot hunting) while concentrating scheduling authority on the owner side, where it belongs. The assistant’s job is 24/7 intake into that inbox, not auto-confirm. The phone booking is how the salon records a call without a worker login. Voice capture and an agent that books from those rows are future.
+The picker shows which quarters are already taken. Sending still does not hold a chair; the owner accepts or counter-proposes. Scheduling authority stays on the owner side. The assistant’s job is 24/7 intake into that inbox, not auto-confirm. The phone booking is how the salon records a call without a worker login. Voice capture and an agent that books from those rows are future.
 
 ## Business Goals
 

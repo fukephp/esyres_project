@@ -124,10 +124,13 @@ type Booking {
     status: BookingStatus! @method(name: "graphqlStatus")
     preferredDate: String! @method(name: "preferredDateString")
     preferredStartsAt: String! @method(name: "preferredStartsAtIso")
+    preferredStartsAtLabel: String! @method(name: "preferredStartsAtLabel")
     durationMinutes: Int! @rename(attribute: "duration_minutes")
     customerName: String! @method(name: "customerName")
     worker: Worker
     proposedStartsAt: String @method(name: "proposedStartsAtIso")
+    proposedStartsAtLabel: String @method(name: "proposedStartsAtLabel")
+    proposedDate: String @method(name: "proposedDateString")
     proposedWorker: Worker @method(name: "proposedWorkerOrNull")
     declineReason: String @rename(attribute: "decline_reason")
     salon: Salon!
@@ -135,6 +138,7 @@ type Booking {
     intake: AssistantIntake @field(resolver: "App\\GraphQL\\Queries\\BookingIntake")
     rescheduleDate: String @method(name: "rescheduleDateString")
     rescheduleStartsAt: String @method(name: "rescheduleStartsAtIso")
+    rescheduleStartsAtLabel: String @method(name: "rescheduleStartsAtLabel")
     reschedulePending: Boolean! @method(name: "reschedulePending")
     lateToCancel: Boolean! @method(name: "lateToCancel")
     cancelledAt: String @method(name: "cancelledAtIso")

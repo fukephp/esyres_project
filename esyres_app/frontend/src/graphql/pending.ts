@@ -8,7 +8,9 @@ export const OWNER_BOOKING_QUERY = gql`
       customerName
       preferredDate
       preferredStartsAt
+      preferredStartsAtLabel
       proposedStartsAt
+      proposedStartsAtLabel
       durationMinutes
       worker {
         id
@@ -56,6 +58,7 @@ export const PENDING_BOOKINGS_QUERY = gql`
       customerName
       preferredDate
       preferredStartsAt
+      preferredStartsAtLabel
       durationMinutes
       worker {
         id
@@ -73,6 +76,7 @@ export const PENDING_BOOKINGS_QUERY = gql`
         preferredTime
       }
       rescheduleStartsAt
+      rescheduleStartsAtLabel
       reschedulePending
     }
   }
@@ -178,7 +182,9 @@ export const SALON_DAY_BOOKINGS_QUERY = gql`
       origin
       customerName
       preferredStartsAt
+      preferredStartsAtLabel
       proposedStartsAt
+      proposedStartsAtLabel
       worker {
         id
         name
@@ -200,7 +206,9 @@ export type ZapisiBooking = {
   origin: 'PICKER' | 'ASSISTANT' | 'PHONE'
   customerName: string
   preferredStartsAt: string
+  preferredStartsAtLabel: string
   proposedStartsAt: string | null
+  proposedStartsAtLabel: string | null
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null
   services: { name: string }[]
@@ -217,7 +225,9 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
       status
       customerName
       preferredStartsAt
+      preferredStartsAtLabel
       proposedStartsAt
+      proposedStartsAtLabel
       durationMinutes
       worker {
         id
@@ -243,7 +253,9 @@ export const OCCUPYING_BOOKINGS_RANGE_QUERY = gql`
       customerName
       preferredDate
       preferredStartsAt
+      preferredStartsAtLabel
       proposedStartsAt
+      proposedStartsAtLabel
       durationMinutes
       worker {
         id
@@ -326,7 +338,9 @@ export type OwnerBooking = {
   customerName: string
   preferredDate: string
   preferredStartsAt: string
+  preferredStartsAtLabel: string
   proposedStartsAt: string | null
+  proposedStartsAtLabel: string | null
   durationMinutes: number
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null
@@ -349,11 +363,13 @@ export type PendingBooking = {
   customerName: string
   preferredDate: string
   preferredStartsAt: string
+  preferredStartsAtLabel: string
   durationMinutes: number
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]
   intake: BookingIntake | null
   rescheduleStartsAt: string | null
+  rescheduleStartsAtLabel: string | null
   reschedulePending: boolean
 }
 
@@ -367,7 +383,9 @@ export type OccupyingBooking = {
   customerName: string
   preferredDate?: string
   preferredStartsAt: string
+  preferredStartsAtLabel: string
   proposedStartsAt: string | null
+  proposedStartsAtLabel: string | null
   durationMinutes: number
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null

@@ -157,3 +157,12 @@ Feature: Customer multi-service booking request
     When I log in as "ana@example.com" with password "secret-pass"
     And I create a booking on "2026-08-31" at "15:00" with the salon services
     Then the created booking preferred start is "2026-08-31T13:00:00+00:00" stored as "2026-08-31 13:00:00"
+    And the created booking clock label is "15:00"
+
+  Scenario: A January Sarajevo request clock labels 15:00
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    When the current time is "2026-01-15 09:00" in Sarajevo
+    And I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-01-15" at "15:00" with the salon services
+    Then the created booking preferred start is "2026-01-15T14:00:00+00:00" stored as "2026-01-15 14:00:00"
+    And the created booking clock label is "15:00"

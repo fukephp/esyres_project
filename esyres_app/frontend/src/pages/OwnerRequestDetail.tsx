@@ -34,7 +34,6 @@ import {
   assistantTranscriptLines,
   canAcceptPreferredTime,
   declineErrorKey,
-  formatSarajevoTime,
   hoursForDate,
   occupyingBlock,
   ownerDateFromSearch,
@@ -303,7 +302,7 @@ export function OwnerRequestDetail() {
         ) : ownerDetailMode(booking.status) === 'bounce' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -320,7 +319,9 @@ export function OwnerRequestDetail() {
             <p className="font-semibold text-ink">{booking.customerName}</p>
             <p className="mt-1 text-sm text-ink">
               {occupyingBlock(booking) === null
-                ? formatSarajevoTime(booking.proposedStartsAt ?? booking.preferredStartsAt)
+                ? booking.status === 'TIME_PROPOSED' && booking.proposedStartsAtLabel !== null
+                  ? booking.proposedStartsAtLabel
+                  : booking.preferredStartsAtLabel
                 : occupyingClockRange(
                     occupyingBlock(booking)!.start,
                     occupyingBlock(booking)!.durationMinutes,
@@ -361,7 +362,7 @@ export function OwnerRequestDetail() {
         ) : ownerDetailMode(booking.status) === 'form' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{formatSarajevoTime(booking.preferredStartsAt)}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -384,7 +385,7 @@ export function OwnerRequestDetail() {
                     services: booking.services,
                     workerName: booking.worker?.name ?? null,
                     preferredDate: booking.intake?.preferredDate ?? booking.preferredDate,
-                    preferredTime: booking.intake?.preferredTime ?? formatSarajevoTime(booking.preferredStartsAt),
+                    preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel,
                     noPreference: t('salon.noPreference'),
                   }).map((line) => (
                     <li key={line.step}>

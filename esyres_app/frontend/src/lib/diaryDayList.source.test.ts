@@ -29,7 +29,7 @@ test('pending queue rows are pink cards with the clock inside', () => {
   const pending = sliceFn(read('pages/OwnerHome.tsx'), 'QueueRow')
   expect(pending).toMatch(/rounded-2xl bg-status-pending/)
   expect(pending).not.toMatch(/grid-cols-\[3\.5rem/)
-  expect(pending).toMatch(/formatSarajevoTime\(clock\)/)
+  expect(pending).toMatch(/queueRowLabel\(row\)/)
   expect(pending).toMatch(/salon\.duration/)
   expect(pending).toMatch(/salon\.noPreference/)
   expect(pending).toMatch(/queueChipInitial/)

@@ -55,7 +55,7 @@ test('zapisi page is week day chips with origin chips, Kalendar or Kanban, and n
   expect(page).not.toMatch(/bookingRescheduled/)
   expect(page).not.toMatch(/bookingCancelled/)
   expect(page).toMatch(/requestFromZapisiPath/)
-  expect(page).toMatch(/formatSarajevoTime/)
+  expect(page).toMatch(/bookingStartLabel/)
   expect(page).toMatch(/bookingStartIso/)
   const boards = read('components/OwnerBoards.tsx')
   const booking = boards.slice(boards.indexOf('function BookingCard'))

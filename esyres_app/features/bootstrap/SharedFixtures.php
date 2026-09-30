@@ -2036,6 +2036,19 @@ GQL;
     }
 
     /**
+     * @Then the created booking clock label is :label
+     */
+    public function theCreatedBookingClockLabelIs(string $label): void
+    {
+        $this->assertNoGraphqlErrors();
+        $created = $this->graphql['data']['createPhoneBooking'] ?? $this->graphql['data']['createBooking'] ?? null;
+        if (! is_array($created)) {
+            throw new RuntimeException('No created booking in the GraphQL response');
+        }
+        $this->assertSame($label, $created['preferredStartsAtLabel']);
+    }
+
+    /**
      * @Then the reschedule start is :iso stored as :raw
      */
     public function theRescheduleStartIsStoredAs(string $iso, string $raw): void
@@ -2044,6 +2057,17 @@ GQL;
         $this->assertSame($iso, $this->graphql['data']['requestReschedule']['rescheduleStartsAt']);
         $this->booking->refresh();
         $this->assertSame($raw, $this->booking->getRawOriginal('reschedule_starts_at'));
+    }
+
+    /**
+     * @Then the reschedule clock label is :label on :date
+     */
+    public function theRescheduleClockLabelIsOn(string $label, string $date): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['requestReschedule'];
+        $this->assertSame($label, $row['rescheduleStartsAtLabel']);
+        $this->assertSame($date, $row['rescheduleDate']);
     }
 
     private function trustSalonQuery(): string

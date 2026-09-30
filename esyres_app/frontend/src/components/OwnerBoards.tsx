@@ -5,9 +5,8 @@ import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
 import {
   STATUS_CARD_CLASS,
-  bookingStartIso,
   currentJobLabel,
-  formatSarajevoTime,
+  bookingStartLabel,
   kanbanColumn,
   occupyingBlock,
   occupyingByDay,
@@ -222,7 +221,7 @@ export function BookingCard({ row, to, now }: { row: ZapisiBooking; to: string; 
   return (
     <Link to={to} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
       <span className="flex items-center justify-between gap-2 text-xs">
-        <span className="font-semibold tabular-nums">{formatSarajevoTime(bookingStartIso(row))}</span>
+        <span className="font-semibold tabular-nums">{bookingStartLabel(row)}</span>
         <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-[11px] font-semibold">{originLabel(t, row.origin)}</span>
       </span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
