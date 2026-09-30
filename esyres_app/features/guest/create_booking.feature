@@ -129,16 +129,70 @@ Feature: Customer multi-service booking request
     And I create a booking on "2026-08-31" at "25:00" with the salon services
     Then the GraphQL error code is "INVALID_TIME"
 
-  Scenario: Preference inside a break on an open day is accepted
+  Scenario: Preference inside a break on an open day is rejected
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I log in as "ana@example.com" with password "secret-pass"
     And I create a booking on "2026-08-31" at "13:30" with the salon services
-    Then the booking status is "REQUESTED"
+    Then the GraphQL error code is "DURING_BREAK"
 
-  Scenario: Preference outside hours on an open day is accepted
+  Scenario: Preference outside hours on an open day is rejected
     Given a verified customer "ana@example.com" with password "secret-pass"
     When I log in as "ana@example.com" with password "secret-pass"
     And I create a booking on "2026-08-31" at "21:00" with the salon services
+    Then the GraphQL error code is "OUTSIDE_HOURS"
+
+  Scenario: Off-quarter picker time is rejected
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:07" with the salon services
+    Then the GraphQL error code is "INVALID_TIME_STEP"
+
+  Scenario: Picker time past close is rejected
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "19:00" with the salon services
+    Then the GraphQL error code is "OUTSIDE_HOURS"
+
+  Scenario: Two guests can send the same free quarter
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And another verified customer "lejla@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services
+    Then the booking status is "REQUESTED"
+    When I log in as "lejla@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services
+    Then the booking status is "REQUESTED"
+
+  Scenario: Picker create is taken when the named worker is occupied
+    Given the salon has a worker:
+      """
+      {"name": "Ana"}
+      """
+    And the salon has a requested booking on "2026-08-31" at "10:00" for "Lejla"
+    And that booking is for the salon worker
+    And that booking is confirmed
+    And a verified customer "ana@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon worker
+    Then the GraphQL error code is "SLOT_TAKEN"
+
+  Scenario: Picker create with no preference is taken only when every worker is blocked
+    Given the salon has a worker:
+      """
+      {"name": "Ana"}
+      """
+    And the salon has a requested booking on "2026-08-31" at "10:00" for "Lejla"
+    And that booking is for the salon worker
+    And that booking is confirmed
+    And a verified customer "ana@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "10:00" with the salon services
+    Then the GraphQL error code is "SLOT_TAKEN"
+    Given the salon has a worker:
+      """
+      {"name": "Ena"}
+      """
+    When I create a booking on "2026-08-31" at "10:00" with the salon services
     Then the booking status is "REQUESTED"
 
   Scenario: Requested booking counts toward busy-level
@@ -148,7 +202,7 @@ Feature: Customer multi-service booking request
       {"name": "Dugi tretman", "category": "HAIR", "durationMinutes": 300, "priceFeninga": 9000}
       """
     When I log in as "ana@example.com" with password "secret-pass"
-    And I create a booking on "2026-08-31" at "10:00" with the salon services
+    And I create a booking on "2026-08-31" at "14:00" with service "Dugi tretman"
     And I query salon busy level "2026-08-31" as a guest
     Then busy level is "MEDIUM"
 

@@ -9,7 +9,12 @@ import { TopNav } from '../components/TopNav'
 import { GuestPageSkeleton, SalonProfileSkeleton } from '../components/Skeleton'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { ME_QUERY, type MeData } from '../graphql/auth'
-import { CREATE_BOOKING_MUTATION, type CreateBookingInput } from '../graphql/booking'
+import {
+  CREATE_BOOKING_MUTATION,
+  QUARTER_STARTS_QUERY,
+  type CreateBookingInput,
+  type QuarterStartsData,
+} from '../graphql/booking'
 import {
   ASSISTANT_INTAKE_QUERY,
   PING_ASSISTANT_INTAKE_MUTATION,
@@ -34,6 +39,7 @@ import {
   type ProfileMode,
 } from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
+import { keepQuarterStart, quarterNoneTappable, quarterStartPast } from '../lib/guestQuarter'
 import { dialogCancelShouldClose } from '../lib/salonDialog'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoNowMinutes, sarajevoToday } from '../lib/format'
@@ -109,8 +115,17 @@ function gateMessage(
   if (code === 'PAST_TIME') {
     return t('salon.gate.PAST_TIME')
   }
-  if (code === 'INVALID_DATE' || code === 'INVALID_TIME') {
-    return t('salon.gate.INVALID_DATE')
+  if (code === 'INVALID_DATE' || code === 'INVALID_TIME' || code === 'INVALID_TIME_STEP') {
+    return t('salon.gate.INVALID_TIME_STEP')
+  }
+  if (code === 'OUTSIDE_HOURS') {
+    return t('salon.gate.OUTSIDE_HOURS')
+  }
+  if (code === 'DURING_BREAK') {
+    return t('salon.gate.DURING_BREAK')
+  }
+  if (code === 'SLOT_TAKEN') {
+    return t('salon.gate.SLOT_TAKEN')
   }
   if (code === 'INVALID_CREDENTIALS') {
     return t('salon.gate.INVALID_CREDENTIALS')
@@ -219,6 +234,19 @@ export function SalonProfile() {
   const [preferredDate, setPreferredDate] = useState('')
   const [preferredTime, setPreferredTime] = useState('')
   const [workerChoice, setWorkerChoice] = useState('')
+  const quarterWorkerId = workerChoice === '' ? null : workerChoice
+  const { data: quarterData, loading: quartersLoading } = useQuery<QuarterStartsData>(QUARTER_STARTS_QUERY, {
+    variables: {
+      salonId: id ?? '',
+      date: preferredDate,
+      serviceIds: selected,
+      workerId: quarterWorkerId,
+    },
+    skip: !id || mode !== 'picker' || selected.length === 0 || preferredDate === '',
+    fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
+  })
+  const quarters = quartersLoading || quarterData === undefined ? null : quarterData.quarterStarts
   const [chatSelected, setChatSelected] = useState<string[]>([])
   const [needLogin, setNeedLogin] = useState(false)
   const [needEmail, setNeedEmail] = useState(false)
@@ -353,6 +381,15 @@ export function SalonProfile() {
     })
   }, [id, mode, chatSnapshot, intakeToken, upsertIntake, waiting, refetchIntake])
 
+  useEffect(() => {
+    if (quarters === null) {
+      return
+    }
+    setPreferredTime((current) =>
+      keepQuarterStart(current, quarters, (time) => quarterStartPast(preferredDate, time, date, new Date())),
+    )
+  }, [quarters, preferredDate, date])
+
   if (loading) {
     return (
       <>
@@ -385,7 +422,17 @@ export function SalonProfile() {
   const chatting = isChatOpen(mode)
   const sent = mode === 'sent'
   const showBookingColumn = hasServices && !sent
-  const canSendPicker = chosen.length > 0 && preferredDate !== '' && preferredTime !== ''
+  const pickerDay = preferredDate === '' ? undefined : assistantHoursForDate(salon.hours, preferredDate)
+  const pickerClosed =
+    preferredDate !== '' &&
+    (pickerDay === undefined || pickerDay.closed || pickerDay.opensAt === null || pickerDay.closesAt === null)
+  const quarterPast = (time: string) => quarterStartPast(preferredDate, time, date, new Date())
+  const canSendPicker =
+    chosen.length > 0 &&
+    preferredDate !== '' &&
+    !pickerClosed &&
+    quarters !== null &&
+    quarters.some((row) => row.time === preferredTime && !row.booked && !quarterPast(row.time))
   const canSendChat = assistantCanSend(chatSelected, chatDate, chatTime)
   const hoursForDay = chatDate === '' ? undefined : assistantHoursForDate(salon.hours, chatDate)
   const dayClosed =
@@ -861,18 +908,46 @@ export function SalonProfile() {
               className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
             />
           </label>
-          <label className="block text-sm text-body">
-            {t('salon.time')}
-            <input
-              type="time"
-              lang="bs-BA"
-              required
-              step={900}
-              value={preferredTime}
-              onChange={(e) => setPreferredTime(e.target.value)}
-              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
-            />
-          </label>
+          {chosen.length > 0 ? (
+            <div>
+              <p className="text-sm text-body">{t('salon.time')}</p>
+              {pickerClosed ? <p className="mt-2 text-sm text-body">{t('salon.gate.SALON_CLOSED')}</p> : null}
+              {!pickerClosed && quarters !== null && quarterNoneTappable(quarters, quarterPast) ? (
+                <p className="mt-2 text-sm text-body">{t('salon.quarter.none')}</p>
+              ) : null}
+              {!pickerClosed && quarters !== null && quarters.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {quarters.map((choice) => {
+                    const past = quarterPast(choice.time)
+                    const disabled = choice.booked || past
+                    const pressed = preferredTime === choice.time && !disabled
+                    return (
+                      <button
+                        key={choice.time}
+                        type="button"
+                        disabled={disabled}
+                        aria-pressed={pressed}
+                        onClick={() => {
+                          if (!disabled) {
+                            setPreferredTime(choice.time)
+                          }
+                        }}
+                        className={
+                          disabled
+                            ? 'rounded-full border border-hairline px-3 py-1.5 text-sm text-muted disabled:opacity-40'
+                            : pressed
+                              ? 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas'
+                              : 'rounded-full border border-hairline px-3 py-1.5 text-sm text-ink'
+                        }
+                      >
+                        {choice.booked && !past ? `${choice.time} ${t('salon.quarter.booked')}` : choice.time}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {error && picking && <p className="text-sm text-busy-busy">{error}</p>}
           {!needLogin && !needEmail && !needPhone && (
             <button
