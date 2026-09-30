@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\UtcDatetime;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,12 +35,12 @@ class Booking extends Model
     {
         return [
             'preferred_date' => 'date',
-            'preferred_starts_at' => 'datetime',
+            'preferred_starts_at' => UtcDatetime::class,
             'duration_minutes' => 'integer',
             'owner_responded_at' => 'datetime',
-            'proposed_starts_at' => 'datetime',
+            'proposed_starts_at' => UtcDatetime::class,
             'reschedule_date' => 'date',
-            'reschedule_starts_at' => 'datetime',
+            'reschedule_starts_at' => UtcDatetime::class,
             'cancelled_at' => 'datetime',
             'late_cancel' => 'boolean',
             'no_show_at' => 'datetime',

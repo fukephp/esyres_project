@@ -54,7 +54,7 @@ final class SalonWeekStats
 
         $hourCounts = [];
         foreach ($rows as $row) {
-            $hour = CarbonImmutable::parse($row->preferred_starts_at)->timezone('Europe/Sarajevo')->hour;
+            $hour = $row->preferred_starts_at->timezone('Europe/Sarajevo')->hour;
             $hourCounts[$hour] = ($hourCounts[$hour] ?? 0) + 1;
         }
 

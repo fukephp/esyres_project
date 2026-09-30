@@ -240,3 +240,13 @@ Feature: Customer reschedule of a confirmed booking
     And I request reschedule "2026-08-31" at "nope"
     Then the GraphQL error code is "INVALID_TIME"
     And that booking has no reschedule overlay
+
+  Scenario: A Sarajevo reschedule clock is stored as UTC and read back as that clock
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    And the customer has a requested booking on "2026-08-29" at "11:00"
+    And that booking is for the salon worker
+    And that booking is confirmed
+    And that booking recorded an owner response
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I request reschedule "2026-08-31" at "15:00"
+    Then the reschedule start is "2026-08-31T13:00:00+00:00" stored as "2026-08-31 13:00:00"

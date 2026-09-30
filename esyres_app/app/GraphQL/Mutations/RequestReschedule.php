@@ -26,7 +26,7 @@ final class RequestReschedule
             if ((int) $salon->reschedule_cap < 1) {
                 throw new ClientError('RESCHEDULE_DISABLED');
             }
-            $starts = PreferredClock::parse($args['preferredDate'], $args['preferredTime'])->timezone('Europe/Sarajevo');
+            $starts = PreferredClock::parse($args['preferredDate'], $args['preferredTime']);
             PreferredClock::assertOpenWeekday($salon, $args['preferredDate']);
 
             $booking->reschedule_date = $args['preferredDate'];

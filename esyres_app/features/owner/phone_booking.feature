@@ -160,3 +160,8 @@ Feature: Phone booking
     And an intake points at this booking
     When I backfill booking origins
     Then the stored booking origin is "assistant"
+
+  Scenario: A Sarajevo phone clock is stored as UTC and read back as that clock
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I create a phone booking on "2026-08-29" at "15:00" for "Ana"
+    Then the created booking preferred start is "2026-08-29T13:00:00+00:00" stored as "2026-08-29 13:00:00"

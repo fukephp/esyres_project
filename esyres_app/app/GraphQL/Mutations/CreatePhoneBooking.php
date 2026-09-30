@@ -45,9 +45,7 @@ final class CreatePhoneBooking
                 ->lockForUpdate()
                 ->get();
 
-            // Datetime columns are written as a UTC wall clock and read back in APP_TIMEZONE.
-            $asStored = CarbonImmutable::parse($starts->utc()->format('Y-m-d H:i:s'), (string) config('app.timezone'));
-            if (WorkerOverlap::taken($worker->id, $asStored, $duration, 0)) {
+            if (WorkerOverlap::taken($worker->id, $starts, $duration, 0)) {
                 throw new ClientError('SLOT_TAKEN');
             }
 

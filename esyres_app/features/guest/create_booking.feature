@@ -151,3 +151,9 @@ Feature: Customer multi-service booking request
     And I create a booking on "2026-08-31" at "10:00" with the salon services
     And I query salon busy level "2026-08-31" as a guest
     Then busy level is "MEDIUM"
+
+  Scenario: A Sarajevo request clock is stored as UTC and read back as that clock
+    Given a verified customer "ana@example.com" with password "secret-pass"
+    When I log in as "ana@example.com" with password "secret-pass"
+    And I create a booking on "2026-08-31" at "15:00" with the salon services
+    Then the created booking preferred start is "2026-08-31T13:00:00+00:00" stored as "2026-08-31 13:00:00"

@@ -2020,6 +2020,32 @@ mutation MarkNoShow($bookingId: ID!) {
 GQL;
     }
 
+    /**
+     * @Then the created booking preferred start is :iso stored as :raw
+     */
+    public function theCreatedBookingPreferredStartIsStoredAs(string $iso, string $raw): void
+    {
+        $this->assertNoGraphqlErrors();
+        $created = $this->graphql['data']['createPhoneBooking'] ?? $this->graphql['data']['createBooking'] ?? null;
+        if (! is_array($created)) {
+            throw new RuntimeException('No created booking in the GraphQL response');
+        }
+        $this->assertSame($iso, $created['preferredStartsAt']);
+        $booking = Booking::query()->findOrFail($created['id']);
+        $this->assertSame($raw, $booking->getRawOriginal('preferred_starts_at'));
+    }
+
+    /**
+     * @Then the reschedule start is :iso stored as :raw
+     */
+    public function theRescheduleStartIsStoredAs(string $iso, string $raw): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($iso, $this->graphql['data']['requestReschedule']['rescheduleStartsAt']);
+        $this->booking->refresh();
+        $this->assertSame($raw, $this->booking->getRawOriginal('reschedule_starts_at'));
+    }
+
     private function trustSalonQuery(): string
     {
         return <<<'GQL'

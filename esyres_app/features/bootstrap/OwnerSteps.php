@@ -2962,6 +2962,7 @@ mutation CreatePhoneBooking($input: CreatePhoneBookingInput!) {
     id
     status
     origin
+    preferredStartsAt
     customerName
     callerPhone
     callerNote
