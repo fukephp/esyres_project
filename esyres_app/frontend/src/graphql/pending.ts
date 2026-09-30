@@ -179,6 +179,14 @@ export const SALON_DAY_BOOKINGS_QUERY = gql`
       customerName
       preferredStartsAt
       proposedStartsAt
+      worker {
+        id
+        name
+      }
+      proposedWorker {
+        id
+        name
+      }
       services {
         name
       }
@@ -193,6 +201,8 @@ export type ZapisiBooking = {
   customerName: string
   preferredStartsAt: string
   proposedStartsAt: string | null
+  worker: { id: string; name: string } | null
+  proposedWorker: { id: string; name: string } | null
   services: { name: string }[]
 }
 
@@ -205,6 +215,7 @@ export const OCCUPYING_BOOKINGS_QUERY = gql`
     occupyingBookings(salonId: $salonId, date: $date) {
       id
       status
+      customerName
       preferredStartsAt
       proposedStartsAt
       durationMinutes
@@ -229,6 +240,7 @@ export const OCCUPYING_BOOKINGS_RANGE_QUERY = gql`
     occupyingBookingsRange(salonId: $salonId, from: $from, to: $to) {
       id
       status
+      customerName
       preferredDate
       preferredStartsAt
       proposedStartsAt
@@ -352,6 +364,7 @@ export type PendingBookingsData = {
 export type OccupyingBooking = {
   id: string
   status: 'CONFIRMED' | 'TIME_PROPOSED'
+  customerName: string
   preferredDate?: string
   preferredStartsAt: string
   proposedStartsAt: string | null

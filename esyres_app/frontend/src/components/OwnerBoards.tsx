@@ -94,18 +94,21 @@ export function OccupyingCard({ row }: { row: OccupyingBooking }) {
     return null
   }
   const tone: KanbanColumn = row.status === 'TIME_PROPOSED' ? 'proposed' : 'confirmed'
-  const workerName = row.status === 'TIME_PROPOSED' ? row.proposedWorker?.name : row.worker?.name
+  const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
     <Link to={`/owner/requests/${row.id}`} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}>
       <span className="block text-xs font-semibold tabular-nums">{occupyingClockRange(block.start, block.durationMinutes)}</span>
-      <span className="mt-1 block text-sm font-semibold leading-snug">{block.label}</span>
-      {workerName ? (
+      <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
+      <span className="mt-0.5 block text-xs text-body">{block.label}</span>
+      {worker ? (
         <span className="mt-1.5 flex items-center gap-1.5 text-xs">
-          <span className={`h-2 w-2 shrink-0 rounded-full ${workerDotColor(block.workerId)}`} />
-          {workerName}
+          <span className={`h-2 w-2 shrink-0 rounded-full ${workerDotColor(worker.id)}`} />
+          {worker.name}
         </span>
-      ) : null}
+      ) : (
+        <span className="mt-1.5 block text-xs">{t('salon.noPreference')}</span>
+      )}
       {row.status === 'TIME_PROPOSED' || row.noShowAt ? (
         <span className="mt-1.5 flex flex-wrap gap-1">
           {row.status === 'TIME_PROPOSED' ? (
@@ -214,6 +217,7 @@ export function BoardColumn({
 export function BookingCard({ row, to, now }: { row: ZapisiBooking; to: string; now?: Date }) {
   const { t } = useTranslation()
   const column = kanbanColumn(row, now)
+  const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
     <Link to={to} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
@@ -223,6 +227,14 @@ export function BookingCard({ row, to, now }: { row: ZapisiBooking; to: string; 
       </span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
       <span className="mt-0.5 block text-xs text-body">{currentJobLabel(row.services)}</span>
+      {worker ? (
+        <span className="mt-1.5 flex items-center gap-1.5 text-xs">
+          <span className={`h-2 w-2 shrink-0 rounded-full ${workerDotColor(worker.id)}`} />
+          {worker.name}
+        </span>
+      ) : (
+        <span className="mt-1.5 block text-xs">{t('salon.noPreference')}</span>
+      )}
       {column === 'done' ? <span className="mt-1 block text-[11px] font-semibold">{t(`bookings.status.${row.status}`)}</span> : null}
     </Link>
   )
