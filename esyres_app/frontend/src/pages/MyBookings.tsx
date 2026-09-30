@@ -28,7 +28,7 @@ import {
   rescheduleErrorKey,
   respondErrorKey,
 } from '../lib/booking'
-import { formatSarajevoDateTime } from '../lib/format'
+import { formatCivilDate } from '../lib/format'
 import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
 import { useCustomerPush } from '../lib/push'
 
@@ -109,7 +109,13 @@ function BookingRow({
     <li className="rounded-lg border border-hairline px-4 py-3">
       <p className="text-sm font-semibold text-muted">{t(`bookings.status.${bookingStatusKey(row.status)}`)}</p>
       <p className="mt-1 font-semibold text-ink">{row.salon.name}</p>
-      <p className="mt-1 text-sm text-ink">{formatSarajevoDateTime(clock.startsAt)}</p>
+      <p className="mt-1 text-sm text-ink">
+        {formatCivilDate(row.status === 'TIME_PROPOSED' && row.proposedDate !== null ? row.proposedDate : row.preferredDate)}
+        {' '}
+        {row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null
+          ? row.proposedStartsAtLabel
+          : row.preferredStartsAtLabel}
+      </p>
       <p className="mt-1 text-sm text-body">
         {row.services.map((s) => s.name).join(', ')}
         {' · '}
@@ -130,7 +136,9 @@ function BookingRow({
               onClick={onRescheduleOpen}
               className="text-sm font-medium text-ink underline disabled:opacity-40"
             >
-              {formatSarajevoDateTime(row.rescheduleStartsAt)}
+              {row.rescheduleDate !== null && row.rescheduleStartsAtLabel !== null
+                ? `${formatCivilDate(row.rescheduleDate)} ${row.rescheduleStartsAtLabel}`
+                : null}
             </button>
           ) : null}
         </div>

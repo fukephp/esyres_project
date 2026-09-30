@@ -44,7 +44,6 @@ import {
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
-  formatSarajevoTime,
   hoursForDate,
   isPreferredSoon,
   kanbanGroups,
@@ -54,7 +53,7 @@ import {
   ownerWeekDays,
   overlayQueueChrome,
   queueChipInitial,
-  queueRowClock,
+  queueRowLabel,
   shiftOwnerDate,
   sarajevoWeekday,
   trimDeclineReason,
@@ -479,7 +478,7 @@ function QueueRow({
 }) {
   const { t } = useTranslation()
   const chrome = overlayQueueChrome(row.reschedulePending)
-  const clock = queueRowClock(row)
+  const clock = queueRowLabel(row)
 
   return (
     <li className="min-w-0 rounded-2xl bg-status-pending p-3 md:p-4">
@@ -488,7 +487,7 @@ function QueueRow({
           {queueChipInitial(row.customerName)}
         </span>
         <div className="min-w-0 flex-1">
-      <p className="text-xs font-semibold tabular-nums text-ink">{formatSarajevoTime(clock)}</p>
+      <p className="text-xs font-semibold tabular-nums text-ink">{clock}</p>
       <p className="font-semibold text-ink">
         {row.customerName}
         {' · '}

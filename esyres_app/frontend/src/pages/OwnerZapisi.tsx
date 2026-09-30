@@ -11,12 +11,13 @@ import { ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { SALON_DAY_BOOKINGS_QUERY, type SalonDayBookingsData } from '../graphql/pending'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
-import { formatSarajevoTime, sarajevoToday } from '../lib/format'
+import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
   KANBAN_COLUMNS,
   bookingStartIso,
+  bookingStartLabel,
   kanbanGroups,
   ownerDateFromSearch,
   ownerSalonFromSearch,
@@ -184,7 +185,7 @@ export function OwnerZapisi() {
                 .sort((a, b) => bookingStartIso(a).localeCompare(bookingStartIso(b)))
                 .map((row) => (
                   <li key={row.id} className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start gap-2">
-                    <span className="pt-3 text-sm tabular-nums text-muted">{formatSarajevoTime(bookingStartIso(row))}</span>
+                    <span className="pt-3 text-sm tabular-nums text-muted">{bookingStartLabel(row)}</span>
                     <BookingCard row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
                   </li>
                 ))}

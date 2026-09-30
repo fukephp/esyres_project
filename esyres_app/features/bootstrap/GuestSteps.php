@@ -1972,6 +1972,7 @@ mutation RequestReschedule($bookingId: ID!, $preferredDate: String!, $preferredT
     reschedulePending
     rescheduleDate
     rescheduleStartsAt
+    rescheduleStartsAtLabel
   }
 }
 GQL;
@@ -2119,6 +2120,7 @@ mutation CreateBooking($input: CreateBookingInput!) {
     status
     preferredDate
     preferredStartsAt
+    preferredStartsAtLabel
     durationMinutes
     services {
       name

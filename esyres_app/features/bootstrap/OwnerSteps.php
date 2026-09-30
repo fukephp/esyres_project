@@ -1152,6 +1152,12 @@ GQL, ['id' => (string) $this->booking->id]);
         $this->assertSame($expected['worker'], $row['worker'] === null ? null : $row['worker']['name']);
         $this->assertSame($expected['proposedWorker'], $row['proposedWorker'] === null ? null : $row['proposedWorker']['name']);
         $this->assertNotNull($row['proposedStartsAt']);
+        if (array_key_exists('proposedStartsAtLabel', $expected)) {
+            $this->assertSame($expected['proposedStartsAtLabel'], $row['proposedStartsAtLabel']);
+        }
+        if (array_key_exists('proposedDate', $expected)) {
+            $this->assertSame($expected['proposedDate'], $row['proposedDate']);
+        }
     }
 
     /**
@@ -1788,6 +1794,8 @@ mutation Propose($bookingId: ID!, $workerId: ID!, $proposedTime: String!) {
     preferredDate
     preferredStartsAt
     proposedStartsAt
+    proposedStartsAtLabel
+    proposedDate
     worker { id name }
     proposedWorker { id name }
   }

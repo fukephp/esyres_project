@@ -119,6 +119,18 @@ export function queueRowClock(row: {
   return row.preferredStartsAt
 }
 
+export function queueRowLabel(row: {
+  reschedulePending: boolean
+  rescheduleStartsAtLabel: string | null
+  preferredStartsAtLabel: string
+}): string {
+  if (row.reschedulePending && row.rescheduleStartsAtLabel !== null) {
+    return row.rescheduleStartsAtLabel
+  }
+
+  return row.preferredStartsAtLabel
+}
+
 export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'NOT_RESCHEDULE' | 'fallback' {
   if (code === 'SLOT_TAKEN' || code === 'NOT_REQUESTED' || code === 'NOT_RESCHEDULE') {
     return code
@@ -747,7 +759,9 @@ export function assistantTranscriptLines(input: {
 export function occupyingBlock(row: {
   status: string
   preferredStartsAt: string
+  preferredStartsAtLabel?: string
   proposedStartsAt: string | null
+  proposedStartsAtLabel?: string | null
   durationMinutes: number
   worker: { id: string } | null
   proposedWorker: { id: string } | null
@@ -757,7 +771,7 @@ export function occupyingBlock(row: {
   if (row.status === 'TIME_PROPOSED' && row.proposedWorker !== null && row.proposedStartsAt !== null) {
     return {
       workerId: row.proposedWorker.id,
-      start: formatSarajevoTime(row.proposedStartsAt),
+      start: row.proposedStartsAtLabel ?? formatSarajevoTime(row.proposedStartsAt),
       durationMinutes: row.durationMinutes,
       status: 'TIME_PROPOSED',
       label,
@@ -766,7 +780,7 @@ export function occupyingBlock(row: {
   if (row.status === 'CONFIRMED' && row.worker !== null) {
     return {
       workerId: row.worker.id,
-      start: formatSarajevoTime(row.preferredStartsAt),
+      start: row.preferredStartsAtLabel ?? formatSarajevoTime(row.preferredStartsAt),
       durationMinutes: row.durationMinutes,
       status: 'CONFIRMED',
       label,
@@ -1000,6 +1014,18 @@ export function bookingStartIso(row: { status: string; preferredStartsAt: string
   }
 
   return row.preferredStartsAt
+}
+
+export function bookingStartLabel(row: {
+  status: string
+  preferredStartsAtLabel: string
+  proposedStartsAtLabel: string | null
+}): string {
+  if (row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null) {
+    return row.proposedStartsAtLabel
+  }
+
+  return row.preferredStartsAtLabel
 }
 
 export function kanbanColumn(

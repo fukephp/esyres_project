@@ -16,7 +16,7 @@ Feature: Owner drag-to-counter-propose
     And I propose time "14:00" on the salon worker
     Then the proposed booking matches:
       """
-      {"status": "TIME_PROPOSED", "preferredDate": "2026-08-29", "worker": "Lejla", "proposedWorker": "Lejla"}
+      {"status": "TIME_PROPOSED", "preferredDate": "2026-08-29", "worker": "Lejla", "proposedWorker": "Lejla", "proposedStartsAtLabel": "14:00", "proposedDate": "2026-08-29"}
       """
     And that booking has owner_responded_at set
     When I query pending bookings for date "2026-08-29"

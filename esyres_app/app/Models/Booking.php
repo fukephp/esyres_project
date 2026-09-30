@@ -125,6 +125,11 @@ class Booking extends Model
         return $this->preferred_starts_at->utc()->toIso8601String();
     }
 
+    public function preferredStartsAtLabel(): string
+    {
+        return $this->preferred_starts_at->timezone('Europe/Sarajevo')->format('H:i');
+    }
+
     public function proposedStartsAtIso(): ?string
     {
         if ($this->status !== self::TIME_PROPOSED || $this->proposed_starts_at === null) {
@@ -132,6 +137,24 @@ class Booking extends Model
         }
 
         return $this->proposed_starts_at->utc()->toIso8601String();
+    }
+
+    public function proposedStartsAtLabel(): ?string
+    {
+        if ($this->status !== self::TIME_PROPOSED || $this->proposed_starts_at === null) {
+            return null;
+        }
+
+        return $this->proposed_starts_at->timezone('Europe/Sarajevo')->format('H:i');
+    }
+
+    public function proposedDateString(): ?string
+    {
+        if ($this->status !== self::TIME_PROPOSED || $this->proposed_starts_at === null) {
+            return null;
+        }
+
+        return $this->proposed_starts_at->timezone('Europe/Sarajevo')->format('Y-m-d');
     }
 
     public function proposedWorkerOrNull(): ?Worker
@@ -168,6 +191,15 @@ class Booking extends Model
         }
 
         return $this->reschedule_starts_at->utc()->toIso8601String();
+    }
+
+    public function rescheduleStartsAtLabel(): ?string
+    {
+        if ($this->reschedule_starts_at === null) {
+            return null;
+        }
+
+        return $this->reschedule_starts_at->timezone('Europe/Sarajevo')->format('H:i');
     }
 
     public function reschedulePending(): bool

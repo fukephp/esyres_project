@@ -250,3 +250,4 @@ Feature: Customer reschedule of a confirmed booking
     When I log in as "ana@example.com" with password "secret-pass"
     And I request reschedule "2026-08-31" at "15:00"
     Then the reschedule start is "2026-08-31T13:00:00+00:00" stored as "2026-08-31 13:00:00"
+    And the reschedule clock label is "15:00" on "2026-08-31"
