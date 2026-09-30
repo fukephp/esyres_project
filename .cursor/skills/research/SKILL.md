@@ -15,8 +15,9 @@ Vendored from [mattpocock/skills research](https://github.com/mattpocock/skills/
 
 - Follow `.cursor/CONTEXT.md`. Product truth is `docs/mvp/`; architecture is `docs/architecture/`. Do not invent a stack or expand MVP.
 - In-repo primary sources come first: `docs/mvp/`, `docs/architecture/`, `docs/glossary.md`, `docs/adr/`, and `esyres_app/` code. External docs still need the source that owns the claim.
-- Application code lives in `esyres_app/`. Research notes stay at git-root `docs/research/<slug>.md`. Never write them into `esyres_app/`.
+- Application code lives in `esyres_app/`. Research notes stay at git-root `docs/research/<slug>.md`. Never write them into `esyres_app/`. Chat is not the record: the file is required before you finish.
 - Notes are not product or architecture truth. Do not update `docs/mvp/`, `docs/architecture/`, `docs/glossary.md`, or `docs/adr/` from research unless the user asks (grill-with-docs / domain-modeling owns glossary + ADRs).
+- Do not open a GitHub issue unless the user asks. An unfixed bug from `skills/diagnosing-bugs/` is the path that also files an issue.
 - Background agent: Task tool. Keep working in this chat.
 
 Spin up a **background agent** to do the research, so you keep working while it reads.
