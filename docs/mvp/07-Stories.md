@@ -27,7 +27,7 @@
 
 - As a customer, I want to select multiple services in one request, so that I don't need to submit separate requests for a haircut and a color.
 - As a customer, I want to optionally pick a specific worker or say "no preference," so that I have control when I care, and less friction when I don't.
-- As a customer, I want to pick a preferred day and time with a simple picker (no availability grid), so that the salon knows when I'd like to come without me guessing their schedule.
+- As a customer, I want to pick a quarter start on Pošalji zahtjev and see which ones are Zauzet, so that I ask for a time the salon can still take.
 - As a customer, I want to create an account with email and password without a homepage login wall, so that I can browse first and sign in when I request or open My Bookings.
 - As a customer or someone opening a panel, I want to type my Ime i prezime when I register and see Rezervacije or Panel on the auth shell, so that my name is real and I know which door I opened.
 - As a customer, I want to verify my email before my request is sent, so that the salon can reach me with reminders.

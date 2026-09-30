@@ -8,7 +8,7 @@ Application code lives in `esyres_app/` (Laravel + PWA). Product scope: `docs/mv
 
 **Booking model**
 
-- Customer picks service(s), optional worker, and a preferred day and time (simple picker, no availability grid).
+- Customer picks service(s), optional worker, and a preferred day and quarter start on Pošalji zahtjev (Zauzet when occupying). Chat stays 1–3 coarse times.
 - Owner accepts preferred time in one tap, or counter-proposes from the worker × time-slot panel (drag or form). A counter-proposal holds that slot until confirm/decline/expire.
 - Status: `requested` → `confirmed` (accept) or `requested` → `time_proposed` → `confirmed` | `declined` (counter-propose).
 - Ask for a different day or time reopens the **same** booking.

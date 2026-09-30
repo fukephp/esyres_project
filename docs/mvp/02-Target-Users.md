@@ -15,7 +15,7 @@ People in Sarajevo (and eventually wider BiH) looking to book a haircut, make-up
 - To trust that the salon is legitimate and responsive before committing
 
 **What they explicitly do NOT want (design implication):**
-- To deal with a detailed time-slot grid or scheduling logic — that's the salon's job in this model. Chat may suggest 1–3 preferred times from busy-level, not live slots.
+- To manage the book themselves. The day badge stays coarse. Chat may suggest 1–3 preferred times from busy-level and does not name live quarters. Pošalji zahtjev shows that day’s quarter starts and which are Zauzet; the guest cannot type a time there.
 - A dashboard-like experience — their surface stays to Profile (including optional scripted chat on that profile), Bookmarks/Favorites, Search/Discover, and Schedule/Reschedule only. Chat speaks as the salon (Bosnian); Esyres is invisible plumbing.
 
 ## 2. Salon Owners
