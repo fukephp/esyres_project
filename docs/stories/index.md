@@ -111,4 +111,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-86 | Same-day service block | 2 | — | STORY-08, STORY-19, STORY-21, STORY-29 |
 | STORY-87 | Pending jump | 3 | — | STORY-13, STORY-76, STORY-80 |
 | STORY-88 | Owner rail toggle | 3 | — | STORY-85 |
-| STORY-89 | Always-on Pošalji zahtjev | 2 | — | STORY-65, STORY-84, STORY-08 |
+| STORY-89 | Always-on Pošalji zahtjev | 2 | `STORY-89` | STORY-65, STORY-84, STORY-08 |

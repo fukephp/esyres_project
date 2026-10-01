@@ -31,7 +31,7 @@ test('REGISTER_MUTATION sends name; LOGIN_MUTATION does not', () => {
   expect(auth).not.toMatch(/mutation Login\([^)]*\$name/)
 })
 
-test('customer place heading is Rezervacije on homepage, bookings, salon, assistant', () => {
+test('customer place heading is Rezervacije on homepage, bookings, and assistant', () => {
   const home = read('pages/Homepage.tsx')
   expect(home).toMatch(/<h1 className=\{PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}<\/h1>/)
   expect(home).not.toMatch(/pitch-display[\s\S]*auth\.placeCustomer/)
@@ -42,9 +42,9 @@ test('customer place heading is Rezervacije on homepage, bookings, salon, assist
   expect(bookings).toMatch(/EmailVerifyPanel/)
 
   const salon = read('pages/SalonProfile.tsx')
-  expect(salon).toMatch(/<p className=\{PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}<\/p>/)
-  expect(salon).toMatch(/needLogin && \([\s\S]*auth\.placeCustomer[\s\S]*AuthShell/)
-  expect(salon).not.toMatch(/needLogin && \([\s\S]*<h1[\s\S]*auth\.placeCustomer/)
+  expect(salon).toMatch(/meData\?\.me == null[\s\S]*salon\.loginToRequest[\s\S]*AuthShell/)
+  expect(salon).toMatch(/onAuthenticated=\{\(\) => setNeedLogin\(false\)\}/)
+  expect(salon).not.toMatch(/auth\.placeCustomer/)
 
   const assistant = read('components/AssistantIntake.tsx')
   expect(assistant).toMatch(/<p className=\{PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}<\/p>/)
