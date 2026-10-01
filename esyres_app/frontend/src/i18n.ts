@@ -331,11 +331,13 @@ void i18n.use(initReactI18next).init({
           noPending: 'Nema novih zahtjeva za ovaj dan.',
           noBookings: 'Nema zapisa za ovaj dan.',
           kanban: {
+            inProgress: 'U toku',
             pending: 'Zahtjevi',
             proposed: 'Predloženo',
             confirmed: 'Potvrđeno',
             done: 'Završeno i otkazano',
           },
+          columnsError: 'Kolone nisu sačuvane. Pokušaj ponovo.',
           empty: 'Nema zahtjeva za ovaj dan.',
           notOwner: 'Nisi vlasnik salona.',
           createSalon: 'Napravi salon',

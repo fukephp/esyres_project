@@ -104,7 +104,7 @@ test('dense owner home is Kalendar week grid or status Kanban on pastel cards', 
   expect(home).toMatch(/bg-status-pending/)
   const boards = read('components/OwnerBoards.tsx')
   expect(boards).toMatch(/md:grid-cols-7/)
-  expect(boards).toMatch(/md:grid-cols-4/)
+  expect(boards).toMatch(/md:grid-cols-5/)
   expect(boards).toMatch(/snap-x snap-mandatory/)
   expect(boards).toMatch(/STATUS_CARD_CLASS/)
   expect(boards).not.toMatch(/draggable|@dnd-kit/)

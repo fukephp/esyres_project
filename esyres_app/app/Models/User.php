@@ -32,6 +32,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'cancel_count' => 'integer',
             'late_cancel_count' => 'integer',
             'no_show_count' => 'integer',
+            'show_in_progress' => 'boolean',
+            'show_finished' => 'boolean',
         ];
     }
 

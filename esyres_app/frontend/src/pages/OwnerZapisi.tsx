@@ -1,13 +1,14 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekHeader } from '../components/OwnerBoards'
+import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekHeader } from '../components/OwnerBoards'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { KanbanSkeleton, OwnerPageSkeleton, RowsSkeleton } from '../components/Skeleton'
-import { ME_QUERY, type MeData } from '../graphql/auth'
+import { ME_QUERY, UPDATE_KANBAN_COLUMNS_MUTATION, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { SALON_DAY_BOOKINGS_QUERY, type SalonDayBookingsData } from '../graphql/pending'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
@@ -16,13 +17,13 @@ import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
   boardSearchParams,
-  KANBAN_COLUMNS,
   bookingStartIso,
   bookingStartLabel,
   kanbanGroups,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerWeekDays,
+  visibleKanbanColumns,
   ownerZapisiSearchParams,
   requestFromZapisiPath,
   shiftOwnerDate,
@@ -39,6 +40,8 @@ export function OwnerZapisi({
   hideSwitcher?: boolean
 } = {}) {
   const { t } = useTranslation()
+  const [columnError, setColumnError] = useState<string | null>(null)
+  const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
   const [params, setParams] = useSearchParams()
   const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
@@ -69,6 +72,9 @@ export function OwnerZapisi({
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
   const rows = listData?.salonDayBookings ?? []
   const kanban = data?.me?.ownerView === 'KANBAN'
+  const showInProgress = data?.me?.showInProgress !== false
+  const showFinished = data?.me?.showFinished !== false
+  const columns = visibleKanbanColumns(showInProgress, showFinished)
   const days = ownerWeekDays(date)
   const groups = kanbanGroups(rows)
 
@@ -180,15 +186,27 @@ export function OwnerZapisi({
               <RowsSkeleton count={4} className="mt-6" />
             )
           ) : kanban ? (
-            <KanbanBoard>
-              {KANBAN_COLUMNS.map((column) => (
-                <BoardColumn key={column} column={column} count={groups[column].length}>
-                  {groups[column].map((row) => (
-                    <BookingCard key={row.id} row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
-                  ))}
-                </BoardColumn>
-              ))}
-            </KanbanBoard>
+            <>
+              <KanbanColumnToggles
+                showInProgress={showInProgress}
+                showFinished={showFinished}
+                error={columnError}
+                onChange={(nextInProgress, nextFinished) => {
+                  void updateKanbanColumns({ variables: { showInProgress: nextInProgress, showFinished: nextFinished } })
+                    .then(() => setColumnError(null))
+                    .catch(() => setColumnError(t('owner.columnsError')))
+                }}
+              />
+              <KanbanBoard>
+                {columns.map((column) => (
+                  <BoardColumn key={column} column={column} count={groups[column].length}>
+                    {groups[column].map((row) => (
+                      <BookingCard key={row.id} row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
+                    ))}
+                  </BoardColumn>
+                ))}
+              </KanbanBoard>
+            </>
           ) : rows.length === 0 ? (
             <p className="mt-6 text-sm text-muted">{t('owner.noBookings')}</p>
           ) : (

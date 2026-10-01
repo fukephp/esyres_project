@@ -202,6 +202,8 @@ type User {
     phone: String
     phoneVerified: Boolean! @method(name: "hasVerifiedPhone")
     ownerView: OwnerView! @method(name: "graphqlOwnerView")
+    showInProgress: Boolean! @rename(attribute: "show_in_progress")
+    showFinished: Boolean! @rename(attribute: "show_finished")
     salons: [Salon!]! @method(name: "salonList")
     favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
 }
@@ -299,6 +301,7 @@ type Mutation {
     register(name: String!, email: String!, password: String!, phone: String): User!
     changePassword(currentPassword: String!, password: String!): User!
     updateOwnerView(view: OwnerView!): User!
+    updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     logout: Boolean!
     resendVerificationEmail: Boolean!
     requestPhoneOtp(phone: String!): Boolean!

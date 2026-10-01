@@ -870,6 +870,7 @@ test('kanbanColumn maps status and past confirmed starts', () => {
   expect(kanbanColumn({ ...base, status: 'REQUESTED' }, now)).toBe('pending')
   expect(kanbanColumn({ ...base, status: 'TIME_PROPOSED' }, now)).toBe('proposed')
   expect(kanbanColumn({ ...base, status: 'CONFIRMED' }, now)).toBe('confirmed')
+  expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z', durationMinutes: 180 }, now)).toBe('inProgress')
   expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z' }, now)).toBe('done')
   expect(kanbanColumn({ ...base, status: 'DECLINED' }, now)).toBe('done')
   expect(kanbanColumn({ ...base, status: 'CANCELLED' }, now)).toBe('done')

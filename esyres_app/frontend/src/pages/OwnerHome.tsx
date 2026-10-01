@@ -8,7 +8,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ColumnSkeleton, OwnerPageSkeleton, OwnerWeekSkeleton, WeekGridSkeleton } from '../components/Skeleton'
-import { ME_QUERY, type MeData } from '../graphql/auth'
+import { ME_QUERY, UPDATE_KANBAN_COLUMNS_MUTATION, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
   type InFlightIntakeCountData,
@@ -34,7 +34,7 @@ import {
   type PendingJumpData,
   type SalonDayBookingsData,
 } from '../graphql/pending'
-import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekGrid, WeekHeader } from '../components/OwnerBoards'
+import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekGrid, WeekHeader } from '../components/OwnerBoards'
 import { graphqlErrorCode } from '../lib/booking'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
@@ -66,6 +66,7 @@ import {
   shiftOwnerDate,
   sarajevoWeekday,
   trimDeclineReason,
+  visibleKanbanColumns,
 } from '../lib/owner'
 
 export function OwnerHome({
@@ -157,6 +158,8 @@ export function OwnerHome({
   const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
   const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
+  const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
+  const [columnError, setColumnError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [declineId, setDeclineId] = useState<string | null>(null)
   const [dismissId, setDismissId] = useState<string | null>(null)
@@ -370,7 +373,10 @@ export function OwnerHome({
     const block = occupyingBlock(row)
     return block === null ? [] : [block]
   })
-  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'))
+  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'), now)
+  const showInProgress = data?.me?.showInProgress !== false
+  const showFinished = data?.me?.showFinished !== false
+  const columns = visibleKanbanColumns(showInProgress, showFinished)
   const dayTitle = `${t(`weekday.${sarajevoWeekday(date)}`)}, ${formatPickerDayNumeric(date)}`
 
   const pendingList = (
@@ -466,29 +472,43 @@ export function OwnerHome({
             <DayChips days={days} date={date} closedFor={closedFor} onDate={onDate} className="mt-4" />
             <h3 className="mt-5 text-lg font-semibold tracking-tight text-ink">{dayTitle}</h3>
             {closedFor(date) ? <p className="mt-1 text-sm text-muted">{t('owner.closedDay')}</p> : null}
+            <KanbanColumnToggles
+              showInProgress={showInProgress}
+              showFinished={showFinished}
+              error={columnError}
+              onChange={(nextInProgress, nextFinished) => {
+                void updateKanbanColumns({ variables: { showInProgress: nextInProgress, showFinished: nextFinished } })
+                  .then(() => setColumnError(null))
+                  .catch(() => setColumnError(t('owner.columnsError')))
+              }}
+            />
             <KanbanBoard>
-              <BoardColumn column="pending" count={rows.length}>
-                {queueLoading ? <ColumnSkeleton /> : pendingList}
-              </BoardColumn>
-              {(['proposed', 'confirmed', 'done'] as const).map((column) => (
-                <BoardColumn key={column} column={column} count={groups[column].length}>
-                  {dayBookings === undefined ? (
-                    <ColumnSkeleton />
-                  ) : (
-                    groups[column].map((row) => {
-                      const ymd = row.status === 'CONFIRMED' ? occupyingSarajevoYmd(row) : null
-                      return (
-                        <BookingCard
-                          key={row.id}
-                          row={row}
-                          to={`/owner/requests/${row.id}`}
-                          progress={ymd !== null && row.preferredStartsAtLabel !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
-                        />
-                      )
-                    })
-                  )}
-                </BoardColumn>
-              ))}
+              {columns.map((column) =>
+                column === 'pending' ? (
+                  <BoardColumn key={column} column={column} count={rows.length}>
+                    {queueLoading ? <ColumnSkeleton /> : pendingList}
+                  </BoardColumn>
+                ) : (
+                  <BoardColumn key={column} column={column} count={groups[column].length}>
+                    {dayBookings === undefined ? (
+                      <ColumnSkeleton />
+                    ) : (
+                      groups[column].map((row) => {
+                        const ymd = row.status === 'CONFIRMED' ? occupyingSarajevoYmd(row) : null
+                        return (
+                          <BookingCard
+                            key={row.id}
+                            row={row}
+                            to={`/owner/requests/${row.id}`}
+                            now={now}
+                            progress={ymd !== null && row.preferredStartsAtLabel !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
+                          />
+                        )
+                      })
+                    )}
+                  </BoardColumn>
+                ),
+              )}
             </KanbanBoard>
           </section>
         ) : (

@@ -198,8 +198,8 @@ export function OwnerWeekSkeleton() {
 export function KanbanSkeleton({ className = '' }: { className?: string }) {
   return (
     <Skeleton className={className}>
-      <div className="grid gap-3 md:grid-cols-4">
-        {times(4).map((c) => (
+      <div className="grid gap-3 md:grid-cols-5">
+        {times(5).map((c) => (
           <div key={c} className="space-y-2 rounded-2xl p-3">
             <SkeletonBlock className="h-5 w-24 rounded-md" />
             {times(2).map((i) => (

@@ -202,9 +202,45 @@ export function WeekGrid({
   )
 }
 
+export function KanbanColumnToggles({
+  showInProgress,
+  showFinished,
+  error,
+  onChange,
+}: {
+  showInProgress: boolean
+  showFinished: boolean
+  error: string | null
+  onChange: (showInProgress: boolean, showFinished: boolean) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-ink">
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={showInProgress}
+          onChange={() => onChange(!showInProgress, showFinished)}
+        />
+        {t('owner.kanban.inProgress')}
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={showFinished}
+          onChange={() => onChange(showInProgress, !showFinished)}
+        />
+        {t('owner.kanban.done')}
+      </label>
+      {error !== null ? <p className="text-busy-busy">{error}</p> : null}
+    </div>
+  )
+}
+
 export function KanbanBoard({ children }: { children: ReactNode }) {
   return (
-    <div className="-mx-4 mt-5 flex items-start snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+    <div className="-mx-4 mt-5 flex items-start snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
       {children}
     </div>
   )

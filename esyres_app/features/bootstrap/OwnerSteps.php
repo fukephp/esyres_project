@@ -37,6 +37,62 @@ GQL, ['view' => $view]);
     }
 
     /**
+     * @When I set kanban columns in progress :inProgress and finished :finished
+     */
+    public function iSetKanbanColumns(string $inProgress, string $finished): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateKanbanColumns($showInProgress: Boolean!, $showFinished: Boolean!) {
+  updateKanbanColumns(showInProgress: $showInProgress, showFinished: $showFinished) {
+    id
+    showInProgress
+    showFinished
+  }
+}
+GQL, [
+            'showInProgress' => $inProgress === 'true',
+            'showFinished' => $finished === 'true',
+        ]);
+    }
+
+    /**
+     * @When I query my kanban columns
+     */
+    public function iQueryMyKanbanColumns(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeKanban {
+  me {
+    showInProgress
+    showFinished
+  }
+}
+GQL);
+    }
+
+    /**
+     * @Then my kanban columns are in progress :inProgress and finished :finished
+     */
+    public function myKanbanColumnsAre(string $inProgress, string $finished): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['updateKanbanColumns'] ?? $this->graphql['data']['me'] ?? null;
+        $this->assertIsArray($row);
+        $this->assertSame($inProgress === 'true', $row['showInProgress']);
+        $this->assertSame($finished === 'true', $row['showFinished']);
+    }
+
+    /**
+     * @Then the stored kanban columns of :email are in progress :inProgress and finished :finished
+     */
+    public function theStoredKanbanColumnsAre(string $email, string $inProgress, string $finished): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $this->assertSame($inProgress === 'true', (bool) $user->show_in_progress);
+        $this->assertSame($finished === 'true', (bool) $user->show_finished);
+    }
+
+    /**
      * @When I query my owner view
      */
     public function iQueryMyOwnerView(): void

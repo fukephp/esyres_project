@@ -1084,11 +1084,25 @@ export function occupyingByDay<T extends {
     .sort((a, b) => (occupyingStartIso(a) ?? '').localeCompare(occupyingStartIso(b) ?? ''))
 }
 
-export type KanbanColumn = 'pending' | 'proposed' | 'confirmed' | 'done'
+export type KanbanColumn = 'inProgress' | 'pending' | 'proposed' | 'confirmed' | 'done'
 
-export const KANBAN_COLUMNS: KanbanColumn[] = ['pending', 'proposed', 'confirmed', 'done']
+export const KANBAN_COLUMNS: KanbanColumn[] = ['inProgress', 'pending', 'proposed', 'confirmed', 'done']
+
+export function visibleKanbanColumns(showInProgress: boolean, showFinished: boolean): KanbanColumn[] {
+  return KANBAN_COLUMNS.filter((column) => {
+    if (column === 'inProgress') {
+      return showInProgress
+    }
+    if (column === 'done') {
+      return showFinished
+    }
+
+    return true
+  })
+}
 
 export const STATUS_CARD_CLASS: Record<KanbanColumn, string> = {
+  inProgress: 'bg-status-confirmed',
   pending: 'bg-status-pending',
   proposed: 'bg-status-proposed',
   confirmed: 'bg-status-confirmed',
@@ -1116,7 +1130,7 @@ export function bookingStartLabel(row: {
 }
 
 export function kanbanColumn(
-  row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null },
+  row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null; durationMinutes?: number },
   now = new Date(),
 ): KanbanColumn {
   if (row.status === 'REQUESTED') {
@@ -1125,18 +1139,26 @@ export function kanbanColumn(
   if (row.status === 'TIME_PROPOSED') {
     return 'proposed'
   }
-  if (row.status === 'CONFIRMED' && row.preferredStartsAt !== null && new Date(row.preferredStartsAt).getTime() >= now.getTime()) {
-    return 'confirmed'
+  if (row.status === 'CONFIRMED' && row.preferredStartsAt !== null) {
+    const start = new Date(row.preferredStartsAt).getTime()
+    const end = start + (row.durationMinutes ?? 0) * 60_000
+    const t = now.getTime()
+    if (t < start) {
+      return 'confirmed'
+    }
+    if (t < end) {
+      return 'inProgress'
+    }
   }
 
   return 'done'
 }
 
-export function kanbanGroups<T extends { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null }>(
+export function kanbanGroups<T extends { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null; durationMinutes?: number }>(
   rows: T[],
   now = new Date(),
 ): Record<KanbanColumn, T[]> {
-  const groups: Record<KanbanColumn, T[]> = { pending: [], proposed: [], confirmed: [], done: [] }
+  const groups: Record<KanbanColumn, T[]> = { inProgress: [], pending: [], proposed: [], confirmed: [], done: [] }
   const sorted = [...rows].sort((a, b) => bookingStartIso(a).localeCompare(bookingStartIso(b)))
   for (const row of sorted) {
     groups[kanbanColumn(row, now)].push(row)
