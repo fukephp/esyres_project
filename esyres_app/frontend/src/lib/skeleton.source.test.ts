@@ -85,8 +85,10 @@ test('guest page loading keeps TopNav with a page-shaped preset', () => {
 test('owner loading renders a ghost OwnerShell with no interactive elements', () => {
   const ghost = fn(skeleton, 'OwnerShellGhost')
   expect(ghost).toMatch(/bg-surface-dark/)
+  expect(ghost).toMatch(/ownerRailExpanded/)
+  expect(ghost).toMatch(/OWNER_RAIL_STORAGE_KEY/)
   expect(ghost).toMatch(/md:w-16/)
-  expect(ghost).not.toMatch(/md:w-60/)
+  expect(ghost).toMatch(/md:w-60/)
   expect(ghost).toMatch(/h-6 w-6 rounded-full/)
   expect(ghost).toMatch(/fixed inset-x-0 bottom-0/)
   expect(ghost).toMatch(/SkeletonBlock dark/)

@@ -13,6 +13,7 @@ type Props = {
   badge: number | null
   active: OwnerNavActive
   variant: 'sidebar' | 'tabs'
+  expanded?: boolean
 }
 
 function NavIcon({ children }: { children: ReactNode }) {
@@ -58,7 +59,7 @@ const ICONS: Record<OwnerNavActive, ReactNode> = {
   ),
 }
 
-export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant }: Props) {
+export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant, expanded = false }: Props) {
   const { t } = useTranslation()
   const today = sarajevoToday()
   const queue = ownerQueuePath(date ?? today, today, salonId, firstOwnedId)
@@ -97,17 +98,20 @@ export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant }
   }
 
   return (
-    <nav className="mt-8 flex flex-col items-center gap-1 text-sm">
+    <nav className={`mt-8 flex flex-col gap-1 text-sm ${expanded ? 'w-full' : 'items-center'}`}>
       {items.map((item) => (
         <Link
           key={item.key}
           to={item.to}
           aria-label={item.label}
           title={item.label}
-          className={`relative flex h-10 w-10 items-center justify-center rounded-full ${active === item.key ? 'bg-canvas font-semibold text-ink' : 'text-on-dark-soft active:text-on-dark'}`}
+          className={`relative flex items-center rounded-full ${expanded ? 'h-10 w-full justify-start gap-3 px-3' : 'h-10 w-10 justify-center'} ${active === item.key ? 'bg-canvas font-semibold text-ink' : 'text-on-dark-soft active:text-on-dark'}`}
         >
           {ICONS[item.key]}
-          {item.badge != null ? <span className={`absolute -right-1 -top-1 ${badgeClass}`}>{item.badge}</span> : null}
+          {expanded ? <span className="truncate">{item.label}</span> : null}
+          {item.badge != null ? (
+            <span className={expanded ? `ml-auto ${badgeClass}` : `absolute -right-1 -top-1 ${badgeClass}`}>{item.badge}</span>
+          ) : null}
         </Link>
       ))}
     </nav>

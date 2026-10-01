@@ -234,6 +234,8 @@ void i18n.use(initReactI18next).init({
           stats: 'Statistika',
           salons: 'Saloni',
           settings: 'Postavke',
+          expandMenu: 'Proširi izbornik',
+          collapseMenu: 'Sklopi izbornik',
           passwordTitle: 'Lozinka',
           view: 'Prikaz',
           viewCalendar: 'Kalendar',
