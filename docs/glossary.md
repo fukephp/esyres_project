@@ -73,7 +73,7 @@ A named person at a salon who can be requested for a booking. Not a user and not
 _Avoid_: staff account, employee user, stylist account
 
 **No preference**:
-The guest did not pick a specific worker on a request. Valid on a request; a confirmed booking always has a worker. A counter-proposal names a worker even when the request was no preference. Not a missing worker and not a fake “any” worker row.
+The guest did not pick a specific worker on a request. Valid on a request; a confirmed booking always has a worker. When the request already has a preferred time, the owner may assign a worker and confirm. A counter-proposal still names a worker when there is no preferred time, or when the owner changes the clock. Not a missing worker and not a fake “any” worker row.
 _Avoid_: unassigned, any stylist, empty worker, default worker
 
 ## Discovery
@@ -121,7 +121,7 @@ _Avoid_: trending, featured, curated homepage, popular ranking
 ## Request paths
 
 **Picker**:
-The primary request path on a salon profile. The guest chooses services, optional worker, a day, and a quarter start, then sends. Not the assistant.
+The primary request path on a salon profile. The guest chooses services, optional worker, a day, and an optional quarter start, then sends. Not the assistant.
 _Avoid_: form, booking widget, slot picker, calendar
 
 **Quarter start**:
@@ -183,8 +183,8 @@ The owner’s list of requested bookings and in-progress reschedules for one sal
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
-The owner’s screen for one booking, in the same Cal card chrome as Zahtjevi: pending requests get accept, decline, or counter-propose; occupying bookings (`confirmed` / `time_proposed`) are read-only. The only counter-propose path. Not the pending queue, not the month navigator, not a salon-edit panel, and not the customer Time Proposed screen.
-_Avoid_: booking detail, request modal, tap fallback (as a screen name), settings panel
+The owner’s screen for one booking, opened as a modal over Zahtjevi or Zapisi. Pending requests get accept, assign worker, decline, or counter-propose. Occupying bookings (`confirmed` / `time_proposed`) are read-only except a phone booking. The only counter-propose path. Not the pending queue and not the customer Time Proposed screen.
+_Avoid_: booking detail, full-page card, tap fallback (as a screen name), settings panel
 
 **Assistant-originated**:
 A request sent from the salon booking assistant, not the picker. Same request as any other. The owner sees it tagged Asistent. Not an in-flight chat and not a second inbox.
@@ -207,8 +207,12 @@ The Prikaz that shows one week as seven day columns of occupying bookings, plus 
 _Avoid_: schedule, agenda, timeline board
 
 **Kanban**:
-The Prikaz that shows one selected day's bookings in four status columns: Zahtjevi, Predloženo, Potvrđeno, Završeno i otkazano. Cards do not move by drag; status changes only through accept, decline, counter-propose, and the customer's answer. Not a worker board.
+The Prikaz that shows one selected day's bookings in five columns: U toku, Zahtjevi, Predloženo, Potvrđeno, Završeno i otkazano. Two account checkboxes can hide U toku and Završeno i otkazano. Cards do not move by drag; status changes only through accept, assign worker, decline, counter-propose, and the customer's answer. Not a worker board.
 _Avoid_: pipeline, board (alone), columns view
+
+**U toku**:
+A confirmed booking whose occupied range contains the current time. Not a status. Not Potvrđeno, which has not started, and not a finished visit.
+_Avoid_: in progress (as a status), live job, current job
 
 **Month navigator**:
 The month grid on Zahtjevi. Days with occupying bookings show worker-colored dots. Tapping a day selects it. Not a guest slot picker and not a per-worker shift calendar.
@@ -227,16 +231,24 @@ The owner’s offered worker and clock range on a booking, instead of accepting 
 _Avoid_: accept, reschedule (Epic 5), hold (as a request), slot offer
 
 **Request**:
-A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
+A customer’s booking that is still `requested`: a preferred day, an optional preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted, assigned a worker, or counter-proposed yet.
 _Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
+
+**Day-only request**:
+A request with a preferred day and no preferred time. It holds no clock. The owner counter-proposes one quarter on that same day, or declines.
+_Avoid_: open request, flexible time, anytime
 
 **Same-day service**:
 A service this customer already has on another live booking at that salon on that preferred day. Not Zauzet and not a phone booking.
 _Avoid_: duplicate request, spam hold, slot block
 
 **Accept preferred time**:
-The owner’s one tap that turns a request into a confirmed booking at the guest’s preferred time. Not a counter-proposal.
+The owner’s one tap that turns a named-worker request into a confirmed booking at the guest’s preferred time. Not assign worker and not a counter-proposal.
 _Avoid_: approve, book, auto-confirm, one-click book
+
+**Assign worker**:
+The owner’s tap of a free worker on a no-preference request that already has a preferred time. The booking becomes confirmed at that time. Not a counter-proposal and not accept preferred time.
+_Avoid_: unassigned, allocate, staff assign
 
 **Confirm proposed time**:
 The customer’s yes to a time-proposed booking. The booking becomes confirmed at the offered worker and time. Not accept preferred time.
@@ -247,7 +259,7 @@ The customer’s no to a time-proposed booking. The booking becomes declined wit
 _Avoid_: decline (customer), cancel (as time-proposed)
 
 **Confirmed booking**:
-A booking locked to a worker and a clock range. That happens when the owner accepts the preferred time, when both sides agree after a counter-proposal, or when the owner writes a phone booking. Not a request.
+A booking locked to a worker and a clock range. That happens when the owner accepts the preferred time, when the owner assigns a worker on a no-preference request that already has a time, when both sides agree after a counter-proposal, or when the owner writes a phone booking. Not a request.
 _Avoid_: reservation, appointment (as the request), hold
 
 **Phone booking**:

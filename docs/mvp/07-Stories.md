@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-89`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-94`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -29,6 +29,7 @@
 - As a customer, I want to optionally pick a specific worker or say "no preference," so that I have control when I care, and less friction when I don't.
 - As a customer, I want Radno vrijeme to show when the salon is open, and Pošalji zahtjev to open a request I leave only with Zatvori, so that I can ask for a time without the hours list acting as the button.
 - As a customer, I want to pick a quarter start on Pošalji zahtjev and see which ones are Zauzet, so that I ask for a time the salon can still take.
+- As a customer, I want to send Pošalji zahtjev for an open day without picking a quarter, so that the salon can offer a time.
 - As a customer, I want a second request for a service I already have that day to be refused, so that I cannot spam the same service.
 - As a customer, I want to create an account with email and password without a homepage login wall, so that I can browse first and sign in when I request or open My Bookings.
 - As a customer or someone opening a panel, I want to type my Ime i prezime when I register and see Rezervacije or Panel on the auth shell, so that my name is real and I know which door I opened.
@@ -47,10 +48,13 @@
 - As an owner, I want to accept a guest's preferred time in one tap when it works, so that simple requests don't need an extra back-and-forth.
 - As an owner, I want to counter-propose a different time from Request Detail, so that I can adjust when the preferred time doesn't fit without dragging.
 - As an owner, I want Request Detail in the same Cal card as Zahtjevi, so that counter-propose is not a blank column after the month-and-list.
+- As an owner, I want Request Detail as a modal over Zahtjevi or Zapisi, so that I can act on a booking without leaving the board.
+- As an owner, I want to confirm a no-preference request that already has a time by tapping a free worker, so that the guest is not asked again.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 - As an owner, I want Telefon as modal steps on Zahtjevi, with Danas, Sutra, or another day and tappable quarter-hour starts, so that I can write a phone booking with a few taps while I am still on the call.
 - As a guest or an owner, I want pages and lists to show a calm skeleton of what is coming while they load (owner pages inside the shell frame), so that the screen does not jump.
 - As an owner, I want each confirmed card on Zahtjevi to show how far that appointment has run, and the menu as icons only, so that I can see progress without a wide labeled sidebar.
+- As an owner, I want visits that are happening now in a first Kanban column, and checkboxes to hide that column or the finished one, so that the board stays the pipeline I need.
 - As an owner, I want one button with the count of pending reservations that jumps me to that day, so that I can accept or decline without hunting the week.
 - As an owner, I want a button to collapse and expand the menu, so that I can use icons or read the labels.
 
@@ -88,6 +92,7 @@
 - As an owner, I want each weekday on Radno vrijeme collapsed until I open it, so that I can scan the week without scrolling through seven expanded editors.
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.
 - As an owner, I want to change my password on `/owner/settings`, so that I can rotate the shared credential without a founder reset.
+- As an owner, I want a Chat switch on Postavke, default off, so that the menu hides a tab I am not using.
 
 ## Epic 8 — Trust Signal Data Foundations
 
