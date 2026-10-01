@@ -16,6 +16,8 @@ Laravel is the only application server. Lighthouse exposes one `/graphql` endpoi
 
 ## Conventions
 
+PHP types, mutations, and policies stay the contract on one endpoint (decision 8 in `docs/architecture/08-Decisions.md`); where a resolver stops and a domain class starts is `docs/architecture/09-Api-Boundaries.md`.
+
 - MySQL is the source of truth. Laravel Cache holds OTP TTL (Redis when that service is in compose). Redis remains the target for cache, queues, Reverb — not bookings. See `docs/adr/0005-otp-in-laravel-cache.md`.
 - GraphQL `ID` is the MySQL bigint.
 - Money is integer **feninga**.

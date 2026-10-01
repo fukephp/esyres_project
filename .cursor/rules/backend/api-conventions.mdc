@@ -6,7 +6,7 @@ alwaysApply: false
 
 # API and data conventions
 
-Stack, GraphQL, and data rules: `docs/architecture/`.
+Stack, GraphQL, and data rules: `docs/architecture/`. Resolver and domain boundary: `docs/architecture/09-Api-Boundaries.md`.
 
 - Login is email+password. Guest queries stay public. `createBooking` requires verified email **and** phone OTP. Owner mutations require verified email plus salon policy. `createSalon` requires verified email; owner access is owning at least one salon.
 - Capture from day one: response-time timestamps, no-show/cancel counters, QR scan + visited markers, verification status.

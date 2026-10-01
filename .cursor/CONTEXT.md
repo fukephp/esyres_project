@@ -101,6 +101,7 @@ Do not invent a different stack. Do not expand the scaffold into product feature
 - `docs/architecture/06-Auth-Notifications-Realtime.md`
 - `docs/architecture/07-Docker-and-Local-Dev.md`
 - `docs/architecture/08-Decisions.md`
+- `docs/architecture/09-Api-Boundaries.md`
 
 **Research (lazy)**
 
