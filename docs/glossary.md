@@ -230,6 +230,10 @@ _Avoid_: accept, reschedule (Epic 5), hold (as a request), slot offer
 A customer’s booking that is still `requested`: preferred time, one or more services, optional worker. It is not a held clock slot. The owner has not accepted or counter-proposed yet.
 _Avoid_: reservation (as confirmed), appointment (as confirmed), order, hold
 
+**Same-day service**:
+A service this customer already has on another live booking at that salon on that preferred day. Not Zauzet and not a phone booking.
+_Avoid_: duplicate request, spam hold, slot block
+
 **Accept preferred time**:
 The owner’s one tap that turns a request into a confirmed booking at the guest’s preferred time. Not a counter-proposal.
 _Avoid_: approve, book, auto-confirm, one-click book
