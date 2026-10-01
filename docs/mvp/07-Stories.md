@@ -48,6 +48,7 @@
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 - As an owner, I want Telefon as modal steps on Zahtjevi, with Danas, Sutra, or another day and tappable quarter-hour starts, so that I can write a phone booking with a few taps while I am still on the call.
 - As a guest or an owner, I want pages and lists to show a calm skeleton of what is coming while they load (owner pages inside the shell frame), so that the screen does not jump.
+- As an owner, I want each confirmed card on Zahtjevi to show how far that appointment has run, and the menu as icons only, so that I can see progress without a wide labeled sidebar.
 
 ## Epic 4 — Booking Lifecycle & Customer Response
 

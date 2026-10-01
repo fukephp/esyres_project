@@ -5,7 +5,7 @@ description: >-
   Design 2 — Esyres pastel pack (homepage on `/`, discovery, salon, owner).
   Direction adapted from the Intelly HealthCare dashboard
   (https://dribbble.com/shots/23902200-Intelly-HealthCare-App-Dashboard):
-  cream canvas, black owner sidebar, pastel status cards, big display greeting.
+  cream canvas, black owner icon rail, pastel status cards, big display greeting.
   Supersedes Design 1 Cal (ADR 0039).
 colors:
   page: "#FAF4EA"
@@ -80,9 +80,9 @@ Self-hosted via Fontsource (OFL): `@fontsource-variable/bricolage-grotesque`, `@
 
 | Component | Spec |
 |-----------|------|
-| `OwnerShell` | `md+`: fixed 240px black sidebar (`surface-dark`, `on-dark`): brand mark, salon switcher (dark select), nav links (Zahtjevi, Zapisi, Chats + badge, Statistika, Saloni, Postavke), active link = `canvas` pill with ink text; Odjava at the bottom (`error-strong`). Main column on `page`: header row with display greeting `Dobrodošli, {ime}` (or page title when no name) and an optional action slot (e.g. Telefon). Phone: no sidebar; compact header (brand + salon + Odjava) and a fixed bottom tab bar (Zahtjevi, Zapisi, Chats, Saloni, Postavke) on `surface-dark`. Statistika is reachable from the header on phone. |
+| `OwnerShell` | `md+`: narrow black icon rail (`surface-dark`, `on-dark`): brand mark → `/` (no wordmark), outline icons (Zahtjevi calendar, Zapisi list, Chats speech bubble + count badge, Statistika bar chart, Saloni shop, Postavke gear), active link = `canvas` pill, icon Odjava at the bottom (`error-strong`, exit icon). Does not expand. Main column on `page`: header row with display greeting `Dobrodošli, {ime}` (or page title when no name), salon switcher or salon name before the optional action slot (e.g. Telefon). Phone: no rail; compact header (brand + salon + Statistika text link + text Odjava) and a fixed bottom tab bar of the same five icons (no visible labels; Chats keeps the count) on `surface-dark`. |
 | `SegmentedToggle` | Pill group on `surface-card`; selected segment `ink` fill + `canvas` text. Used for Prikaz (Kalendar / Kanban) and week/day switch. |
-| `StatusCard` | `rounded-2xl` pastel fill by status, `p-3`; top line time (`tabular-nums`, 600), then customer or service name (600), then meta (`muted`, worker dot + name). Whole card is a link to Request Detail unless it carries actions. |
+| `StatusCard` | `rounded-2xl` pastel fill by status, `p-3`; top line time (`tabular-nums`, 600), then customer or service name (600), then meta (`muted`, worker dot + name). Whole card is a link to Request Detail unless it carries actions. Confirmed Zahtjevi cards add a bottom ink progress track (elapsed share of the occupied range, soft track, no percent). Zapisi cards do not. |
 | `WeekGrid` | `md+`: 7 day columns (`micro` weekday + date head; selected day `pastel-pink` head, today ink underline). Cards stacked by start time per column (no pixel-exact clock placement, no now-line, no drag). Chevrons shift a week. Phone: day chips row (7) + the selected day column only. |
 | `KanbanBoard` | 4 columns on `md+` (`grid-cols-4`), horizontally scrollable snap columns on phone. Column head: `micro` label + count pill. Column 1 cards carry Prihvati / Predloži / Odbij (same rules as today). |
 | `DayChips` | 7 pills for the visible week (weekday + date), selected = `ink` fill. |

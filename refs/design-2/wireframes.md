@@ -40,22 +40,18 @@ Phone (390px): same order, one column; mock below the CTA; Popularno strip scrol
 ## Owner shell — 1280px
 
 ```
-+-----------+------------------------------------------------------------------+
-| (black)   |  Dobrodošli, Amira                         [Telefon]  (display)  |
-| [mark]    |  Salon Mira                                                      |
-| Esyres    |                                                                  |
-|           |  +------------------------------------------------------------+  |
-| [Salon v] |  |  page content (rounded-3xl canvas panel)                   |  |
-|           |  |                                                            |  |
-| (Zahtjevi)|  |                                                            |  |
-|  Zapisi   |  |                                                            |  |
-|  Chats (2)|  |                                                            |  |
-|  Statist. |  |                                                            |  |
-|  Saloni   |  +------------------------------------------------------------+  |
-|  Postavke |                                                                  |
-|           |                                                                  |
-| [Odjava]  |                                                                  |
-+-----------+------------------------------------------------------------------+
++------+--------------------------------------------------------------------+
+| (blk)|  Dobrodošli, Amira          Salon Mira v          [Telefon]        |
+| [mk] |                                                                    |
+| [cal]|  +--------------------------------------------------------------+  |
+| [lst]|  |  page content (rounded-3xl canvas panel)                     |  |
+| [cht]|  |                                                              |  |
+|  (2) |  |                                                              |  |
+| [bar]|  +--------------------------------------------------------------+  |
+| [shp]|                                                                    |
+| [ger]|                                                                    |
+| [out]|                                                                    |
++------+--------------------------------------------------------------------+
 ```
 
 Phone:
@@ -68,7 +64,7 @@ Phone:
 |  content                       |
 |                                |
 +--------------------------------+
-| Zahtjevi Zapisi Chats Saloni P |  (black bottom tabs, fixed)
+| [cal] [lst] [cht] [shp] [ger] |  (icon tabs, no labels, fixed)
 +--------------------------------+
 ```
 
