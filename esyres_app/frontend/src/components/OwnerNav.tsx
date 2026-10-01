@@ -14,6 +14,7 @@ type Props = {
   active: OwnerNavActive
   variant: 'sidebar' | 'tabs'
   expanded?: boolean
+  chatEnabled?: boolean
 }
 
 function NavIcon({ children }: { children: ReactNode }) {
@@ -59,26 +60,27 @@ const ICONS: Record<OwnerNavActive, ReactNode> = {
   ),
 }
 
-export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant, expanded = false }: Props) {
+export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant, expanded = false, chatEnabled = false }: Props) {
   const { t } = useTranslation()
   const today = sarajevoToday()
   const queue = ownerQueuePath(date ?? today, today, salonId, firstOwnedId)
   const zapisi = ownerZapisiPath(date ?? today, today, salonId, firstOwnedId)
   const chats = ownerChatPath(salonId, firstOwnedId)
   const stats = ownerStatsPath(salonId, firstOwnedId)
-  const items: { key: OwnerNavActive; to: string; label: string; badge?: number | null; tab: boolean }[] = [
-    { key: 'queue', to: queue, label: t('owner.title'), tab: true },
-    { key: 'zapisi', to: zapisi, label: t('owner.zapisi'), tab: true },
-    { key: 'chats', to: chats, label: t('owner.chat'), badge, tab: true },
-    { key: 'stats', to: stats, label: t('owner.stats'), tab: false },
-    { key: 'salons', to: OWNER_SALONS_PATH, label: t('owner.salons'), tab: true },
-    { key: 'settings', to: OWNER_SETTINGS_PATH, label: t('owner.settings'), tab: true },
-  ]
+  const items = [
+    { key: 'queue' as const, to: queue, label: t('owner.title'), tab: true },
+    { key: 'zapisi' as const, to: zapisi, label: t('owner.zapisi'), tab: true },
+    { key: 'chats' as const, to: chats, label: t('owner.chat'), badge, tab: true },
+    { key: 'stats' as const, to: stats, label: t('owner.stats'), tab: false },
+    { key: 'salons' as const, to: OWNER_SALONS_PATH, label: t('owner.salons'), tab: true },
+    { key: 'settings' as const, to: OWNER_SETTINGS_PATH, label: t('owner.settings'), tab: true },
+  ].filter((item) => item.key !== 'chats' || chatEnabled)
+  const tabs = items.filter((item) => item.tab)
   const badgeClass = 'inline-flex min-w-5 justify-center rounded-full bg-pastel-pink px-1.5 text-xs font-semibold text-ink'
 
   if (variant === 'tabs') {
     return (
-      <nav className="grid grid-cols-5 text-[11px] font-semibold">
+      <nav className={`${tabs.length === 5 ? 'grid-cols-5' : 'grid-cols-4'} grid text-[11px] font-semibold`}>
         {items
           .filter((item) => item.tab)
           .map((item) => (

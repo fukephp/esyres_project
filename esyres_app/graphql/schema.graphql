@@ -204,6 +204,7 @@ type User {
     ownerView: OwnerView! @method(name: "graphqlOwnerView")
     showInProgress: Boolean! @rename(attribute: "show_in_progress")
     showFinished: Boolean! @rename(attribute: "show_finished")
+    chatEnabled: Boolean! @rename(attribute: "chat_enabled")
     salons: [Salon!]! @method(name: "salonList")
     favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
 }
@@ -302,6 +303,7 @@ type Mutation {
     changePassword(currentPassword: String!, password: String!): User!
     updateOwnerView(view: OwnerView!): User!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
+    updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!
     resendVerificationEmail: Boolean!
     requestPhoneOtp(phone: String!): Boolean!

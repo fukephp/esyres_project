@@ -116,4 +116,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-91 | Assign worker | 3 | STORY-91 | STORY-14, STORY-90 |
 | STORY-92 | Day-only request | 2 | STORY-92 | STORY-89, STORY-84, STORY-13 |
 | STORY-93 | U toku column | 3 | STORY-93 | STORY-80, STORY-85 |
-| STORY-94 | Hide Chat | 7 | — | STORY-71, STORY-78, STORY-26 |
+| STORY-94 | Hide Chat | 7 | STORY-94 | STORY-71, STORY-78, STORY-26 |

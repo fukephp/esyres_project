@@ -1,8 +1,8 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { LOGOUT_MUTATION } from '../graphql/auth'
+import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { DISCOVERY_BRAND_KEY } from '../lib/homepage'
 import { OWNER_RAIL_STORAGE_KEY, ownerRailExpanded, ownerStatsPath } from '../lib/owner'
 import { OwnerNav, type OwnerNavActive } from './OwnerNav'
@@ -48,6 +48,8 @@ export function OwnerShell({
   children,
 }: Props) {
   const { t } = useTranslation()
+  const { data: meData } = useQuery<MeData>(ME_QUERY)
+  const chatEnabled = meData?.me?.chatEnabled === true
   const [logout] = useMutation(LOGOUT_MUTATION, { refetchQueries: ['Me'] })
   const [expanded, setExpanded] = useState(readRailExpanded)
   const salon = salons.find((row) => row.id === salonId) ?? null
@@ -80,6 +82,7 @@ export function OwnerShell({
           active={active}
           variant="sidebar"
           expanded={expanded}
+          chatEnabled={chatEnabled}
         />
         <div className="mt-auto flex flex-col items-center gap-1">
           <button
@@ -139,7 +142,7 @@ export function OwnerShell({
         <main className="px-5 py-6 md:px-10 md:py-8">{children}</main>
       </div>
       <div className="fixed inset-x-0 bottom-0 z-20 bg-surface-dark md:hidden">
-        <OwnerNav salonId={salonId} firstOwnedId={firstOwnedId} date={date} badge={badge} active={active} variant="tabs" />
+        <OwnerNav salonId={salonId} firstOwnedId={firstOwnedId} date={date} badge={badge} active={active} variant="tabs" chatEnabled={chatEnabled} />
       </div>
     </div>
   )

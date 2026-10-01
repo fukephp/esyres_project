@@ -34,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'no_show_count' => 'integer',
             'show_in_progress' => 'boolean',
             'show_finished' => 'boolean',
+            'chat_enabled' => 'boolean',
         ];
     }
 

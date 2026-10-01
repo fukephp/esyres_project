@@ -246,6 +246,7 @@ void i18n.use(initReactI18next).init({
           viewKanban: 'Kanban',
           viewHint: 'Kako vidiš Zahtjeve i Zapise. Pamti se na tvom računu.',
           viewError: 'Prikaz nije sačuvan. Pokušaj ponovo.',
+          chatError: 'Chat nije sačuvan. Pokušaj ponovo.',
           noTime: 'Bez vremena',
           passwordCurrent: 'Trenutna lozinka',
           passwordNew: 'Nova lozinka',

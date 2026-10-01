@@ -93,6 +93,53 @@ GQL);
     }
 
     /**
+     * @When I set chat enabled to :enabled
+     */
+    public function iSetChatEnabledTo(string $enabled): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateChatEnabled($enabled: Boolean!) {
+  updateChatEnabled(enabled: $enabled) {
+    id
+    chatEnabled
+  }
+}
+GQL, ['enabled' => $enabled === 'true']);
+    }
+
+    /**
+     * @When I query my chat enabled
+     */
+    public function iQueryMyChatEnabled(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeChat {
+  me { chatEnabled }
+}
+GQL);
+    }
+
+    /**
+     * @Then my chat enabled is :enabled
+     */
+    public function myChatEnabledIs(string $enabled): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['updateChatEnabled'] ?? $this->graphql['data']['me'] ?? null;
+        $this->assertIsArray($row);
+        $this->assertSame($enabled === 'true', $row['chatEnabled']);
+    }
+
+    /**
+     * @Then the stored chat enabled of :email is :enabled
+     */
+    public function theStoredChatEnabledIs(string $email, string $enabled): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $this->assertSame($enabled === 'true', (bool) $user->chat_enabled);
+    }
+
+    /**
      * @When I query my owner view
      */
     public function iQueryMyOwnerView(): void

@@ -11,6 +11,7 @@ import {
   CHANGE_PASSWORD_MUTATION,
   ME_QUERY,
   UPDATE_OWNER_VIEW_MUTATION,
+  UPDATE_CHAT_ENABLED_MUTATION,
   type MeData,
   type OwnerView,
 } from '../graphql/auth'
@@ -26,7 +27,9 @@ export function OwnerSettings() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [changePassword, { loading: saving }] = useMutation(CHANGE_PASSWORD_MUTATION)
   const [updateOwnerView, { loading: savingView }] = useMutation(UPDATE_OWNER_VIEW_MUTATION)
+  const [updateChatEnabled] = useMutation(UPDATE_CHAT_ENABLED_MUTATION)
   const [viewError, setViewError] = useState(false)
+  const [chatError, setChatError] = useState(false)
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -43,6 +46,18 @@ export function OwnerSettings() {
     fetchPolicy: 'network-only',
   })
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
+
+  async function chooseChat(enabled: boolean) {
+    if (data?.me?.chatEnabled === enabled) {
+      return
+    }
+    setChatError(false)
+    try {
+      await updateChatEnabled({ variables: { enabled } })
+    } catch {
+      setChatError(true)
+    }
+  }
 
   async function chooseView(view: OwnerView) {
     if (savingView || data?.me?.ownerView === view) {
@@ -175,6 +190,16 @@ export function OwnerSettings() {
             </div>
             <p className="text-sm text-muted">{t('owner.viewHint')}</p>
             {viewError ? <p className="text-sm text-busy-busy">{t('owner.viewError')}</p> : null}
+            <label className="flex items-center gap-2 text-sm text-ink">
+              <input
+                type="checkbox"
+                role="switch"
+                checked={data.me?.chatEnabled === true}
+                onChange={() => void chooseChat(data.me?.chatEnabled !== true)}
+              />
+              {t('owner.chat')}
+            </label>
+            {chatError ? <p className="text-sm text-busy-busy">{t('owner.chatError')}</p> : null}
           </section>
           <form className="space-y-4 rounded-3xl bg-canvas p-5 md:p-6" onSubmit={(e) => void onSubmit(e)}>
             <h2 className="micro-label text-muted">{t('owner.passwordTitle')}</h2>
