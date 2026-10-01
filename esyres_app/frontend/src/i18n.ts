@@ -320,6 +320,7 @@ void i18n.use(initReactI18next).init({
           closed: 'Zatvoreno',
           dayFree: 'Slobodno',
           pendingFor: 'Na čekanju',
+          pendingJump: 'Na čekanju · {{count}}',
           noPending: 'Nema novih zahtjeva za ovaj dan.',
           noBookings: 'Nema zapisa za ovaj dan.',
           kanban: {

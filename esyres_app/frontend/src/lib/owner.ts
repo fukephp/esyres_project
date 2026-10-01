@@ -17,6 +17,18 @@ export function isYmd(value: string): boolean {
   return dt.getUTCFullYear() === year && dt.getUTCMonth() === month - 1 && dt.getUTCDate() === day
 }
 
+export function nextPendingDay(selected: string, dates: readonly string[]): string | null {
+  if (dates.length === 0) {
+    return null
+  }
+  const index = dates.indexOf(selected)
+  if (index === -1) {
+    return dates[0]
+  }
+
+  return dates[index + 1] ?? dates[0]
+}
+
 export function ownerDateFromSearch(param: string | null, today = sarajevoToday()): string {
   if (param !== null && isYmd(param)) {
     return param

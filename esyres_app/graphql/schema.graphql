@@ -266,6 +266,11 @@ type SalonStats {
     hours: [SalonStatsHour!]!
 }
 
+type PendingJump {
+    count: Int!
+    dates: [String!]!
+}
+
 type Query {
     vapidPublicKey: String!
     me: User
@@ -274,6 +279,7 @@ type Query {
     salonsNearby(lat: Float!, lng: Float!, limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
     popularInSarajevo(limit: Int = 20, offset: Int = 0, category: String, name: String): [Salon!]!
     pendingBookings(salonId: ID!, date: String!, limit: Int = 20, offset: Int = 0): [Booking!]!
+    pendingJump(salonId: ID!): PendingJump!
     salonDayBookings(salonId: ID!, date: String!, origin: BookingOrigin): [Booking!]! @field(resolver: "App\\GraphQL\\Queries\\SalonDayBookings")
     occupyingBookings(salonId: ID!, date: String!): [Booking!]!
     occupyingBookingsRange(salonId: ID!, from: String!, to: String!): [Booking!]!

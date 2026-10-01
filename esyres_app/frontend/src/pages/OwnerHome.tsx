@@ -24,11 +24,13 @@ import {
   OCCUPYING_BOOKINGS_RANGE_QUERY,
   OWNER_SALON_QUERY,
   PENDING_BOOKINGS_QUERY,
+  PENDING_JUMP_QUERY,
   SALON_DAY_BOOKINGS_QUERY,
   type OccupyingBookingsRangeData,
   type OwnerSalonData,
   type PendingBooking,
   type PendingBookingsData,
+  type PendingJumpData,
   type SalonDayBookingsData,
 } from '../graphql/pending'
 import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekGrid, WeekHeader } from '../components/OwnerBoards'
@@ -49,6 +51,7 @@ import {
   kanbanGroups,
   occupiedElapsedShare,
   occupyingSarajevoYmd,
+  nextPendingDay,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
@@ -84,6 +87,11 @@ export function OwnerHome() {
     variables: { salonId: salon?.id ?? '', date, limit: 50 },
     skip: !ownerReady,
   })
+  const { data: jumpData, loading: jumpLoading, refetch: refetchJump } = useQuery<PendingJumpData>(PENDING_JUMP_QUERY, {
+    variables: { salonId: salon?.id ?? '' },
+    skip: !ownerReady,
+  })
+  const jump = jumpLoading ? undefined : jumpData?.pendingJump
   const { data: board } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
     variables: { id: salon?.id ?? '' },
     skip: !ownerReady,
@@ -100,6 +108,7 @@ export function OwnerHome() {
   })
   function refetchAll() {
     void refetchQueue()
+    void refetchJump()
     if (kanban) {
       void refetchDay()
     } else {
@@ -158,6 +167,7 @@ export function OwnerHome() {
     }
     return [
       { query: PENDING_BOOKINGS_QUERY, variables: { salonId: salon.id, date, limit: 50 } },
+      { query: PENDING_JUMP_QUERY, variables: { salonId: salon.id } },
       kanban
         ? { query: SALON_DAY_BOOKINGS_QUERY, variables: { salonId: salon.id, date, origin: null } }
         : { query: OCCUPYING_BOOKINGS_RANGE_QUERY, variables: { salonId: salon.id, from: week.from, to: week.to } },
@@ -369,13 +379,29 @@ export function OwnerHome() {
         active="queue"
         onSalon={onSalon}
         action={
-          <button
-            type="button"
-            onClick={() => setPhoneOpen(true)}
-            className="inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-canvas active:scale-[0.98] active:bg-[#242424]"
-          >
-            {t('owner.phone.button')}
-          </button>
+          <>
+            {jump !== undefined && jump.count > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const landed = nextPendingDay(date, jump.dates)
+                  if (landed !== null) {
+                    onDate(landed)
+                  }
+                }}
+                className="inline-flex h-11 items-center rounded-full bg-pastel-pink px-6 text-sm font-semibold text-ink active:scale-[0.98]"
+              >
+                {t('owner.pendingJump', { count: jump.count })}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setPhoneOpen(true)}
+              className="inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-canvas active:scale-[0.98] active:bg-[#242424]"
+            >
+              {t('owner.phone.button')}
+            </button>
+          </>
         }
       >
         {kanban ? (

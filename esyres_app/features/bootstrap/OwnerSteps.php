@@ -659,6 +659,37 @@ GQL);
     }
 
     /**
+     * @When I query pending jump
+     */
+    public function iQueryPendingJump(): void
+    {
+        $this->graphql($this->pendingJumpQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @When I query pending jump as a guest
+     */
+    public function iQueryPendingJumpAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->pendingJumpQuery(), [
+            'salonId' => (string) $this->salon->id,
+        ]);
+    }
+
+    /**
+     * @Then pending jump matches:
+     */
+    public function pendingJumpMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode(trim($payload->getRaw()), true);
+        $this->assertSame($expected, $this->graphql['data']['pendingJump']);
+    }
+
+    /**
      * @Given that booking is time proposed on :date at :time
      */
     public function thatBookingIsTimeProposedOn(string $date, string $time): void
@@ -1910,6 +1941,18 @@ query SalonDayBookings($salonId: ID!, $date: String!, $origin: BookingOrigin) {
     preferredStartsAt
     proposedStartsAt
     services { name }
+  }
+}
+GQL;
+    }
+
+    private function pendingJumpQuery(): string
+    {
+        return <<<'GQL'
+query PendingJump($salonId: ID!) {
+  pendingJump(salonId: $salonId) {
+    count
+    dates
   }
 }
 GQL;
