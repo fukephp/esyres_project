@@ -3,6 +3,7 @@
 use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Salon;
+use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
@@ -600,6 +601,35 @@ GQL, [
             throw new RuntimeException('Salon worker fixture is missing');
         }
         $this->postCreateBooking($date, $time, $this->salonServiceIds(), (string) $this->worker->id);
+    }
+
+    /**
+     * @When I create a booking at the other salon on :date at :time with service :name
+     */
+    public function iCreateABookingAtTheOtherSalon(string $date, string $time, string $name): void
+    {
+        if ($this->otherSalon === null) {
+            throw new RuntimeException('Other salon fixture is missing');
+        }
+        $this->otherSalon->hours = $this->salon->hours;
+        $this->otherSalon->save();
+        $category = SalonServiceCategory::firstOrCreateLegacy((int) $this->otherSalon->id, 'HAIR');
+        $service = Service::query()->firstOrCreate(
+            ['salon_id' => $this->otherSalon->id, 'name' => $name],
+            [
+                'service_category_id' => $category->id,
+                'duration_minutes' => 30,
+                'price_feninga' => 2500,
+            ],
+        );
+        $this->graphql($this->createBookingMutation(), [
+            'input' => [
+                'salonId' => (string) $this->otherSalon->id,
+                'serviceIds' => [(string) $service->id],
+                'preferredDate' => $date,
+                'preferredTime' => $time,
+            ],
+        ]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\GraphQL\Mutations;
 
 use App\Booking\PreferredClock;
+use App\Booking\SameDayService;
 use App\Exceptions\ClientError;
 use App\GraphQL\BroadcastRescheduled;
 use App\GraphQL\CustomerAccess;
@@ -28,6 +29,7 @@ final class RequestReschedule
             }
             $starts = PreferredClock::parse($args['preferredDate'], $args['preferredTime']);
             PreferredClock::assertOpenWeekday($salon, $args['preferredDate']);
+            SameDayService::assertForBooking($booking, $args['preferredDate']);
 
             $booking->reschedule_date = $args['preferredDate'];
             $booking->reschedule_starts_at = $starts;

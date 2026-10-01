@@ -3,6 +3,7 @@
 namespace App\GraphQL\Mutations;
 
 use App\Booking\PreferredClock;
+use App\Booking\SameDayService;
 use App\GraphQL\BroadcastCustomerResponded;
 use App\GraphQL\CustomerAccess;
 use App\Push\OwnerPush;
@@ -23,6 +24,7 @@ final class AskOtherTime
             $booking = CustomerAccess::lockedMine($user, $args['bookingId']);
             $starts = PreferredClock::parse($args['preferredDate'], $args['preferredTime']);
             PreferredClock::assertOpenWeekday($booking->salon, $args['preferredDate']);
+            SameDayService::assertForBooking($booking, $args['preferredDate']);
 
             $booking->preferred_date = $args['preferredDate'];
             $booking->preferred_starts_at = $starts;

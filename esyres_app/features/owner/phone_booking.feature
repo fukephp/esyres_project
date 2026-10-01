@@ -152,7 +152,7 @@ Feature: Phone booking
     Then the stored booking origin is "picker"
     When I upsert a new assistant intake as a guest
     And I log in as "ana@example.com" with password "secret-pass"
-    And I create a booking on "2026-08-31" at "11:00" with the salon services and the intake token
+    And I create a booking on "2026-09-01" at "11:00" with the salon services and the intake token
     Then the stored booking origin is "assistant"
 
   Scenario: Backfill marks an intake-linked row as assistant

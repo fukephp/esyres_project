@@ -43,6 +43,7 @@ void i18n.use(initReactI18next).init({
             OUTSIDE_HOURS: 'Van radnog vremena.',
             DURING_BREAK: 'Termin pada u pauzu.',
             SLOT_TAKEN: 'Taj termin je zauzet.',
+            SAME_DAY_SERVICE: 'Već imaš ovu uslugu tog dana.',
             INVALID_CREDENTIALS: 'Pogrešan email ili lozinka.',
             fallback: 'Zahtjev nije poslan.',
           },
@@ -199,6 +200,7 @@ void i18n.use(initReactI18next).init({
             INVALID_TIME: 'Neispravan datum ili vrijeme.',
             FORBIDDEN: 'Zahtjev nije tvoj.',
             SLOT_TAKEN: 'Taj termin je zauzet.',
+            SAME_DAY_SERVICE: 'Već imaš ovu uslugu tog dana.',
             fallback: 'Odgovor nije poslan.',
           },
           rescheduleError: {
@@ -211,6 +213,7 @@ void i18n.use(initReactI18next).init({
             INVALID_DATE: 'Neispravan datum ili vrijeme.',
             INVALID_TIME: 'Neispravan datum ili vrijeme.',
             FORBIDDEN: 'Zahtjev nije tvoj.',
+            SAME_DAY_SERVICE: 'Već imaš ovu uslugu tog dana.',
             fallback: 'Premještaj nije poslan.',
           },
           cancelError: {

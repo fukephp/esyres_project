@@ -93,6 +93,7 @@ test('rescheduleErrorKey maps known codes', () => {
   expect(rescheduleErrorKey('RESCHEDULE_DISABLED')).toBe('RESCHEDULE_DISABLED')
   expect(rescheduleErrorKey('EMAIL_UNVERIFIED')).toBe('EMAIL_UNVERIFIED')
   expect(rescheduleErrorKey('SLOT_TAKEN')).toBe('fallback')
+  expect(rescheduleErrorKey('SAME_DAY_SERVICE')).toBe('SAME_DAY_SERVICE')
   expect(rescheduleErrorKey(null)).toBe('fallback')
 })
 
@@ -115,6 +116,7 @@ test('respondErrorKey maps known codes', () => {
   expect(respondErrorKey('INVALID_TIME')).toBe('INVALID_TIME')
   expect(respondErrorKey('FORBIDDEN')).toBe('FORBIDDEN')
   expect(respondErrorKey('SLOT_TAKEN')).toBe('SLOT_TAKEN')
+  expect(respondErrorKey('SAME_DAY_SERVICE')).toBe('SAME_DAY_SERVICE')
   expect(respondErrorKey('NOT_REQUESTED')).toBe('fallback')
   expect(respondErrorKey(null)).toBe('fallback')
 })

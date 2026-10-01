@@ -69,6 +69,7 @@ const RESPOND_ERROR_KEYS = [
   'INVALID_TIME',
   'FORBIDDEN',
   'SLOT_TAKEN',
+  'SAME_DAY_SERVICE',
 ] as const
 
 export type RespondErrorKey = (typeof RESPOND_ERROR_KEYS)[number] | 'fallback'
@@ -99,6 +100,7 @@ const RESCHEDULE_ERROR_KEYS = [
   'INVALID_DATE',
   'INVALID_TIME',
   'FORBIDDEN',
+  'SAME_DAY_SERVICE',
 ] as const
 
 export type RescheduleErrorKey = (typeof RESCHEDULE_ERROR_KEYS)[number] | 'fallback'
