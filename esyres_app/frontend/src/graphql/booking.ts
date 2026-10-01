@@ -75,7 +75,7 @@ export type CreateBookingInput = {
   serviceIds: string[]
   workerId?: string
   preferredDate: string
-  preferredTime: string
+  preferredTime?: string
   intakeToken?: string
 }
 
@@ -83,8 +83,8 @@ export type MyBooking = {
   id: string
   status: 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLINED' | 'CANCELLED'
   preferredDate: string
-  preferredStartsAt: string
-  preferredStartsAtLabel: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel: string | null
   durationMinutes: number
   worker: { id: string; name: string } | null
   proposedStartsAt: string | null

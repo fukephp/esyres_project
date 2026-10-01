@@ -34,6 +34,7 @@ test('nothing tappable when every row is booked or past', () => {
 test('guest quarter copy', () => {
   expect(i18n.t('salon.quarter.booked')).toBe('Zauzet')
   expect(i18n.t('salon.quarter.none')).toBe('Nema slobodnog termina.')
+  expect(i18n.t('salon.quarter.dayOnly')).toBe('Možeš poslati i bez vremena.')
   expect(i18n.t('salon.gate.SLOT_TAKEN')).toBe('Taj termin je zauzet.')
   expect(i18n.t('salon.gate.OUTSIDE_HOURS')).toBe('Van radnog vremena.')
   expect(i18n.t('salon.gate.DURING_BREAK')).toBe('Termin pada u pauzu.')

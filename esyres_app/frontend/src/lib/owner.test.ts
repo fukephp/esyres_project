@@ -253,6 +253,7 @@ test('freeWorkers lists names that do not overlap the range', () => {
   expect(freeWorkers(workers, '11:00', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
   expect(freeWorkers(workers, '11:30', 30, blocks).map((row) => row.name)).toEqual(['Lejla', 'Amina'])
   expect(freeWorkers(workers, '10:45', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
+  expect(freeWorkers(workers, null, 30, blocks)).toEqual([])
 })
 
 test('owner queue path omits today', () => {

@@ -1358,6 +1358,22 @@ GQL, ['id' => (string) $this->salon->id]);
     }
 
     /**
+     * @Then pending booking :name has no preferred start
+     */
+    public function pendingBookingHasNoPreferredStart(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->graphql['data']['pendingBookings'] as $row) {
+            if ($row['customerName'] === $name) {
+                $this->assertNull($row['preferredStartsAt']);
+
+                return;
+            }
+        }
+        $this->fail('Pending booking missing: '.$name);
+    }
+
+    /**
      * @Then the first pending booking matches:
      */
     public function theFirstPendingBookingMatches(PyStringNode $payload): void

@@ -330,7 +330,7 @@ export function OwnerRequestDetail() {
         ) : ownerDetailMode(booking.status) === 'bounce' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -349,7 +349,7 @@ export function OwnerRequestDetail() {
               {occupyingBlock(booking) === null
                 ? booking.status === 'TIME_PROPOSED' && booking.proposedStartsAtLabel !== null
                   ? booking.proposedStartsAtLabel
-                  : booking.preferredStartsAtLabel
+                  : (booking.preferredStartsAtLabel ?? t('owner.noTime'))
                 : occupyingClockRange(
                     occupyingBlock(booking)!.start,
                     occupyingBlock(booking)!.durationMinutes,
@@ -390,7 +390,7 @@ export function OwnerRequestDetail() {
         ) : ownerDetailMode(booking.status) === 'form' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -413,7 +413,7 @@ export function OwnerRequestDetail() {
                     services: booking.services,
                     workerName: booking.worker?.name ?? null,
                     preferredDate: booking.intake?.preferredDate ?? booking.preferredDate,
-                    preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel,
+                    preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel ?? '',
                     noPreference: t('salon.noPreference'),
                   }).map((line) => (
                     <li key={line.step}>
@@ -583,7 +583,7 @@ function PriorMemory({
   const rows = booking.priorConfirmedBookings ?? []
   const stamped = booking.noShowAt != null && booking.noShowAt !== ''
   const canMark =
-    booking.status === 'CONFIRMED' && !stamped && Date.parse(booking.preferredStartsAt) <= Date.now()
+    booking.status === 'CONFIRMED' && !stamped && booking.preferredStartsAt !== null && Date.parse(booking.preferredStartsAt) <= Date.now()
 
   return (
     <div className="mt-4">
@@ -638,7 +638,7 @@ function PhoneCancel({
   onConfirm: () => void
 }) {
   const { t } = useTranslation()
-  const beforeStart = booking.status === 'CONFIRMED' && Date.parse(booking.preferredStartsAt) > Date.now()
+  const beforeStart = booking.status === 'CONFIRMED' && booking.preferredStartsAt !== null && Date.parse(booking.preferredStartsAt) > Date.now()
   if (booking.origin !== 'PHONE' || !beforeStart) {
     return null
   }

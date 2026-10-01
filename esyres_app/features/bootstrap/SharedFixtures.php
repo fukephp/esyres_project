@@ -104,6 +104,14 @@ trait SharedFixtures
     }
 
     /**
+     * @Given the salon has a day-only requested booking on :date for :name
+     */
+    public function theSalonHasADayOnlyRequestedBooking(string $date, string $name): void
+    {
+        $this->insertRequestedBooking($this->salon, $date, '', $name, null);
+    }
+
+    /**
      * @Given the other salon has a requested booking on :date at :time for :name
      */
     public function theOtherSalonHasARequestedBooking(string $date, string $time, string $name): void
@@ -418,7 +426,7 @@ trait SharedFixtures
             'phone' => '+38761'.substr(sha1($name.$date.$time.uniqid('', true)), 0, 6),
             'phone_verified_at' => now(),
         ]);
-        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $starts = $time === '' ? null : Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
         $booking = new Booking;
         $booking->salon_id = $salon->id;
         $booking->customer_id = $customer->id;

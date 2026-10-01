@@ -88,14 +88,18 @@ export function isPreferredSoon(iso: string, now = new Date()): boolean {
 
 export function freeWorkers<T extends { id: string }>(
   workers: T[],
-  start: string,
+  start: string | null,
   durationMinutes: number,
   blocks: { workerId: string; start: string; durationMinutes: number }[],
 ): T[] {
+  if (clockMinutes(start ?? '') === null) {
+    return []
+  }
+
   return workers.filter(
     (worker) =>
       !blocks.some(
-        (block) => block.workerId === worker.id && clockOverlaps(start, durationMinutes, block.start, block.durationMinutes),
+        (block) => block.workerId === worker.id && clockOverlaps(start ?? '', durationMinutes, block.start, block.durationMinutes),
       ),
   )
 }
@@ -173,13 +177,13 @@ export function queueRowClock(row: {
 export function queueRowLabel(row: {
   reschedulePending: boolean
   rescheduleStartsAtLabel: string | null
-  preferredStartsAtLabel: string
+  preferredStartsAtLabel: string | null
 }): string {
   if (row.reschedulePending && row.rescheduleStartsAtLabel !== null) {
     return row.rescheduleStartsAtLabel
   }
 
-  return row.preferredStartsAtLabel
+  return row.preferredStartsAtLabel ?? ''
 }
 
 export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'NOT_RESCHEDULE' | 'fallback' {
@@ -815,8 +819,8 @@ export function assistantTranscriptLines(input: {
 
 export function occupyingBlock(row: {
   status: string
-  preferredStartsAt: string
-  preferredStartsAtLabel?: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel?: string | null
   proposedStartsAt: string | null
   proposedStartsAtLabel?: string | null
   durationMinutes: number
@@ -834,7 +838,7 @@ export function occupyingBlock(row: {
       label,
     }
   }
-  if (row.status === 'CONFIRMED' && row.worker !== null) {
+  if (row.status === 'CONFIRMED' && row.worker !== null && row.preferredStartsAt !== null) {
     return {
       workerId: row.worker.id,
       start: row.preferredStartsAtLabel ?? formatSarajevoTime(row.preferredStartsAt),
@@ -982,7 +986,7 @@ export function occupiedElapsedShare(date: string, startHHmm: string, durationMi
 
 export function occupyingStartIso(row: {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
 }): string | null {
   if (row.status === 'TIME_PROPOSED') {
@@ -997,7 +1001,7 @@ export function occupyingStartIso(row: {
 
 export function occupyingSarajevoYmd(row: {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
 }): string | null {
   const iso = occupyingStartIso(row)
@@ -1091,28 +1095,28 @@ export const STATUS_CARD_CLASS: Record<KanbanColumn, string> = {
   done: 'bg-status-done',
 }
 
-export function bookingStartIso(row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null }): string {
+export function bookingStartIso(row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null }): string {
   if (row.status === 'TIME_PROPOSED' && row.proposedStartsAt !== null) {
     return row.proposedStartsAt
   }
 
-  return row.preferredStartsAt
+  return row.preferredStartsAt ?? ''
 }
 
 export function bookingStartLabel(row: {
   status: string
-  preferredStartsAtLabel: string
+  preferredStartsAtLabel: string | null
   proposedStartsAtLabel: string | null
 }): string {
   if (row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null) {
     return row.proposedStartsAtLabel
   }
 
-  return row.preferredStartsAtLabel
+  return row.preferredStartsAtLabel ?? ''
 }
 
 export function kanbanColumn(
-  row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null },
+  row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null },
   now = new Date(),
 ): KanbanColumn {
   if (row.status === 'REQUESTED') {
@@ -1121,14 +1125,14 @@ export function kanbanColumn(
   if (row.status === 'TIME_PROPOSED') {
     return 'proposed'
   }
-  if (row.status === 'CONFIRMED' && new Date(row.preferredStartsAt).getTime() >= now.getTime()) {
+  if (row.status === 'CONFIRMED' && row.preferredStartsAt !== null && new Date(row.preferredStartsAt).getTime() >= now.getTime()) {
     return 'confirmed'
   }
 
   return 'done'
 }
 
-export function kanbanGroups<T extends { status: string; preferredStartsAt: string; proposedStartsAt: string | null }>(
+export function kanbanGroups<T extends { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null }>(
   rows: T[],
   now = new Date(),
 ): Record<KanbanColumn, T[]> {
@@ -1147,7 +1151,7 @@ export type SelectedDayRestItem<T> =
 
 export function mixRestWithBreak<T extends {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
   durationMinutes: number
   worker: { id: string } | null

@@ -859,6 +859,41 @@ GQL, [
     }
 
     /**
+     * @When I create a day-only booking on :date with the salon services
+     */
+    public function iCreateADayOnlyBooking(string $date): void
+    {
+        $this->postCreateBooking($date, '', $this->salonServiceIds(), null);
+    }
+
+    /**
+     * @When I create a day-only booking on :date with the salon services and the intake token
+     */
+    public function iCreateADayOnlyBookingWithIntake(string $date): void
+    {
+        $this->postCreateBooking($date, '', $this->salonServiceIds(), null, $this->intakeToken);
+    }
+
+    /**
+     * @Then the created booking has no preferred start
+     */
+    public function theCreatedBookingHasNoPreferredStart(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNull($this->graphql['data']['createBooking']['preferredStartsAt']);
+        $this->assertNull($this->graphql['data']['createBooking']['preferredStartsAtLabel']);
+    }
+
+    /**
+     * @Then the created booking preferred start label is :time
+     */
+    public function theCreatedBookingPreferredStartLabelIs(string $time): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($time, $this->graphql['data']['createBooking']['preferredStartsAtLabel']);
+    }
+
+    /**
      * @Then the intake token is a uuid
      */
     public function theIntakeTokenIsAUuid(): void
@@ -1416,8 +1451,10 @@ GQL;
             'salonId' => (string) $this->salon->id,
             'serviceIds' => $serviceIds,
             'preferredDate' => $date,
-            'preferredTime' => $time,
         ];
+        if ($time !== '') {
+            $input['preferredTime'] = $time;
+        }
         if ($workerId !== null) {
             $input['workerId'] = $workerId;
         }

@@ -123,8 +123,8 @@ type Booking {
     id: ID!
     status: BookingStatus! @method(name: "graphqlStatus")
     preferredDate: String! @method(name: "preferredDateString")
-    preferredStartsAt: String! @method(name: "preferredStartsAtIso")
-    preferredStartsAtLabel: String! @method(name: "preferredStartsAtLabel")
+    preferredStartsAt: String @method(name: "preferredStartsAtIso")
+    preferredStartsAtLabel: String @method(name: "preferredStartsAtLabel")
     durationMinutes: Int! @rename(attribute: "duration_minutes")
     customerName: String! @method(name: "customerName")
     worker: Worker
@@ -166,7 +166,7 @@ input CreateBookingInput {
     serviceIds: [ID!]!
     workerId: ID
     preferredDate: String!
-    preferredTime: String!
+    preferredTime: String
     intakeToken: String
 }
 

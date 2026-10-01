@@ -281,12 +281,7 @@ export function SalonProfile() {
     preferredDate !== '' &&
     (pickerDay === undefined || pickerDay.closed || pickerDay.opensAt === null || pickerDay.closesAt === null)
   const quarterPast = (time: string) => quarterStartPast(preferredDate, time, date, new Date())
-  const canSendPicker =
-    chosen.length > 0 &&
-    preferredDate !== '' &&
-    !pickerClosed &&
-    quarters !== null &&
-    quarters.some((row) => row.time === preferredTime && !row.booked && !quarterPast(row.time))
+  const canSendPicker = chosen.length > 0 && preferredDate !== '' && !pickerClosed
 
   function toggle(service: SalonService) {
     setSelected((ids) => (ids.includes(service.id) ? ids.filter((sid) => sid !== service.id) : [...ids, service.id]))
@@ -333,7 +328,9 @@ export function SalonProfile() {
       salonId: id,
       serviceIds: selected,
       preferredDate,
-      preferredTime,
+    }
+    if (preferredTime !== '') {
+      input.preferredTime = preferredTime
     }
     const workerId = bookingWorkerId(workerChoice)
     if (workerId !== undefined) {
@@ -587,6 +584,9 @@ export function SalonProfile() {
                   {pickerClosed ? <p className="mt-2 text-sm text-body">{t('salon.gate.SALON_CLOSED')}</p> : null}
                   {!pickerClosed && quarters !== null && quarterNoneTappable(quarters, quarterPast) ? (
                     <p className="mt-2 text-sm text-body">{t('salon.quarter.none')}</p>
+                  ) : null}
+                  {!pickerClosed && quarters !== null && quarters.length > 0 && preferredTime === '' ? (
+                    <p className="mt-2 text-sm text-muted">{t('salon.quarter.dayOnly')}</p>
                   ) : null}
                   {!pickerClosed && quarters !== null && quarters.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-2">

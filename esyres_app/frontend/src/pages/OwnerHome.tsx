@@ -482,7 +482,7 @@ export function OwnerHome({
                           key={row.id}
                           row={row}
                           to={`/owner/requests/${row.id}`}
-                          progress={ymd !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
+                          progress={ymd !== null && row.preferredStartsAtLabel !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
                         />
                       )
                     })
@@ -593,7 +593,7 @@ function QueueRow({
           {queueChipInitial(row.customerName)}
         </span>
         <div className="min-w-0 flex-1">
-      <p className="text-xs font-semibold tabular-nums text-ink">{clock}</p>
+      <p className="text-xs font-semibold tabular-nums text-ink">{clock || t('owner.noTime')}</p>
       <p className="font-semibold text-ink">
         {row.customerName}
         {' · '}

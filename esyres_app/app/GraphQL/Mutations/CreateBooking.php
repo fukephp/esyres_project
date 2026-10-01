@@ -21,7 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 final class CreateBooking
 {
     /**
-     * @param  array{input: array{salonId: string, serviceIds: list<string>, workerId?: string|null, preferredDate: string, preferredTime: string, intakeToken?: string|null}}  $args
+     * @param  array{input: array{salonId: string, serviceIds: list<string>, workerId?: string|null, preferredDate: string, preferredTime?: string|null, intakeToken?: string|null}}  $args
      */
     public function __invoke(mixed $root, array $args, GraphQLContext $context): Booking
     {
@@ -37,18 +37,24 @@ final class CreateBooking
         }
 
         $input = $args['input'];
-        $starts = $this->preferredStarts($input['preferredDate'], $input['preferredTime']);
+        $time = $input['preferredTime'] ?? null;
+        $starts = is_string($time) && $time !== ''
+            ? $this->preferredStarts($input['preferredDate'], $time)
+            : $this->openDate($input['preferredDate']);
         $salon = Salon::query()->find($input['salonId']);
         if ($salon === null) {
             throw new ClientError('INVALID_SERVICES');
         }
         $this->assertOpenWeekday($salon, $input['preferredDate']);
         $this->assertIntakeNotTakenOver($salon->id, $input['intakeToken'] ?? null);
+        if ($starts === null && $this->willAttachIntake($salon->id, $input['intakeToken'] ?? null)) {
+            throw new ClientError('INVALID_TIME');
+        }
 
         $services = $this->services($salon, $input['serviceIds']);
         $workerId = $this->workerId($salon, $input['workerId'] ?? null);
         $duration = Booking::roundUp15(array_sum(array_map(fn (Service $s): int => $s->duration_minutes, $services)));
-        if (! $this->willAttachIntake($salon->id, $input['intakeToken'] ?? null)) {
+        if ($starts !== null && ! $this->willAttachIntake($salon->id, $input['intakeToken'] ?? null)) {
             $block = QuarterStarts::pickerBlock($salon, $starts, $duration, $workerId);
             if ($block !== null) {
                 throw new ClientError($block);
@@ -108,6 +114,15 @@ final class CreateBooking
         }
 
         return $local->utc();
+    }
+
+    private function openDate(string $date): null
+    {
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $m) !== 1 || ! checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+            throw new ClientError('INVALID_DATE');
+        }
+
+        return null;
     }
 
     private function assertOpenWeekday(Salon $salon, string $date): void

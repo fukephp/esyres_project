@@ -4,7 +4,7 @@
 |-------|--------|
 | ID | STORY-92 |
 | Epic | 2 — Booking Request Flow (Customer) |
-| Loop | — |
+| Loop | STORY-92 |
 | Depends on | STORY-89, STORY-84, STORY-13 |
 
 ## User story
