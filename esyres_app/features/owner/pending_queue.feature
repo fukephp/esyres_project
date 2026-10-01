@@ -133,6 +133,22 @@ Feature: Owner pending queue for a day
     And I query pending bookings for date "nope"
     Then the GraphQL error code is "INVALID_DATE"
 
+  Scenario: Day-only rows follow timed rows, oldest first
+    Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
+    And the salon has a day-only requested booking on "2026-08-29" for "Ana"
+    And the salon has a requested booking on "2026-08-29" at "15:00" for "Ena"
+    And the salon has a requested booking on "2026-08-29" at "10:00" for "Lejla"
+    And the salon has a day-only requested booking on "2026-08-29" for "Mina"
+    When I log in as "owner@example.com" with password "secret-pass"
+    And I query pending bookings for date "2026-08-29"
+    Then pending booking names are:
+      """
+      ["Lejla", "Ena", "Ana", "Mina"]
+      """
+    And pending booking "Ana" has no preferred start
+    And pending booking "Mina" has no preferred start
+
+
   Scenario: Invalid page is rejected
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
     When I log in as "owner@example.com" with password "secret-pass"

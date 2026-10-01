@@ -86,6 +86,43 @@ export function isPreferredSoon(iso: string, now = new Date()): boolean {
   return start <= now.getTime() + TWO_HOURS_MS
 }
 
+export function freeWorkers<T extends { id: string }>(
+  workers: T[],
+  start: string | null,
+  durationMinutes: number,
+  blocks: { workerId: string; start: string; durationMinutes: number }[],
+): T[] {
+  if (clockMinutes(start ?? '') === null) {
+    return []
+  }
+
+  return workers.filter(
+    (worker) =>
+      !blocks.some(
+        (block) => block.workerId === worker.id && clockOverlaps(start ?? '', durationMinutes, block.start, block.durationMinutes),
+      ),
+  )
+}
+
+function clockOverlaps(start: string, duration: number, otherStart: string, otherDuration: number): boolean {
+  const from = clockMinutes(start)
+  const other = clockMinutes(otherStart)
+  if (from === null || other === null) {
+    return false
+  }
+
+  return from < other + otherDuration && other < from + duration
+}
+
+function clockMinutes(value: string): number | null {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (match === null) {
+    return null
+  }
+
+  return Number(match[1]) * 60 + Number(match[2])
+}
+
 export function canAcceptPreferredTime(worker: { id: string } | null): boolean {
   return worker !== null
 }
@@ -140,13 +177,13 @@ export function queueRowClock(row: {
 export function queueRowLabel(row: {
   reschedulePending: boolean
   rescheduleStartsAtLabel: string | null
-  preferredStartsAtLabel: string
+  preferredStartsAtLabel: string | null
 }): string {
   if (row.reschedulePending && row.rescheduleStartsAtLabel !== null) {
     return row.rescheduleStartsAtLabel
   }
 
-  return row.preferredStartsAtLabel
+  return row.preferredStartsAtLabel ?? ''
 }
 
 export function acceptErrorKey(code: string | null): 'SLOT_TAKEN' | 'NOT_REQUESTED' | 'NOT_RESCHEDULE' | 'fallback' {
@@ -487,9 +524,15 @@ export function requestFromZapisiPath(
   origin: ZapisiOrigin | null = null,
 ): string {
   const list = ownerZapisiPath(date, today, salonId, firstOwnedId, origin)
-  const extra = list.includes('?') ? `&${list.slice(list.indexOf('?') + 1)}` : ''
+  const query = list.includes('?') ? list.slice(list.indexOf('?')) : ''
 
-  return `/owner/requests/${bookingId}?from=zapisi${extra}`
+  return `/owner/requests/${bookingId}${query}`
+}
+
+export function boardSearchParams(board: string): URLSearchParams {
+  const query = board.includes('?') ? board.slice(board.indexOf('?') + 1) : ''
+
+  return new URLSearchParams(query)
 }
 
 export function ownerPhonePath(
@@ -776,8 +819,8 @@ export function assistantTranscriptLines(input: {
 
 export function occupyingBlock(row: {
   status: string
-  preferredStartsAt: string
-  preferredStartsAtLabel?: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel?: string | null
   proposedStartsAt: string | null
   proposedStartsAtLabel?: string | null
   durationMinutes: number
@@ -795,7 +838,7 @@ export function occupyingBlock(row: {
       label,
     }
   }
-  if (row.status === 'CONFIRMED' && row.worker !== null) {
+  if (row.status === 'CONFIRMED' && row.worker !== null && row.preferredStartsAt !== null) {
     return {
       workerId: row.worker.id,
       start: row.preferredStartsAtLabel ?? formatSarajevoTime(row.preferredStartsAt),
@@ -943,7 +986,7 @@ export function occupiedElapsedShare(date: string, startHHmm: string, durationMi
 
 export function occupyingStartIso(row: {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
 }): string | null {
   if (row.status === 'TIME_PROPOSED') {
@@ -958,7 +1001,7 @@ export function occupyingStartIso(row: {
 
 export function occupyingSarajevoYmd(row: {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
 }): string | null {
   const iso = occupyingStartIso(row)
@@ -1041,39 +1084,53 @@ export function occupyingByDay<T extends {
     .sort((a, b) => (occupyingStartIso(a) ?? '').localeCompare(occupyingStartIso(b) ?? ''))
 }
 
-export type KanbanColumn = 'pending' | 'proposed' | 'confirmed' | 'done'
+export type KanbanColumn = 'inProgress' | 'pending' | 'proposed' | 'confirmed' | 'done'
 
-export const KANBAN_COLUMNS: KanbanColumn[] = ['pending', 'proposed', 'confirmed', 'done']
+export const KANBAN_COLUMNS: KanbanColumn[] = ['inProgress', 'pending', 'proposed', 'confirmed', 'done']
+
+export function visibleKanbanColumns(showInProgress: boolean, showFinished: boolean): KanbanColumn[] {
+  return KANBAN_COLUMNS.filter((column) => {
+    if (column === 'inProgress') {
+      return showInProgress
+    }
+    if (column === 'done') {
+      return showFinished
+    }
+
+    return true
+  })
+}
 
 export const STATUS_CARD_CLASS: Record<KanbanColumn, string> = {
+  inProgress: 'bg-status-confirmed',
   pending: 'bg-status-pending',
   proposed: 'bg-status-proposed',
   confirmed: 'bg-status-confirmed',
   done: 'bg-status-done',
 }
 
-export function bookingStartIso(row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null }): string {
+export function bookingStartIso(row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null }): string {
   if (row.status === 'TIME_PROPOSED' && row.proposedStartsAt !== null) {
     return row.proposedStartsAt
   }
 
-  return row.preferredStartsAt
+  return row.preferredStartsAt ?? ''
 }
 
 export function bookingStartLabel(row: {
   status: string
-  preferredStartsAtLabel: string
+  preferredStartsAtLabel: string | null
   proposedStartsAtLabel: string | null
 }): string {
   if (row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null) {
     return row.proposedStartsAtLabel
   }
 
-  return row.preferredStartsAtLabel
+  return row.preferredStartsAtLabel ?? ''
 }
 
 export function kanbanColumn(
-  row: { status: string; preferredStartsAt: string; proposedStartsAt: string | null },
+  row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null; durationMinutes?: number },
   now = new Date(),
 ): KanbanColumn {
   if (row.status === 'REQUESTED') {
@@ -1082,18 +1139,26 @@ export function kanbanColumn(
   if (row.status === 'TIME_PROPOSED') {
     return 'proposed'
   }
-  if (row.status === 'CONFIRMED' && new Date(row.preferredStartsAt).getTime() >= now.getTime()) {
-    return 'confirmed'
+  if (row.status === 'CONFIRMED' && row.preferredStartsAt !== null) {
+    const start = new Date(row.preferredStartsAt).getTime()
+    const end = start + (row.durationMinutes ?? 0) * 60_000
+    const t = now.getTime()
+    if (t < start) {
+      return 'confirmed'
+    }
+    if (t < end) {
+      return 'inProgress'
+    }
   }
 
   return 'done'
 }
 
-export function kanbanGroups<T extends { status: string; preferredStartsAt: string; proposedStartsAt: string | null }>(
+export function kanbanGroups<T extends { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null; durationMinutes?: number }>(
   rows: T[],
   now = new Date(),
 ): Record<KanbanColumn, T[]> {
-  const groups: Record<KanbanColumn, T[]> = { pending: [], proposed: [], confirmed: [], done: [] }
+  const groups: Record<KanbanColumn, T[]> = { inProgress: [], pending: [], proposed: [], confirmed: [], done: [] }
   const sorted = [...rows].sort((a, b) => bookingStartIso(a).localeCompare(bookingStartIso(b)))
   for (const row of sorted) {
     groups[kanbanColumn(row, now)].push(row)
@@ -1108,7 +1173,7 @@ export type SelectedDayRestItem<T> =
 
 export function mixRestWithBreak<T extends {
   status: string
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   proposedStartsAt: string | null
   durationMinutes: number
   worker: { id: string } | null

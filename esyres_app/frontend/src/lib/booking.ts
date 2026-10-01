@@ -26,7 +26,7 @@ export type BookingStatus = 'REQUESTED' | 'TIME_PROPOSED' | 'CONFIRMED' | 'DECLI
 
 export type BookingClockRow = {
   status: BookingStatus
-  preferredStartsAt: string
+  preferredStartsAt: string | null
   worker: { id: string; name: string } | null
   proposedStartsAt: string | null
   proposedWorker: { id: string; name: string } | null
@@ -38,12 +38,12 @@ export function bookingClock(row: BookingClockRow): {
 } {
   if (row.status === 'TIME_PROPOSED') {
     return {
-      startsAt: row.proposedStartsAt ?? row.preferredStartsAt,
+      startsAt: row.proposedStartsAt ?? row.preferredStartsAt ?? '',
       worker: row.proposedWorker,
     }
   }
 
-  return { startsAt: row.preferredStartsAt, worker: row.worker }
+  return { startsAt: row.preferredStartsAt ?? '', worker: row.worker }
 }
 
 export function bookingStatusKey(status: string): BookingStatus {

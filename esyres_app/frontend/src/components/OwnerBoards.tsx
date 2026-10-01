@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
 import {
@@ -100,6 +100,7 @@ function ElapsedTrack({ share }: { share: number }) {
 
 export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const block = occupyingBlock(row)
   if (block === null) {
     return null
@@ -110,7 +111,11 @@ export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link to={`/owner/requests/${row.id}`} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}>
+    <Link
+      to={`/owner/requests/${row.id}`}
+      state={{ board: `${location.pathname}${location.search}` }}
+      className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}
+    >
       <span className="block text-xs font-semibold tabular-nums">{occupyingClockRange(block.start, block.durationMinutes)}</span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
       <span className="mt-0.5 block text-xs text-body">{block.label}</span>
@@ -197,9 +202,45 @@ export function WeekGrid({
   )
 }
 
+export function KanbanColumnToggles({
+  showInProgress,
+  showFinished,
+  error,
+  onChange,
+}: {
+  showInProgress: boolean
+  showFinished: boolean
+  error: string | null
+  onChange: (showInProgress: boolean, showFinished: boolean) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-ink">
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={showInProgress}
+          onChange={() => onChange(!showInProgress, showFinished)}
+        />
+        {t('owner.kanban.inProgress')}
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={showFinished}
+          onChange={() => onChange(showInProgress, !showFinished)}
+        />
+        {t('owner.kanban.done')}
+      </label>
+      {error !== null ? <p className="text-busy-busy">{error}</p> : null}
+    </div>
+  )
+}
+
 export function KanbanBoard({ children }: { children: ReactNode }) {
   return (
-    <div className="-mx-4 mt-5 flex items-start snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+    <div className="-mx-4 mt-5 flex items-start snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
       {children}
     </div>
   )
@@ -232,13 +273,14 @@ export function BoardColumn({
 
 export function BookingCard({ row, to, now, progress }: { row: ZapisiBooking; to: string; now?: Date; progress?: number }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const column = kanbanColumn(row, now)
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link to={to} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
+    <Link to={to} state={{ board: `${location.pathname}${location.search}` }} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
       <span className="flex items-center justify-between gap-2 text-xs">
-        <span className="font-semibold tabular-nums">{bookingStartLabel(row)}</span>
+        <span className="font-semibold tabular-nums">{bookingStartLabel(row) || t('owner.noTime')}</span>
         <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-[11px] font-semibold">{originLabel(t, row.origin)}</span>
       </span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>

@@ -33,6 +33,7 @@ final class PendingBookings
                         ->whereDate('reschedule_date', $date);
                 });
             })
+            ->orderByRaw('COALESCE(reschedule_starts_at, preferred_starts_at) IS NULL')
             ->orderByRaw('COALESCE(reschedule_starts_at, preferred_starts_at)')
             ->orderBy('created_at')
             ->offset($offset)

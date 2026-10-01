@@ -123,8 +123,8 @@ type Booking {
     id: ID!
     status: BookingStatus! @method(name: "graphqlStatus")
     preferredDate: String! @method(name: "preferredDateString")
-    preferredStartsAt: String! @method(name: "preferredStartsAtIso")
-    preferredStartsAtLabel: String! @method(name: "preferredStartsAtLabel")
+    preferredStartsAt: String @method(name: "preferredStartsAtIso")
+    preferredStartsAtLabel: String @method(name: "preferredStartsAtLabel")
     durationMinutes: Int! @rename(attribute: "duration_minutes")
     customerName: String! @method(name: "customerName")
     worker: Worker
@@ -166,7 +166,7 @@ input CreateBookingInput {
     serviceIds: [ID!]!
     workerId: ID
     preferredDate: String!
-    preferredTime: String!
+    preferredTime: String
     intakeToken: String
 }
 
@@ -202,6 +202,9 @@ type User {
     phone: String
     phoneVerified: Boolean! @method(name: "hasVerifiedPhone")
     ownerView: OwnerView! @method(name: "graphqlOwnerView")
+    showInProgress: Boolean! @rename(attribute: "show_in_progress")
+    showFinished: Boolean! @rename(attribute: "show_finished")
+    chatEnabled: Boolean! @rename(attribute: "chat_enabled")
     salons: [Salon!]! @method(name: "salonList")
     favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
 }
@@ -299,6 +302,8 @@ type Mutation {
     register(name: String!, email: String!, password: String!, phone: String): User!
     changePassword(currentPassword: String!, password: String!): User!
     updateOwnerView(view: OwnerView!): User!
+    updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
+    updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!
     resendVerificationEmail: Boolean!
     requestPhoneOtp(phone: String!): Boolean!
@@ -327,6 +332,7 @@ type Mutation {
     releaseAssistantIntake(id: ID!): AssistantIntake!
     updateSalonDnd(salonId: ID!, dnd: Boolean!): Salon
     acceptPreferredTime(bookingId: ID!): Booking!
+    assignWorker(bookingId: ID!, workerId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
     declineBooking(bookingId: ID!, reason: String): Booking!
     confirmProposedTime(bookingId: ID!): Booking!

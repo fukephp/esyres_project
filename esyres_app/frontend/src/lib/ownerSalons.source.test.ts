@@ -60,7 +60,6 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
     'pages/OwnerStats.tsx',
-    'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
@@ -320,9 +319,9 @@ test('add salon overlay form calls addSalon and lands on edit', () => {
   expect(page).not.toMatch(/updateSalonDnd/)
 })
 
-test('request detail has OwnerShell and no salon switcher', () => {
+test('request detail hides the salon switcher while the modal is open', () => {
   const page = read('pages/OwnerRequestDetail.tsx')
-  expect(page).toMatch(/<OwnerShell/)
+  expect(page).toMatch(/hideSwitcher/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/onSalon/)
 })

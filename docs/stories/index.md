@@ -112,8 +112,8 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-87 | Pending jump | 3 | — | STORY-13, STORY-76, STORY-80 |
 | STORY-88 | Owner rail toggle | 3 | — | STORY-85 |
 | STORY-89 | Always-on Pošalji zahtjev | 2 | `STORY-89` | STORY-65, STORY-84, STORY-08 |
-| STORY-90 | Request Detail modal | 3 | — | STORY-70, STORY-75, STORY-80 |
-| STORY-91 | Assign worker | 3 | — | STORY-14, STORY-90 |
-| STORY-92 | Day-only request | 2 | — | STORY-89, STORY-84, STORY-13 |
-| STORY-93 | U toku column | 3 | — | STORY-80, STORY-85 |
-| STORY-94 | Hide Chat | 7 | — | STORY-71, STORY-78, STORY-26 |
+| STORY-90 | Request Detail modal | 3 | `STORY-90` | STORY-70, STORY-75, STORY-80 |
+| STORY-91 | Assign worker | 3 | STORY-91 | STORY-14, STORY-90 |
+| STORY-92 | Day-only request | 2 | STORY-92 | STORY-89, STORY-84, STORY-13 |
+| STORY-93 | U toku column | 3 | STORY-93 | STORY-80, STORY-85 |
+| STORY-94 | Hide Chat | 7 | STORY-94 | STORY-71, STORY-78, STORY-26 |

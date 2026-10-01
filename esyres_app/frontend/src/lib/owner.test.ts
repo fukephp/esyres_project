@@ -13,6 +13,7 @@ import {
   isFifteenMinute,
   isPreferredSoon,
   occupiedElapsedShare,
+  freeWorkers,
   occupyingBlock,
   occupyingColSpan,
   currentJobLabel,
@@ -243,6 +244,18 @@ test('propose start times are droppable starts for that worker', () => {
   expect(proposeStartTimes([], blocks, '1')).toEqual([])
 })
 
+test('freeWorkers lists names that do not overlap the range', () => {
+  const workers = [
+    { id: '1', name: 'Lejla' },
+    { id: '2', name: 'Amina' },
+  ]
+  const blocks = [{ workerId: '1', start: '11:00', durationMinutes: 30 }]
+  expect(freeWorkers(workers, '11:00', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
+  expect(freeWorkers(workers, '11:30', 30, blocks).map((row) => row.name)).toEqual(['Lejla', 'Amina'])
+  expect(freeWorkers(workers, '10:45', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
+  expect(freeWorkers(workers, null, 30, blocks)).toEqual([])
+})
+
 test('owner queue path omits today', () => {
   expect(ownerQueuePath('2026-08-29', '2026-08-29')).toBe('/owner')
   expect(ownerQueuePath('2026-08-30', '2026-08-29')).toBe('/owner?date=2026-08-30')
@@ -256,9 +269,9 @@ test('owner zapisi path omits today, first salon, and Svi', () => {
   expect(zapisiOriginFromSearch('nope')).toBeNull()
   expect(zapisiOriginFromSearch('assistant')).toBe('assistant')
   expect(requestFromZapisiPath('9', '2026-08-30', '2026-08-29', '2', '1', 'picker')).toBe(
-    '/owner/requests/9?from=zapisi&date=2026-08-30&salon=2&origin=picker',
+    '/owner/requests/9?date=2026-08-30&salon=2&origin=picker',
   )
-  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9?from=zapisi')
+  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9')
 })
 
 test('owner phone path keeps the return day and omits the first salon', () => {
@@ -857,6 +870,7 @@ test('kanbanColumn maps status and past confirmed starts', () => {
   expect(kanbanColumn({ ...base, status: 'REQUESTED' }, now)).toBe('pending')
   expect(kanbanColumn({ ...base, status: 'TIME_PROPOSED' }, now)).toBe('proposed')
   expect(kanbanColumn({ ...base, status: 'CONFIRMED' }, now)).toBe('confirmed')
+  expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z', durationMinutes: 180 }, now)).toBe('inProgress')
   expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z' }, now)).toBe('done')
   expect(kanbanColumn({ ...base, status: 'DECLINED' }, now)).toBe('done')
   expect(kanbanColumn({ ...base, status: 'CANCELLED' }, now)).toBe('done')

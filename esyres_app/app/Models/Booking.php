@@ -120,13 +120,21 @@ class Booking extends Model
         return $this->preferred_date->format('Y-m-d');
     }
 
-    public function preferredStartsAtIso(): string
+    public function preferredStartsAtIso(): ?string
     {
+        if ($this->preferred_starts_at === null) {
+            return null;
+        }
+
         return $this->preferred_starts_at->utc()->toIso8601String();
     }
 
-    public function preferredStartsAtLabel(): string
+    public function preferredStartsAtLabel(): ?string
     {
+        if ($this->preferred_starts_at === null) {
+            return null;
+        }
+
         return $this->preferred_starts_at->timezone('Europe/Sarajevo')->format('H:i');
     }
 
@@ -213,6 +221,9 @@ class Booking extends Model
             return false;
         }
         $start = $this->preferred_starts_at;
+        if ($start === null) {
+            return false;
+        }
         $now = now();
         if ($now->gte($start)) {
             return false;

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
@@ -18,7 +18,7 @@ import {
   type InFlightIntakesData,
 } from '../graphql/intake'
 import { OWNER_SALON_QUERY, type OwnerSalonData } from '../graphql/pending'
-import { formatSarajevoDateTime } from '../lib/format'
+import { formatSarajevoDateTime, sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
   chatBadgeCount,
@@ -28,7 +28,7 @@ import {
   intakeStepFromSnapshot,
   takeoverRowChrome,
 } from '../lib/intake'
-import { ownerChatSearchParams, ownerSalonFromSearch } from '../lib/owner'
+import { ownerChatSearchParams, ownerQueuePath, ownerSalonFromSearch } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
 
 export function OwnerChats() {
@@ -80,6 +80,11 @@ export function OwnerChats() {
         <RowsSkeleton count={4} />
       </OwnerPageSkeleton>
     )
+  }
+
+  if (data?.me != null && data.me.chatEnabled !== true) {
+    const today = sarajevoToday()
+    return <Navigate to={ownerQueuePath(today, today, salon?.id ?? null, firstOwnedId === '' ? null : firstOwnedId)} replace />
   }
 
   if (data?.me == null) {

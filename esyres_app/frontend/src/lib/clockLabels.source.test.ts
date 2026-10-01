@@ -35,6 +35,8 @@ test('booking clocks render server labels', () => {
   expect(bookings).toMatch(/proposedDate/)
   expect(bookings).toMatch(/proposedStartsAtLabel/)
   expect(bookings).toMatch(/preferredStartsAtLabel/)
+  expect(bookings).toMatch(/owner\.noTime/)
+  expect(read('pages/OwnerHome.tsx')).toMatch(/owner\.noTime/)
   expect(bookings).toMatch(/rescheduleDate/)
   expect(bookings).toMatch(/rescheduleStartsAtLabel/)
 })

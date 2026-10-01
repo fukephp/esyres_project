@@ -1,14 +1,14 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ColumnSkeleton, OwnerPageSkeleton, OwnerWeekSkeleton, WeekGridSkeleton } from '../components/Skeleton'
-import { ME_QUERY, type MeData } from '../graphql/auth'
+import { ME_QUERY, UPDATE_KANBAN_COLUMNS_MUTATION, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
   type InFlightIntakeCountData,
@@ -16,6 +16,7 @@ import {
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   ACCEPT_RESCHEDULE_MUTATION,
+  ASSIGN_WORKER_MUTATION,
   BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
   BOOKING_RESCHEDULED_SUBSCRIPTION,
   BOOKING_CANCELLED_SUBSCRIPTION,
@@ -33,7 +34,7 @@ import {
   type PendingJumpData,
   type SalonDayBookingsData,
 } from '../graphql/pending'
-import { BoardColumn, BookingCard, DayChips, KanbanBoard, WeekGrid, WeekHeader } from '../components/OwnerBoards'
+import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekGrid, WeekHeader } from '../components/OwnerBoards'
 import { graphqlErrorCode } from '../lib/booking'
 import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
@@ -46,12 +47,15 @@ import {
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
+  freeWorkers,
   hoursForDate,
   isPreferredSoon,
   kanbanGroups,
   occupiedElapsedShare,
+  occupyingBlock,
   occupyingSarajevoYmd,
   nextPendingDay,
+  boardSearchParams,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
@@ -62,9 +66,16 @@ import {
   shiftOwnerDate,
   sarajevoWeekday,
   trimDeclineReason,
+  visibleKanbanColumns,
 } from '../lib/owner'
 
-export function OwnerHome() {
+export function OwnerHome({
+  lockedSearch,
+  hideSwitcher = false,
+}: {
+  lockedSearch?: string
+  hideSwitcher?: boolean
+} = {}) {
   const { t } = useTranslation()
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
@@ -72,14 +83,15 @@ export function OwnerHome() {
     return () => clearInterval(id)
   }, [])
   const [params, setParams] = useSearchParams()
-  const date = ownerDateFromSearch(params.get('date'))
+  const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
+  const date = ownerDateFromSearch(boardParams.get('date'))
   const days = ownerWeekDays(date)
   const week = { from: days[0], to: days[6] }
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const kanban = data?.me?.ownerView === 'KANBAN'
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
-  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
+  const salonId = ownerSalonFromSearch(boardParams.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
@@ -142,9 +154,12 @@ export function OwnerHome() {
     fetchPolicy: 'network-only',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
   const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
   const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
+  const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
+  const [columnError, setColumnError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [declineId, setDeclineId] = useState<string | null>(null)
   const [dismissId, setDismissId] = useState<string | null>(null)
@@ -153,10 +168,16 @@ export function OwnerHome() {
   const [phoneOpen, setPhoneOpen] = useState(false)
 
   function onDate(value: string) {
+    if (lockedSearch !== undefined) {
+      return
+    }
     setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
   }
 
   function onSalon(id: string) {
+    if (lockedSearch !== undefined) {
+      return
+    }
     setPhoneOpen(false)
     setParams(ownerSearchParams(date, sarajevoToday(), id, salons[0]?.id ?? null))
   }
@@ -188,6 +209,31 @@ export function OwnerHome() {
       const mutate = row.reschedulePending ? acceptReschedule : accept
       await mutate({
         variables: { bookingId: row.id },
+        refetchQueries: refetchBoard(),
+      })
+    } catch (error) {
+      setErrors((current) => ({
+        ...current,
+        [row.id]: t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(error))}`),
+      }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function onAssign(row: PendingBooking, workerId: string) {
+    if (salon === null) {
+      return
+    }
+    setBusyId(row.id)
+    setErrors((current) => {
+      const next = { ...current }
+      delete next[row.id]
+      return next
+    })
+    try {
+      await assignWorker({
+        variables: { bookingId: row.id, workerId },
         refetchQueries: refetchBoard(),
       })
     } catch (error) {
@@ -321,7 +367,16 @@ export function OwnerHome() {
   const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? salon.id
   const rangeRows = occupyingRange?.occupyingBookingsRange ?? []
-  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'))
+  const occupyingRows = kanban ? (dayBookings?.salonDayBookings ?? []) : rangeRows.filter((row) => occupyingSarajevoYmd(row) === date)
+  const occupyingReady = kanban ? dayBookings !== undefined : occupyingRange !== undefined
+  const freeBlocks = occupyingRows.flatMap((row) => {
+    const block = occupyingBlock(row)
+    return block === null ? [] : [block]
+  })
+  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'), now)
+  const showInProgress = data?.me?.showInProgress !== false
+  const showFinished = data?.me?.showFinished !== false
+  const columns = visibleKanbanColumns(showInProgress, showFinished)
   const dayTitle = `${t(`weekday.${sarajevoWeekday(date)}`)}, ${formatPickerDayNumeric(date)}`
 
   const pendingList = (
@@ -336,6 +391,12 @@ export function OwnerHome() {
           dismissOpen={dismissId === row.id}
           reasonDraft={reasonDraft}
           onAccept={() => void onAccept(row)}
+          taps={
+            occupyingReady && row.worker === null
+              ? freeWorkers(workers, row.preferredStartsAtLabel, row.durationMinutes, freeBlocks)
+              : []
+          }
+          onAssign={(workerId) => void onAssign(row, workerId)}
           onDeclineOpen={() => {
             setDeclineId(row.id)
             setReasonDraft('')
@@ -377,6 +438,7 @@ export function OwnerHome() {
         date={date}
         badge={badge}
         active="queue"
+        hideSwitcher={hideSwitcher}
         onSalon={onSalon}
         action={
           <>
@@ -410,29 +472,43 @@ export function OwnerHome() {
             <DayChips days={days} date={date} closedFor={closedFor} onDate={onDate} className="mt-4" />
             <h3 className="mt-5 text-lg font-semibold tracking-tight text-ink">{dayTitle}</h3>
             {closedFor(date) ? <p className="mt-1 text-sm text-muted">{t('owner.closedDay')}</p> : null}
+            <KanbanColumnToggles
+              showInProgress={showInProgress}
+              showFinished={showFinished}
+              error={columnError}
+              onChange={(nextInProgress, nextFinished) => {
+                void updateKanbanColumns({ variables: { showInProgress: nextInProgress, showFinished: nextFinished } })
+                  .then(() => setColumnError(null))
+                  .catch(() => setColumnError(t('owner.columnsError')))
+              }}
+            />
             <KanbanBoard>
-              <BoardColumn column="pending" count={rows.length}>
-                {queueLoading ? <ColumnSkeleton /> : pendingList}
-              </BoardColumn>
-              {(['proposed', 'confirmed', 'done'] as const).map((column) => (
-                <BoardColumn key={column} column={column} count={groups[column].length}>
-                  {dayBookings === undefined ? (
-                    <ColumnSkeleton />
-                  ) : (
-                    groups[column].map((row) => {
-                      const ymd = row.status === 'CONFIRMED' ? occupyingSarajevoYmd(row) : null
-                      return (
-                        <BookingCard
-                          key={row.id}
-                          row={row}
-                          to={`/owner/requests/${row.id}`}
-                          progress={ymd !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
-                        />
-                      )
-                    })
-                  )}
-                </BoardColumn>
-              ))}
+              {columns.map((column) =>
+                column === 'pending' ? (
+                  <BoardColumn key={column} column={column} count={rows.length}>
+                    {queueLoading ? <ColumnSkeleton /> : pendingList}
+                  </BoardColumn>
+                ) : (
+                  <BoardColumn key={column} column={column} count={groups[column].length}>
+                    {dayBookings === undefined ? (
+                      <ColumnSkeleton />
+                    ) : (
+                      groups[column].map((row) => {
+                        const ymd = row.status === 'CONFIRMED' ? occupyingSarajevoYmd(row) : null
+                        return (
+                          <BookingCard
+                            key={row.id}
+                            row={row}
+                            to={`/owner/requests/${row.id}`}
+                            now={now}
+                            progress={ymd !== null && row.preferredStartsAtLabel !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
+                          />
+                        )
+                      })
+                    )}
+                  </BoardColumn>
+                ),
+              )}
             </KanbanBoard>
           </section>
         ) : (
@@ -475,7 +551,9 @@ export function OwnerHome() {
         onSaved={(saved) => {
           const savedWeek = ownerWeekDays(saved)
           setPhoneOpen(false)
-          setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          if (lockedSearch === undefined) {
+            setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          }
           void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
           if (kanban) {
             void refetchDay({ salonId: salon.id, date: saved, origin: null })
@@ -496,6 +574,8 @@ function QueueRow({
   dismissOpen,
   reasonDraft,
   onAccept,
+  taps,
+  onAssign,
   onDeclineOpen,
   onDeclineCancel,
   onDeclineConfirm,
@@ -511,6 +591,8 @@ function QueueRow({
   dismissOpen: boolean
   reasonDraft: string
   onAccept: () => void
+  taps: { id: string; name: string }[]
+  onAssign: (workerId: string) => void
   onDeclineOpen: () => void
   onDeclineCancel: () => void
   onDeclineConfirm: () => void
@@ -520,6 +602,7 @@ function QueueRow({
   onReasonChange: (value: string) => void
 }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const chrome = overlayQueueChrome(row.reschedulePending)
   const clock = queueRowLabel(row)
 
@@ -530,7 +613,7 @@ function QueueRow({
           {queueChipInitial(row.customerName)}
         </span>
         <div className="min-w-0 flex-1">
-      <p className="text-xs font-semibold tabular-nums text-ink">{clock}</p>
+      <p className="text-xs font-semibold tabular-nums text-ink">{clock || t('owner.noTime')}</p>
       <p className="font-semibold text-ink">
         {row.customerName}
         {' · '}
@@ -569,9 +652,21 @@ function QueueRow({
             {t('owner.accept')}
           </button>
         ) : null}
+        {taps.map((worker) => (
+          <button
+            key={worker.id}
+            type="button"
+            disabled={busy}
+            onClick={() => onAssign(worker.id)}
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {worker.name}
+          </button>
+        ))}
         {chrome.propose ? (
           <Link
             to={`/owner/requests/${row.id}`}
+            state={{ board: `${location.pathname}${location.search}` }}
             className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink"
           >
             {t('owner.propose')}

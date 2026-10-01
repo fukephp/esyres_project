@@ -1,16 +1,15 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
-import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { OwnerPageSkeleton, RequestDetailSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
-import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
+  ASSIGN_WORKER_MUTATION,
   DECLINE_BOOKING_MUTATION,
   MARK_NO_SHOW_MUTATION,
   CANCEL_PHONE_BOOKING_MUTATION,
@@ -26,22 +25,20 @@ import {
 } from '../graphql/pending'
 import { graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
-import { chatBadgeCount } from '../lib/intake'
 import { formatCivilDate, sarajevoToday } from '../lib/format'
+import { SALON_PICKER_DIALOG_CLASS } from '../lib/salonSend'
 import {
   acceptErrorKey,
   assistantOriginVisible,
   assistantTranscriptLines,
   canAcceptPreferredTime,
   declineErrorKey,
+  freeWorkers,
   hoursForDate,
   occupyingBlock,
-  ownerDateFromSearch,
   ownerDetailMode,
   occupyingClockRange,
   ownerQueuePath,
-  ownerZapisiPath,
-  zapisiOriginFromSearch,
   panelCells,
   phoneErrorKey,
   proposeErrorKey,
@@ -49,11 +46,13 @@ import {
   trimDeclineReason,
 } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
+import { OwnerHome } from './OwnerHome'
+import { OwnerZapisi } from './OwnerZapisi'
 
 export function OwnerRequestDetail() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
-  const [search] = useSearchParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
@@ -70,16 +69,9 @@ export function OwnerRequestDetail() {
   })
   const booking = bookingData?.ownerBooking
   const firstOwnedId = data?.me?.salons[0]?.id ?? ''
-  const navSalonId = booking?.salon.id ?? firstOwnedId
-  const { data: chatCount } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
-    variables: { salonId: navSalonId },
-    skip: !ownerReady || navSalonId === '',
-    fetchPolicy: 'network-only',
-  })
-  const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const salonId = booking?.salon.id ?? ''
   const date = booking?.preferredDate ?? ''
-  const { data: board } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
+  const { data: salonBoard } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
     variables: { id: salonId },
     skip: salonId === '',
   })
@@ -88,6 +80,7 @@ export function OwnerRequestDetail() {
     skip: salonId === '' || date === '',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
@@ -100,6 +93,14 @@ export function OwnerRequestDetail() {
   const [error, setError] = useState<string | null>(null)
   const [noShowError, setNoShowError] = useState<string | null>(null)
   const [phoneCancelOpen, setPhoneCancelOpen] = useState(false)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (dialog !== null && !dialog.open) {
+      dialog.showModal()
+    }
+  })
 
   useEffect(() => {
     if (booking === undefined) {
@@ -113,34 +114,32 @@ export function OwnerRequestDetail() {
     setNoShowError(null)
   }, [booking?.id, booking?.worker?.id])
 
-  const workers = board?.salon?.workers ?? []
-  const dayHours = date === '' ? undefined : hoursForDate(board?.salon?.hours ?? [], date)
+  const workers = salonBoard?.salon?.workers ?? []
+  const dayHours = date === '' ? undefined : hoursForDate(salonBoard?.salon?.hours ?? [], date)
   const cells = panelCells(dayHours)
   const blocks = (occupying?.occupyingBookings ?? [])
     .map((row: OccupyingBooking) => occupyingBlock(row))
     .filter((row) => row !== null)
   const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
+  const assignTaps =
+    booking === undefined || booking.worker !== null || occupying === undefined
+      ? []
+      : freeWorkers(workers, booking.preferredStartsAtLabel, booking.durationMinutes, blocks)
   const queuePath =
     booking === undefined
       ? '/owner'
       : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
-  const leavePath =
-    search.get('from') === 'zapisi'
-      ? ownerZapisiPath(
-          ownerDateFromSearch(search.get('date')),
-          sarajevoToday(),
-          search.get('salon'),
-          firstOwnedId,
-          zapisiOriginFromSearch(search.get('origin')),
-        )
-      : queuePath
+  const board = typeof location.state === 'object' && location.state !== null && 'board' in location.state && typeof location.state.board === 'string'
+    ? location.state.board
+    : null
   const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
 
-  async function goQueue() {
-    if (booking === undefined) {
+  function close() {
+    if (board !== null) {
+      navigate(board)
       return
     }
-    await navigate(ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId))
+    navigate(queuePath)
   }
 
   async function onAccept() {
@@ -151,7 +150,23 @@ export function OwnerRequestDetail() {
     setError(null)
     try {
       await accept({ variables: { bookingId: booking.id } })
-      await goQueue()
+      await refetchBooking()
+    } catch (caught) {
+      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onAssign(workerIdToAssign: string) {
+    if (booking === undefined) {
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await assignWorker({ variables: { bookingId: booking.id, workerId: workerIdToAssign } })
+      await refetchBooking()
     } catch (caught) {
       setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
     } finally {
@@ -167,7 +182,7 @@ export function OwnerRequestDetail() {
     setError(null)
     try {
       await propose({ variables: { bookingId: booking.id, workerId, proposedTime: time } })
-      await goQueue()
+      await refetchBooking()
     } catch (caught) {
       setError(t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(caught))}`))
     } finally {
@@ -184,7 +199,7 @@ export function OwnerRequestDetail() {
     const reason = trimDeclineReason(reasonDraft)
     try {
       await decline({ variables: { bookingId: booking.id, reason } })
-      await goQueue()
+      await refetchBooking()
     } catch (caught) {
       setError(t(`owner.declineError.${declineErrorKey(graphqlErrorCode(caught))}`))
     } finally {
@@ -280,29 +295,42 @@ export function OwnerRequestDetail() {
     )
   }
 
+  const zapisi = board?.startsWith('/owner/zapisi') === true
+  const lockedSearch = board ?? (booking !== undefined ? `?date=${booking.preferredDate}&salon=${booking.salon.id}` : '')
+
   return (
     <>
-      <OwnerShell
-        personName={data.me.name}
-        title={t('owner.title')}
-        salons={booking === undefined ? [] : [booking.salon]}
-        salonId={navSalonId}
-        firstOwnedId={firstOwnedId}
-        badge={badge}
-        active="queue"
+      <div inert>
+        {zapisi ? (
+          <OwnerZapisi lockedSearch={board ?? ''} hideSwitcher />
+        ) : (
+          <OwnerHome lockedSearch={lockedSearch} hideSwitcher />
+        )}
+      </div>
+      <dialog
+        ref={dialogRef}
+        className={SALON_PICKER_DIALOG_CLASS}
+        onCancel={() => {
+          close()
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            close()
+          }
+        }}
       >
-        <p>
-          <Link to={leavePath} className="inline-flex h-9 items-center rounded-full bg-surface-card px-4 text-sm font-medium text-ink">
-            ← {t('owner.back')}
-          </Link>
-        </p>
-        <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">
+        <div className="mb-4 flex justify-end">
+          <button type="button" className="text-sm text-body" onClick={close}>
+            {t('salon.close')}
+          </button>
+        </div>
+        <section className="rounded-3xl bg-canvas p-4 md:p-6">
         {forbidden || booking === undefined ? (
           <p className="text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
         ) : ownerDetailMode(booking.status) === 'bounce' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -321,7 +349,7 @@ export function OwnerRequestDetail() {
               {occupyingBlock(booking) === null
                 ? booking.status === 'TIME_PROPOSED' && booking.proposedStartsAtLabel !== null
                   ? booking.proposedStartsAtLabel
-                  : booking.preferredStartsAtLabel
+                  : (booking.preferredStartsAtLabel ?? t('owner.noTime'))
                 : occupyingClockRange(
                     occupyingBlock(booking)!.start,
                     occupyingBlock(booking)!.durationMinutes,
@@ -362,7 +390,7 @@ export function OwnerRequestDetail() {
         ) : ownerDetailMode(booking.status) === 'form' ? (
           <>
             <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel}</p>
+            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
             <p className="mt-1 text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
@@ -385,7 +413,7 @@ export function OwnerRequestDetail() {
                     services: booking.services,
                     workerName: booking.worker?.name ?? null,
                     preferredDate: booking.intake?.preferredDate ?? booking.preferredDate,
-                    preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel,
+                    preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel ?? '',
                     noPreference: t('salon.noPreference'),
                   }).map((line) => (
                     <li key={line.step}>
@@ -397,6 +425,21 @@ export function OwnerRequestDetail() {
                 </ul>
               </details>
               </>
+            ) : null}
+            {assignTaps.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {assignTaps.map((worker) => (
+                  <button
+                    key={worker.id}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void onAssign(worker.id)}
+                    className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+                  >
+                    {worker.name}
+                  </button>
+                ))}
+              </div>
             ) : null}
             {workers.length === 0 ? (
               <p className="mt-8 text-sm text-body">{t('owner.noWorkers')}</p>
@@ -520,7 +563,7 @@ export function OwnerRequestDetail() {
           </>
         ) : null}
         </section>
-      </OwnerShell>
+      </dialog>
     </>
   )
 }
@@ -540,7 +583,7 @@ function PriorMemory({
   const rows = booking.priorConfirmedBookings ?? []
   const stamped = booking.noShowAt != null && booking.noShowAt !== ''
   const canMark =
-    booking.status === 'CONFIRMED' && !stamped && Date.parse(booking.preferredStartsAt) <= Date.now()
+    booking.status === 'CONFIRMED' && !stamped && booking.preferredStartsAt !== null && Date.parse(booking.preferredStartsAt) <= Date.now()
 
   return (
     <div className="mt-4">
@@ -595,7 +638,7 @@ function PhoneCancel({
   onConfirm: () => void
 }) {
   const { t } = useTranslation()
-  const beforeStart = booking.status === 'CONFIRMED' && Date.parse(booking.preferredStartsAt) > Date.now()
+  const beforeStart = booking.status === 'CONFIRMED' && booking.preferredStartsAt !== null && Date.parse(booking.preferredStartsAt) > Date.now()
   if (booking.origin !== 'PHONE' || !beforeStart) {
     return null
   }

@@ -10,6 +10,9 @@ export const ME_QUERY = gql`
       phone
       phoneVerified
       ownerView
+      showInProgress
+      showFinished
+      chatEnabled
       salons {
         id
         name
@@ -91,6 +94,25 @@ export const UPDATE_OWNER_VIEW_MUTATION = gql`
     updateOwnerView(view: $view) {
       id
       ownerView
+    }
+  }
+`
+
+export const UPDATE_KANBAN_COLUMNS_MUTATION = gql`
+  mutation UpdateKanbanColumns($showInProgress: Boolean!, $showFinished: Boolean!) {
+    updateKanbanColumns(showInProgress: $showInProgress, showFinished: $showFinished) {
+      id
+      showInProgress
+      showFinished
+    }
+  }
+`
+
+export const UPDATE_CHAT_ENABLED_MUTATION = gql`
+  mutation UpdateChatEnabled($enabled: Boolean!) {
+    updateChatEnabled(enabled: $enabled) {
+      id
+      chatEnabled
     }
   }
 `
@@ -281,6 +303,9 @@ export type MeData = {
     phone: string | null
     phoneVerified: boolean
     ownerView: OwnerView
+    showInProgress: boolean
+    showFinished: boolean
+    chatEnabled: boolean
     salons: {
       id: string
       name: string

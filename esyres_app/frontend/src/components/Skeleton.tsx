@@ -198,8 +198,8 @@ export function OwnerWeekSkeleton() {
 export function KanbanSkeleton({ className = '' }: { className?: string }) {
   return (
     <Skeleton className={className}>
-      <div className="grid gap-3 md:grid-cols-4">
-        {times(4).map((c) => (
+      <div className="grid gap-3 md:grid-cols-5">
+        {times(5).map((c) => (
           <div key={c} className="space-y-2 rounded-2xl p-3">
             <SkeletonBlock className="h-5 w-24 rounded-md" />
             {times(2).map((i) => (
@@ -282,7 +282,7 @@ export function OwnerShellGhost({ children }: { children: ReactNode }) {
           <>
             <SkeletonBlock dark className="h-6 w-6 rounded-full" />
             <div className="mt-8 space-y-2">
-              {times(6).map((i) => (
+              {times(5).map((i) => (
                 <SkeletonBlock key={i} dark className="h-8 w-8 rounded-full" />
               ))}
             </div>
@@ -313,7 +313,7 @@ export function OwnerShellGhost({ children }: { children: ReactNode }) {
       <div aria-hidden="true" className="fixed inset-x-0 bottom-0 z-20 bg-surface-dark md:hidden">
         <div className="flex h-16 items-center justify-around px-3">
           {visible
-            ? times(5).map((i) => <SkeletonBlock key={i} dark className="h-6 w-6 rounded-full" />)
+            ? times(4).map((i) => <SkeletonBlock key={i} dark className="h-6 w-6 rounded-full" />)
             : null}
         </div>
       </div>

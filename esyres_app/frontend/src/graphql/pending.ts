@@ -100,6 +100,15 @@ export const ACCEPT_PREFERRED_TIME_MUTATION = gql`
   }
 `
 
+export const ASSIGN_WORKER_MUTATION = gql`
+  mutation AssignWorker($bookingId: ID!, $workerId: ID!) {
+    assignWorker(bookingId: $bookingId, workerId: $workerId) {
+      id
+      status
+    }
+  }
+`
+
 export const PROPOSE_TIME_MUTATION = gql`
   mutation ProposeTime($bookingId: ID!, $workerId: ID!, $proposedTime: String!) {
     proposeTime(bookingId: $bookingId, workerId: $workerId, proposedTime: $proposedTime) {
@@ -215,8 +224,8 @@ export type ZapisiBooking = {
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED' | 'CANCELLED'
   origin: 'PICKER' | 'ASSISTANT' | 'PHONE'
   customerName: string
-  preferredStartsAt: string
-  preferredStartsAtLabel: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel: string | null
   proposedStartsAt: string | null
   proposedStartsAtLabel: string | null
   durationMinutes: number
@@ -348,8 +357,8 @@ export type OwnerBooking = {
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'
   customerName: string
   preferredDate: string
-  preferredStartsAt: string
-  preferredStartsAtLabel: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel: string | null
   proposedStartsAt: string | null
   proposedStartsAtLabel: string | null
   durationMinutes: number
@@ -373,8 +382,8 @@ export type PendingBooking = {
   id: string
   customerName: string
   preferredDate: string
-  preferredStartsAt: string
-  preferredStartsAtLabel: string
+  preferredStartsAt: string | null
+  preferredStartsAtLabel: string | null
   durationMinutes: number
   worker: { id: string; name: string } | null
   services: { name: string; durationMinutes: number }[]

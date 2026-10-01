@@ -19,6 +19,8 @@ trait OwnerSteps
 {
     private ?\Throwable $seederException = null;
 
+    private ?string $rememberedRespondedAt = null;
+
     /**
      * @When I set my owner view to :view
      */
@@ -32,6 +34,109 @@ mutation UpdateOwnerView($view: OwnerView!) {
   }
 }
 GQL, ['view' => $view]);
+    }
+
+    /**
+     * @When I set kanban columns in progress :inProgress and finished :finished
+     */
+    public function iSetKanbanColumns(string $inProgress, string $finished): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateKanbanColumns($showInProgress: Boolean!, $showFinished: Boolean!) {
+  updateKanbanColumns(showInProgress: $showInProgress, showFinished: $showFinished) {
+    id
+    showInProgress
+    showFinished
+  }
+}
+GQL, [
+            'showInProgress' => $inProgress === 'true',
+            'showFinished' => $finished === 'true',
+        ]);
+    }
+
+    /**
+     * @When I query my kanban columns
+     */
+    public function iQueryMyKanbanColumns(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeKanban {
+  me {
+    showInProgress
+    showFinished
+  }
+}
+GQL);
+    }
+
+    /**
+     * @Then my kanban columns are in progress :inProgress and finished :finished
+     */
+    public function myKanbanColumnsAre(string $inProgress, string $finished): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['updateKanbanColumns'] ?? $this->graphql['data']['me'] ?? null;
+        $this->assertIsArray($row);
+        $this->assertSame($inProgress === 'true', $row['showInProgress']);
+        $this->assertSame($finished === 'true', $row['showFinished']);
+    }
+
+    /**
+     * @Then the stored kanban columns of :email are in progress :inProgress and finished :finished
+     */
+    public function theStoredKanbanColumnsAre(string $email, string $inProgress, string $finished): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $this->assertSame($inProgress === 'true', (bool) $user->show_in_progress);
+        $this->assertSame($finished === 'true', (bool) $user->show_finished);
+    }
+
+    /**
+     * @When I set chat enabled to :enabled
+     */
+    public function iSetChatEnabledTo(string $enabled): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateChatEnabled($enabled: Boolean!) {
+  updateChatEnabled(enabled: $enabled) {
+    id
+    chatEnabled
+  }
+}
+GQL, ['enabled' => $enabled === 'true']);
+    }
+
+    /**
+     * @When I query my chat enabled
+     */
+    public function iQueryMyChatEnabled(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeChat {
+  me { chatEnabled }
+}
+GQL);
+    }
+
+    /**
+     * @Then my chat enabled is :enabled
+     */
+    public function myChatEnabledIs(string $enabled): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['updateChatEnabled'] ?? $this->graphql['data']['me'] ?? null;
+        $this->assertIsArray($row);
+        $this->assertSame($enabled === 'true', $row['chatEnabled']);
+    }
+
+    /**
+     * @Then the stored chat enabled of :email is :enabled
+     */
+    public function theStoredChatEnabledIs(string $email, string $enabled): void
+    {
+        $user = User::query()->where('email', $email)->firstOrFail();
+        $this->assertSame($enabled === 'true', (bool) $user->chat_enabled);
     }
 
     /**
@@ -423,6 +528,91 @@ GQL);
         $this->graphql($this->acceptPreferredTimeMutation(), [
             'bookingId' => $id,
         ]);
+    }
+
+    /**
+     * @When I assign the salon worker
+     */
+    public function iAssignTheSalonWorker(): void
+    {
+        if ($this->worker === null) {
+            throw new RuntimeException('Salon worker fixture is missing');
+        }
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $this->worker->id,
+        ]);
+    }
+
+    /**
+     * @When I assign worker :name
+     */
+    public function iAssignWorker(string $name): void
+    {
+        $worker = Worker::query()->where('salon_id', $this->salon->id)->where('name', $name)->firstOrFail();
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $worker->id,
+        ]);
+    }
+
+    /**
+     * @When I assign worker :name for :customer
+     */
+    public function iAssignWorkerFor(string $name, string $customer): void
+    {
+        $this->booking = Booking::query()
+            ->where('salon_id', $this->salon->id)
+            ->whereHas('customer', static fn ($query) => $query->where('name', $customer))
+            ->firstOrFail();
+        $this->iAssignWorker($name);
+    }
+
+    /**
+     * @When I assign worker id :id
+     */
+    public function iAssignWorkerId(string $id): void
+    {
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then the assigned booking status is :status
+     */
+    public function theAssignedBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['assignWorker']['status']);
+    }
+
+    /**
+     * @Then the assigned worker is :name
+     */
+    public function theAssignedWorkerIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['assignWorker']['worker']['name']);
+    }
+
+    /**
+     * @When I remember owner_responded_at
+     */
+    public function iRememberOwnerRespondedAt(): void
+    {
+        $this->booking->refresh();
+        $this->rememberedRespondedAt = $this->booking->owner_responded_at?->utc()->toIso8601String();
+    }
+
+    /**
+     * @Then that booking's owner_responded_at is unchanged
+     */
+    public function thatBookingsOwnerRespondedAtIsUnchanged(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($this->rememberedRespondedAt, $this->booking->owner_responded_at?->utc()->toIso8601String());
     }
 
     /**
@@ -1271,6 +1461,22 @@ GQL, ['id' => (string) $this->salon->id]);
     }
 
     /**
+     * @Then pending booking :name has no preferred start
+     */
+    public function pendingBookingHasNoPreferredStart(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        foreach ($this->graphql['data']['pendingBookings'] as $row) {
+            if ($row['customerName'] === $name) {
+                $this->assertNull($row['preferredStartsAt']);
+
+                return;
+            }
+        }
+        $this->fail('Pending booking missing: '.$name);
+    }
+
+    /**
      * @Then the first pending booking matches:
      */
     public function theFirstPendingBookingMatches(PyStringNode $payload): void
@@ -1810,6 +2016,19 @@ mutation Accept($bookingId: ID!) {
   acceptPreferredTime(bookingId: $bookingId) {
     id
     status
+  }
+}
+GQL;
+    }
+
+    private function assignWorkerMutation(): string
+    {
+        return <<<'GQL'
+mutation Assign($bookingId: ID!, $workerId: ID!) {
+  assignWorker(bookingId: $bookingId, workerId: $workerId) {
+    id
+    status
+    worker { id name }
   }
 }
 GQL;

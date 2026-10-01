@@ -96,7 +96,7 @@ function BookingRow({
   const canCancel =
     cancelChrome({
       confirmed: row.status === 'CONFIRMED',
-      startsAt: row.preferredStartsAt,
+      startsAt: row.preferredStartsAt ?? '',
       now: Date.now(),
     }) === 'show'
   const open = expand !== null && expand.id === row.id
@@ -114,7 +114,7 @@ function BookingRow({
         {' '}
         {row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null
           ? row.proposedStartsAtLabel
-          : row.preferredStartsAtLabel}
+          : (row.preferredStartsAtLabel ?? t('owner.noTime'))}
       </p>
       <p className="mt-1 text-sm text-body">
         {row.services.map((s) => s.name).join(', ')}

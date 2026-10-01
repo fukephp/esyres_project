@@ -1,8 +1,8 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { LOGOUT_MUTATION } from '../graphql/auth'
+import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { DISCOVERY_BRAND_KEY } from '../lib/homepage'
 import { OWNER_RAIL_STORAGE_KEY, ownerRailExpanded, ownerStatsPath } from '../lib/owner'
 import { OwnerNav, type OwnerNavActive } from './OwnerNav'
@@ -29,6 +29,7 @@ type Props = {
   active: OwnerNavActive
   onSalon?: (id: string) => void
   action?: ReactNode
+  hideSwitcher?: boolean
   children: ReactNode
 }
 
@@ -43,9 +44,12 @@ export function OwnerShell({
   active,
   onSalon,
   action,
+  hideSwitcher = false,
   children,
 }: Props) {
   const { t } = useTranslation()
+  const { data: meData } = useQuery<MeData>(ME_QUERY)
+  const chatEnabled = meData?.me?.chatEnabled === true
   const [logout] = useMutation(LOGOUT_MUTATION, { refetchQueries: ['Me'] })
   const [expanded, setExpanded] = useState(readRailExpanded)
   const salon = salons.find((row) => row.id === salonId) ?? null
@@ -78,6 +82,7 @@ export function OwnerShell({
           active={active}
           variant="sidebar"
           expanded={expanded}
+          chatEnabled={chatEnabled}
         />
         <div className="mt-auto flex flex-col items-center gap-1">
           <button
@@ -109,7 +114,7 @@ export function OwnerShell({
             <img src="/esyres-mark.svg" width={24} height={24} alt="" aria-hidden="true" />
           </Link>
           <div className="min-w-0 flex-1">
-            <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark={false} />
+            <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} hideSwitcher={hideSwitcher} dark={false} />
           </div>
           {active === 'stats' ? null : (
             <Link to={ownerStatsPath(salonId, firstOwnedId)} className="text-sm text-body">
@@ -129,7 +134,7 @@ export function OwnerShell({
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:block">
-              <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark={false} />
+              <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} hideSwitcher={hideSwitcher} dark={false} />
             </div>
             {action}
           </div>
@@ -137,7 +142,7 @@ export function OwnerShell({
         <main className="px-5 py-6 md:px-10 md:py-8">{children}</main>
       </div>
       <div className="fixed inset-x-0 bottom-0 z-20 bg-surface-dark md:hidden">
-        <OwnerNav salonId={salonId} firstOwnedId={firstOwnedId} date={date} badge={badge} active={active} variant="tabs" />
+        <OwnerNav salonId={salonId} firstOwnedId={firstOwnedId} date={date} badge={badge} active={active} variant="tabs" chatEnabled={chatEnabled} />
       </div>
     </div>
   )
@@ -147,15 +152,17 @@ function SalonSwitcher({
   salons,
   salon,
   onSalon,
+  hideSwitcher,
   dark,
 }: {
   salons: { id: string; name: string }[]
   salon: { id: string; name: string } | null
   onSalon?: (id: string) => void
+  hideSwitcher: boolean
   dark: boolean
 }) {
   const { t } = useTranslation()
-  if (onSalon !== undefined && salon !== null && salons.length > 1) {
+  if (!hideSwitcher && onSalon !== undefined && salon !== null && salons.length > 1) {
     return (
       <label className={`block text-xs ${dark ? 'text-on-dark-soft' : 'text-muted'}`}>
         <span className="sr-only md:not-sr-only">{t('owner.salon')}</span>
