@@ -9,6 +9,7 @@ import { OwnerPageSkeleton, RequestDetailSkeleton } from '../components/Skeleton
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
+  ASSIGN_WORKER_MUTATION,
   DECLINE_BOOKING_MUTATION,
   MARK_NO_SHOW_MUTATION,
   CANCEL_PHONE_BOOKING_MUTATION,
@@ -32,6 +33,7 @@ import {
   assistantTranscriptLines,
   canAcceptPreferredTime,
   declineErrorKey,
+  freeWorkers,
   hoursForDate,
   occupyingBlock,
   ownerDetailMode,
@@ -78,6 +80,7 @@ export function OwnerRequestDetail() {
     skip: salonId === '' || date === '',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
   const [propose] = useMutation(PROPOSE_TIME_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
   const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
@@ -118,6 +121,10 @@ export function OwnerRequestDetail() {
     .map((row: OccupyingBooking) => occupyingBlock(row))
     .filter((row) => row !== null)
   const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
+  const assignTaps =
+    booking === undefined || booking.worker !== null || occupying === undefined
+      ? []
+      : freeWorkers(workers, booking.preferredStartsAtLabel, booking.durationMinutes, blocks)
   const queuePath =
     booking === undefined
       ? '/owner'
@@ -143,6 +150,22 @@ export function OwnerRequestDetail() {
     setError(null)
     try {
       await accept({ variables: { bookingId: booking.id } })
+      await refetchBooking()
+    } catch (caught) {
+      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onAssign(workerIdToAssign: string) {
+    if (booking === undefined) {
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await assignWorker({ variables: { bookingId: booking.id, workerId: workerIdToAssign } })
       await refetchBooking()
     } catch (caught) {
       setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
@@ -402,6 +425,21 @@ export function OwnerRequestDetail() {
                 </ul>
               </details>
               </>
+            ) : null}
+            {assignTaps.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {assignTaps.map((worker) => (
+                  <button
+                    key={worker.id}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void onAssign(worker.id)}
+                    className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+                  >
+                    {worker.name}
+                  </button>
+                ))}
+              </div>
             ) : null}
             {workers.length === 0 ? (
               <p className="mt-8 text-sm text-body">{t('owner.noWorkers')}</p>

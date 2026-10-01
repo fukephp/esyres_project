@@ -86,6 +86,39 @@ export function isPreferredSoon(iso: string, now = new Date()): boolean {
   return start <= now.getTime() + TWO_HOURS_MS
 }
 
+export function freeWorkers<T extends { id: string }>(
+  workers: T[],
+  start: string,
+  durationMinutes: number,
+  blocks: { workerId: string; start: string; durationMinutes: number }[],
+): T[] {
+  return workers.filter(
+    (worker) =>
+      !blocks.some(
+        (block) => block.workerId === worker.id && clockOverlaps(start, durationMinutes, block.start, block.durationMinutes),
+      ),
+  )
+}
+
+function clockOverlaps(start: string, duration: number, otherStart: string, otherDuration: number): boolean {
+  const from = clockMinutes(start)
+  const other = clockMinutes(otherStart)
+  if (from === null || other === null) {
+    return false
+  }
+
+  return from < other + otherDuration && other < from + duration
+}
+
+function clockMinutes(value: string): number | null {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (match === null) {
+    return null
+  }
+
+  return Number(match[1]) * 60 + Number(match[2])
+}
+
 export function canAcceptPreferredTime(worker: { id: string } | null): boolean {
   return worker !== null
 }

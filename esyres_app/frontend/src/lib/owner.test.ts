@@ -13,6 +13,7 @@ import {
   isFifteenMinute,
   isPreferredSoon,
   occupiedElapsedShare,
+  freeWorkers,
   occupyingBlock,
   occupyingColSpan,
   currentJobLabel,
@@ -241,6 +242,17 @@ test('propose start times are droppable starts for that worker', () => {
   expect(proposeStartTimes(cells, blocks, '1')).toEqual(['09:45'])
   expect(proposeStartTimes(cells, blocks, '2')).toEqual(['09:00', '09:15', '09:45'])
   expect(proposeStartTimes([], blocks, '1')).toEqual([])
+})
+
+test('freeWorkers lists names that do not overlap the range', () => {
+  const workers = [
+    { id: '1', name: 'Lejla' },
+    { id: '2', name: 'Amina' },
+  ]
+  const blocks = [{ workerId: '1', start: '11:00', durationMinutes: 30 }]
+  expect(freeWorkers(workers, '11:00', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
+  expect(freeWorkers(workers, '11:30', 30, blocks).map((row) => row.name)).toEqual(['Lejla', 'Amina'])
+  expect(freeWorkers(workers, '10:45', 30, blocks).map((row) => row.name)).toEqual(['Amina'])
 })
 
 test('owner queue path omits today', () => {

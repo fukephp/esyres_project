@@ -19,6 +19,8 @@ trait OwnerSteps
 {
     private ?\Throwable $seederException = null;
 
+    private ?string $rememberedRespondedAt = null;
+
     /**
      * @When I set my owner view to :view
      */
@@ -423,6 +425,91 @@ GQL);
         $this->graphql($this->acceptPreferredTimeMutation(), [
             'bookingId' => $id,
         ]);
+    }
+
+    /**
+     * @When I assign the salon worker
+     */
+    public function iAssignTheSalonWorker(): void
+    {
+        if ($this->worker === null) {
+            throw new RuntimeException('Salon worker fixture is missing');
+        }
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $this->worker->id,
+        ]);
+    }
+
+    /**
+     * @When I assign worker :name
+     */
+    public function iAssignWorker(string $name): void
+    {
+        $worker = Worker::query()->where('salon_id', $this->salon->id)->where('name', $name)->firstOrFail();
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => (string) $worker->id,
+        ]);
+    }
+
+    /**
+     * @When I assign worker :name for :customer
+     */
+    public function iAssignWorkerFor(string $name, string $customer): void
+    {
+        $this->booking = Booking::query()
+            ->where('salon_id', $this->salon->id)
+            ->whereHas('customer', static fn ($query) => $query->where('name', $customer))
+            ->firstOrFail();
+        $this->iAssignWorker($name);
+    }
+
+    /**
+     * @When I assign worker id :id
+     */
+    public function iAssignWorkerId(string $id): void
+    {
+        $this->graphql($this->assignWorkerMutation(), [
+            'bookingId' => (string) $this->booking->id,
+            'workerId' => $id,
+        ]);
+    }
+
+    /**
+     * @Then the assigned booking status is :status
+     */
+    public function theAssignedBookingStatusIs(string $status): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($status, $this->graphql['data']['assignWorker']['status']);
+    }
+
+    /**
+     * @Then the assigned worker is :name
+     */
+    public function theAssignedWorkerIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['assignWorker']['worker']['name']);
+    }
+
+    /**
+     * @When I remember owner_responded_at
+     */
+    public function iRememberOwnerRespondedAt(): void
+    {
+        $this->booking->refresh();
+        $this->rememberedRespondedAt = $this->booking->owner_responded_at?->utc()->toIso8601String();
+    }
+
+    /**
+     * @Then that booking's owner_responded_at is unchanged
+     */
+    public function thatBookingsOwnerRespondedAtIsUnchanged(): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($this->rememberedRespondedAt, $this->booking->owner_responded_at?->utc()->toIso8601String());
     }
 
     /**
@@ -1810,6 +1897,19 @@ mutation Accept($bookingId: ID!) {
   acceptPreferredTime(bookingId: $bookingId) {
     id
     status
+  }
+}
+GQL;
+    }
+
+    private function assignWorkerMutation(): string
+    {
+        return <<<'GQL'
+mutation Assign($bookingId: ID!, $workerId: ID!) {
+  assignWorker(bookingId: $bookingId, workerId: $workerId) {
+    id
+    status
+    worker { id name }
   }
 }
 GQL;

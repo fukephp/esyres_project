@@ -100,6 +100,15 @@ export const ACCEPT_PREFERRED_TIME_MUTATION = gql`
   }
 `
 
+export const ASSIGN_WORKER_MUTATION = gql`
+  mutation AssignWorker($bookingId: ID!, $workerId: ID!) {
+    assignWorker(bookingId: $bookingId, workerId: $workerId) {
+      id
+      status
+    }
+  }
+`
+
 export const PROPOSE_TIME_MUTATION = gql`
   mutation ProposeTime($bookingId: ID!, $workerId: ID!, $proposedTime: String!) {
     proposeTime(bookingId: $bookingId, workerId: $workerId, proposedTime: $proposedTime) {

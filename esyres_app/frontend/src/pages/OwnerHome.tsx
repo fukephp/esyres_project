@@ -16,6 +16,7 @@ import {
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
   ACCEPT_RESCHEDULE_MUTATION,
+  ASSIGN_WORKER_MUTATION,
   BOOKING_CUSTOMER_RESPONDED_SUBSCRIPTION,
   BOOKING_RESCHEDULED_SUBSCRIPTION,
   BOOKING_CANCELLED_SUBSCRIPTION,
@@ -46,10 +47,12 @@ import {
   assistantOriginVisible,
   canAcceptPreferredTime,
   declineErrorKey,
+  freeWorkers,
   hoursForDate,
   isPreferredSoon,
   kanbanGroups,
   occupiedElapsedShare,
+  occupyingBlock,
   occupyingSarajevoYmd,
   nextPendingDay,
   boardSearchParams,
@@ -150,6 +153,7 @@ export function OwnerHome({
     fetchPolicy: 'network-only',
   })
   const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
   const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
   const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
@@ -202,6 +206,31 @@ export function OwnerHome({
       const mutate = row.reschedulePending ? acceptReschedule : accept
       await mutate({
         variables: { bookingId: row.id },
+        refetchQueries: refetchBoard(),
+      })
+    } catch (error) {
+      setErrors((current) => ({
+        ...current,
+        [row.id]: t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(error))}`),
+      }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function onAssign(row: PendingBooking, workerId: string) {
+    if (salon === null) {
+      return
+    }
+    setBusyId(row.id)
+    setErrors((current) => {
+      const next = { ...current }
+      delete next[row.id]
+      return next
+    })
+    try {
+      await assignWorker({
+        variables: { bookingId: row.id, workerId },
         refetchQueries: refetchBoard(),
       })
     } catch (error) {
@@ -335,6 +364,12 @@ export function OwnerHome({
   const badge = chatBadgeCount(chatCount?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? salon.id
   const rangeRows = occupyingRange?.occupyingBookingsRange ?? []
+  const occupyingRows = kanban ? (dayBookings?.salonDayBookings ?? []) : rangeRows.filter((row) => occupyingSarajevoYmd(row) === date)
+  const occupyingReady = kanban ? dayBookings !== undefined : occupyingRange !== undefined
+  const freeBlocks = occupyingRows.flatMap((row) => {
+    const block = occupyingBlock(row)
+    return block === null ? [] : [block]
+  })
   const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'))
   const dayTitle = `${t(`weekday.${sarajevoWeekday(date)}`)}, ${formatPickerDayNumeric(date)}`
 
@@ -350,6 +385,12 @@ export function OwnerHome({
           dismissOpen={dismissId === row.id}
           reasonDraft={reasonDraft}
           onAccept={() => void onAccept(row)}
+          taps={
+            occupyingReady && row.worker === null
+              ? freeWorkers(workers, row.preferredStartsAtLabel, row.durationMinutes, freeBlocks)
+              : []
+          }
+          onAssign={(workerId) => void onAssign(row, workerId)}
           onDeclineOpen={() => {
             setDeclineId(row.id)
             setReasonDraft('')
@@ -513,6 +554,8 @@ function QueueRow({
   dismissOpen,
   reasonDraft,
   onAccept,
+  taps,
+  onAssign,
   onDeclineOpen,
   onDeclineCancel,
   onDeclineConfirm,
@@ -528,6 +571,8 @@ function QueueRow({
   dismissOpen: boolean
   reasonDraft: string
   onAccept: () => void
+  taps: { id: string; name: string }[]
+  onAssign: (workerId: string) => void
   onDeclineOpen: () => void
   onDeclineCancel: () => void
   onDeclineConfirm: () => void
@@ -587,6 +632,17 @@ function QueueRow({
             {t('owner.accept')}
           </button>
         ) : null}
+        {taps.map((worker) => (
+          <button
+            key={worker.id}
+            type="button"
+            disabled={busy}
+            onClick={() => onAssign(worker.id)}
+            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          >
+            {worker.name}
+          </button>
+        ))}
         {chrome.propose ? (
           <Link
             to={`/owner/requests/${row.id}`}

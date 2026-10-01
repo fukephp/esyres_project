@@ -327,6 +327,7 @@ type Mutation {
     releaseAssistantIntake(id: ID!): AssistantIntake!
     updateSalonDnd(salonId: ID!, dnd: Boolean!): Salon
     acceptPreferredTime(bookingId: ID!): Booking!
+    assignWorker(bookingId: ID!, workerId: ID!): Booking!
     proposeTime(bookingId: ID!, workerId: ID!, proposedTime: String!): Booking!
     declineBooking(bookingId: ID!, reason: String): Booking!
     confirmProposedTime(bookingId: ID!): Booking!
