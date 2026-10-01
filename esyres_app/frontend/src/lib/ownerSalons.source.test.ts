@@ -71,6 +71,8 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
   }
   expect(read('components/OwnerShell.tsx')).toMatch(/<OwnerNav/)
   expect(read('components/OwnerShell.tsx')).toMatch(/md:w-16/)
+  expect(read('components/OwnerShell.tsx')).toMatch(/md:w-60/)
+  expect(read('components/OwnerShell.tsx')).toMatch(/ownerRailExpanded/)
   expect(read('components/OwnerNav.tsx')).toMatch(/<svg/)
   expect(nav.indexOf('owner.salons')).toBeLessThan(nav.indexOf('owner.settings'))
   expect(nav).toMatch(/key: 'settings'/)

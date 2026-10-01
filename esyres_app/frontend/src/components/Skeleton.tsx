@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GUEST_COLUMN_CLASS } from '../lib/homepage'
+import { OWNER_RAIL_STORAGE_KEY, ownerRailExpanded } from '../lib/owner'
 
 export const SKELETON_DELAY_MS = 150
 
@@ -265,11 +266,17 @@ export function RequestDetailSkeleton() {
 
 export function OwnerShellGhost({ children }: { children: ReactNode }) {
   const visible = useSkeletonVisible()
+  let expanded = false
+  try {
+    expanded = ownerRailExpanded(localStorage.getItem(OWNER_RAIL_STORAGE_KEY))
+  } catch {
+    expanded = false
+  }
   return (
     <div className="min-h-svh bg-page text-ink md:flex">
       <aside
         aria-hidden="true"
-        className="hidden bg-surface-dark px-4 py-6 md:sticky md:top-0 md:flex md:h-svh md:w-16 md:shrink-0 md:flex-col md:items-center"
+        className={`hidden bg-surface-dark px-4 py-6 md:sticky md:top-0 md:flex md:h-svh md:shrink-0 md:flex-col md:items-center ${expanded ? 'md:w-60' : 'md:w-16'}`}
       >
         {visible ? (
           <>

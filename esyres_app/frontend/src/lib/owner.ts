@@ -4,6 +4,12 @@ export { formatSarajevoTime }
 
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 
+export const OWNER_RAIL_STORAGE_KEY = 'esyres.ownerRail'
+
+export function ownerRailExpanded(stored: string | null): boolean {
+  return stored === 'expanded'
+}
+
 export function isYmd(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (match === null) {

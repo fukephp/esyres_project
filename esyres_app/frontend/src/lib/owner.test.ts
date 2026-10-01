@@ -67,6 +67,8 @@ import {
   ownerMonthDays,
   ownerMonthWeekdayOffset,
   formatOwnerMonthTitle,
+  OWNER_RAIL_STORAGE_KEY,
+  ownerRailExpanded,
   occupyingClockRange,
   occupyingDiaryMeta,
   ownerDetailMode,
@@ -81,6 +83,17 @@ test('omit or invalid date falls back to Sarajevo today', () => {
   expect(ownerDateFromSearch('nope', '2026-08-29')).toBe('2026-08-29')
   expect(ownerDateFromSearch('2026-02-31', '2026-08-29')).toBe('2026-08-29')
   expect(ownerDateFromSearch('2026-08-31', '2026-08-29')).toBe('2026-08-31')
+})
+
+test('owner rail is expanded only when this browser stored that word', async () => {
+  expect(OWNER_RAIL_STORAGE_KEY).toBe('esyres.ownerRail')
+  expect(ownerRailExpanded(null)).toBe(false)
+  expect(ownerRailExpanded('')).toBe(false)
+  expect(ownerRailExpanded('collapsed')).toBe(false)
+  expect(ownerRailExpanded('expanded')).toBe(true)
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.expandMenu')).toBe('Proširi izbornik')
+  expect(i18n.t('owner.collapseMenu')).toBe('Sklopi izbornik')
 })
 
 test('owner day heading is Bosnian Intl without trailing period', () => {
