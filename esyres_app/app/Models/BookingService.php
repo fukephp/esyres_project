@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['booking_id', 'name', 'duration_minutes', 'price_feninga'])]
+#[Fillable(['booking_id', 'service_id', 'name', 'duration_minutes', 'price_feninga'])]
 class BookingService extends Model
 {
     /**

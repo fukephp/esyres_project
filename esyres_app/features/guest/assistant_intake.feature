@@ -112,7 +112,7 @@ Feature: Guest assistant intake persistence
       """
       {"name": "Ana"}
       """
-    And the salon has a requested booking on "2026-08-31" at "10:00" for "Lejla"
+    And the salon has a requested booking on "2026-09-03" at "10:00" for "Lejla"
     And that booking is for the salon worker
     And that booking is confirmed
     And a verified customer "ana@example.com" with password "secret-pass"
@@ -123,15 +123,15 @@ Feature: Guest assistant intake persistence
     Then the booking status is "REQUESTED"
     When I upsert a new assistant intake as a guest
     Then the intake token is a uuid
-    When I create a booking on "2026-08-31" at "21:00" with the salon services and the intake token
+    When I create a booking on "2026-09-01" at "21:00" with the salon services and the intake token
     Then the booking status is "REQUESTED"
     When I upsert a new assistant intake as a guest
     Then the intake token is a uuid
-    When I create a booking on "2026-08-31" at "10:07" with the salon services and the intake token
+    When I create a booking on "2026-09-02" at "10:07" with the salon services and the intake token
     Then the booking status is "REQUESTED"
     When I upsert a new assistant intake as a guest
     Then the intake token is a uuid
-    When I create a booking on "2026-08-31" at "10:00" with the salon services and the intake token
+    When I create a booking on "2026-09-03" at "10:00" with the salon services and the intake token
     Then the booking status is "REQUESTED"
 
   Scenario: Unknown intake token still creates the booking

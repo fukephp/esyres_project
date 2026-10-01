@@ -3,6 +3,7 @@
 namespace App\GraphQL\Mutations;
 
 use App\Booking\QuarterStarts;
+use App\Booking\SameDayService;
 use App\Exceptions\ClientError;
 use App\Models\AssistantIntake;
 use App\Models\Booking;
@@ -55,6 +56,7 @@ final class CreateBooking
         }
 
         $booking = DB::transaction(function () use ($user, $salon, $services, $workerId, $starts, $input, $duration): Booking {
+            SameDayService::assertForServices($user->id, $salon->id, $input['preferredDate'], $services, 0);
             $booking = new Booking;
             $booking->salon_id = $salon->id;
             $booking->customer_id = $user->id;
@@ -69,6 +71,7 @@ final class CreateBooking
             foreach ($services as $service) {
                 $row = new BookingService;
                 $row->booking_id = $booking->id;
+                $row->service_id = $service->id;
                 $row->name = $service->name;
                 $row->duration_minutes = $service->duration_minutes;
                 $row->price_feninga = $service->price_feninga;

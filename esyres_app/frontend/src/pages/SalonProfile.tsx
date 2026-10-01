@@ -127,6 +127,9 @@ function gateMessage(
   if (code === 'SLOT_TAKEN') {
     return t('salon.gate.SLOT_TAKEN')
   }
+  if (code === 'SAME_DAY_SERVICE') {
+    return t('salon.gate.SAME_DAY_SERVICE')
+  }
   if (code === 'INVALID_CREDENTIALS') {
     return t('salon.gate.INVALID_CREDENTIALS')
   }

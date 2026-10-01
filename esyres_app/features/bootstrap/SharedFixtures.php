@@ -250,6 +250,90 @@ trait SharedFixtures
     }
 
     /**
+     * @Then that booking preferred date is :date
+     */
+    public function thatBookingPreferredDateIs(string $date): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($date, $this->booking->preferred_date->format('Y-m-d'));
+    }
+
+    /**
+     * @Then that booking is still :status
+     */
+    public function thatBookingIsStill(string $status): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($status, $this->booking->status);
+    }
+
+    /**
+     * @Then the customer has :count bookings
+     */
+    public function theCustomerHasBookings(int $count): void
+    {
+        $this->assertSame($count, Booking::query()->where('customer_id', $this->user->id)->count());
+    }
+
+    /**
+     * @Given that booking snapshot is only the name :name
+     */
+    public function thatBookingSnapshotIsOnlyTheName(string $name): void
+    {
+        BookingService::query()->where('booking_id', $this->booking->id)->update([
+            'name' => $name,
+            'service_id' => null,
+        ]);
+    }
+
+    /**
+     * @Given the salon service :from is renamed to :to
+     */
+    public function theSalonServiceIsRenamedTo(string $from, string $to): void
+    {
+        $service = Service::query()->where('salon_id', $this->salon->id)->where('name', $from)->firstOrFail();
+        $service->name = $to;
+        $service->save();
+    }
+
+    /**
+     * @Then that intake has no booking
+     */
+    public function thatIntakeHasNoBooking(): void
+    {
+        $this->intake->refresh();
+        $this->assertNull($this->intake->booking_id);
+    }
+
+    /**
+     * @Given the salon has a phone booking on :date at :time for service :name
+     */
+    public function theSalonHasAPhoneBooking(string $date, string $time, string $name): void
+    {
+        if ($this->worker === null) {
+            throw new RuntimeException('Salon worker fixture is missing');
+        }
+        $starts = Carbon::createFromFormat('Y-m-d H:i', $date.' '.$time, 'Europe/Sarajevo');
+        $booking = new Booking;
+        $booking->salon_id = $this->salon->id;
+        $booking->customer_id = null;
+        $booking->worker_id = $this->worker->id;
+        $booking->preferred_date = $date;
+        $booking->preferred_starts_at = $starts;
+        $booking->status = Booking::CONFIRMED;
+        $booking->duration_minutes = 30;
+        $booking->origin = Booking::ORIGIN_PHONE;
+        $booking->caller_name = 'Poziv';
+        $booking->save();
+        $row = new BookingService;
+        $row->booking_id = $booking->id;
+        $row->name = $name;
+        $row->duration_minutes = 30;
+        $row->price_feninga = 2500;
+        $row->save();
+    }
+
+    /**
      * @Then that booking has no reschedule overlay
      */
     public function thatBookingHasNoRescheduleOverlay(): void
