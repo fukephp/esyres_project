@@ -1,14 +1,14 @@
 import { expect, test } from 'vitest'
 import type { AssistantDayHours } from './assistant'
 import {
-  applyHoursRowTap,
   formatPickerDayNumeric,
+  guestAfterServiceChange,
+  guestDayChange,
+  guestHoursSkip,
+  hoursHaveOpenQuarter,
   hoursRowClosed,
-  hoursRowSelected,
-  hoursRowTappable,
   nextSarajevoDateForWeekday,
   sarajevoWeekdayFromYmd,
-  showDaySendPill,
 } from './salonHours'
 
 const today = '2026-09-13'
@@ -45,85 +45,77 @@ test('hoursRowClosed follows assistantHoursFacts', () => {
   expect(hoursRowClosed(openMonday)).toBe(false)
 })
 
-test('hoursRowTappable only for open rows with services in idle picker or chat', () => {
-  expect(hoursRowTappable({ closed: true, hasServices: true, mode: 'idle' })).toBe(false)
-  expect(hoursRowTappable({ closed: false, hasServices: false, mode: 'idle' })).toBe(false)
-  expect(hoursRowTappable({ closed: false, hasServices: true, mode: 'sent' })).toBe(false)
-  expect(hoursRowTappable({ closed: false, hasServices: true, mode: 'idle' })).toBe(true)
-  expect(hoursRowTappable({ closed: false, hasServices: true, mode: 'picker' })).toBe(true)
-  expect(hoursRowTappable({ closed: false, hasServices: true, mode: 'chat' })).toBe(true)
+test('hoursHaveOpenQuarter ignores duration, past, and a break that does not cover every tick', () => {
+  expect(hoursHaveOpenQuarter(undefined)).toBe(false)
+  expect(hoursHaveOpenQuarter(closedSunday)).toBe(false)
+  expect(hoursHaveOpenQuarter({ ...openMonday, opensAt: null, closesAt: null, closed: false })).toBe(false)
+  expect(hoursHaveOpenQuarter(openMonday)).toBe(true)
+  expect(hoursHaveOpenQuarter({ ...openMonday, opensAt: '09:00', closesAt: '09:10' })).toBe(true)
+  expect(hoursHaveOpenQuarter({ ...openMonday, opensAt: '09:07', closesAt: '09:10' })).toBe(false)
+  expect(
+    hoursHaveOpenQuarter({ ...openMonday, opensAt: '12:00', closesAt: '13:00', breakStartsAt: '12:00', breakEndsAt: '13:00' }),
+  ).toBe(false)
+  expect(
+    hoursHaveOpenQuarter({ ...openMonday, opensAt: '09:00', closesAt: '17:00', breakStartsAt: '12:00', breakEndsAt: '13:00' }),
+  ).toBe(true)
 })
 
-test('hoursRowSelected matches weekday of preferredDate, including next week', () => {
-  expect(hoursRowSelected({ tappable: true, rowWeekday: 'MONDAY', preferredDate: '' })).toBe(false)
-  expect(hoursRowSelected({ tappable: false, rowWeekday: 'MONDAY', preferredDate: '2026-09-14' })).toBe(false)
-  expect(hoursRowSelected({ tappable: true, rowWeekday: 'MONDAY', preferredDate: '2026-09-15' })).toBe(false)
-  expect(hoursRowSelected({ tappable: true, rowWeekday: 'MONDAY', preferredDate: '2026-09-14' })).toBe(true)
-  expect(hoursRowSelected({ tappable: true, rowWeekday: 'MONDAY', preferredDate: '2026-09-21' })).toBe(true)
+test('guestHoursSkip picks the first open day in the next 7 and does not store a later day', () => {
+  const names = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+  const hours = (open: string[]): AssistantDayHours[] =>
+    names.map((weekday) =>
+      open.includes(weekday) ? { ...openMonday, weekday } : { ...closedSunday, weekday },
+    )
+
+  expect(guestHoursSkip(today, hours(['SUNDAY']))).toEqual({ chip: 'today', date: '2026-09-13' })
+  expect(guestHoursSkip(today, hours(['MONDAY']))).toEqual({ chip: 'tomorrow', date: '2026-09-14' })
+  expect(guestHoursSkip(today, hours(['TUESDAY']))).toEqual({ chip: 'other', date: '' })
+  expect(guestHoursSkip(today, hours([]))).toEqual({ chip: 'today', date: '2026-09-13' })
 })
 
-test('applyHoursRowTap noops when not tappable or already selected', () => {
-  expect(
-    applyHoursRowTap({
-      tappable: false,
-      selected: false,
-      weekday: 'MONDAY',
-      today,
-      preferredTime: '',
-    }),
-  ).toEqual({ noop: true })
-  expect(
-    applyHoursRowTap({
-      tappable: true,
-      selected: true,
-      weekday: 'MONDAY',
-      today,
-      preferredTime: '10:00',
-    }),
-  ).toEqual({ noop: true })
-})
-
-test('applyHoursRowTap seeds next weekday from today and keeps time, without opening picker', () => {
-  expect(
-    applyHoursRowTap({
-      tappable: true,
-      selected: false,
-      weekday: 'MONDAY',
-      today,
-      preferredTime: '',
-    }),
-  ).toEqual({
-    preferredDate: '2026-09-14',
-    preferredTime: '',
+test('guestDayChange clears the start and worker; Drugi dan clears the date', () => {
+  expect(guestDayChange(today, { chip: 'today' })).toEqual({
+    chip: 'today',
+    date: '2026-09-13',
+    time: '',
+    workerId: '',
   })
-  expect(
-    applyHoursRowTap({
-      tappable: true,
-      selected: false,
-      weekday: 'TUESDAY',
-      today,
-      preferredTime: '10:00',
-    }),
-  ).toEqual({
-    preferredDate: '2026-09-15',
-    preferredTime: '10:00',
+  expect(guestDayChange(today, { chip: 'tomorrow' })).toEqual({
+    chip: 'tomorrow',
+    date: '2026-09-14',
+    time: '',
+    workerId: '',
+  })
+  expect(guestDayChange(today, { chip: 'other' })).toEqual({
+    chip: 'other',
+    date: '',
+    time: '',
+    workerId: '',
+  })
+  expect(guestDayChange(today, { date: '2026-09-13' })).toEqual({
+    chip: 'today',
+    date: '2026-09-13',
+    time: '',
+    workerId: '',
+  })
+  expect(guestDayChange(today, { date: '2026-09-14' })).toEqual({
+    chip: 'tomorrow',
+    date: '2026-09-14',
+    time: '',
+    workerId: '',
+  })
+  expect(guestDayChange(today, { date: '2026-09-16' })).toEqual({
+    chip: 'other',
+    date: '2026-09-16',
+    time: '',
+    workerId: '',
   })
 })
 
-test('showDaySendPill needs a selected day, services, tappable row, and not chat or sent', () => {
-  const open = {
-    preferredDate: '2026-09-14',
-    hasServices: true,
-    chatting: false,
-    sent: false,
-    tappable: true,
-  }
-  expect(showDaySendPill({ ...open, preferredDate: '' })).toBe(false)
-  expect(showDaySendPill(open)).toBe(true)
-  expect(showDaySendPill({ ...open, hasServices: false })).toBe(false)
-  expect(showDaySendPill({ ...open, chatting: true })).toBe(false)
-  expect(showDaySendPill({ ...open, sent: true })).toBe(false)
-  expect(showDaySendPill({ ...open, tappable: false })).toBe(false)
+test('guestAfterServiceChange keeps a tappable start and does not touch the day', () => {
+  expect(guestAfterServiceChange('10:00', ['09:00', '10:00'])).toBe('10:00')
+  expect(guestAfterServiceChange('10:00', ['09:00'])).toBe('')
+  expect(guestAfterServiceChange('', ['09:00'])).toBe('')
 })
 
 test('formatPickerDayNumeric is day. month. year without pad or trailing period', () => {

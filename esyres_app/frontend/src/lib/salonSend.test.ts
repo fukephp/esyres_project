@@ -49,10 +49,14 @@ test('press hex stays arbitrary; hairline and Manrope stay tokens', () => {
   expect(read('lib/salonSend.ts')).not.toMatch(/from '\.\/homepage'/)
 })
 
-test('i18n send stays Pošalji zahtjev; hours hint is day-first copy', () => {
+test('i18n send stays Pošalji zahtjev; day chips and the login line are guest copy', () => {
   const i18n = read('i18n.ts')
   expect(i18n).toMatch(/send: 'Pošalji zahtjev'/)
-  expect(i18n).toMatch(/sendHint: 'Odaberi dan da pošalješ zahtjev\.'/)
+  expect(i18n).not.toMatch(/sendHint:/)
+  expect(i18n).toMatch(/loginToRequest: 'Prijavi se ili se registruj da pošalješ zahtjev\.'/)
+  expect(i18n).toMatch(/today: 'Danas'/)
+  expect(i18n).toMatch(/tomorrow: 'Sutra'/)
+  expect(i18n).toMatch(/otherDay: 'Drugi dan'/)
   expect(i18n).toMatch(/WEDNESDAY: 'Srijeda'/)
   expect(i18n).toMatch(/ask: 'Nisi sigurna\? Pitaj salon\.'/)
   expect(i18n).toMatch(/hello: '\{\{name\}\} ovdje\.'/)

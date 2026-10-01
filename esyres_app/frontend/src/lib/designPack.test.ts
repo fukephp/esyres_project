@@ -119,7 +119,7 @@ test('discovery and salon stay sparse; no homepage IA', () => {
   expect(salon).toMatch(/GUEST_COLUMN_CLASS/)
   expect(salon).not.toMatch(/mx-auto max-w-md/)
   expect(salon).not.toMatch(/md:grid-cols-2/)
-  expect(salon).toMatch(/bg-surface-soft/)
+  expect(salon).not.toMatch(/hover:bg-surface-soft/)
   expect(salon).toMatch(/<TopNav/)
   expect(salon).not.toMatch(/CompanyPitch/)
   expect(salon).not.toMatch(/company-pitch/)
