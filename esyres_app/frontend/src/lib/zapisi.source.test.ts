@@ -69,10 +69,14 @@ test('zapisi page is week day chips with origin chips, Kalendar or Kanban, and n
   expect(page).not.toMatch(/occupyingBookingsRange/)
 })
 
-test('request detail Nazad returns to Zapisi only when opened from there', () => {
+test('request detail closes to the board in location state', () => {
   const detail = read('pages/OwnerRequestDetail.tsx')
-  expect(detail).toMatch(/search\.get\('from'\) === 'zapisi'/)
-  expect(detail).toMatch(/ownerZapisiPath/)
+  const boards = read('components/OwnerBoards.tsx')
+  expect(detail).toMatch(/location\.state/)
+  expect(detail).toMatch(/startsWith\('\/owner\/zapisi'\)/)
   expect(detail).toMatch(/ownerQueuePath/)
-  expect(detail).toMatch(/to=\{leavePath\}/)
+  expect(detail).toMatch(/<OwnerZapisi/)
+  expect(detail).toMatch(/<OwnerHome/)
+  expect(boards).toMatch(/state=\{\{ board:/)
+  expect(read('pages/OwnerHome.tsx')).toMatch(/state=\{\{ board:/)
 })

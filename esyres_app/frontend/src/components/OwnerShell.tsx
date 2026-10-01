@@ -29,6 +29,7 @@ type Props = {
   active: OwnerNavActive
   onSalon?: (id: string) => void
   action?: ReactNode
+  hideSwitcher?: boolean
   children: ReactNode
 }
 
@@ -43,6 +44,7 @@ export function OwnerShell({
   active,
   onSalon,
   action,
+  hideSwitcher = false,
   children,
 }: Props) {
   const { t } = useTranslation()
@@ -109,7 +111,7 @@ export function OwnerShell({
             <img src="/esyres-mark.svg" width={24} height={24} alt="" aria-hidden="true" />
           </Link>
           <div className="min-w-0 flex-1">
-            <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark={false} />
+            <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} hideSwitcher={hideSwitcher} dark={false} />
           </div>
           {active === 'stats' ? null : (
             <Link to={ownerStatsPath(salonId, firstOwnedId)} className="text-sm text-body">
@@ -129,7 +131,7 @@ export function OwnerShell({
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:block">
-              <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark={false} />
+              <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} hideSwitcher={hideSwitcher} dark={false} />
             </div>
             {action}
           </div>
@@ -147,15 +149,17 @@ function SalonSwitcher({
   salons,
   salon,
   onSalon,
+  hideSwitcher,
   dark,
 }: {
   salons: { id: string; name: string }[]
   salon: { id: string; name: string } | null
   onSalon?: (id: string) => void
+  hideSwitcher: boolean
   dark: boolean
 }) {
   const { t } = useTranslation()
-  if (onSalon !== undefined && salon !== null && salons.length > 1) {
+  if (!hideSwitcher && onSalon !== undefined && salon !== null && salons.length > 1) {
     return (
       <label className={`block text-xs ${dark ? 'text-on-dark-soft' : 'text-muted'}`}>
         <span className="sr-only md:not-sr-only">{t('owner.salon')}</span>

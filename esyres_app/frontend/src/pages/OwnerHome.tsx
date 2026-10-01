@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
@@ -52,6 +52,7 @@ import {
   occupiedElapsedShare,
   occupyingSarajevoYmd,
   nextPendingDay,
+  boardSearchParams,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
@@ -64,7 +65,13 @@ import {
   trimDeclineReason,
 } from '../lib/owner'
 
-export function OwnerHome() {
+export function OwnerHome({
+  lockedSearch,
+  hideSwitcher = false,
+}: {
+  lockedSearch?: string
+  hideSwitcher?: boolean
+} = {}) {
   const { t } = useTranslation()
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
@@ -72,14 +79,15 @@ export function OwnerHome() {
     return () => clearInterval(id)
   }, [])
   const [params, setParams] = useSearchParams()
-  const date = ownerDateFromSearch(params.get('date'))
+  const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
+  const date = ownerDateFromSearch(boardParams.get('date'))
   const days = ownerWeekDays(date)
   const week = { from: days[0], to: days[6] }
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const kanban = data?.me?.ownerView === 'KANBAN'
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
-  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
+  const salonId = ownerSalonFromSearch(boardParams.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
@@ -153,10 +161,16 @@ export function OwnerHome() {
   const [phoneOpen, setPhoneOpen] = useState(false)
 
   function onDate(value: string) {
+    if (lockedSearch !== undefined) {
+      return
+    }
     setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
   }
 
   function onSalon(id: string) {
+    if (lockedSearch !== undefined) {
+      return
+    }
     setPhoneOpen(false)
     setParams(ownerSearchParams(date, sarajevoToday(), id, salons[0]?.id ?? null))
   }
@@ -377,6 +391,7 @@ export function OwnerHome() {
         date={date}
         badge={badge}
         active="queue"
+        hideSwitcher={hideSwitcher}
         onSalon={onSalon}
         action={
           <>
@@ -475,7 +490,9 @@ export function OwnerHome() {
         onSaved={(saved) => {
           const savedWeek = ownerWeekDays(saved)
           setPhoneOpen(false)
-          setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          if (lockedSearch === undefined) {
+            setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
+          }
           void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
           if (kanban) {
             void refetchDay({ salonId: salon.id, date: saved, origin: null })
@@ -520,6 +537,7 @@ function QueueRow({
   onReasonChange: (value: string) => void
 }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const chrome = overlayQueueChrome(row.reschedulePending)
   const clock = queueRowLabel(row)
 
@@ -572,6 +590,7 @@ function QueueRow({
         {chrome.propose ? (
           <Link
             to={`/owner/requests/${row.id}`}
+            state={{ board: `${location.pathname}${location.search}` }}
             className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink"
           >
             {t('owner.propose')}

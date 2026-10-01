@@ -487,9 +487,15 @@ export function requestFromZapisiPath(
   origin: ZapisiOrigin | null = null,
 ): string {
   const list = ownerZapisiPath(date, today, salonId, firstOwnedId, origin)
-  const extra = list.includes('?') ? `&${list.slice(list.indexOf('?') + 1)}` : ''
+  const query = list.includes('?') ? list.slice(list.indexOf('?')) : ''
 
-  return `/owner/requests/${bookingId}?from=zapisi${extra}`
+  return `/owner/requests/${bookingId}${query}`
+}
+
+export function boardSearchParams(board: string): URLSearchParams {
+  const query = board.includes('?') ? board.slice(board.indexOf('?') + 1) : ''
+
+  return new URLSearchParams(query)
 }
 
 export function ownerPhonePath(

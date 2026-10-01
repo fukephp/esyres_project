@@ -256,9 +256,9 @@ test('owner zapisi path omits today, first salon, and Svi', () => {
   expect(zapisiOriginFromSearch('nope')).toBeNull()
   expect(zapisiOriginFromSearch('assistant')).toBe('assistant')
   expect(requestFromZapisiPath('9', '2026-08-30', '2026-08-29', '2', '1', 'picker')).toBe(
-    '/owner/requests/9?from=zapisi&date=2026-08-30&salon=2&origin=picker',
+    '/owner/requests/9?date=2026-08-30&salon=2&origin=picker',
   )
-  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9?from=zapisi')
+  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9')
 })
 
 test('owner phone path keeps the return day and omits the first salon', () => {

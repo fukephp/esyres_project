@@ -217,7 +217,6 @@ test('owner ready state is OwnerShell; TopNav only on gate states; no bookings o
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
     'pages/OwnerStats.tsx',
-    'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
@@ -238,6 +237,13 @@ test('owner ready state is OwnerShell; TopNav only on gate states; no bookings o
     expect(text, file).not.toMatch(/home\.footer/)
     expect(text, file).not.toMatch(/pitch\.cta/)
   }
+  const detail = read('pages/OwnerRequestDetail.tsx')
+  expect(detail).toMatch(/<TopNav/)
+  expect(detail).toMatch(/<dialog/)
+  expect(detail).not.toMatch(/<OwnerNav/)
+  expect(detail.slice(detail.lastIndexOf('<dialog'))).not.toMatch(/<TopNav/)
+  expect(detail).not.toMatch(/GUEST_COLUMN_CLASS/)
+  expect(detail).not.toMatch(/nav\.bookings/)
   const shell = read('components/OwnerShell.tsx')
   const asideEnd = shell.indexOf('md:hidden')
   const aside = shell.slice(0, asideEnd)

@@ -74,7 +74,6 @@ test('owner chrome is the Design 2 shell: dark sidebar and dark bottom tabs', ()
     'pages/OwnerHome.tsx',
     'pages/OwnerChats.tsx',
     'pages/OwnerStats.tsx',
-    'pages/OwnerRequestDetail.tsx',
     'pages/OwnerSalons.tsx',
     'pages/OwnerSalonCreate.tsx',
     'pages/OwnerSalonEdit.tsx',
@@ -86,6 +85,14 @@ test('owner chrome is the Design 2 shell: dark sidebar and dark bottom tabs', ()
     expect(text, file).toMatch(/text-ink/)
     expect(text, file).toMatch(/<OwnerShell/)
   }
+
+  const detail = read('pages/OwnerRequestDetail.tsx')
+  expect(detail).toMatch(/bg-canvas/)
+  expect(detail).toMatch(/text-ink/)
+  expect(detail).toMatch(/<dialog/)
+  expect(detail).not.toMatch(/bg-surface-dark/)
+  expect(detail).not.toMatch(/text-on-dark/)
+  expect(detail).not.toMatch(/CompanyPitch/)
 })
 
 test('dense owner home is Kalendar week grid or status Kanban on pastel cards', () => {

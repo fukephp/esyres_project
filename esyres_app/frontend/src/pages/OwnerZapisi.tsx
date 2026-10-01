@@ -15,6 +15,7 @@ import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
+  boardSearchParams,
   KANBAN_COLUMNS,
   bookingStartIso,
   bookingStartLabel,
@@ -30,19 +31,26 @@ import {
 } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
 
-export function OwnerZapisi() {
+export function OwnerZapisi({
+  lockedSearch,
+  hideSwitcher = false,
+}: {
+  lockedSearch?: string
+  hideSwitcher?: boolean
+} = {}) {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
+  const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
-  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
+  const salonId = ownerSalonFromSearch(boardParams.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
   const today = sarajevoToday()
-  const date = ownerDateFromSearch(params.get('date'), today)
-  const origin = zapisiOriginFromSearch(params.get('origin'))
+  const date = ownerDateFromSearch(boardParams.get('date'), today)
+  const origin = zapisiOriginFromSearch(boardParams.get('origin'))
   const firstOwnedId = salons[0]?.id ?? ''
   const { data: countData } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
     variables: { salonId: salon?.id ?? '' },
@@ -65,6 +73,9 @@ export function OwnerZapisi() {
   const groups = kanbanGroups(rows)
 
   function write(nextDate: string, nextSalon: string, nextOrigin: ZapisiOrigin | null) {
+    if (lockedSearch !== undefined) {
+      return
+    }
     setParams(ownerZapisiSearchParams(nextDate, today, nextSalon, firstOwnedId, nextOrigin))
   }
 
@@ -137,6 +148,7 @@ export function OwnerZapisi() {
         date={date}
         badge={badge}
         active="zapisi"
+        hideSwitcher={hideSwitcher}
         onSalon={(id) => write(date, id, origin)}
       >
         <section className="rounded-3xl bg-canvas p-4 md:p-6">

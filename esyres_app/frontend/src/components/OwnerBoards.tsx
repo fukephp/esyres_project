@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
 import {
@@ -100,6 +100,7 @@ function ElapsedTrack({ share }: { share: number }) {
 
 export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const block = occupyingBlock(row)
   if (block === null) {
     return null
@@ -110,7 +111,11 @@ export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link to={`/owner/requests/${row.id}`} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}>
+    <Link
+      to={`/owner/requests/${row.id}`}
+      state={{ board: `${location.pathname}${location.search}` }}
+      className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}
+    >
       <span className="block text-xs font-semibold tabular-nums">{occupyingClockRange(block.start, block.durationMinutes)}</span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
       <span className="mt-0.5 block text-xs text-body">{block.label}</span>
@@ -232,11 +237,12 @@ export function BoardColumn({
 
 export function BookingCard({ row, to, now, progress }: { row: ZapisiBooking; to: string; now?: Date; progress?: number }) {
   const { t } = useTranslation()
+  const location = useLocation()
   const column = kanbanColumn(row, now)
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link to={to} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
+    <Link to={to} state={{ board: `${location.pathname}${location.search}` }} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
       <span className="flex items-center justify-between gap-2 text-xs">
         <span className="font-semibold tabular-nums">{bookingStartLabel(row)}</span>
         <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-[11px] font-semibold">{originLabel(t, row.origin)}</span>
