@@ -269,18 +269,17 @@ export function OwnerShellGhost({ children }: { children: ReactNode }) {
     <div className="min-h-svh bg-page text-ink md:flex">
       <aside
         aria-hidden="true"
-        className="hidden bg-surface-dark px-4 py-6 md:sticky md:top-0 md:flex md:h-svh md:w-60 md:shrink-0 md:flex-col"
+        className="hidden bg-surface-dark px-4 py-6 md:sticky md:top-0 md:flex md:h-svh md:w-16 md:shrink-0 md:flex-col md:items-center"
       >
         {visible ? (
           <>
-            <SkeletonBlock dark className="mx-2 h-7 w-28 rounded-md" />
-            <SkeletonBlock dark className="mx-2 mt-8 h-9 rounded-full" />
-            <div className="mt-6 space-y-2">
+            <SkeletonBlock dark className="h-6 w-6 rounded-full" />
+            <div className="mt-8 space-y-2">
               {times(6).map((i) => (
-                <SkeletonBlock key={i} dark className="h-10 rounded-full" />
+                <SkeletonBlock key={i} dark className="h-8 w-8 rounded-full" />
               ))}
             </div>
-            <SkeletonBlock dark className="mt-auto h-10 rounded-full" />
+            <SkeletonBlock dark className="mt-auto h-8 w-8 rounded-full" />
           </>
         ) : null}
       </aside>
@@ -307,7 +306,7 @@ export function OwnerShellGhost({ children }: { children: ReactNode }) {
       <div aria-hidden="true" className="fixed inset-x-0 bottom-0 z-20 bg-surface-dark md:hidden">
         <div className="flex h-16 items-center justify-around px-3">
           {visible
-            ? times(5).map((i) => <SkeletonBlock key={i} dark className="h-8 w-12 rounded-full" />)
+            ? times(5).map((i) => <SkeletonBlock key={i} dark className="h-6 w-6 rounded-full" />)
             : null}
         </div>
       </div>

@@ -44,17 +44,20 @@ export function OwnerShell({
 
   return (
     <div className="min-h-svh bg-page text-ink md:flex">
-      <aside className="hidden bg-surface-dark px-4 py-6 text-on-dark md:sticky md:top-0 md:flex md:h-svh md:w-60 md:shrink-0 md:flex-col">
-        <Link to="/" className="pitch-display flex items-center gap-2 px-2 text-xl text-on-dark">
+      <aside className="hidden bg-surface-dark px-4 py-6 text-on-dark md:sticky md:top-0 md:flex md:h-svh md:w-16 md:shrink-0 md:flex-col md:items-center">
+        <Link to="/" aria-label={t(DISCOVERY_BRAND_KEY)} className="flex items-center justify-center">
           <img src="/esyres-mark.svg" width={24} height={24} alt="" aria-hidden="true" className="invert" />
-          {t(DISCOVERY_BRAND_KEY)}
         </Link>
-        <div className="mt-8 px-2">
-          <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark />
-        </div>
         <OwnerNav salonId={salonId} firstOwnedId={firstOwnedId} date={date} badge={badge} active={active} variant="sidebar" />
-        <button type="button" className={`mt-auto ${logoutClass}`} onClick={() => void logout()}>
-          {t('home.logout')}
+        <button
+          type="button"
+          aria-label={t('home.logout')}
+          className="mt-auto flex h-10 w-10 items-center justify-center rounded-full bg-error-strong text-canvas active:bg-error-strong-active"
+          onClick={() => void logout()}
+        >
+          <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 7V5H5v14h5v-2M10 12h9M16 9l3 3-3 3" />
+          </svg>
         </button>
       </aside>
       <div className="min-w-0 flex-1 pb-20 md:pb-0">
@@ -81,7 +84,12 @@ export function OwnerShell({
               {name ? t('nav.welcome', { name }) : title}
             </h1>
           </div>
-          {action}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <SalonSwitcher salons={salons} salon={salon} onSalon={onSalon} dark={false} />
+            </div>
+            {action}
+          </div>
         </div>
         <main className="px-5 py-6 md:px-10 md:py-8">{children}</main>
       </div>

@@ -8,9 +8,11 @@ import {
   currentJobLabel,
   bookingStartLabel,
   kanbanColumn,
+  occupiedElapsedShare,
   occupyingBlock,
   occupyingByDay,
   occupyingClockRange,
+  occupyingSarajevoYmd,
   sarajevoWeekday,
   workerDotColor,
   type KanbanColumn,
@@ -86,12 +88,24 @@ export function DayChips({
   )
 }
 
-export function OccupyingCard({ row }: { row: OccupyingBooking }) {
+function ElapsedTrack({ share }: { share: number }) {
+  const pct = Math.round(share * 100)
+
+  return (
+    <span className="mt-2 block h-1 overflow-hidden rounded-full bg-ink/15" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+      <span className="block h-full bg-ink" style={{ width: `${pct}%` }} />
+    </span>
+  )
+}
+
+export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }) {
   const { t } = useTranslation()
   const block = occupyingBlock(row)
   if (block === null) {
     return null
   }
+  const ymd = occupyingSarajevoYmd(row)
+  const share = row.status === 'CONFIRMED' && ymd !== null ? occupiedElapsedShare(ymd, block.start, block.durationMinutes, now) : null
   const tone: KanbanColumn = row.status === 'TIME_PROPOSED' ? 'proposed' : 'confirmed'
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
@@ -118,6 +132,7 @@ export function OccupyingCard({ row }: { row: OccupyingBooking }) {
           ) : null}
         </span>
       ) : null}
+      {share !== null ? <ElapsedTrack share={share} /> : null}
     </Link>
   )
 }
@@ -128,12 +143,14 @@ export function WeekGrid({
   rows,
   closedFor,
   onDate,
+  now,
 }: {
   days: string[]
   date: string
   rows: OccupyingBooking[]
   closedFor: (ymd: string) => boolean
   onDate: (ymd: string) => void
+  now: Date
 }) {
   const { t } = useTranslation()
   const selectedRows = occupyingByDay(rows, date)
@@ -160,7 +177,7 @@ export function WeekGrid({
                 {closed ? (
                   <p className="py-2 text-center text-xs text-muted">{t('owner.closed')}</p>
                 ) : (
-                  dayRows.map((row) => <OccupyingCard key={row.id} row={row} />)
+                  dayRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} />)
                 )}
               </div>
             </div>
@@ -173,7 +190,7 @@ export function WeekGrid({
         ) : selectedRows.length === 0 ? (
           <p className="text-sm text-muted">{t('owner.dayFree')}</p>
         ) : (
-          selectedRows.map((row) => <OccupyingCard key={row.id} row={row} />)
+          selectedRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} />)
         )}
       </div>
     </>
@@ -213,7 +230,7 @@ export function BoardColumn({
   )
 }
 
-export function BookingCard({ row, to, now }: { row: ZapisiBooking; to: string; now?: Date }) {
+export function BookingCard({ row, to, now, progress }: { row: ZapisiBooking; to: string; now?: Date; progress?: number }) {
   const { t } = useTranslation()
   const column = kanbanColumn(row, now)
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
@@ -235,6 +252,7 @@ export function BookingCard({ row, to, now }: { row: ZapisiBooking; to: string; 
         <span className="mt-1.5 block text-xs">{t('salon.noPreference')}</span>
       )}
       {column === 'done' ? <span className="mt-1 block text-[11px] font-semibold">{t(`bookings.status.${row.status}`)}</span> : null}
+      {progress !== undefined ? <ElapsedTrack share={progress} /> : null}
     </Link>
   )
 }

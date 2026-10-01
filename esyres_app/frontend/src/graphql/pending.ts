@@ -185,6 +185,7 @@ export const SALON_DAY_BOOKINGS_QUERY = gql`
       preferredStartsAtLabel
       proposedStartsAt
       proposedStartsAtLabel
+      durationMinutes
       worker {
         id
         name
@@ -209,6 +210,7 @@ export type ZapisiBooking = {
   preferredStartsAtLabel: string
   proposedStartsAt: string | null
   proposedStartsAtLabel: string | null
+  durationMinutes: number
   worker: { id: string; name: string } | null
   proposedWorker: { id: string; name: string } | null
   services: { name: string }[]

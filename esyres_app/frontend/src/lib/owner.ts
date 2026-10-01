@@ -897,6 +897,32 @@ export function ownerDetailMode(status: string): 'form' | 'read' | 'bounce' {
   return 'bounce'
 }
 
+function sarajevoWallUtc(ymd: string, minutes: number): number {
+  const [year, month, day] = ymd.split('-').map(Number)
+  const guess = Date.UTC(year, month - 1, day, Math.floor(minutes / 60), minutes % 60)
+  const at = new Date(guess)
+  const wall = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sarajevo' }).format(at)
+  const [gy, gm, gd] = wall.split('-').map(Number)
+  const seen = Date.UTC(gy, gm - 1, gd, Math.floor(sarajevoNowMinutes(at) / 60), sarajevoNowMinutes(at) % 60)
+
+  return guess - (seen - guess)
+}
+
+export function occupiedElapsedShare(date: string, startHHmm: string, durationMinutes: number, now: Date): number {
+  const [hour, minute] = startHHmm.split(':').map(Number)
+  const start = sarajevoWallUtc(date, hour * 60 + minute)
+  const end = start + durationMinutes * 60_000
+  const t = now.getTime()
+  if (t <= start) {
+    return 0
+  }
+  if (t >= end) {
+    return 1
+  }
+
+  return (t - start) / (end - start)
+}
+
 export function occupyingStartIso(row: {
   status: string
   preferredStartsAt: string
