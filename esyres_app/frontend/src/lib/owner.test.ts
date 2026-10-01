@@ -12,6 +12,7 @@ import {
   hoursForDate,
   isFifteenMinute,
   isPreferredSoon,
+  occupiedElapsedShare,
   occupyingBlock,
   occupyingColSpan,
   currentJobLabel,
@@ -862,4 +863,15 @@ test('occupyingByDay keeps that Sarajevo day in start order', () => {
     { id: '4', status: 'CONFIRMED', preferredStartsAt: '2026-09-29T09:00:00Z', proposedStartsAt: null, durationMinutes: 30, worker: null, proposedWorker: null },
   ]
   expect(occupyingByDay(rows, '2026-09-29').map((row) => row.id)).toEqual(['1', '2'])
+})
+
+test('occupiedElapsedShare is the Sarajevo fraction of the occupied range', () => {
+  const at = (iso: string) => new Date(iso)
+  expect(occupiedElapsedShare('2026-01-15', '10:00', 60, at('2026-01-15T08:00:00+01:00'))).toBe(0)
+  expect(occupiedElapsedShare('2026-01-15', '10:00', 60, at('2026-01-15T10:00:00+01:00'))).toBe(0)
+  expect(occupiedElapsedShare('2026-01-15', '10:00', 60, at('2026-01-15T10:30:00+01:00'))).toBe(0.5)
+  expect(occupiedElapsedShare('2026-01-15', '10:00', 60, at('2026-01-15T11:00:00+01:00'))).toBe(1)
+  expect(occupiedElapsedShare('2026-01-15', '10:00', 60, at('2026-01-15T12:00:00+01:00'))).toBe(1)
+  expect(occupiedElapsedShare('2026-01-16', '10:00', 60, at('2026-01-15T10:30:00+01:00'))).toBe(0)
+  expect(occupiedElapsedShare('2026-01-14', '10:00', 60, at('2026-01-15T10:30:00+01:00'))).toBe(1)
 })

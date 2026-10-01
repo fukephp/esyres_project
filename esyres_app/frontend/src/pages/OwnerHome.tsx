@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
@@ -47,6 +47,8 @@ import {
   hoursForDate,
   isPreferredSoon,
   kanbanGroups,
+  occupiedElapsedShare,
+  occupyingSarajevoYmd,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
@@ -61,6 +63,11 @@ import {
 
 export function OwnerHome() {
   const { t } = useTranslation()
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [])
   const [params, setParams] = useSearchParams()
   const date = ownerDateFromSearch(params.get('date'))
   const days = ownerWeekDays(date)
@@ -386,7 +393,17 @@ export function OwnerHome() {
                   {dayBookings === undefined ? (
                     <ColumnSkeleton />
                   ) : (
-                    groups[column].map((row) => <BookingCard key={row.id} row={row} to={`/owner/requests/${row.id}`} />)
+                    groups[column].map((row) => {
+                      const ymd = row.status === 'CONFIRMED' ? occupyingSarajevoYmd(row) : null
+                      return (
+                        <BookingCard
+                          key={row.id}
+                          row={row}
+                          to={`/owner/requests/${row.id}`}
+                          progress={ymd !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
+                        />
+                      )
+                    })
                   )}
                 </BoardColumn>
               ))}
@@ -401,7 +418,7 @@ export function OwnerHome() {
               {occupyingRange === undefined ? (
                 <WeekGridSkeleton className="mt-4" />
               ) : (
-                <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} />
+                <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} now={now} />
               )}
             </section>
             <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { sarajevoToday } from '../lib/format'
@@ -12,6 +13,49 @@ type Props = {
   badge: number | null
   active: OwnerNavActive
   variant: 'sidebar' | 'tabs'
+}
+
+function NavIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+      {children}
+    </svg>
+  )
+}
+
+const ICONS: Record<OwnerNavActive, ReactNode> = {
+  queue: (
+    <NavIcon>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path strokeLinecap="round" d="M3 10h18M8 3v4M16 3v4" />
+    </NavIcon>
+  ),
+  zapisi: (
+    <NavIcon>
+      <path strokeLinecap="round" d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
+    </NavIcon>
+  ),
+  chats: (
+    <NavIcon>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 6h14v9H8l-3 3V6z" />
+    </NavIcon>
+  ),
+  stats: (
+    <NavIcon>
+      <path strokeLinecap="round" d="M4 19V5M4 19h16M8 16v-3M12 16V8M16 16v-6" />
+    </NavIcon>
+  ),
+  salons: (
+    <NavIcon>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 10h16l-1 10H5L4 10zM9 10V7a3 3 0 0 1 6 0v3" />
+    </NavIcon>
+  ),
+  settings: (
+    <NavIcon>
+      <circle cx="12" cy="12" r="3" />
+      <path strokeLinecap="round" d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.5 1.5M16.9 16.9l1.5 1.5M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5" />
+    </NavIcon>
+  ),
 }
 
 export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant }: Props) {
@@ -40,12 +84,11 @@ export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant }
             <Link
               key={item.key}
               to={item.to}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 ${active === item.key ? 'text-pastel-pink' : 'text-on-dark-soft'}`}
+              aria-label={item.label}
+              className={`relative flex min-h-14 flex-col items-center justify-center gap-1 ${active === item.key ? 'text-pastel-pink' : 'text-on-dark-soft'}`}
             >
-              <span className="flex items-center gap-1">
-                {item.label}
-                {item.badge != null ? <span className={badgeClass}>{item.badge}</span> : null}
-              </span>
+              {ICONS[item.key]}
+              {item.badge != null ? <span className={`absolute right-2 top-2 ${badgeClass}`}>{item.badge}</span> : null}
               <span className={`h-1 w-1 rounded-full ${active === item.key ? 'bg-pastel-pink' : 'bg-transparent'}`} />
             </Link>
           ))}
@@ -54,15 +97,17 @@ export function OwnerNav({ salonId, firstOwnedId, date, badge, active, variant }
   }
 
   return (
-    <nav className="mt-8 flex flex-col gap-1 text-sm">
+    <nav className="mt-8 flex flex-col items-center gap-1 text-sm">
       {items.map((item) => (
         <Link
           key={item.key}
           to={item.to}
-          className={`flex items-center justify-between rounded-full px-4 py-2.5 ${active === item.key ? 'bg-canvas font-semibold text-ink' : 'text-on-dark-soft active:text-on-dark'}`}
+          aria-label={item.label}
+          title={item.label}
+          className={`relative flex h-10 w-10 items-center justify-center rounded-full ${active === item.key ? 'bg-canvas font-semibold text-ink' : 'text-on-dark-soft active:text-on-dark'}`}
         >
-          {item.label}
-          {item.badge != null ? <span className={badgeClass}>{item.badge}</span> : null}
+          {ICONS[item.key]}
+          {item.badge != null ? <span className={`absolute -right-1 -top-1 ${badgeClass}`}>{item.badge}</span> : null}
         </Link>
       ))}
     </nav>
