@@ -10,7 +10,7 @@ A two-sided salon reservation marketplace, mobile-first PWA, connecting customer
 
 ## Core Booking Philosophy
 
-The customer picks a service, optionally a worker (or "no preference"), and a preferred **day and quarter start**. On Pošalji zahtjev those starts are the day’s open quarters; one already covered by an occupying booking is Zauzet and cannot be sent. Two guest paths, one booking contract: the **picker** is the fast path; a **scripted salon-profile chat** (Salon Booking Assistant) is the messy-intent alternate. Both call the same `createBooking` and create a `requested` row. Chat may suggest 1–3 preferred times from salon hours, day busy-level, and worker preference only — never live quarters, never a held clock. The day badge stays coarse.
+The customer picks a service, optionally a worker (or "no preference"), and a preferred **day and quarter start**. On Pošalji zahtjev those starts are the day’s open quarters; one already covered by an occupying booking is Zauzet and cannot be sent. The salon profile shows read-only hours and one `Pošalji zahtjev` that opens the request modal (Danas / Sutra / Drugi dan, then quarter pills). A logged-out guest signs in inside that modal before the form. Scripted salon-profile chat is not offered on the profile. A request calls `createBooking` and creates a `requested` row. The day badge stays coarse.
 
 The salon owner **accepts** the preferred time in one tap when it works, or **counter-proposes** a different time from Request Detail. The customer confirms only when the salon proposes a different time; they can approve, reject, or ask for a different day or time.
 

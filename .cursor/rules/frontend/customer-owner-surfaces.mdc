@@ -10,7 +10,7 @@ Stack and routes: `docs/architecture/` (`/` customer, `/owner` owner, salon swit
 
 Customer surface is narrow: Profile, Favorites, Search/Discover, Schedule/Reschedule.
 
-- Customers see a day-level busy badge (🟢/🟡/🔴). Pošalji zahtjev offers that day’s quarter starts and disables Zauzet ones. Chat stays 1–3 coarse suggestions and does not name live quarters.
+- Customers see a day-level busy badge (🟢/🟡/🔴). Pošalji zahtjev offers that day’s quarter starts and disables Zauzet ones. The salon profile does not offer chat.
 - Do not show owner dashboards, stats, or worker grids to customers.
 - Owner complexity lives on Zahtjevi, rendered in the owner's Prikaz: Kalendar (week grid + selected day's pending queue) or Kanban (selected day in four status columns). Zapisi follows the same Prikaz.
 - Calm state copy for limbo states (reschedule in progress, late-cancel warning — not a hard block).

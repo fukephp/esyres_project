@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-76`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-89`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -17,16 +17,17 @@
 - As a customer, I want the salon profile and picker to group services under the owner’s category names, so that the menu matches the shop instead of three locked types.
 - As a customer, I want `/salons` to show a short card teaser and then a richer results list when I filter, search, or show all, so that I can pick a salon without opening every profile.
 - As a customer, I want to see a salon's services, prices, hours, and a busy-level badge on its profile, so that I can decide whether to request an appointment.
-- As a customer, I want the salon profile to show the address when it exists, a send button under the title, and tappable open hours that fill the picker’s day, so that I can start a request from what I already see.
+- As a customer, I want the salon profile to show the address when it exists, and Radno vrijeme as the days the salon is open, so that I can read the shop before I send.
 - As a customer, I want every Pošalji zahtjev on the salon profile to look and feel like one primary action, so that sending a request is obvious and the press feels physical.
 - As a customer, I want a single send on the salon profile — under the title on a phone, in a sticky sidebar on a wide screen — so that I am not looking at two identical buttons.
-- As a customer, I want to start a salon request from Radno vrijeme and reach Moje rezervacije from the logged-in homepage, so that send is not sitting idle on load and bookings are one tap from `/`.
-- As a customer, I want Pošalji zahtjev under the weekday I picked and to see that day named in the picker modal, so that send sits on my choice and I know which date I am requesting.
+- As a customer, I want Pošalji zahtjev after the hours list, so that send is a button and the hours stay information.
+- As a logged-in customer, I want Moje rezervacije on the homepage, so that bookings are one tap from `/`.
 
 ## Epic 2 — Booking Request Flow (Customer)
 
 - As a customer, I want to select multiple services in one request, so that I don't need to submit separate requests for a haircut and a color.
 - As a customer, I want to optionally pick a specific worker or say "no preference," so that I have control when I care, and less friction when I don't.
+- As a customer, I want Radno vrijeme to show when the salon is open, and Pošalji zahtjev to open a request I leave only with Zatvori, so that I can ask for a time without the hours list acting as the button.
 - As a customer, I want to pick a quarter start on Pošalji zahtjev and see which ones are Zauzet, so that I ask for a time the salon can still take.
 - As a customer, I want a second request for a service I already have that day to be refused, so that I cannot spam the same service.
 - As a customer, I want to create an account with email and password without a homepage login wall, so that I can browse first and sign in when I request or open My Bookings.
@@ -100,6 +101,8 @@
 - As an owner, I want to see how many people scanned my QR code and how many converted into verified visits, so that I know if the sticker is working.
 
 ## Epic 10 — Salon Booking Assistant (scripted intake)
+
+Not on `/salon/:id` (STORY-89). The stories below are the assistant contract, not a profile button.
 
 - As a customer, I want an alternate chat on the salon profile when I am not sure which service or time to pick, so that I can still send the same kind of request without hunting a slot grid.
 - As a customer, I want Pitaj salon to open a full-canvas chat overlay so I can talk to this salon without the hours list competing with the conversation.

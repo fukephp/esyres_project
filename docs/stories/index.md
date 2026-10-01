@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-88` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–88. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-89` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–89. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -111,3 +111,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-86 | Same-day service block | 2 | — | STORY-08, STORY-19, STORY-21, STORY-29 |
 | STORY-87 | Pending jump | 3 | — | STORY-13, STORY-76, STORY-80 |
 | STORY-88 | Owner rail toggle | 3 | — | STORY-85 |
+| STORY-89 | Always-on Pošalji zahtjev | 2 | — | STORY-65, STORY-84, STORY-08 |
