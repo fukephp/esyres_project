@@ -4,7 +4,7 @@ Loop Engineering means: clear fog, approve a pass/fail answer key, implement and
 
 **Runtime is Hybrid.** Default is Local Agent in this chat. Cloud Agent is opt-in only (`story-loop STORY-xx unattended`, or a clear “Cloud Agent for STORY-xx”). There is no `briefs/` folder; the answer key is the contract.
 
-This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt. An **attended** sequential drain (`/start-building-stories`) is allowed: print what-next, run one Local story-loop, wait for you to merge and say continue. Still one story → one PR. Story-create tokens `no-human-grilling` / `no-human-review` on `/new-story` (and `/grill-me` / `/grill-with-docs` product persist) do **not** skip this loop’s key approval, Bugbot, or merge.
+This is **not** an unattended gauntlet that builds the whole MVP from a vague prompt. An **attended** sequential drain (`/start-building-stories`) is allowed: print what-next, run one Local story-loop, wait for you to merge and say continue. Still one story → one PR. Named `/batch-stories` is the multi-story unit: one grill, one branch, one PR (`.cursor/skills/batch-stories/SKILL.md`). Story-create tokens `no-human-grilling` / `no-human-review` on `/new-story` (and `/grill-me` / `/grill-with-docs` product persist) do **not** skip this loop’s key approval, Bugbot, or merge.
 
 ## Project fields (fill in CONTEXT when locked)
 
@@ -25,7 +25,7 @@ Foggy stories use a **light story map** (Destination, Decisions so far, Open dec
 
 **Loop** when all of these are true:
 
-- Work is **one story** (or a thin vertical slice of one story) → one PR
+- Work is **one story** (or a thin vertical slice of one story) → one PR, or a named `/batch-stories` set → one PR
 - Product fog is cleared (map compiled or sharp-path grill; answer key approved)
 - An **approved** answer key exists under `.cursor/loops/answer-keys/`
 - The app root named in CONTEXT has a real local verify runner (tests and/or typecheck/lint the agent can fail)
@@ -43,7 +43,7 @@ Foggy stories use a **light story map** (Destination, Decisions so far, Open dec
 |----------|--------|
 | Job | Ship features with less coding babysitting (plan gates stay) |
 | Stop rule | You approve answer key → machine gates → you review PR |
-| Unit of work | One story → one PR |
+| Unit of work | One story → one PR. Named `/batch-stories` → one PR |
 | Ready when | App root + local verify commands exist |
 | Runtime | Hybrid: Local Agent default (implement in chat); Cloud Agent on `unattended` (short paste, no file) |
 | Answer key | Per-story markdown under `.cursor/loops/answer-keys/` |
@@ -122,7 +122,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 
 ## Out of scope
 
-- Unattended whole-MVP or multi-epic gauntlet (attended `/start-building-stories` drain is in scope)
+- Unattended whole-MVP or multi-epic gauntlet (attended `/start-building-stories` and named `/batch-stories` are in scope)
 - Creating or inventing `docs/stories/STORY-xx.md` (product grill persist owns that)
 - Restoring `docs/tasks/`
 - Coding loops before the app root has a real verify runner
@@ -140,6 +140,7 @@ Every product check on the key must name a verifier: a test, a command, or `huma
 - Keys: `.cursor/loops/answer-keys/`
 - Skill: `.cursor/skills/story-loop/SKILL.md`
 - Attended drain: `.cursor/skills/start-building-stories/SKILL.md`
+- Named batch: `.cursor/skills/batch-stories/SKILL.md`
 - Product constraints while implementing: `.cursor/skills/custom-feature-skills/SKILL.md`
 - Tests command: `.cursor/commands/run-tests.md`
 - Grilling: `.cursor/skills/grilling/SKILL.md`

@@ -9,7 +9,7 @@ description: >-
 
 # Start building stories
 
-Thin wrapper. **Classify** with [what-next](../what-next/SKILL.md), **execute** with [story-loop](../story-loop/SKILL.md) for Recommended only. Sequences N single loops in this chat. Does **not** turn story-loop into a multi-story gauntlet.
+Thin wrapper. **Classify** with [what-next](../what-next/SKILL.md), **execute** with [story-loop](../story-loop/SKILL.md) for Recommended only. Sequences N single loops in this chat. Does **not** turn story-loop into a multi-story gauntlet. A named multi-story run is `/batch-stories`, not this drain.
 
 Playbook: `.cursor/loops/PLAYBOOK.md`.
 

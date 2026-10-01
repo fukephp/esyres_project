@@ -48,7 +48,9 @@ Detect `no-human-grilling` and `no-human-review` as space-separated tokens after
 
 Honor them **only** from those three wrappers on a **product persist** path (a session that may write `STORY-xx`). Wrappers classify: if they mark flags as no-ops or refuse them, grill as today (wait for answers; persist after confirm).
 
-When grilling is a subroutine ([story-loop](../story-loop/SKILL.md) maps/keys, [what-next](../what-next/SKILL.md), [start-building-stories](../start-building-stories/SKILL.md), [custom-feature-skills](../custom-feature-skills/SKILL.md), coding), **ignore** these tokens even if they appear in chat. They do not skip key approval, Bugbot, or merge.
+When grilling is a subroutine ([story-loop](../story-loop/SKILL.md) maps/keys, [what-next](../what-next/SKILL.md), [start-building-stories](../start-building-stories/SKILL.md), [batch-stories](../batch-stories/SKILL.md), [custom-feature-skills](../custom-feature-skills/SKILL.md), coding), **ignore** these tokens even if they appear in chat. They do not skip key approval, Bugbot, or merge.
+
+When [batch-stories](../batch-stories/SKILL.md) is the caller, ask one combined frontier and stop. That skill marks later decisions `assumed`.
 
 **`no-human-grilling`:** Do not wait for round answers. Walk the tree. For each frontier question, take the recommended answer **only** when it is already locked in `docs/mvp/`, `docs/architecture/`, `docs/stories/`, `docs/glossary.md`, `docs/adr/`, or the codebase. Print auto-locks in chat (same round format; mark them taken). Still explore. Do not invent product.
 

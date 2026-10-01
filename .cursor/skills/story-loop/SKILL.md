@@ -28,7 +28,7 @@ Do **not** emit a Cloud Agent brief unless the user opted into Cloud. Do not wri
 3. **Verify gate:** Detect whether the app root has a real local verify runner (tests, typecheck, lint, CI scripts the agent can fail). If there is no app root, only a placeholder, or no runner:
    - Say that story coding loops are blocked until scaffold + local verify exist.
    - Offer plan-gate prep only (map and/or answer key). Do **not** start coding or emit a Cloud paste. Do not scaffold the app unless the user asked.
-4. Unit of work is **one story** from `docs/stories/` → one PR. Refuse multi-epic / whole-MVP gauntlets.
+4. Unit of work is **one story** from `docs/stories/` → one PR. A named `/batch-stories` run owns its branch and PR ([batch-stories](../batch-stories/SKILL.md)). This loop stays one story. Refuse a whole-MVP gauntlet.
 
 ## Plan gate (Wayfinder-lite)
 
@@ -120,3 +120,4 @@ Remind: Bugbot → human merge. Machine gates already passed; Bugbot is the ligh
 - Grill-me: `.cursor/skills/grill-me/SKILL.md`
 - Grill-with-docs: `.cursor/skills/grill-with-docs/SKILL.md`
 - Start-building-stories: `.cursor/skills/start-building-stories/SKILL.md` (sequences this skill one story at a time; does not make this loop a gauntlet)
+- Batch stories: `.cursor/skills/batch-stories/SKILL.md` (named set → one branch, one PR; does not run this loop end to end)
