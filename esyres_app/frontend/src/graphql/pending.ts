@@ -51,6 +51,15 @@ export const OWNER_BOOKING_QUERY = gql`
   }
 `
 
+export const PENDING_JUMP_QUERY = gql`
+  query PendingJump($salonId: ID!) {
+    pendingJump(salonId: $salonId) {
+      count
+      dates
+    }
+  }
+`
+
 export const PENDING_BOOKINGS_QUERY = gql`
   query PendingBookings($salonId: ID!, $date: String!, $limit: Int) {
     pendingBookings(salonId: $salonId, date: $date, limit: $limit) {
@@ -377,6 +386,13 @@ export type PendingBooking = {
 
 export type PendingBookingsData = {
   pendingBookings: PendingBooking[]
+}
+
+export type PendingJumpData = {
+  pendingJump: {
+    count: number
+    dates: string[]
+  }
 }
 
 export type OccupyingBooking = {

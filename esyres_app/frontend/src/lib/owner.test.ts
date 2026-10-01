@@ -18,6 +18,7 @@ import {
   currentJobLabel,
   overlayQueueChrome,
   ownerDateFromSearch,
+  nextPendingDay,
   ownerQueuePath,
   ownerPhonePath,
   ownerZapisiPath,
@@ -811,6 +812,16 @@ test('owner settings copy is Bosnian', async () => {
   expect(i18n.t('owner.passwordError.INVALID_CURRENT_PASSWORD')).toBe('Pogrešna trenutna lozinka.')
   expect(i18n.t('auth.gate.WEAK_PASSWORD')).toBe('Lozinka mora imati najmanje 8 karaktera.')
   expect(i18n.t('owner.save')).toBe('Spremi')
+})
+
+test('nextPendingDay walks stops then wraps', async () => {
+  const { default: i18n } = await import('../i18n')
+  expect(i18n.t('owner.pendingJump', { count: 3 })).toBe('Na čekanju · 3')
+  expect(nextPendingDay('2026-08-10', [])).toBeNull()
+  expect(nextPendingDay('2026-08-10', ['2026-08-01', '2026-08-29'])).toBe('2026-08-01')
+  expect(nextPendingDay('2026-08-01', ['2026-08-01', '2026-08-29', '2026-09-02'])).toBe('2026-08-29')
+  expect(nextPendingDay('2026-08-29', ['2026-08-01', '2026-08-29', '2026-09-02'])).toBe('2026-09-02')
+  expect(nextPendingDay('2026-09-02', ['2026-08-01', '2026-08-29', '2026-09-02'])).toBe('2026-08-01')
 })
 
 test('ownerWeekDays is Monday to Sunday around the date', () => {
