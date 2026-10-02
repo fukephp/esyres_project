@@ -16,7 +16,6 @@ import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import {
-  boardSearchParams,
   bookingStartIso,
   bookingStartLabel,
   kanbanGroups,
@@ -25,42 +24,36 @@ import {
   ownerWeekDays,
   visibleKanbanColumns,
   ownerZapisiSearchParams,
-  requestFromZapisiPath,
   shiftOwnerDate,
   zapisiOriginFromSearch,
   type ZapisiOrigin,
 } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
+import { RequestDetailAside, type RequestAsideState } from './OwnerRequestDetail'
 
-export function OwnerZapisi({
-  lockedSearch,
-  hideSwitcher = false,
-}: {
-  lockedSearch?: string
-  hideSwitcher?: boolean
-} = {}) {
+export function OwnerZapisi() {
   const { t } = useTranslation()
   const [columnError, setColumnError] = useState<string | null>(null)
+  const [aside, setAside] = useState<RequestAsideState>(null)
   const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
   const [params, setParams] = useSearchParams()
-  const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
-  const salonId = ownerSalonFromSearch(boardParams.get('salon'), salons)
+  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
   const today = sarajevoToday()
-  const date = ownerDateFromSearch(boardParams.get('date'), today)
-  const origin = zapisiOriginFromSearch(boardParams.get('origin'))
+  const date = ownerDateFromSearch(params.get('date'), today)
+  const origin = zapisiOriginFromSearch(params.get('origin'))
   const firstOwnedId = salons[0]?.id ?? ''
   const { data: countData } = useQuery<InFlightIntakeCountData>(IN_FLIGHT_INTAKE_COUNT_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
     fetchPolicy: 'network-only',
   })
-  const { data: listData, loading: listLoading } = useQuery<SalonDayBookingsData>(SALON_DAY_BOOKINGS_QUERY, {
+  const { data: listData, loading: listLoading, refetch: refetchList } = useQuery<SalonDayBookingsData>(SALON_DAY_BOOKINGS_QUERY, {
     variables: {
       salonId: salon?.id ?? '',
       date,
@@ -78,10 +71,11 @@ export function OwnerZapisi({
   const days = ownerWeekDays(date)
   const groups = kanbanGroups(rows)
 
+  function openAside(id: string) {
+    setAside({ id, open: true })
+  }
+
   function write(nextDate: string, nextSalon: string, nextOrigin: ZapisiOrigin | null) {
-    if (lockedSearch !== undefined) {
-      return
-    }
     setParams(ownerZapisiSearchParams(nextDate, today, nextSalon, firstOwnedId, nextOrigin))
   }
 
@@ -154,7 +148,7 @@ export function OwnerZapisi({
         date={date}
         badge={badge}
         active="zapisi"
-        hideSwitcher={hideSwitcher}
+        hideSwitcher={aside?.open === true}
         onSalon={(id) => write(date, id, origin)}
       >
         <section className="rounded-3xl bg-canvas p-4 md:p-6">
@@ -201,7 +195,7 @@ export function OwnerZapisi({
                 {columns.map((column) => (
                   <BoardColumn key={column} column={column} count={groups[column].length}>
                     {groups[column].map((row) => (
-                      <BookingCard key={row.id} row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
+                      <BookingCard key={row.id} row={row} onOpen={openAside} />
                     ))}
                   </BoardColumn>
                 ))}
@@ -216,13 +210,18 @@ export function OwnerZapisi({
                 .map((row) => (
                   <li key={row.id} className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start gap-2">
                     <span className="pt-3 text-sm tabular-nums text-muted">{bookingStartLabel(row)}</span>
-                    <BookingCard row={row} to={requestFromZapisiPath(row.id, date, today, salon.id, firstOwnedId, origin)} />
+                    <BookingCard row={row} onOpen={openAside} />
                   </li>
                 ))}
             </ul>
           )}
         </section>
       </OwnerShell>
+      <RequestDetailAside
+        aside={aside}
+        onClose={() => setAside((current) => (current === null ? null : { ...current, open: false }))}
+        onChanged={() => void refetchList()}
+      />
     </>
   )
 }

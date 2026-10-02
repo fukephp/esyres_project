@@ -42,10 +42,10 @@ test('pending queue rows are pink cards with the clock inside', () => {
   expect(pending).toMatch(/owner\.keepOriginal/)
 })
 
-test('occupying and booking cards are pastel links to Request Detail', () => {
+test('occupying and booking cards are pastel buttons that open Request Detail', () => {
   const boards = read('components/OwnerBoards.tsx')
   const occupying = sliceFn(boards, 'OccupyingCard')
-  expect(occupying).toMatch(/\/owner\/requests\//)
+  expect(occupying).toMatch(/onClick=\{\(\) => onOpen\(row\.id\)\}/)
   expect(occupying).toMatch(/STATUS_CARD_CLASS\[tone\]/)
   expect(occupying).toMatch(/'TIME_PROPOSED' \? 'proposed' : 'confirmed'/)
   expect(occupying).toMatch(/row\.customerName/)
@@ -55,5 +55,5 @@ test('occupying and booking cards are pastel links to Request Detail', () => {
   const booking = sliceFn(boards, 'BookingCard')
   expect(booking).toMatch(/kanbanColumn\(row, now\)/)
   expect(booking).toMatch(/STATUS_CARD_CLASS\[column\]/)
-  expect(booking).toMatch(/<Link to=\{to\}/)
+  expect(booking).toMatch(/<button type="button" onClick=\{\(\) => onOpen\(row\.id\)\}/)
 })

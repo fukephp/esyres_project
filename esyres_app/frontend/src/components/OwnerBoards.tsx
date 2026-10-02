@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation } from 'react-router-dom'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
 import { Alert } from './ui'
@@ -99,9 +98,8 @@ function ElapsedTrack({ share }: { share: number }) {
   )
 }
 
-export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }) {
+export function OccupyingCard({ row, now, onOpen }: { row: OccupyingBooking; now: Date; onOpen: (id: string) => void }) {
   const { t } = useTranslation()
-  const location = useLocation()
   const block = occupyingBlock(row)
   if (block === null) {
     return null
@@ -112,10 +110,10 @@ export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link
-      to={`/owner/requests/${row.id}`}
-      state={{ board: `${location.pathname}${location.search}` }}
-      className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[tone]}`}
+    <button
+      type="button"
+      onClick={() => onOpen(row.id)}
+      className={`block w-full rounded-2xl p-3 text-left text-ink ${STATUS_CARD_CLASS[tone]}`}
     >
       <span className="block text-xs font-semibold tabular-nums">{occupyingClockRange(block.start, block.durationMinutes)}</span>
       <span className="mt-1 block text-sm font-semibold leading-snug">{row.customerName}</span>
@@ -139,7 +137,7 @@ export function OccupyingCard({ row, now }: { row: OccupyingBooking; now: Date }
         </span>
       ) : null}
       {share !== null ? <ElapsedTrack share={share} /> : null}
-    </Link>
+    </button>
   )
 }
 
@@ -150,6 +148,7 @@ export function WeekGrid({
   closedFor,
   onDate,
   now,
+  onOpen,
 }: {
   days: string[]
   date: string
@@ -157,6 +156,7 @@ export function WeekGrid({
   closedFor: (ymd: string) => boolean
   onDate: (ymd: string) => void
   now: Date
+  onOpen: (id: string) => void
 }) {
   const { t } = useTranslation()
   const selectedRows = occupyingByDay(rows, date)
@@ -183,7 +183,7 @@ export function WeekGrid({
                 {closed ? (
                   <p className="py-2 text-center text-xs text-muted">{t('owner.closed')}</p>
                 ) : (
-                  dayRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} />)
+                  dayRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} onOpen={onOpen} />)
                 )}
               </div>
             </div>
@@ -196,7 +196,7 @@ export function WeekGrid({
         ) : selectedRows.length === 0 ? (
           <p className="text-sm text-muted">{t('owner.dayFree')}</p>
         ) : (
-          selectedRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} />)
+          selectedRows.map((row) => <OccupyingCard key={row.id} row={row} now={now} onOpen={onOpen} />)
         )}
       </div>
     </>
@@ -272,14 +272,13 @@ export function BoardColumn({
   )
 }
 
-export function BookingCard({ row, to, now, progress }: { row: ZapisiBooking; to: string; now?: Date; progress?: number }) {
+export function BookingCard({ row, onOpen, now, progress }: { row: ZapisiBooking; onOpen: (id: string) => void; now?: Date; progress?: number }) {
   const { t } = useTranslation()
-  const location = useLocation()
   const column = kanbanColumn(row, now)
   const worker = row.status === 'TIME_PROPOSED' ? row.proposedWorker : row.worker
 
   return (
-    <Link to={to} state={{ board: `${location.pathname}${location.search}` }} className={`block rounded-2xl p-3 text-ink ${STATUS_CARD_CLASS[column]}`}>
+    <button type="button" onClick={() => onOpen(row.id)} className={`block w-full rounded-2xl p-3 text-left text-ink ${STATUS_CARD_CLASS[column]}`}>
       <span className="flex items-center justify-between gap-2 text-xs">
         <span className="font-semibold tabular-nums">{bookingStartLabel(row) || t('owner.noTime')}</span>
         <span className="rounded-full bg-canvas/70 px-2 py-0.5 text-[11px] font-semibold">{originLabel(t, row.origin)}</span>
@@ -296,7 +295,7 @@ export function BookingCard({ row, to, now, progress }: { row: ZapisiBooking; to
       )}
       {column === 'done' ? <span className="mt-1 block text-[11px] font-semibold">{t(`bookings.status.${row.status}`)}</span> : null}
       {progress !== undefined ? <ElapsedTrack share={progress} /> : null}
-    </Link>
+    </button>
   )
 }
 

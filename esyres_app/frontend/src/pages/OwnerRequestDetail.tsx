@@ -1,12 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
+import { Aside } from '../components/Aside'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
 import { OwnerPageSkeleton, RequestDetailSkeleton } from '../components/Skeleton'
-import { Alert, CloseButton, Spinner } from '../components/ui'
+import { Alert, Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
@@ -27,7 +28,6 @@ import {
 import { graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { formatCivilDate, sarajevoToday } from '../lib/format'
-import { SALON_PICKER_DIALOG_CLASS } from '../lib/salonSend'
 import {
   acceptErrorKey,
   assistantOriginVisible,
@@ -46,200 +46,32 @@ import {
   proposeStartTimes,
   trimDeclineReason,
 } from '../lib/owner'
-import { useOwnerPush } from '../lib/push'
-import { OwnerHome } from './OwnerHome'
-import { OwnerZapisi } from './OwnerZapisi'
+
+export type RequestAsideState = { id: string; open: boolean } | null
+
+export const OPEN_REQUEST_STATE = 'openRequest'
+
+export function openRequestFromState(state: unknown): string | null {
+  if (typeof state !== 'object' || state === null || !(OPEN_REQUEST_STATE in state)) {
+    return null
+  }
+  const id = (state as Record<string, unknown>)[OPEN_REQUEST_STATE]
+
+  return typeof id === 'string' && id !== '' ? id : null
+}
 
 export function OwnerRequestDetail() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
-  const location = useLocation()
-  const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
   const ownerReady = (data?.me?.salons.length ?? 0) > 0 && data?.me?.emailVerified === true
-  useOwnerPush(ownerReady)
-  const {
-    data: bookingData,
-    loading: bookingLoading,
-    error: bookingError,
-    refetch: refetchBooking,
-  } = useQuery<OwnerBookingData>(OWNER_BOOKING_QUERY, {
+  const { data: bookingData, error: bookingError } = useQuery<OwnerBookingData>(OWNER_BOOKING_QUERY, {
     variables: { id },
     skip: !ownerReady || id === '',
   })
   const booking = bookingData?.ownerBooking
   const firstOwnedId = data?.me?.salons[0]?.id ?? ''
-  const salonId = booking?.salon.id ?? ''
-  const date = booking?.preferredDate ?? ''
-  const { data: salonBoard } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
-    variables: { id: salonId },
-    skip: salonId === '',
-  })
-  const { data: occupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
-    variables: { salonId, date },
-    skip: salonId === '' || date === '',
-  })
-  const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
-  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
-  const [propose] = useMutation(PROPOSE_TIME_MUTATION)
-  const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
-  const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
-  const [cancelPhone] = useMutation(CANCEL_PHONE_BOOKING_MUTATION)
-  const [workerId, setWorkerId] = useState('')
-  const [time, setTime] = useState('')
-  const [busy, setBusy] = useState<string | null>(null)
-  const working = busy !== null
-  const [declineOpen, setDeclineOpen] = useState(false)
-  const [reasonDraft, setReasonDraft] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [noShowError, setNoShowError] = useState<string | null>(null)
-  const [phoneCancelOpen, setPhoneCancelOpen] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (dialog !== null && !dialog.open) {
-      dialog.showModal()
-    }
-  })
-
-  useEffect(() => {
-    if (booking === undefined) {
-      return
-    }
-    setWorkerId(booking.worker?.id ?? '')
-    setTime('')
-    setDeclineOpen(false)
-    setReasonDraft('')
-    setError(null)
-    setNoShowError(null)
-  }, [booking?.id, booking?.worker?.id])
-
-  const workers = salonBoard?.salon?.workers ?? []
-  const dayHours = date === '' ? undefined : hoursForDate(salonBoard?.salon?.hours ?? [], date)
-  const cells = panelCells(dayHours)
-  const blocks = (occupying?.occupyingBookings ?? [])
-    .map((row: OccupyingBooking) => occupyingBlock(row))
-    .filter((row) => row !== null)
-  const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
-  const assignTaps =
-    booking === undefined || booking.worker !== null || occupying === undefined
-      ? []
-      : freeWorkers(workers, booking.preferredStartsAtLabel, booking.durationMinutes, blocks)
-  const queuePath =
-    booking === undefined
-      ? '/owner'
-      : ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)
-  const board = typeof location.state === 'object' && location.state !== null && 'board' in location.state && typeof location.state.board === 'string'
-    ? location.state.board
-    : null
-  const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
-
-  function close() {
-    if (board !== null) {
-      navigate(board)
-      return
-    }
-    navigate(queuePath)
-  }
-
-  async function onAccept() {
-    if (booking === undefined) {
-      return
-    }
-    setBusy('accept')
-    setError(null)
-    try {
-      await accept({ variables: { bookingId: booking.id } })
-      await refetchBooking()
-    } catch (caught) {
-      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  async function onAssign(workerIdToAssign: string) {
-    if (booking === undefined) {
-      return
-    }
-    setBusy(`assign:${workerIdToAssign}`)
-    setError(null)
-    try {
-      await assignWorker({ variables: { bookingId: booking.id, workerId: workerIdToAssign } })
-      await refetchBooking()
-    } catch (caught) {
-      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  async function onPropose() {
-    if (booking === undefined || workerId === '' || time === '') {
-      return
-    }
-    setBusy('propose')
-    setError(null)
-    try {
-      await propose({ variables: { bookingId: booking.id, workerId, proposedTime: time } })
-      await refetchBooking()
-    } catch (caught) {
-      setError(t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(caught))}`))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  async function onDecline() {
-    if (booking === undefined) {
-      return
-    }
-    setBusy('decline')
-    setError(null)
-    const reason = trimDeclineReason(reasonDraft)
-    try {
-      await decline({ variables: { bookingId: booking.id, reason } })
-      await refetchBooking()
-    } catch (caught) {
-      setError(t(`owner.declineError.${declineErrorKey(graphqlErrorCode(caught))}`))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  async function onNoShow() {
-    if (booking === undefined) {
-      return
-    }
-    setBusy('noShow')
-    setNoShowError(null)
-    try {
-      await markNoShow({ variables: { bookingId: booking.id } })
-      await refetchBooking()
-    } catch {
-      setNoShowError(t('owner.noShowError'))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  async function onPhoneCancel() {
-    if (booking === undefined) {
-      return
-    }
-    setBusy('phoneCancel')
-    setError(null)
-    try {
-      await cancelPhone({ variables: { bookingId: booking.id } })
-      navigate(queuePath)
-    } catch (err) {
-      setError(t(`owner.phone.error.${phoneErrorKey(graphqlErrorCode(err))}`))
-    } finally {
-      setBusy(null)
-    }
-  }
 
   if (loading) {
     return (
@@ -289,49 +121,254 @@ export function OwnerRequestDetail() {
     )
   }
 
-  if (bookingLoading && booking === undefined && !forbidden) {
+  const state = { [OPEN_REQUEST_STATE]: id }
+  if (booking !== undefined) {
     return (
-      <OwnerPageSkeleton>
-        <RequestDetailSkeleton />
-      </OwnerPageSkeleton>
+      <Navigate
+        replace
+        to={ownerQueuePath(booking.preferredDate, sarajevoToday(), booking.salon.id, firstOwnedId)}
+        state={state}
+      />
     )
   }
-
-  const zapisi = board?.startsWith('/owner/zapisi') === true
-  const lockedSearch = board ?? (booking !== undefined ? `?date=${booking.preferredDate}&salon=${booking.salon.id}` : '')
+  if (bookingError !== undefined) {
+    return <Navigate replace to="/owner" state={state} />
+  }
 
   return (
-    <>
-      <div inert>
-        {zapisi ? (
-          <OwnerZapisi lockedSearch={board ?? ''} hideSwitcher />
-        ) : (
-          <OwnerHome lockedSearch={lockedSearch} hideSwitcher />
-        )}
-      </div>
-      <dialog
-        ref={dialogRef}
-        className={SALON_PICKER_DIALOG_CLASS}
-        onCancel={() => {
-          close()
-        }}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            close()
-          }
-        }}
-      >
-        <div className="mb-4 flex justify-end">
-          <CloseButton onClick={close} />
-        </div>
-        <section className="rounded-3xl bg-canvas p-4 md:p-6">
+    <OwnerPageSkeleton>
+      <RequestDetailSkeleton />
+    </OwnerPageSkeleton>
+  )
+}
+
+export function RequestDetailAside({
+  aside,
+  onClose,
+  onChanged,
+}: {
+  aside: RequestAsideState
+  onClose: () => void
+  onChanged: () => void
+}) {
+  return (
+    <RequestDetailPanel
+      key={aside?.id ?? ''}
+      id={aside?.id ?? ''}
+      open={aside?.open === true}
+      onClose={onClose}
+      onChanged={onChanged}
+    />
+  )
+}
+
+function RequestDetailPanel({
+  id,
+  open,
+  onClose,
+  onChanged,
+}: {
+  id: string
+  open: boolean
+  onClose: () => void
+  onChanged: () => void
+}) {
+  const { t } = useTranslation()
+  const {
+    data: bookingData,
+    loading: bookingLoading,
+    error: bookingError,
+    refetch: refetchBooking,
+  } = useQuery<OwnerBookingData>(OWNER_BOOKING_QUERY, {
+    variables: { id },
+    skip: id === '',
+    fetchPolicy: 'cache-and-network',
+  })
+  const booking = bookingData?.ownerBooking
+  const salonId = booking?.salon.id ?? ''
+  const date = booking?.preferredDate ?? ''
+  const { data: salonBoard } = useQuery<OwnerSalonData>(OWNER_SALON_QUERY, {
+    variables: { id: salonId },
+    skip: salonId === '',
+  })
+  const { data: occupying } = useQuery<OccupyingBookingsData>(OCCUPYING_BOOKINGS_QUERY, {
+    variables: { salonId, date },
+    skip: salonId === '' || date === '',
+    fetchPolicy: 'cache-and-network',
+  })
+  const [accept] = useMutation(ACCEPT_PREFERRED_TIME_MUTATION)
+  const [assignWorker] = useMutation(ASSIGN_WORKER_MUTATION)
+  const [propose] = useMutation(PROPOSE_TIME_MUTATION)
+  const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
+  const [markNoShow] = useMutation(MARK_NO_SHOW_MUTATION)
+  const [cancelPhone] = useMutation(CANCEL_PHONE_BOOKING_MUTATION)
+  const [workerId, setWorkerId] = useState('')
+  const [time, setTime] = useState('')
+  const [busy, setBusy] = useState<string | null>(null)
+  const working = busy !== null
+  const [declineOpen, setDeclineOpen] = useState(false)
+  const [reasonDraft, setReasonDraft] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [noShowError, setNoShowError] = useState<string | null>(null)
+  const [phoneCancelOpen, setPhoneCancelOpen] = useState(false)
+
+  useEffect(() => {
+    if (booking === undefined) {
+      return
+    }
+    setWorkerId(booking.worker?.id ?? '')
+    setTime('')
+    setDeclineOpen(false)
+    setReasonDraft('')
+    setError(null)
+    setNoShowError(null)
+  }, [booking?.id, booking?.worker?.id])
+
+  const workers = salonBoard?.salon?.workers ?? []
+  const dayHours = date === '' ? undefined : hoursForDate(salonBoard?.salon?.hours ?? [], date)
+  const cells = panelCells(dayHours)
+  const blocks = (occupying?.occupyingBookings ?? [])
+    .map((row: OccupyingBooking) => occupyingBlock(row))
+    .filter((row) => row !== null)
+  const times = workerId === '' ? [] : proposeStartTimes(cells, blocks, workerId)
+  const assignTaps =
+    booking === undefined || booking.worker !== null || occupying === undefined
+      ? []
+      : freeWorkers(workers, booking.preferredStartsAtLabel, booking.durationMinutes, blocks)
+  const forbidden = graphqlErrorCode(bookingError) === 'FORBIDDEN'
+  const missing = forbidden || (bookingError !== undefined && booking === undefined)
+  const loadingBooking = bookingLoading && booking === undefined && !missing
+
+  async function changed() {
+    await refetchBooking()
+    onChanged()
+  }
+
+  async function onAccept() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy('accept')
+    setError(null)
+    try {
+      await accept({ variables: { bookingId: booking.id } })
+      await changed()
+    } catch (caught) {
+      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function onAssign(workerIdToAssign: string) {
+    if (booking === undefined) {
+      return
+    }
+    setBusy(`assign:${workerIdToAssign}`)
+    setError(null)
+    try {
+      await assignWorker({ variables: { bookingId: booking.id, workerId: workerIdToAssign } })
+      await changed()
+    } catch (caught) {
+      setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function onPropose() {
+    if (booking === undefined || workerId === '' || time === '') {
+      return
+    }
+    setBusy('propose')
+    setError(null)
+    try {
+      await propose({ variables: { bookingId: booking.id, workerId, proposedTime: time } })
+      await changed()
+    } catch (caught) {
+      setError(t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function onDecline() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy('decline')
+    setError(null)
+    const reason = trimDeclineReason(reasonDraft)
+    try {
+      await decline({ variables: { bookingId: booking.id, reason } })
+      await changed()
+    } catch (caught) {
+      setError(t(`owner.declineError.${declineErrorKey(graphqlErrorCode(caught))}`))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function onNoShow() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy('noShow')
+    setNoShowError(null)
+    try {
+      await markNoShow({ variables: { bookingId: booking.id } })
+      await changed()
+    } catch {
+      setNoShowError(t('owner.noShowError'))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function onPhoneCancel() {
+    if (booking === undefined) {
+      return
+    }
+    setBusy('phoneCancel')
+    setError(null)
+    try {
+      await cancelPhone({ variables: { bookingId: booking.id } })
+      onChanged()
+      onClose()
+    } catch (err) {
+      setError(t(`owner.phone.error.${phoneErrorKey(graphqlErrorCode(err))}`))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const mode = booking === undefined ? null : ownerDetailMode(booking.status)
+  const block = booking === undefined ? null : occupyingBlock(booking)
+  const clock =
+    booking === undefined || missing
+      ? null
+      : mode === 'read' && block !== null
+        ? occupyingClockRange(block.start, block.durationMinutes)
+        : mode === 'read' && booking.status === 'TIME_PROPOSED' && booking.proposedStartsAtLabel !== null
+          ? booking.proposedStartsAtLabel
+          : (booking.preferredStartsAtLabel ?? t('owner.noTime'))
+
+  return (
+    <Aside
+      open={open}
+      onClose={onClose}
+      title={booking !== undefined && !missing ? booking.customerName : t('owner.title')}
+      headerExtra={clock === null ? null : <p className="mt-0.5 text-sm tabular-nums text-ink">{clock}</p>}
+    >
+      {loadingBooking ? (
+        <RequestDetailSkeleton />
+      ) : (
+        <div className="text-ink">
         {forbidden || booking === undefined ? (
           <p className="text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
         ) : ownerDetailMode(booking.status) === 'bounce' ? (
           <>
-            <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
-            <p className="mt-1 text-sm text-body">
+            <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
@@ -344,18 +381,7 @@ export function OwnerRequestDetail() {
           </>
         ) : ownerDetailMode(booking.status) === 'read' ? (
           <>
-            <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">
-              {occupyingBlock(booking) === null
-                ? booking.status === 'TIME_PROPOSED' && booking.proposedStartsAtLabel !== null
-                  ? booking.proposedStartsAtLabel
-                  : (booking.preferredStartsAtLabel ?? t('owner.noTime'))
-                : occupyingClockRange(
-                    occupyingBlock(booking)!.start,
-                    occupyingBlock(booking)!.durationMinutes,
-                  )}
-            </p>
-            <p className="mt-1 text-sm text-body">
+            <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
@@ -389,9 +415,7 @@ export function OwnerRequestDetail() {
           </>
         ) : ownerDetailMode(booking.status) === 'form' ? (
           <>
-            <p className="font-semibold text-ink">{booking.customerName}</p>
-            <p className="mt-1 text-sm text-ink">{booking.preferredStartsAtLabel ?? t('owner.noTime')}</p>
-            <p className="mt-1 text-sm text-body">
+            <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
               {' · '}
               {booking.services.map((s) => s.name).join(', ')}
@@ -566,9 +590,9 @@ export function OwnerRequestDetail() {
             {error ? <Alert variant="error" className="mt-3">{error}</Alert> : null}
           </>
         ) : null}
-        </section>
-      </dialog>
-    </>
+        </div>
+      )}
+    </Aside>
   )
 }
 

@@ -239,9 +239,9 @@ test('owner ready state is OwnerShell; TopNav only on gate states; no bookings o
   }
   const detail = read('pages/OwnerRequestDetail.tsx')
   expect(detail).toMatch(/<TopNav/)
-  expect(detail).toMatch(/<dialog/)
+  expect(detail).toMatch(/<Aside/)
   expect(detail).not.toMatch(/<OwnerNav/)
-  expect(detail.slice(detail.lastIndexOf('<dialog'))).not.toMatch(/<TopNav/)
+  expect(detail.slice(detail.lastIndexOf('<Aside'))).not.toMatch(/<TopNav/)
   expect(detail).not.toMatch(/GUEST_COLUMN_CLASS/)
   expect(detail).not.toMatch(/nav\.bookings/)
   const shell = read('components/OwnerShell.tsx')
