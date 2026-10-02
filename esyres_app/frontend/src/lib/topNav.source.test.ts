@@ -108,8 +108,7 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   expect(page).toMatch(/<TopNav/)
   expect(page).toMatch(/AuthShell/)
   expect(page).toMatch(/nextHomepageAuth/)
-  expect(page).toMatch(/PLACE_HEADING_CLASS/)
-  expect(page).toMatch(/auth\.placeCustomer/)
+  expect(page).toMatch(/<AuthShell key=\{authOpen\} place="customer"/)
   expect(page).toMatch(/authOpen \?/)
   expect(page).toMatch(/pitch\.h1/)
   expect(page).toMatch(/pitch\.cta/)
@@ -118,12 +117,10 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   expect(page).toMatch(/GUEST_COLUMN_CLASS/)
   expect(page).not.toMatch(/max-w-3xl/)
   expect(page).toMatch(/max-w-xl/)
-  expect(page).toMatch(/max-w-sm/)
   expect(page).toMatch(/w-fit/)
   expect(page).not.toMatch(/navigate\('\/owner'\)/)
   expect(page).not.toMatch(/nav\.bookings/)
-  expect(page).toMatch(/PLACE_HEADING_CLASS\}>\{t\('auth\.placeCustomer'\)\}[\s\S]*max-w-sm[\s\S]*AuthShell/)
-  expect(page).not.toMatch(/max-w-sm[\s\S]*PLACE_HEADING_CLASS/)
+  expect(page).not.toMatch(/PLACE_HEADING_CLASS/)
 })
 
 function topNavTags(text: string): string[] {

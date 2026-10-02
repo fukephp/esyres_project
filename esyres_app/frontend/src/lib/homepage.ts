@@ -4,6 +4,7 @@ export const DISCOVERY_HREF = '/salons'
 export const CREATE_SALON_HREF = CREATE_SALON_PATH
 export const HOME_HREF = '/'
 export const BOOKINGS_HREF = '/bookings'
+export const RESET_PASSWORD_PATH = '/reset-password'
 export const DISCOVERY_BRAND_KEY = 'pitch.brand' as const
 export const GUEST_COLUMN_CLASS = 'mx-auto w-full max-w-[1200px] px-5 md:px-16'
 export const PLACE_HEADING_CLASS = 'font-display text-[28px] font-semibold tracking-tight text-ink'
@@ -104,7 +105,7 @@ export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
   if (slot === 'session' && me != null) {
     return { brand, slot: 'session', personName, logout: true }
   }
-  if (isCreateSalonPath(path) && personName != null) {
+  if ((isCreateSalonPath(path) || path === RESET_PASSWORD_PATH) && personName != null) {
     return { brand, slot: 'greeting', personName }
   }
   return { brand, slot: 'empty' }

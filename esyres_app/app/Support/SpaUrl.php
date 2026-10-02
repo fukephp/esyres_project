@@ -23,4 +23,9 @@ final class SpaUrl
     {
         return self::origin().'/bookings?'.$query;
     }
+
+    public static function resetPassword(string $token, string $email): string
+    {
+        return self::origin().'/reset-password?'.http_build_query(['token' => $token, 'email' => $email]);
+    }
 }

@@ -7,14 +7,18 @@ use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
+use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use App\SalonHours\WeeklyHours;
 use App\Sms\FakeSmsGateway;
 use App\Sms\SmsGateway;
+use App\Support\SpaUrl;
 use Behat\Gherkin\Node\PyStringNode;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 trait GuestSteps
 {
@@ -106,6 +110,134 @@ GQL, [
     {
         $this->assertNoGraphqlErrors();
         $this->assertSame($this->user->email, $this->graphql['data']['changePassword']['email']);
+    }
+
+    /**
+     * @When I request a password reset for :email
+     */
+    public function iRequestAPasswordResetFor(string $email): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql(<<<'GQL'
+mutation RequestPasswordReset($email: String!) {
+  requestPasswordReset(email: $email)
+}
+GQL, ['email' => $email]);
+    }
+
+    /**
+     * @Then request password reset succeeds
+     */
+    public function requestPasswordResetSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['requestPasswordReset']);
+    }
+
+    /**
+     * @Then :count reset-password notification was sent
+     * @Then :count reset-password notifications were sent
+     */
+    public function resetPasswordNotificationsWereSent(string $count): void
+    {
+        $this->assertSame((int) $count, Notification::sent($this->customer(), ResetPassword::class)->count());
+    }
+
+    /**
+     * @Then the reset-password link opens the PWA for :email
+     */
+    public function theResetPasswordLinkOpensThePwaFor(string $email): void
+    {
+        $notification = $this->mailedResetNotification();
+        $url = $notification->toMail($this->customer())->actionUrl;
+        $this->assertSame(SpaUrl::origin().'/reset-password?'.http_build_query([
+            'token' => $notification->token,
+            'email' => $email,
+        ]), $url);
+        $this->assertSame(true, $notification instanceof \Illuminate\Contracts\Queue\ShouldQueue);
+    }
+
+    /**
+     * @When I reset the password for :email to :password with the mailed token
+     */
+    public function iResetThePasswordWithTheMailedToken(string $email, string $password): void
+    {
+        $this->resetPasswordWith($email, $this->mailedResetNotification()->token, $password);
+    }
+
+    /**
+     * @When I reset the password for :email to :password with token :token
+     */
+    public function iResetThePasswordWithToken(string $email, string $password, string $token): void
+    {
+        $this->resetPasswordWith($email, $token, $password);
+    }
+
+    /**
+     * @Then reset password succeeds
+     */
+    public function resetPasswordSucceeds(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame(true, $this->graphql['data']['resetPassword']);
+    }
+
+    /**
+     * @Given a stored session for :email
+     */
+    public function aStoredSessionFor(string $email): void
+    {
+        DB::table((string) config('session.table'))->insert([
+            'id' => Str::random(40),
+            'user_id' => User::query()->where('email', $email)->value('id'),
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'Behat',
+            'payload' => base64_encode(serialize([])),
+            'last_activity' => now()->getTimestamp(),
+        ]);
+    }
+
+    /**
+     * @Then no stored session remains for :email
+     */
+    public function noStoredSessionRemainsFor(string $email): void
+    {
+        $this->assertSame(0, $this->storedSessionCount($email));
+    }
+
+    /**
+     * @Then a stored session remains for :email
+     */
+    public function aStoredSessionRemainsFor(string $email): void
+    {
+        $this->assertSame(1, $this->storedSessionCount($email));
+    }
+
+    private function storedSessionCount(string $email): int
+    {
+        return DB::table((string) config('session.table'))
+            ->where('user_id', User::query()->where('email', $email)->value('id'))
+            ->count();
+    }
+
+    private function mailedResetNotification(): ResetPassword
+    {
+        $notification = Notification::sent($this->customer(), ResetPassword::class)->last();
+        if (! $notification instanceof ResetPassword) {
+            throw new RuntimeException('No ResetPassword notification for '.$this->customer()->email);
+        }
+
+        return $notification;
+    }
+
+    private function resetPasswordWith(string $email, string $token, string $password): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql(<<<'GQL'
+mutation ResetPassword($email: String!, $token: String!, $password: String!) {
+  resetPassword(email: $email, token: $token, password: $password)
+}
+GQL, ['email' => $email, 'token' => $token, 'password' => $password]);
     }
 
     /**

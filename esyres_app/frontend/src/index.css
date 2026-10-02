@@ -170,3 +170,32 @@ input[type='radio']:disabled {
     transition: none;
   }
 }
+
+@keyframes auth-pane-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes auth-pane-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+.auth-pane-forward {
+  animation: auth-pane-from-right 200ms ease-out;
+}
+
+.auth-pane-back {
+  animation: auth-pane-from-left 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-pane-forward,
+  .auth-pane-back {
+    animation: none;
+  }
+}
