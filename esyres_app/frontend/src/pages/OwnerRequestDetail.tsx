@@ -462,7 +462,7 @@ export function OwnerRequestDetail() {
                       setWorkerId(e.target.value)
                       setTime('')
                     }}
-                    className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                    className="field mt-1"
                   >
                     {booking.worker === null ? <option value="">{t('owner.pickWorker')}</option> : null}
                     {workers.map((worker) => (
@@ -478,7 +478,7 @@ export function OwnerRequestDetail() {
                     value={time}
                     disabled={busy || workerId === ''}
                     onChange={(e) => setTime(e.target.value)}
-                    className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                    className="field mt-1"
                   >
                     <option value="">{t('salon.time')}</option>
                     {times.map((slot) => (
@@ -532,7 +532,7 @@ export function OwnerRequestDetail() {
                     maxLength={255}
                     disabled={busy}
                     onChange={(e) => setReasonDraft(e.target.value)}
-                    className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                    className="field mt-1"
                     rows={2}
                   />
                 </label>

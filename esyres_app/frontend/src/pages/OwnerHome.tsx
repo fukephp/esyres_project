@@ -702,7 +702,7 @@ function QueueRow({
               maxLength={255}
               disabled={busy}
               onChange={(e) => onReasonChange(e.target.value)}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="field mt-1"
               rows={2}
             />
           </label>

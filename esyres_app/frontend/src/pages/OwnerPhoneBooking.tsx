@@ -367,7 +367,7 @@ export function PhoneBookingDialog({
                       type="date"
                       value={otherDate}
                       onChange={(event) => onOtherDate(event.target.value)}
-                      className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                      className="field mt-1"
                     />
                   </label>
                   <label className="block text-sm text-body">
@@ -385,7 +385,7 @@ export function PhoneBookingDialog({
                         }
                         setTime(next)
                       }}
-                      className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+                      className="field mt-1"
                     />
                   </label>
                   {manualBlock !== null && manualBlock !== 'ok' ? (
@@ -481,7 +481,7 @@ export function PhoneBookingDialog({
             <input
               value={callerName}
               onChange={(event) => setCallerName(event.target.value)}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="field mt-1"
             />
           </label>
           <label className="block text-sm text-body">
@@ -489,7 +489,7 @@ export function PhoneBookingDialog({
             <input
               value={callerPhone}
               onChange={(event) => setCallerPhone(event.target.value)}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="field mt-1"
             />
           </label>
           <label className="block text-sm text-body">
@@ -498,7 +498,7 @@ export function PhoneBookingDialog({
               value={callerNote}
               onChange={(event) => setCallerNote(event.target.value)}
               rows={2}
-              className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="field mt-1"
             />
           </label>
           {error ? <p className="text-sm text-busy-busy">{error}</p> : null}

@@ -49,6 +49,14 @@ html {
   color: var(--color-ink);
 }
 
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a[href] {
+    cursor: pointer;
+  }
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.03em;
@@ -65,4 +73,33 @@ html {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.field {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-hairline);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.5rem 0;
+  color: var(--color-ink);
+}
+
+.field:focus {
+  outline: none;
+  border-bottom-color: var(--color-ink);
+}
+
+select.field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23111111' stroke-width='1.5' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 0.75rem;
+  padding-right: 1.25rem;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--color-ink);
 }

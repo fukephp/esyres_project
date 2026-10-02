@@ -105,7 +105,7 @@ export function AuthShell({
             autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            className="field mt-1"
           />
         </label>
       )}
@@ -116,7 +116,7 @@ export function AuthShell({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+          className="field mt-1"
         />
       </label>
       <label className="block text-sm text-body">
@@ -127,7 +127,7 @@ export function AuthShell({
           minLength={mode === 'register' ? 8 : undefined}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+          className="field mt-1"
         />
       </label>
       {mode === 'register' && (
@@ -137,7 +137,7 @@ export function AuthShell({
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+            className="field mt-1"
           />
         </label>
       )}

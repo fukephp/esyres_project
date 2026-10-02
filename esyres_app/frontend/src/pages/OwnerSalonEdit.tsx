@@ -41,8 +41,7 @@ import {
 } from '../lib/owner'
 import { useOwnerPush } from '../lib/push'
 
-const FIELD =
-  'mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink'
+const FIELD = 'field mt-1'
 const SAVE_BTN =
   'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
 const PLUS_BTN =
@@ -893,7 +892,7 @@ export function OwnerSalonEdit() {
                                       onChange={(e) =>
                                         patchDay(day.weekday, { breakStartsAt: e.target.value })
                                       }
-                                      className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                                      className="field"
                                     />
                                     <input
                                       type="time"
@@ -903,7 +902,7 @@ export function OwnerSalonEdit() {
                                       onChange={(e) =>
                                         patchDay(day.weekday, { breakEndsAt: e.target.value })
                                       }
-                                      className="w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                                      className="field"
                                     />
                                   </div>
                                 ) : null}

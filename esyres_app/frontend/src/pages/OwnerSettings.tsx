@@ -209,7 +209,7 @@ export function OwnerSettings() {
                 type="password"
                 value={current}
                 onChange={(e) => setCurrent(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="field mt-1"
               />
             </label>
             <label className="block text-sm text-body">
@@ -218,7 +218,7 @@ export function OwnerSettings() {
                 type="password"
                 value={next}
                 onChange={(e) => setNext(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="field mt-1"
               />
             </label>
             <label className="block text-sm text-body">
@@ -227,7 +227,7 @@ export function OwnerSettings() {
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="field mt-1"
               />
             </label>
             {error ? <p className="text-sm text-busy-busy">{error}</p> : null}

@@ -132,7 +132,7 @@ export function OwnerSalonCreate() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="field mt-1"
               />
             </label>
             <label className="block text-sm text-body">
@@ -141,7 +141,7 @@ export function OwnerSalonCreate() {
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+                className="field mt-1"
               />
             </label>
             {error ? <p className="text-sm text-busy-busy">{error}</p> : null}

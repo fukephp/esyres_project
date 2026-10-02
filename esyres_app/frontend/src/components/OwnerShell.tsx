@@ -71,9 +71,27 @@ export function OwnerShell({
       <aside
         className={`hidden bg-surface-dark px-4 py-6 text-on-dark md:sticky md:top-0 md:flex md:h-svh md:shrink-0 md:flex-col ${expanded ? 'md:w-60 md:items-stretch' : 'md:w-16 md:items-center'}`}
       >
-        <Link to="/" aria-label={t(DISCOVERY_BRAND_KEY)} className="flex items-center justify-center">
-          <img src="/esyres-mark.svg" width={24} height={24} alt="" aria-hidden="true" className="invert" />
-        </Link>
+        <div className={expanded ? 'flex w-full items-center justify-between gap-2' : 'flex flex-col items-center gap-2'}>
+          <Link
+            to="/"
+            aria-label={t(DISCOVERY_BRAND_KEY)}
+            className={`flex items-center ${expanded ? 'min-w-0 gap-2' : 'justify-center'}`}
+          >
+            <img src="/esyres-mark.svg" width={24} height={24} alt="" aria-hidden="true" className="invert" />
+            {expanded ? <span className="pitch-display truncate text-lg text-on-dark">{t(DISCOVERY_BRAND_KEY)}</span> : null}
+          </Link>
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-label={t(expanded ? 'owner.collapseMenu' : 'owner.expandMenu')}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pastel-pink text-ink"
+            onClick={toggleRail}
+          >
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d={expanded ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />
+            </svg>
+          </button>
+        </div>
         <OwnerNav
           salonId={salonId}
           firstOwnedId={firstOwnedId}
@@ -84,27 +102,21 @@ export function OwnerShell({
           expanded={expanded}
           chatEnabled={chatEnabled}
         />
-        <div className="mt-auto flex flex-col items-center gap-1">
-          <button
-            type="button"
-            aria-expanded={expanded}
-            aria-label={t(expanded ? 'owner.collapseMenu' : 'owner.expandMenu')}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-on-dark-soft active:text-on-dark"
-            onClick={toggleRail}
-          >
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d={expanded ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />
-            </svg>
-          </button>
+        <div className="mt-auto flex flex-col items-center">
           <button
             type="button"
             aria-label={t('home.logout')}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-error-strong text-canvas active:bg-error-strong-active"
+            className={
+              expanded
+                ? `${logoutClass} w-full gap-2`
+                : 'flex h-10 w-10 items-center justify-center rounded-full bg-error-strong text-canvas active:bg-error-strong-active'
+            }
             onClick={() => void logout()}
           >
             <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 7V5H5v14h5v-2M10 12h9M16 9l3 3-3 3" />
             </svg>
+            {expanded ? t('home.logout') : null}
           </button>
         </div>
       </aside>

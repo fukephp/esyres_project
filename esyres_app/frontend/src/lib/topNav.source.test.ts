@@ -265,7 +265,7 @@ test('owner ready state is OwnerShell; TopNav only on gate states; no bookings o
   expect(aside).toMatch(/type="button"/)
   expect(aside.indexOf('owner.expandMenu')).toBeLessThan(aside.indexOf('home.logout'))
   expect(aside).toMatch(/aria-label=\{t\('home\.logout'\)\}/)
-  expect(aside).not.toMatch(/>\s*\{t\('home\.logout'\)\}/)
+  expect(aside).toMatch(/expanded \? t\('home\.logout'\) : null/)
   expect(aside).toMatch(/variant="sidebar"/)
   expect(aside).toMatch(/expanded=\{expanded\}/)
   expect(phone).toMatch(/variant="tabs"/)
