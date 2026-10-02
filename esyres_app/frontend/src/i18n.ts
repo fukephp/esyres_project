@@ -423,6 +423,7 @@ void i18n.use(initReactI18next).init({
               SLOT_TAKEN: 'Taj termin je zauzet.',
               INVALID_WORKER: 'Odaberi radnika ovog salona.',
               INVALID_SERVICES: 'Odaberi usluge ovog salona.',
+              PAST_TIME: 'To vrijeme je već prošlo.',
               fallback: 'Termin nije sačuvan.',
             },
           },

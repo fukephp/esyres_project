@@ -14,6 +14,7 @@ import { PillsSkeleton } from '../components/Skeleton'
 import { Alert, CloseButton, Spinner } from '../components/ui'
 import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
+import { quarterStartPast } from '../lib/guestQuarter'
 import {
   hoursForDate,
   ownerDateFromSearch,
@@ -24,6 +25,7 @@ import {
   phoneFreeWorkerIds,
   phoneLegalStarts,
   phoneManualTimeBlock,
+  phoneOpenStarts,
   phoneQuarterChoices,
   phoneRangeOpen,
   type PhoneTimeBlock,
@@ -34,7 +36,12 @@ import {
 } from '../lib/owner'
 import { SALON_PICKER_DIALOG_CLASS } from '../lib/salonSend'
 
-function manualErrorKey(block: PhoneTimeBlock): 'SLOT_TAKEN' | 'OUTSIDE_HOURS' | 'DURING_BREAK' | 'SALON_CLOSED' {
+function manualErrorKey(
+  block: PhoneTimeBlock | 'past',
+): 'SLOT_TAKEN' | 'OUTSIDE_HOURS' | 'DURING_BREAK' | 'SALON_CLOSED' | 'PAST_TIME' {
+  if (block === 'past') {
+    return 'PAST_TIME'
+  }
   if (block === 'taken') {
     return 'SLOT_TAKEN'
   }
@@ -134,19 +141,28 @@ export function PhoneBookingDialog({
     rows === null || hours === null || resolved === ''
       ? []
       : phoneQuarterChoices(dayHours, workers, rows, duration)
-  const starts = choices.filter((row) => !row.booked).map((row) => row.time)
+  const pastStart = (clock: string) => resolved !== '' && quarterStartPast(resolved, clock, today, new Date())
+  const tappable = choices.filter((row) => !row.booked && !pastStart(row.time)).map((row) => row.time)
+  const datePast = resolved !== '' && resolved < today
   const rangeOpen = phoneRangeOpen(dayHours, time, duration) && duration > 0
   const freeIds =
     time === '' || rows === null ? [] : phoneFreeWorkerIds(workers, rows, time, duration, rangeOpen)
   const freeWorkers = workers.filter((worker) => freeIds.includes(worker.id))
   const waitingSkip = !skipped && !windowFailed && (hours === null || windowRows === undefined || windowLoading)
   const dayClosed = resolved !== '' && rows !== null && (dayHours === undefined || dayHours.closed)
-  const dayEmpty = chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length === 0
+  const dayEmpty =
+    chip !== 'other' &&
+    resolved !== '' &&
+    rows !== null &&
+    !dayClosed &&
+    (choices.length === 0 || (tappable.length === 0 && choices.some((row) => pastStart(row.time))))
   const manualBlock =
-    chip === 'other' && resolved !== '' && time !== '' && rows !== null
-      ? phoneManualTimeBlock(dayHours, workers, rows, time, duration)
-      : null
-  const whenReady = chip === 'other' ? manualBlock === 'ok' : time !== '' && starts.includes(time)
+    chip === 'other' && datePast
+      ? 'past'
+      : chip === 'other' && resolved !== '' && time !== '' && rows !== null
+        ? phoneManualTimeBlock(dayHours, workers, rows, time, duration)
+        : null
+  const whenReady = chip === 'other' ? manualBlock === 'ok' : time !== '' && tappable.includes(time)
 
   useEffect(() => {
     if (salonSeen.current === salonId) {
@@ -199,7 +215,14 @@ export function PhoneBookingDialog({
       return
     }
     const picked = phoneSkipDate(today, (day) => {
-      return phoneLegalStarts(hoursForDate(hours, day), workers, windowRows.filter((row) => row.preferredDate === day), duration).length > 0
+      return (
+        phoneOpenStarts(
+          phoneLegalStarts(hoursForDate(hours, day), workers, windowRows.filter((row) => row.preferredDate === day), duration),
+          day,
+          today,
+          new Date(),
+        ).length > 0
+      )
     })
     setChip(phoneDayChip(picked, today))
     setSkipped(true)
@@ -211,6 +234,15 @@ export function PhoneBookingDialog({
     }
     setWorkerId((current) => phoneWorkerSelection(freeIds, current))
   }, [time, rows, freeIds])
+
+  useEffect(() => {
+    if (step !== 1 || time === '' || resolved === '') {
+      return
+    }
+    if (quarterStartPast(resolved, time, today, new Date())) {
+      clearSlot()
+    }
+  }, [step, time, resolved, today])
 
   function clearSlot() {
     setTime('')
@@ -255,7 +287,12 @@ export function PhoneBookingDialog({
     const nextDuration = roundUp15(
       catalog.filter((service) => nextIds.includes(service.id)).reduce((sum, service) => sum + service.durationMinutes, 0),
     )
-    const legal = phoneLegalStarts(hoursForDate(hours, resolved), workers, rows, nextDuration)
+    const legal = phoneOpenStarts(
+      phoneLegalStarts(hoursForDate(hours, resolved), workers, rows, nextDuration),
+      resolved,
+      today,
+      new Date(),
+    )
     const kept = phoneAfterServiceChange(time, workerId, legal)
     setTime(kept.time)
     setWorkerId(kept.workerId)
@@ -365,6 +402,7 @@ export function PhoneBookingDialog({
                     <input
                       type="date"
                       value={otherDate}
+                      min={today}
                       onChange={(event) => onOtherDate(event.target.value)}
                       className="field mt-1"
                     />
@@ -397,22 +435,25 @@ export function PhoneBookingDialog({
               {dayEmpty ? <Alert variant="info">{t('owner.phone.noStart')}</Alert> : null}
               {chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {choices.map((choice) => (
+                  {choices.map((choice) => {
+                    const past = pastStart(choice.time)
+                    const blocked = choice.booked || past
+                    return (
                     <button
                       key={choice.time}
                       type="button"
-                      disabled={choice.booked}
+                      disabled={blocked}
                       aria-pressed={time === choice.time}
-                      aria-label={choice.booked ? `${choice.time}, ${t('owner.phone.booked')}` : undefined}
+                      aria-label={choice.booked && !past ? `${choice.time}, ${t('owner.phone.booked')}` : undefined}
                       onClick={() => {
-                        if (choice.booked || choice.time === time) {
+                        if (blocked || choice.time === time) {
                           return
                         }
                         setWorkerId('')
                         setTime(choice.time)
                       }}
                       className={
-                        choice.booked
+                        blocked
                           ? 'rounded-full border border-hairline px-3 py-1.5 text-sm text-muted disabled:opacity-40'
                           : time === choice.time
                             ? 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas'
@@ -421,7 +462,8 @@ export function PhoneBookingDialog({
                     >
                       {choice.time}
                     </button>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : null}
             </>
@@ -430,7 +472,18 @@ export function PhoneBookingDialog({
             <button type="button" onClick={() => setStep(0)} className="text-sm font-medium text-ink">
               {t('owner.back')}
             </button>
-            <button type="button" disabled={!whenReady} onClick={() => setStep(2)} className={NEXT_CLASS}>
+            <button
+              type="button"
+              disabled={!whenReady}
+              onClick={() => {
+                if (resolved !== '' && quarterStartPast(resolved, time, today, new Date())) {
+                  clearSlot()
+                  return
+                }
+                setStep(2)
+              }}
+              className={NEXT_CLASS}
+            >
               {t('owner.phone.next')}
             </button>
           </div>

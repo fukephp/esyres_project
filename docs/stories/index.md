@@ -117,4 +117,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-92 | Day-only request | 2 | STORY-92 | STORY-89, STORY-84, STORY-13 |
 | STORY-93 | U toku column | 3 | STORY-93 | STORY-80, STORY-85 |
 | STORY-94 | Hide Chat | 7 | STORY-94 | STORY-71, STORY-78, STORY-26 |
-| STORY-95 | Telefon past start | 3 | — | STORY-76 |
+| STORY-95 | Telefon past start | 3 | `STORY-95` | STORY-76 |
