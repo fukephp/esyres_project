@@ -11,7 +11,6 @@ import { sarajevoToday } from '../lib/format'
 import {
   DISCOVERY_HREF,
   GUEST_COLUMN_CLASS,
-  PLACE_HEADING_CLASS,
   homepageChrome,
   nextHomepageAuth,
 } from '../lib/homepage'
@@ -39,12 +38,7 @@ export function Homepage() {
         onRegister={() => setAuthOpen((current) => nextHomepageAuth(current, 'register'))}
       />
       {authOpen ? (
-        <div className={`${GUEST_COLUMN_CLASS} py-8 md:py-12`}>
-          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</h1>
-          <div className="mt-8 max-w-sm">
-            <AuthShell key={authOpen} initialMode={authOpen} onAuthenticated={() => setAuthOpen(null)} />
-          </div>
-        </div>
+        <AuthShell key={authOpen} place="customer" initialMode={authOpen} onAuthenticated={() => setAuthOpen(null)} />
       ) : (
         <>
           <main className={`${GUEST_COLUMN_CLASS} flex-1 pb-16`}>

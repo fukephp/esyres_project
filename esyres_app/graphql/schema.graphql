@@ -330,6 +330,8 @@ type Mutation {
     login(email: String!, password: String!): User!
     register(name: String!, email: String!, password: String!, phone: String): User!
     changePassword(currentPassword: String!, password: String!): User!
+    requestPasswordReset(email: String!): Boolean!
+    resetPassword(email: String!, token: String!, password: String!): Boolean!
     updateOwnerView(view: OwnerView!): User!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     updateChatEnabled(enabled: Boolean!): User!

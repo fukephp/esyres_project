@@ -12,10 +12,12 @@ import {
   TilesSkeleton,
 } from './components/Skeleton'
 import { CREATE_SALON_PATH } from './lib/createSalon'
+import { RESET_PASSWORD_PATH } from './lib/homepage'
 import { CreateSalon } from './pages/CreateSalon'
 import { DiscoveryHome } from './pages/DiscoveryHome'
 import { Homepage } from './pages/Homepage'
 import { MyBookings } from './pages/MyBookings'
+import { ResetPassword } from './pages/ResetPassword'
 import { SalonProfile } from './pages/SalonProfile'
 
 const OwnerHome = lazy(() => import('./pages/OwnerHome').then((m) => ({ default: m.OwnerHome })))
@@ -50,6 +52,7 @@ export default function App() {
         <Route path={CREATE_SALON_PATH} element={<CreateSalon />} />
         <Route path="/salon/:id" element={<SalonProfile />} />
         <Route path="/bookings" element={<MyBookings />} />
+        <Route path={RESET_PASSWORD_PATH} element={<ResetPassword />} />
         <Route path="/owner" element={owner(<OwnerHome />, <OwnerWeekSkeleton />)} />
         <Route path="/owner/chats" element={owner(<OwnerChats />, <RowsSkeleton count={4} />)} />
         <Route path="/owner/stats" element={owner(<OwnerStats />, <TilesSkeleton />)} />

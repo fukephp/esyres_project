@@ -30,7 +30,7 @@ import {
   respondErrorKey,
 } from '../lib/booking'
 import { formatCivilDate } from '../lib/format'
-import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
+import { GUEST_COLUMN_CLASS } from '../lib/homepage'
 import { useCustomerPush } from '../lib/push'
 
 type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' | 'cancel' } | null
@@ -376,16 +376,13 @@ export function MyBookings() {
 
   if (data?.me == null) {
     return (
-      <>
+      <div className="flex min-h-svh flex-col bg-page">
         <TopNav me={navMe} />
-        <main className={`${GUEST_COLUMN_CLASS} py-8`}>
-          <h1 className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</h1>
+        <div className={`${GUEST_COLUMN_CLASS} pt-8 empty:hidden`}>
           <VerifyBanner />
-          <div className="mt-8 max-w-md">
-            <AuthShell onAuthenticated={() => refetch()} />
-          </div>
-        </main>
-      </>
+        </div>
+        <AuthShell place="customer" onAuthenticated={() => refetch()} />
+      </div>
     )
   }
 

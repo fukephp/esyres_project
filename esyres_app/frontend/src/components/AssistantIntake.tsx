@@ -308,7 +308,7 @@ export function AssistantIntake({
           {chrome === 'login' && (
             <>
               <p className={PLACE_HEADING_CLASS}>{t('auth.placeCustomer')}</p>
-              <AuthShell onAuthenticated={onAfterAuth} />
+              <AuthShell variant="modal" onAuthenticated={onAfterAuth} />
             </>
           )}
         </div>

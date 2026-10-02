@@ -504,7 +504,9 @@ export function SalonProfile() {
           ) : showLogin ? (
             <div>
               <p className="text-sm text-body">{t('salon.loginToRequest')}</p>
-              <AuthShell onAuthenticated={() => setNeedLogin(false)} />
+              <div className="mt-4">
+                <AuthShell variant="modal" onAuthenticated={() => setNeedLogin(false)} />
+              </div>
             </div>
           ) : meLoading ? null : (
             <form className="space-y-4" onSubmit={(event) => void onSubmit(event)}>
