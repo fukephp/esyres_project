@@ -89,6 +89,7 @@
 - As an owner, I want to add/edit services with durations and prices, so that customers see accurate options.
 - As an owner, I want to create named service categories and attach services to the selected category, so that the guest menu matches my real cjenovnik instead of locked hair / make-up / massage.
 - As an owner, I want to add workers to my salon, so that customers can request them specifically or leave it open. Workers follow the salon’s hours.
+- As an owner, I want each worker to have a photo, an about text, experience, and lists of talents, specializations, certificates, education, brands, and strongest services, so the salon’s team is described before guests see it.
 - As an owner, I want salon edit split into exclusive sections, so I can edit one chunk at a time on a full-width page instead of a stacked skinny form.
 - As an owner, I want each weekday on Radno vrijeme collapsed until I open it, so that I can scan the week without scrolling through seven expanded editors.
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.
