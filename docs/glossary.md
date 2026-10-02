@@ -132,6 +132,10 @@ _Avoid_: slot, free slot, availability cell, custom time
 A quarter start the guest can see and cannot tap, because that service range overlaps an occupying booking for the named worker, or for every worker when the guest has no preference. A pending request is not Zauzet. A salon with no workers has no Zauzet quarters. Not a closed day and not a past quarter.
 _Avoid_: booked slot, held, unavailable grid
 
+**Past quarter**:
+A quarter start on today whose clock is already behind now. Not Zauzet and not a closed day.
+_Avoid_: expired slot, unavailable date, missed slot
+
 **Salon Booking Assistant**:
 The scripted alternate on a salon profile for messy intent. Speaks as that salon. Completing it is the same request as the picker. Not a customer inbox, not WhatsApp, and not a named platform bot.
 _Avoid_: Cora, chatbot, WhatsApp bot, AI assistant, customer inbox, live chat

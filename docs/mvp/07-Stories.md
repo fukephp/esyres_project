@@ -52,6 +52,7 @@
 - As an owner, I want to confirm a no-preference request that already has a time by tapping a free worker, so that the guest is not asked again.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 - As an owner, I want Telefon as modal steps on Zahtjevi, with Danas, Sutra, or another day and tappable quarter-hour starts, so that I can write a phone booking with a few taps while I am still on the call.
+- As an owner, I want Telefon to refuse a start that is already past, so that a phone booking cannot be written for a time that has already gone.
 - As a guest or an owner, I want pages and lists to show a calm skeleton of what is coming while they load (owner pages inside the shell frame), so that the screen does not jump.
 - As an owner, I want each confirmed card on Zahtjevi to show how far that appointment has run, and the menu as icons only, so that I can see progress without a wide labeled sidebar.
 - As an owner, I want visits that are happening now in a first Kanban column, and checkboxes to hide that column or the finished one, so that the board stays the pipeline I need.
