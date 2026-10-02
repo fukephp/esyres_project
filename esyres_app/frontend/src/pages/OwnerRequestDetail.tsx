@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
 import { OwnerPageSkeleton, RequestDetailSkeleton } from '../components/Skeleton'
+import { Alert, CloseButton, Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   ACCEPT_PREFERRED_TIME_MUTATION,
@@ -87,7 +88,8 @@ export function OwnerRequestDetail() {
   const [cancelPhone] = useMutation(CANCEL_PHONE_BOOKING_MUTATION)
   const [workerId, setWorkerId] = useState('')
   const [time, setTime] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<string | null>(null)
+  const working = busy !== null
   const [declineOpen, setDeclineOpen] = useState(false)
   const [reasonDraft, setReasonDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -146,7 +148,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    setBusy(true)
+    setBusy('accept')
     setError(null)
     try {
       await accept({ variables: { bookingId: booking.id } })
@@ -154,7 +156,7 @@ export function OwnerRequestDetail() {
     } catch (caught) {
       setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -162,7 +164,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    setBusy(true)
+    setBusy(`assign:${workerIdToAssign}`)
     setError(null)
     try {
       await assignWorker({ variables: { bookingId: booking.id, workerId: workerIdToAssign } })
@@ -170,7 +172,7 @@ export function OwnerRequestDetail() {
     } catch (caught) {
       setError(t(`owner.acceptError.${acceptErrorKey(graphqlErrorCode(caught))}`))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -178,7 +180,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined || workerId === '' || time === '') {
       return
     }
-    setBusy(true)
+    setBusy('propose')
     setError(null)
     try {
       await propose({ variables: { bookingId: booking.id, workerId, proposedTime: time } })
@@ -186,7 +188,7 @@ export function OwnerRequestDetail() {
     } catch (caught) {
       setError(t(`owner.proposeError.${proposeErrorKey(graphqlErrorCode(caught))}`))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -194,7 +196,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    setBusy(true)
+    setBusy('decline')
     setError(null)
     const reason = trimDeclineReason(reasonDraft)
     try {
@@ -203,7 +205,7 @@ export function OwnerRequestDetail() {
     } catch (caught) {
       setError(t(`owner.declineError.${declineErrorKey(graphqlErrorCode(caught))}`))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -211,7 +213,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    setBusy(true)
+    setBusy('noShow')
     setNoShowError(null)
     try {
       await markNoShow({ variables: { bookingId: booking.id } })
@@ -219,7 +221,7 @@ export function OwnerRequestDetail() {
     } catch {
       setNoShowError(t('owner.noShowError'))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -227,7 +229,7 @@ export function OwnerRequestDetail() {
     if (booking === undefined) {
       return
     }
-    setBusy(true)
+    setBusy('phoneCancel')
     setError(null)
     try {
       await cancelPhone({ variables: { bookingId: booking.id } })
@@ -235,7 +237,7 @@ export function OwnerRequestDetail() {
     } catch (err) {
       setError(t(`owner.phone.error.${phoneErrorKey(graphqlErrorCode(err))}`))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -320,9 +322,7 @@ export function OwnerRequestDetail() {
         }}
       >
         <div className="mb-4 flex justify-end">
-          <button type="button" className="text-sm text-body" onClick={close}>
-            {t('salon.close')}
-          </button>
+          <CloseButton onClick={close} />
         </div>
         <section className="rounded-3xl bg-canvas p-4 md:p-6">
         {forbidden || booking === undefined ? (
@@ -432,10 +432,11 @@ export function OwnerRequestDetail() {
                   <button
                     key={worker.id}
                     type="button"
-                    disabled={busy}
+                    disabled={working}
                     onClick={() => void onAssign(worker.id)}
-                    className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
                   >
+                    {busy === `assign:${worker.id}` ? <Spinner /> : null}
                     {worker.name}
                   </button>
                 ))}
@@ -457,7 +458,7 @@ export function OwnerRequestDetail() {
                   {t('salon.worker')}
                   <select
                     value={workerId}
-                    disabled={busy}
+                    disabled={working}
                     onChange={(e) => {
                       setWorkerId(e.target.value)
                       setTime('')
@@ -476,7 +477,7 @@ export function OwnerRequestDetail() {
                   {t('salon.time')}
                   <select
                     value={time}
-                    disabled={busy || workerId === ''}
+                    disabled={working || workerId === ''}
                     onChange={(e) => setTime(e.target.value)}
                     className="field mt-1"
                   >
@@ -490,9 +491,10 @@ export function OwnerRequestDetail() {
                 </label>
                 <button
                   type="submit"
-                  disabled={busy || workerId === '' || time === '' || !times.includes(time)}
-                  className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+                  disabled={working || workerId === '' || time === '' || !times.includes(time)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
                 >
+                  {busy === 'propose' ? <Spinner /> : null}
                   {t('owner.propose')}
                 </button>
               </form>
@@ -501,17 +503,18 @@ export function OwnerRequestDetail() {
               {canAcceptPreferredTime(booking.worker) ? (
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={working}
                   onClick={() => void onAccept()}
-                  className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
                 >
+                  {busy === 'accept' ? <Spinner /> : null}
                   {t('owner.accept')}
                 </button>
               ) : null}
               {declineOpen ? null : (
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={working}
                   onClick={() => {
                     setDeclineOpen(true)
                     setReasonDraft('')
@@ -530,7 +533,7 @@ export function OwnerRequestDetail() {
                   <textarea
                     value={reasonDraft}
                     maxLength={255}
-                    disabled={busy}
+                    disabled={working}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     className="field mt-1"
                     rows={2}
@@ -539,15 +542,16 @@ export function OwnerRequestDetail() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    disabled={busy}
+                    disabled={working}
                     onClick={() => void onDecline()}
-                    className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
                   >
+                    {busy === 'decline' ? <Spinner /> : null}
                     {t('owner.declineConfirm')}
                   </button>
                   <button
                     type="button"
-                    disabled={busy}
+                    disabled={working}
                     onClick={() => {
                       setDeclineOpen(false)
                       setReasonDraft('')
@@ -559,7 +563,7 @@ export function OwnerRequestDetail() {
                 </div>
               </div>
             ) : null}
-            {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+            {error ? <Alert variant="error" className="mt-3">{error}</Alert> : null}
           </>
         ) : null}
         </section>
@@ -575,11 +579,12 @@ function PriorMemory({
   onMark,
 }: {
   booking: OwnerBooking
-  busy: boolean
+  busy: string | null
   error: string | null
   onMark: () => void
 }) {
   const { t } = useTranslation()
+  const working = busy !== null
   const rows = booking.priorConfirmedBookings ?? []
   const stamped = booking.noShowAt != null && booking.noShowAt !== ''
   const canMark =
@@ -591,14 +596,15 @@ function PriorMemory({
       {canMark ? (
         <button
           type="button"
-          disabled={busy}
+          disabled={working}
           onClick={onMark}
-          className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
         >
+          {busy === 'noShow' ? <Spinner /> : null}
           {t('owner.noShow')}
         </button>
       ) : null}
-      {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+      {error ? <Alert variant="error" className="mt-3">{error}</Alert> : null}
       {booking.origin === 'PHONE' ? null : (
         <>
           <p className="mt-4 text-sm font-semibold text-ink">{t('owner.priorBookings')}</p>
@@ -631,13 +637,14 @@ function PhoneCancel({
   onConfirm,
 }: {
   booking: OwnerBooking
-  busy: boolean
+  busy: string | null
   open: boolean
   onOpen: () => void
   onClose: () => void
   onConfirm: () => void
 }) {
   const { t } = useTranslation()
+  const working = busy !== null
   const beforeStart = booking.status === 'CONFIRMED' && booking.preferredStartsAt !== null && Date.parse(booking.preferredStartsAt) > Date.now()
   if (booking.origin !== 'PHONE' || !beforeStart) {
     return null
@@ -649,15 +656,16 @@ function PhoneCancel({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={busy}
+            disabled={working}
             onClick={onConfirm}
-            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy === 'phoneCancel' ? <Spinner /> : null}
             {t('bookings.cancelBooking')}
           </button>
           <button
             type="button"
-            disabled={busy}
+            disabled={working}
             onClick={onClose}
             className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
@@ -667,7 +675,7 @@ function PhoneCancel({
       ) : (
         <button
           type="button"
-          disabled={busy}
+          disabled={working}
           onClick={onOpen}
           className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
         >

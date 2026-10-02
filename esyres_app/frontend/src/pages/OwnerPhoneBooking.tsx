@@ -11,6 +11,7 @@ import {
   type OccupyingBookingsRangeData,
 } from '../graphql/pending'
 import { PillsSkeleton } from '../components/Skeleton'
+import { Alert, CloseButton, Spinner } from '../components/ui'
 import { graphqlErrorCode } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
 import {
@@ -47,7 +48,7 @@ function manualErrorKey(block: PhoneTimeBlock): 'SLOT_TAKEN' | 'OUTSIDE_HOURS' |
   return 'OUTSIDE_HOURS'
 }
 
-const NEXT_CLASS = 'rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40'
+const NEXT_CLASS = 'inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40'
 
 function roundUp15(minutes: number): number {
   return Math.floor((minutes + 14) / 15) * 15
@@ -312,9 +313,7 @@ export function PhoneBookingDialog({
     >
       <div className="mb-4 flex items-start justify-between gap-4">
         <h2 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.phone.title')}</h2>
-        <button type="button" className="text-sm text-body" onClick={onClose}>
-          {t('salon.close')}
-        </button>
+        <CloseButton onClick={onClose} />
       </div>
       {step === 0 ? (
         <div className="space-y-4">
@@ -389,13 +388,13 @@ export function PhoneBookingDialog({
                     />
                   </label>
                   {manualBlock !== null && manualBlock !== 'ok' ? (
-                    <p className="text-sm text-busy-busy">{t(`owner.phone.error.${manualErrorKey(manualBlock)}`)}</p>
+                    <Alert variant="error">{t(`owner.phone.error.${manualErrorKey(manualBlock)}`)}</Alert>
                   ) : null}
                 </>
               ) : null}
               {resolved !== '' && rows === null && !windowFailed ? <PillsSkeleton /> : null}
-              {dayClosed && manualBlock === null ? <p className="text-sm text-body">{t('owner.phone.error.SALON_CLOSED')}</p> : null}
-              {dayEmpty ? <p className="text-sm text-body">{t('owner.phone.noStart')}</p> : null}
+              {dayClosed && manualBlock === null ? <Alert variant="warning">{t('owner.phone.error.SALON_CLOSED')}</Alert> : null}
+              {dayEmpty ? <Alert variant="info">{t('owner.phone.noStart')}</Alert> : null}
               {chip !== 'other' && resolved !== '' && rows !== null && !dayClosed && choices.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {choices.map((choice) => (
@@ -501,12 +500,13 @@ export function PhoneBookingDialog({
               className="field mt-1"
             />
           </label>
-          {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+          {error ? <Alert variant="error">{error}</Alert> : null}
           <div className="flex gap-2">
             <button type="button" onClick={() => setStep(2)} className="text-sm font-medium text-ink">
               {t('owner.back')}
             </button>
             <button type="submit" disabled={saving} className={NEXT_CLASS}>
+              {saving ? <Spinner /> : null}
               {t('owner.save')}
             </button>
           </div>

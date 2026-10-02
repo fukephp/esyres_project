@@ -154,7 +154,7 @@ test('picker opens from the pill, names the day, and only Zatvori dismisses', ()
   expect(page).toMatch(/function closePicker\(\) \{\s*allowClose\.current = true/)
   expect(dialog).toMatch(/onClick=\{closePicker\}/)
   expect(dialog).toMatch(/t\('salon\.success'\)/)
-  expect(dialog).toMatch(/t\('salon\.close'\)/)
+  expect(dialog).toMatch(/<CloseButton onClick=\{closePicker\} \/>/)
 })
 
 test('skip runs on open; day change clears worker; login does not send', () => {

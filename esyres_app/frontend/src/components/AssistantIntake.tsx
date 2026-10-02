@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AuthShell } from './AuthShell'
 import { EmailVerifyPanel } from './EmailVerifyPanel'
 import { PhoneOtpPanel } from './PhoneOtpPanel'
+import { Alert, Spinner } from './ui'
 import type { SalonService, SalonWorker } from '../graphql/salon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import {
@@ -233,7 +234,7 @@ export function AssistantIntake({
           {timeStep && hoursLine !== null && <p className="w-full text-sm text-muted">{hoursLine}</p>}
 
           {timeStep && dayClosed && (
-            <p className="w-full text-sm text-busy-busy">{t('salon.gate.SALON_CLOSED')}</p>
+            <Alert variant="warning" className="w-full">{t('salon.gate.SALON_CLOSED')}</Alert>
           )}
 
           {timeStep && !dayClosed && (
@@ -291,13 +292,14 @@ export function AssistantIntake({
             </button>
           )}
           {pingUi === 'done' && <p className="w-full text-sm text-muted">{t('assistant.pinged')}</p>}
-          {error && <p className="w-full text-sm text-busy-busy">{error}</p>}
+          {error && <Alert variant="error" className="w-full">{error}</Alert>}
           {step === 'send' && chrome === 'submit' && (
             <button
               type="submit"
               disabled={!canSend || busy}
               className={SALON_SEND_CLASS}
             >
+              {busy ? <Spinner className="mr-2 size-4" /> : null}
               {t('salon.send')}
             </button>
           )}

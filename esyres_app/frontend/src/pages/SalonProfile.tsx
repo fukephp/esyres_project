@@ -7,6 +7,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
 import { GuestPageSkeleton, SalonProfileSkeleton } from '../components/Skeleton'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
+import { Alert, CloseButton, Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   CREATE_BOOKING_MUTATION,
@@ -496,12 +497,10 @@ export function SalonProfile() {
                 </p>
               ) : null}
             </div>
-            <button type="button" className="text-sm text-body" onClick={closePicker}>
-              {t('salon.close')}
-            </button>
+            <CloseButton onClick={closePicker} />
           </div>
           {sent ? (
-            <p className="text-sm text-ink">{t('salon.success')}</p>
+            <Alert variant="success">{t('salon.success')}</Alert>
           ) : showLogin ? (
             <div>
               <p className="text-sm text-body">{t('salon.loginToRequest')}</p>
@@ -581,9 +580,9 @@ export function SalonProfile() {
               {chosen.length > 0 && preferredDate !== '' ? (
                 <div>
                   <p className="text-sm text-body">{t('salon.time')}</p>
-                  {pickerClosed ? <p className="mt-2 text-sm text-body">{t('salon.gate.SALON_CLOSED')}</p> : null}
+                  {pickerClosed ? <Alert variant="warning" className="mt-2">{t('salon.gate.SALON_CLOSED')}</Alert> : null}
                   {!pickerClosed && quarters !== null && quarterNoneTappable(quarters, quarterPast) ? (
-                    <p className="mt-2 text-sm text-body">{t('salon.quarter.none')}</p>
+                    <Alert variant="info" className="mt-2">{t('salon.quarter.none')}</Alert>
                   ) : null}
                   {!pickerClosed && quarters !== null && quarters.length > 0 && preferredTime === '' ? (
                     <p className="mt-2 text-sm text-muted">{t('salon.quarter.dayOnly')}</p>
@@ -621,9 +620,10 @@ export function SalonProfile() {
                   ) : null}
                 </div>
               ) : null}
-              {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+              {error ? <Alert variant="error">{error}</Alert> : null}
               {!needEmail && !needPhone && (
                 <button type="submit" disabled={!canSendPicker || busy} className={SALON_SEND_CLASS}>
+                  {busy ? <Spinner className="mr-2 size-4" /> : null}
                   {t('salon.send')}
                 </button>
               )}

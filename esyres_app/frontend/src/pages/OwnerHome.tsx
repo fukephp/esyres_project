@@ -7,6 +7,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { Alert, Spinner } from '../components/ui'
 import { ColumnSkeleton, OwnerPageSkeleton, OwnerWeekSkeleton, WeekGridSkeleton } from '../components/Skeleton'
 import { ME_QUERY, UPDATE_KANBAN_COLUMNS_MUTATION, type MeData } from '../graphql/auth'
 import {
@@ -647,8 +648,9 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onAccept}
-            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy && !declineOpen && !dismissOpen && taps.length === 0 ? <Spinner /> : null}
             {t('owner.accept')}
           </button>
         ) : null}
@@ -711,8 +713,9 @@ function QueueRow({
               type="button"
               disabled={busy}
               onClick={onDeclineConfirm}
-              className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
             >
+              {busy ? <Spinner /> : null}
               {t('owner.declineConfirm')}
             </button>
             <button
@@ -732,8 +735,9 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={onDismissConfirm}
-            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy ? <Spinner /> : null}
             {t('owner.declineConfirm')}
           </button>
           <button
@@ -746,7 +750,7 @@ function QueueRow({
           </button>
         </div>
       ) : null}
-      {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+      {error ? <Alert variant="error" className="mt-2">{error}</Alert> : null}
         </div>
       </div>
     </li>

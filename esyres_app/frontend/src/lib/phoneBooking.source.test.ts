@@ -48,7 +48,7 @@ test('phone modal is four steps with day chips and quarter pills', () => {
   expect(dialog).not.toMatch(/dialogCancelShouldClose/)
   expect(dialog).not.toMatch(/event\.target === dialogRef\.current/)
   expect(dialog).toMatch(/onCancel=\{\(event\) => \{\s*event\.preventDefault\(\)/)
-  expect(dialog).toMatch(/salon\.close/)
+  expect(dialog).toMatch(/<CloseButton onClick=\{onClose\} \/>/)
   const step0 = dialog.slice(dialog.indexOf('step === 0'), dialog.indexOf('step === 1'))
   expect(step0).not.toMatch(/onClose/)
   expect(step0).not.toMatch(/owner\.back/)

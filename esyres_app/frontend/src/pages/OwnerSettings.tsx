@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { Alert, Spinner } from '../components/ui'
 import { OwnerPageSkeleton, FormSkeleton } from '../components/Skeleton'
 import {
   CHANGE_PASSWORD_MUTATION,
@@ -189,7 +190,7 @@ export function OwnerSettings() {
               })}
             </div>
             <p className="text-sm text-muted">{t('owner.viewHint')}</p>
-            {viewError ? <p className="text-sm text-busy-busy">{t('owner.viewError')}</p> : null}
+            {viewError ? <Alert variant="error">{t('owner.viewError')}</Alert> : null}
             <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="checkbox"
@@ -199,7 +200,7 @@ export function OwnerSettings() {
               />
               {t('owner.chat')}
             </label>
-            {chatError ? <p className="text-sm text-busy-busy">{t('owner.chatError')}</p> : null}
+            {chatError ? <Alert variant="error">{t('owner.chatError')}</Alert> : null}
           </section>
           <form className="space-y-4 rounded-3xl bg-canvas p-5 md:p-6" onSubmit={(e) => void onSubmit(e)}>
             <h2 className="micro-label text-muted">{t('owner.passwordTitle')}</h2>
@@ -230,13 +231,14 @@ export function OwnerSettings() {
                 className="field mt-1"
               />
             </label>
-            {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
-            {saved ? <p className="text-sm text-ink">{t('owner.passwordChanged')}</p> : null}
+            {error ? <Alert variant="error">{error}</Alert> : null}
+            {saved ? <Alert variant="success">{t('owner.passwordChanged')}</Alert> : null}
             <button
               type="submit"
               disabled={saving}
-              className="h-11 w-fit rounded-full bg-ink px-6 text-sm font-semibold text-canvas disabled:opacity-40 active:scale-[0.98] active:bg-[#242424]"
+              className="inline-flex h-11 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-canvas disabled:opacity-40 active:scale-[0.98] active:bg-[#242424]"
             >
+              {saving ? <Spinner /> : null}
               {t('owner.save')}
             </button>
           </form>

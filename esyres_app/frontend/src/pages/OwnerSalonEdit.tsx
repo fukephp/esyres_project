@@ -6,6 +6,8 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { ImageUploadModal } from '../components/ImageUploadModal'
+import { Alert, Spinner } from '../components/ui'
 import { OwnerPageSkeleton, OwnerSalonEditSkeleton } from '../components/Skeleton'
 import {
   CREATE_SALON_SERVICE_CATEGORY_MUTATION,
@@ -43,7 +45,7 @@ import { useOwnerPush } from '../lib/push'
 
 const FIELD = 'field mt-1'
 const SAVE_BTN =
-  'h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
+  'inline-flex h-10 w-fit items-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]'
 const PLUS_BTN =
   'inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]'
 const REMOVE_BTN =
@@ -214,8 +216,9 @@ function SalonWorkerForm({
           className={FIELD}
         />
       </label>
-      {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+      {error ? <Alert variant="error">{error}</Alert> : null}
       <button type="submit" disabled={saving} className={SAVE_BTN}>
+        {saving ? <Spinner /> : null}
         {worker === undefined ? t('owner.addWorker') : t('owner.save')}
       </button>
     </form>
@@ -345,8 +348,9 @@ function SalonServiceForm({
         {t('owner.price')}
         <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={FIELD} />
       </label>
-      {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+      {error ? <Alert variant="error">{error}</Alert> : null}
       <button type="submit" disabled={saving} className={SAVE_BTN}>
+        {saving ? <Spinner /> : null}
         {service === undefined ? t('owner.addService') : t('owner.save')}
       </button>
     </form>
@@ -375,6 +379,7 @@ export function OwnerSalonEdit() {
   const [notice, setNotice] = useState('24')
   const [infoError, setInfoError] = useState<string | null>(null)
   const [mediaError, setMediaError] = useState<string | null>(null)
+  const [uploadMode, setUploadMode] = useState<'main' | 'gallery' | null>(null)
   const [hoursError, setHoursError] = useState<string | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState('')
   const [categoryName, setCategoryName] = useState('')
@@ -534,29 +539,18 @@ export function OwnerSalonEdit() {
     }
   }
 
-  async function onMainFile(file: File): Promise<void> {
-    if (salon === undefined) {
-      return
+  async function onUploadFile(file: File): Promise<string | null> {
+    if (salon === undefined || uploadMode === null) {
+      return null
     }
     setMediaError(null)
+    const mutation = uploadMode === 'main' ? UPLOAD_SALON_MAIN_IMAGE_MUTATION : UPLOAD_SALON_GALLERY_IMAGE_MUTATION
     try {
-      await graphqlUpload(UPLOAD_SALON_MAIN_IMAGE_MUTATION, { salonId: salon.id }, file)
+      await graphqlUpload(mutation, { salonId: salon.id }, file)
       await refetch()
+      return null
     } catch (err) {
-      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
-    }
-  }
-
-  async function onGalleryFile(file: File): Promise<void> {
-    if (salon === undefined) {
-      return
-    }
-    setMediaError(null)
-    try {
-      await graphqlUpload(UPLOAD_SALON_GALLERY_IMAGE_MUTATION, { salonId: salon.id }, file)
-      await refetch()
-    } catch (err) {
-      setMediaError(mediaFail(graphqlErrorCode(err) ?? '', t))
+      return mediaFail(graphqlErrorCode(err) ?? '', t)
     }
   }
 
@@ -724,22 +718,14 @@ export function OwnerSalonEdit() {
                       </button>
                     </div>
                   ) : (
-                    <label className={PLUS_BTN}>
+                    <button
+                      type="button"
+                      className={PLUS_BTN}
+                      aria-label={t('owner.addImage')}
+                      onClick={() => setUploadMode('main')}
+                    >
                       <span aria-hidden>+</span>
-                      <input
-                        type="file"
-                        accept={FILE_ACCEPT}
-                        className="hidden"
-                        aria-label={t('owner.addImage')}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          e.target.value = ''
-                          if (file) {
-                            void onMainFile(file)
-                          }
-                        }}
-                      />
-                    </label>
+                    </button>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -758,28 +744,28 @@ export function OwnerSalonEdit() {
                       </div>
                     ))}
                     {salon.galleryUrls.length < 6 ? (
-                      <label className={PLUS_BTN}>
+                      <button
+                        type="button"
+                        className={PLUS_BTN}
+                        aria-label={t('owner.addImage')}
+                        onClick={() => setUploadMode('gallery')}
+                      >
                         <span aria-hidden>+</span>
-                        <input
-                          type="file"
-                          accept={FILE_ACCEPT}
-                          className="hidden"
-                          aria-label={t('owner.addImage')}
-                          onChange={(e) => {
-                            const file = e.target.files?.[0]
-                            e.target.value = ''
-                            if (file) {
-                              void onGalleryFile(file)
-                            }
-                          }}
-                        />
-                      </label>
+                      </button>
                     ) : null}
                   </div>
                 </div>
-                {mediaError ? <p className="text-sm text-busy-busy">{mediaError}</p> : null}
-                {infoError ? <p className="text-sm text-busy-busy">{infoError}</p> : null}
+                {mediaError ? <Alert variant="error">{mediaError}</Alert> : null}
+                <ImageUploadModal
+                  open={uploadMode !== null}
+                  title={t(uploadMode === 'gallery' ? 'owner.uploadGalleryTitle' : 'owner.uploadMainTitle')}
+                  accept={FILE_ACCEPT}
+                  onClose={() => setUploadMode(null)}
+                  onUpload={onUploadFile}
+                />
+                {infoError ? <Alert variant="error">{infoError}</Alert> : null}
                 <button type="submit" disabled={savingSalon} className={SAVE_BTN}>
+                  {savingSalon ? <Spinner /> : null}
                   {t('owner.save')}
                 </button>
               </form>
@@ -923,8 +909,9 @@ export function OwnerSalonEdit() {
                     className={FIELD}
                   />
                 </label>
-                {hoursError ? <p className="text-sm text-busy-busy">{hoursError}</p> : null}
+                {hoursError ? <Alert variant="error">{hoursError}</Alert> : null}
                 <button type="submit" disabled={savingHours} className={SAVE_BTN}>
+                  {savingHours ? <Spinner /> : null}
                   {t('owner.save')}
                 </button>
               </form>
@@ -1008,7 +995,7 @@ export function OwnerSalonEdit() {
                     {t('owner.addCategory')}
                   </button>
                 </form>
-                {categoryError ? <p className="text-sm text-busy-busy">{categoryError}</p> : null}
+                {categoryError ? <Alert variant="error">{categoryError}</Alert> : null}
               </section>
               <section className={section === 'workers' ? PANEL : `${PANEL} hidden`}>
                 <h2 className="text-sm font-semibold text-ink">{t('owner.workers')}</h2>

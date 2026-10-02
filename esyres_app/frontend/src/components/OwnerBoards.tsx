@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
+import { Alert } from './ui'
 import {
   STATUS_CARD_CLASS,
   currentJobLabel,
@@ -233,7 +234,7 @@ export function KanbanColumnToggles({
         />
         {t('owner.kanban.done')}
       </label>
-      {error !== null ? <p className="text-busy-busy">{error}</p> : null}
+      {error !== null ? <Alert variant="error">{error}</Alert> : null}
     </div>
   )
 }

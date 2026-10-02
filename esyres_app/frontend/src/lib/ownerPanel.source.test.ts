@@ -117,7 +117,7 @@ test('Request Detail has form, read, and bounce; no WorkerPanel', () => {
   expect(detail).not.toMatch(/t\('owner\.back'\)/)
   expect(detail).not.toMatch(/from=zapisi/)
   expect(detail).toMatch(/SALON_PICKER_DIALOG_CLASS/)
-  expect(detail).toMatch(/t\('salon\.close'\)/)
+  expect(detail).toMatch(/<CloseButton onClick=\{close\} \/>/)
   expect(detail).toMatch(/event\.target === event\.currentTarget/)
   expect(detail).toMatch(/hideSwitcher/)
   expect(detail).toMatch(/lockedSearch/)

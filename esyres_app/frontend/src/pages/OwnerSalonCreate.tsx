@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
+import { Alert, Spinner } from '../components/ui'
 import { OwnerPageSkeleton, FormSkeleton } from '../components/Skeleton'
 import { ADD_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
@@ -144,12 +145,13 @@ export function OwnerSalonCreate() {
                 className="field mt-1"
               />
             </label>
-            {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+            {error ? <Alert variant="error">{error}</Alert> : null}
             <button
               type="submit"
               disabled={saving}
-              className="h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
+              className="inline-flex h-10 w-fit items-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
             >
+              {saving ? <Spinner /> : null}
               {t('owner.save')}
             </button>
           </form>

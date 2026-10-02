@@ -171,7 +171,7 @@ test('discovery and salon share TopNav discovery slot; no in-page BookingsLink',
     expect(tag).not.toMatch(/salon\.name/)
   }
   const chatDialog = salon.slice(salon.lastIndexOf('<dialog'))
-  expect(chatDialog).toMatch(/salon\.close/)
+  expect(chatDialog).toMatch(/<CloseButton onClick=\{closePicker\}/)
   expect(chatDialog).not.toMatch(/nav\.welcome/)
   expect(read('components/AssistantIntake.tsx')).not.toMatch(/nav\.welcome/)
 })

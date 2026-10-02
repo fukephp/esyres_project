@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
+import { Alert, Spinner } from '../components/ui'
 import { FormSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { CREATE_SALON_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
@@ -93,12 +94,13 @@ export function CreateSalon() {
               className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
             />
           </label>
-          {error ? <p className="text-sm text-busy-busy">{error}</p> : null}
+          {error ? <Alert variant="error">{error}</Alert> : null}
           <button
             type="submit"
             disabled={saving}
-            className="h-10 w-fit rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
+            className="inline-flex h-10 w-fit items-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-canvas disabled:opacity-40 active:bg-[#242424]"
           >
+            {saving ? <Spinner /> : null}
             {t('createSalon.submit')}
           </button>
         </form>

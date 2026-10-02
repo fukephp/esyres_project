@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LOGIN_MUTATION, REGISTER_MUTATION } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
+import { Alert, Spinner } from './ui'
 
 function authMessage(code: string | null, t: (key: string) => string): string {
   if (code === 'EMAIL_TAKEN') {
@@ -141,12 +142,13 @@ export function AuthShell({
           />
         </label>
       )}
-      {error && <p className="text-sm text-busy-busy">{error}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
       >
+        {busy ? <Spinner /> : null}
         {mode === 'register' ? t('auth.submitRegister') : t('auth.submitLogin')}
       </button>
     </form>

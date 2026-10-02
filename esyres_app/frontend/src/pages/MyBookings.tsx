@@ -6,6 +6,7 @@ import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { TopNav } from '../components/TopNav'
+import { Alert, Spinner } from '../components/ui'
 import { CardsSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
@@ -183,8 +184,9 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onConfirm}
-            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy ? <Spinner /> : null}
             {t('bookings.confirm')}
           </button>
           <button
@@ -211,8 +213,9 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onRejectConfirm}
-            className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy ? <Spinner /> : null}
             {t('bookings.rejectConfirm')}
           </button>
           <button
@@ -254,8 +257,9 @@ function BookingRow({
               type="button"
               disabled={busy || askDate === '' || askTime === ''}
               onClick={onAskSend}
-              className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
             >
+              {busy ? <Spinner /> : null}
               {t('bookings.askSend')}
             </button>
             <button
@@ -271,14 +275,15 @@ function BookingRow({
       ) : null}
       {cancelOpen ? (
         <div className="mt-3 space-y-2">
-          {row.lateToCancel ? <p className="text-sm text-body">{t('bookings.cancelLate')}</p> : null}
+          {row.lateToCancel ? <Alert variant="warning">{t('bookings.cancelLate')}</Alert> : null}
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               disabled={busy}
               onClick={onCancelConfirm}
-              className="rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
             >
+              {busy ? <Spinner /> : null}
               {t('bookings.cancelConfirm')}
             </button>
             <button
@@ -292,7 +297,7 @@ function BookingRow({
           </div>
         </div>
       ) : null}
-      {error ? <p className="mt-2 text-sm text-busy-busy">{error}</p> : null}
+      {error ? <Alert variant="error" className="mt-2">{error}</Alert> : null}
     </li>
   )
 }
