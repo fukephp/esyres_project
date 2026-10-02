@@ -195,8 +195,12 @@ The owner’s list of requested bookings and in-progress reschedules for one sal
 _Avoid_: reservation inbox, owner inbox, dashboard, owner bookings
 
 **Request Detail**:
-The owner’s screen for one booking, opened as a modal over Zahtjevi or Zapisi. Pending requests get accept, assign worker, decline, or counter-propose. Occupying bookings (`confirmed` / `time_proposed`) are read-only except a phone booking. The only counter-propose path. Not the pending queue and not the customer Time Proposed screen.
-_Avoid_: booking detail, full-page card, tap fallback (as a screen name), settings panel
+The owner’s screen for one booking, opened in the Aside over Zahtjevi or Zapisi. The board URL does not change. Pending requests get accept, assign worker, decline, or counter-propose. Occupying bookings (`confirmed` / `time_proposed`) are read-only except a phone booking. The only counter-propose path. Not the pending queue and not the customer Time Proposed screen.
+_Avoid_: booking detail, full-page card, request modal, tap fallback (as a screen name), settings panel
+
+**Aside**:
+A right slide-over panel with a dim backdrop, used instead of a modal on chosen owner surfaces. It does not change the URL, and the page behind stays mounted. X, backdrop, and Escape close it. Request Detail is the first user. Not Telefon, not the guest Pošalji zahtjev picker, not the empty `md+` guest salon aside, and not the OwnerShell rail.
+_Avoid_: drawer, side sheet, slide-over (as the term), right modal
 
 **Assistant-originated**:
 A request sent from the salon booking assistant, not the picker. Same request as any other. The owner sees it tagged Asistent. Not an in-flight chat and not a second inbox.

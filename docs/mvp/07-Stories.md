@@ -49,6 +49,7 @@
 - As an owner, I want to counter-propose a different time from Request Detail, so that I can adjust when the preferred time doesn't fit without dragging.
 - As an owner, I want Request Detail in the same Cal card as Zahtjevi, so that counter-propose is not a blank column after the month-and-list.
 - As an owner, I want Request Detail as a modal over Zahtjevi or Zapisi, so that I can act on a booking without leaving the board.
+- As an owner, I want Request Detail to slide in from the right over the board without leaving the page, so that I can act on a booking while my week, day, and columns stay where I left them.
 - As an owner, I want to confirm a no-preference request that already has a time by tapping a free worker, so that the guest is not asked again.
 - As an owner, I want to decline a request with an optional reason, so that the customer understands why without me needing to propose a time first.
 - As an owner, I want Telefon as modal steps on Zahtjevi, with Danas, Sutra, or another day and tappable quarter-hour starts, so that I can write a phone booking with a few taps while I am still on the call.

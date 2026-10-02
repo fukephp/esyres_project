@@ -1,34 +1,40 @@
-# STORY-96 — Request Detail aside
+# STORY-96 — Worker profile on Radnici
 
 | Field | Value |
 |-------|--------|
 | ID | STORY-96 |
-| Epic | 3 — Zahtjevi & Time Proposal (Owner) |
+| Epic | 7 — Salon & Service Management (Owner Onboarding) |
 | Loop | — |
-| Depends on | STORY-90, STORY-91 |
+| Depends on | STORY-55, STORY-56, STORY-60, STORY-69 |
 
 ## User story
 
-As an owner, I want Request Detail to slide in from the right over the board without leaving the page, so that I can act on a booking while my week, day, and columns stay where I left them.
+As an owner, I want each worker to have a photo, an about text, experience, and lists of talents, specializations, certificates, education, brands, and strongest services, so the salon’s team is described before guests see it.
 
 ## Acceptance criteria
 
-- Tapping a booking card on Zahtjevi (Kalendar and Kanban) or Zapisi opens Request Detail in an aside: a full-height white panel on the right. It is about 440px wide on `md+` and full width on phone. The phone bottom sheet and the `md+` centered card from STORY-90 are gone.
-- Opening the aside does not change the URL. The board stays mounted and keeps its route, `?date=`, `?salon=`, origin filter, scroll, week, and Kanban columns. Refresh shows the board with the aside closed. Browser Back works as normal and leaves the board. Opening the aside pushes no history entry.
-- A pasted or old `/owner/requests/:id` link redirects to Zahtjevi on that booking's day and salon, with the aside open on that booking.
-- The board behind is dimmed by a backdrop and cannot be clicked. The backdrop fades in and the panel slides in from the right over about 250ms ease-out. Under reduced motion both only fade, with no slide.
-- The X icon in the aside header (aria-label `Zatvori`), a click on the backdrop, and Escape close the aside. The board shows as it was.
-- The header shows the customer name, that mode's clock, and the X. The body scrolls inside the panel. The content keeps today's modes and copy: form for `requested`, read for occupying (`confirmed` / `time_proposed`), and bounce otherwise. Accept, assign worker, decline, counter-propose, no-show, phone-booking cancel, the Asistent tag, the collapsed transcript, and other-bookings memory are unchanged.
-- Accept, assign worker, decline, and counter-propose leave the aside open on the updated booking. The board behind refreshes. The salon switcher stays hidden while the aside is open. There is no **Nazad**.
-- Loading and auth stay uncarded inside the aside. FORBIDDEN or a missing row shows the bounce copy inside the aside. The aside is never an empty panel.
-- The aside is one reusable component. Only Request Detail uses it in this story.
-
-STORY-96 supersedes the STORY-90 lines on the modal shell (phone sheet, `md+` card) and on `/owner/requests/:id` as the open route. That file stays as history.
+- Radnici on `/owner/salons/:id` (STORY-56 chips) becomes a one-column exclusive accordion, like Radno vrijeme (STORY-60). All rows land collapsed. A collapsed row shows the avatar and the worker name. Opening one row closes any other open row. Same owner shell and OwnerNav Saloni. A foreign or missing salon or worker stays forbidden / not found.
+- **Add worker** stays name-only (STORY-55 rules: non-empty, unique on the salon). The owner expands the new row to fill in the rest.
+- **Profilna slika**: one optional jpeg, png, or webp, max 5 MB. It uploads and removes immediately (GraphQL multipart, Laravel public disk, no Spatie) and does not wait for Spremi. Replacing the photo deletes the old file. A failed type or size check keeps no file. HEIC, GIF, and SVG are rejected (same rules as the salon main image, STORY-69).
+- **Initials avatar**: with no photo, the avatar is a pastel circle with initials. Use the first letter of the first word and the first letter of the last word of the name, uppercased (`Joe Doe` → `JD`). A one-word name shows one letter. The avatar follows a rename.
+- The expanded row holds, in order: Profilna slika → Ime → **O radniku** → **Godine iskustva** → **Portfolio / Instagram** → **Talenti** → **Specijalizacije** → **Najjače usluge** → **Certifikati** → **Obrazovanje** → **Brendovi i proizvodi** → **Održavanje** → **Spremi**.
+- One **Spremi** per expanded worker saves the name and every text and list field together. Name is still required and unique. Every other field is optional. Closing the row or switching chips does not save and does not warn.
+- **O radniku**: plain text, max 1000 characters, no markdown or HTML. Whitespace-only counts as empty. Talenti are not repeated inside O radniku.
+- **Godine iskustva**: optional whole number from 0 to 60.
+- **Portfolio / Instagram**: one optional URL. It must start with `http://` or `https://`.
+- **Održavanje**: optional plain text, max 300 characters. It says how often clients come back to keep the look fresh.
+- **List fields** (Talenti, Specijalizacije, Certifikati, Obrazovanje, Brendovi i proizvodi): each is free text rows. A `+` button adds an empty row and each row has a remove control. There are no categories. Up to 20 rows per list, each up to 80 characters. Blank or whitespace-only rows are dropped on save. Order is the order entered.
+- Placeholder hints guide the owner. Examples: Talenti `npr. šminka, manikir, depilacija`; Specijalizacije `npr. kovrdžava kosa, svadbena šminka`; Brendovi i proizvodi `npr. brendovi koje koristiš tokom i nakon usluge`; Održavanje `npr. osvježenje boje svakih 6 sedmica`.
+- **Najjače usluge**: checkboxes over this salon’s services, up to 5 picked. A 6th is refused. They are **display-only**. They do not filter guest worker radios, owner assign, counter-propose, Telefon, availability, or quarter starts. A pick for a service of another salon is refused.
+- The owner salon edit query returns every new field (photo URL, text fields, ordered lists, strongest service ids), so the form round-trips after save and reload.
+- Public `salon` GraphQL, guest `/salon/:id`, and the Pošalji zahtjev worker radios are unchanged. The avatar shows on Radnici rows only. Zahtjevi, Kanban, Zapisi, Telefon, and Request Detail are unchanged.
+- See `docs/adr/0045-worker-profile-on-radnici.md`.
 
 ## Out of scope
 
-- Telefon (stays a modal)
-- Guest Pošalji zahtjev picker (stays a modal)
-- Other owner modals moving to the aside
-- Changing accept, assign, propose, decline, or no-show rules
-- Deep links that reopen the aside after refresh
+- Guest display of the worker profile and public GraphQL for it (later Epic 1)
+- Booking, assign, or availability filtering by service (a real worker↔service matrix)
+- Certificate file uploads; structured certificate or education rows (name, institution, year)
+- Avatar on Zahtjevi, Kanban, Telefon, or Request Detail
+- Worker login; delete or deactivate; per-worker shifts or vacation
+- Drag-reorder of list rows; crop; captions
