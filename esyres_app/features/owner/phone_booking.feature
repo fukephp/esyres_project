@@ -55,11 +55,15 @@ Feature: Phone booking
     And I query my bookings
     Then my bookings are empty
 
-  Scenario: Earlier today is allowed and a taken range is half-open
+  Scenario: A start before now is refused and a taken range is half-open
     When I log in as "owner@example.com" with password "secret-pass"
     And I create a phone booking on "2026-08-29" at "08:30" for "Ana"
+    Then the GraphQL error code is "PAST_TIME"
+    When I create a phone booking on "2026-08-28" at "10:00" for "Ana"
+    Then the GraphQL error code is "PAST_TIME"
+    When I create a phone booking on "2026-08-29" at "09:00" for "Ana"
     Then the phone booking has no customer and no owner response
-    When I create a phone booking on "2026-08-29" at "09:00" for "Lejla"
+    When I create a phone booking on "2026-08-29" at "09:30" for "Lejla"
     Then the phone booking has no customer and no owner response
 
   Scenario: Save rejects closed, hours, break, overlap, blank name, and a foreign worker
@@ -86,6 +90,7 @@ Feature: Phone booking
       {"name": "Dugi tretman", "category": "HAIR", "durationMinutes": 300, "priceFeninga": 9000}
       """
     When I log in as "owner@example.com" with password "secret-pass"
+    And the current time is "2026-08-29 08:00" in Sarajevo
     And I create a phone booking on "2026-08-29" at "08:00" for "Ana"
     And I query salon busy level "2026-08-29" as a guest
     Then busy level is "MEDIUM"
@@ -102,7 +107,7 @@ Feature: Phone booking
 
   Scenario: Cancel after the start is refused
     When I log in as "owner@example.com" with password "secret-pass"
-    And I create a phone booking on "2026-08-29" at "08:30" for "Ana"
+    And I create a phone booking on "2026-08-29" at "09:00" for "Ana"
     And the current time is "2026-08-29 10:00" in Sarajevo
     And I cancel the phone booking
     Then the GraphQL error code is "PAST_START"
@@ -127,7 +132,7 @@ Feature: Phone booking
 
   Scenario: No-show increments the salon only
     When I log in as "owner@example.com" with password "secret-pass"
-    And I create a phone booking on "2026-08-29" at "08:30" for "Ana"
+    And I create a phone booking on "2026-08-29" at "09:00" for "Ana"
     And the current time is "2026-08-29 10:00" in Sarajevo
     And I mark the booking as no-show
     Then mark no-show status is "CONFIRMED"

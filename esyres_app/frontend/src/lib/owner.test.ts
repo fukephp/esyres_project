@@ -26,7 +26,9 @@ import {
   requestFromZapisiPath,
   zapisiOriginFromSearch,
   phoneFreeWorkerIds,
+  phoneErrorKey,
   phoneLegalStarts,
+  phoneOpenStarts,
   phoneQuarterChoices,
   phoneManualTimeBlock,
   phoneSkipDate,
@@ -300,6 +302,7 @@ test('phone copy and free workers', async () => {
   expect(i18n.t('owner.phone.error.OUTSIDE_HOURS')).toBe('Van radnog vremena.')
   expect(i18n.t('owner.phone.error.SLOT_TAKEN')).toBe('Taj termin je zauzet.')
   expect(i18n.t('owner.phone.error.INVALID_WORKER')).toBe('Odaberi radnika ovog salona.')
+  expect(i18n.t('owner.phone.error.PAST_TIME')).toBe('To vrijeme je već prošlo.')
   const day = {
     weekday: 'SATURDAY',
     closed: false,
@@ -368,6 +371,11 @@ test('phone copy and free workers', async () => {
   expect(seen[0]).toBe('2026-09-29')
   expect(seen).not.toContain('2026-09-28')
   expect(phoneSkipDate('2026-09-29', () => false)).toBe('2026-09-29')
+  const now = new Date('2026-08-31T08:00:30.000Z')
+  expect(phoneOpenStarts(['09:00', '10:00', '10:15'], '2026-08-31', '2026-08-31', now)).toEqual(['10:15'])
+  expect(phoneOpenStarts(['09:00'], '2026-09-01', '2026-08-31', now)).toEqual(['09:00'])
+  expect(phoneErrorKey('PAST_TIME')).toBe('PAST_TIME')
+  expect(phoneErrorKey('nope')).toBe('fallback')
   expect(phoneDayChip('2026-09-29', '2026-09-29')).toBe('today')
   expect(phoneDayChip('2026-09-30', '2026-09-29')).toBe('tomorrow')
   expect(phoneDayChip('2026-10-01', '2026-09-29')).toBe('other')

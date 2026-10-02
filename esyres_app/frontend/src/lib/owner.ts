@@ -1,4 +1,5 @@
 import { formatSarajevoTime, sarajevoNowMinutes, sarajevoToday } from './format'
+import { quarterStartPast } from './guestQuarter'
 
 export { formatSarajevoTime }
 
@@ -547,7 +548,7 @@ export function ownerPhonePath(
 
 export function phoneErrorKey(
   code: string | null,
-): 'SALON_CLOSED' | 'OUTSIDE_HOURS' | 'SLOT_TAKEN' | 'INVALID_WORKER' | 'INVALID_SERVICES' | 'DURING_BREAK' | 'INVALID_CALLER_NAME' | 'fallback' {
+): 'SALON_CLOSED' | 'OUTSIDE_HOURS' | 'SLOT_TAKEN' | 'INVALID_WORKER' | 'INVALID_SERVICES' | 'DURING_BREAK' | 'INVALID_CALLER_NAME' | 'PAST_TIME' | 'fallback' {
   if (
     code === 'SALON_CLOSED' ||
     code === 'OUTSIDE_HOURS' ||
@@ -555,7 +556,8 @@ export function phoneErrorKey(
     code === 'INVALID_WORKER' ||
     code === 'INVALID_SERVICES' ||
     code === 'DURING_BREAK' ||
-    code === 'INVALID_CALLER_NAME'
+    code === 'INVALID_CALLER_NAME' ||
+    code === 'PAST_TIME'
   ) {
     return code
   }
@@ -668,6 +670,10 @@ export function phoneLegalStarts(
   return phoneQuarterChoices(day, workers, occupying, durationMinutes)
     .filter((row) => !row.booked)
     .map((row) => row.time)
+}
+
+export function phoneOpenStarts(starts: string[], date: string, today: string, now: Date): string[] {
+  return starts.filter((start) => !quarterStartPast(date, start, today, now))
 }
 
 export type PhoneTimeBlock = 'ok' | 'taken' | 'outside' | 'break' | 'closed' | 'offgrid'

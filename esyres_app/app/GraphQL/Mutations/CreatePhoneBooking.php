@@ -89,6 +89,9 @@ final class CreatePhoneBooking
         if ($local === false) {
             throw new ClientError('INVALID_DATE');
         }
+        if ($local->lt(CarbonImmutable::now('Europe/Sarajevo'))) {
+            throw new ClientError('PAST_TIME');
+        }
 
         return $local->utc();
     }
