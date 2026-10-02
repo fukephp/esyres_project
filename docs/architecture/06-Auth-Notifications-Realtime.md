@@ -6,7 +6,9 @@ One `users` table. A person can be customer and owner. Owner access = owns at le
 
 **Login:** email + password (Sanctum cookie). Guest browse is cookieless aside from the QR hold cookie.
 
-**Password change:** sessioned `changePassword(currentPassword, password)` for any logged-in user. Owner UI is `/owner/settings` (Postavke). Stay signed in (regenerate session). Forgot-password UI stays unused.
+**Password change:** sessioned `changePassword(currentPassword, password)` for any logged-in user. Owner UI is `/owner/settings` (Postavke). Stay signed in (regenerate session).
+
+**Password reset:** guest GraphQL `requestPasswordReset(email)` always returns true (no account enumeration) and queues a reset mail via the Laravel password broker (`password_reset_tokens`; link valid 60 minutes, single use, 1 send per minute per email). The link opens the PWA `/reset-password?token=…&email=…`. `resetPassword(email, token, password)` sets the password (minimum 8, `WEAK_PASSWORD`), logs out every session of that user, and does not log in. Bad or expired token → `INVALID_RESET_TOKEN`. A logged-in visitor may open the link. See `docs/adr/0046-password-reset-broker.md`.
 
 **Register:** public; same `users` row as a future owner. Requires person name (`name`); do not derive it from the email local-part. Phone stays optional. Login has no name field.
 

@@ -12,6 +12,10 @@ _Avoid_: account (as a type), member, client user, shopper
 A user who owns at least one salon. The same person can also be a customer. They become an owner by creating a salon on the same account, not by a second user type.
 _Avoid_: merchant, vendor, admin, staff login
 
+**Auth box**:
+The one sign-in surface everywhere: Prijava / Registracija tabs plus a forgot-password pane, the same on customer and owner routes. A centered card on pages; in a modal the modal is the box. Password reset is by email link only. Not a social login and not a phone login.
+_Avoid_: login page, auth modal (as a separate behavior), owner login
+
 **Owner settings**:
 The owner’s person-account page (Postavke). Password for the same person as the customer. Not salon edit and not a customer settings screen.
 _Avoid_: account settings, profile settings, admin, salon settings

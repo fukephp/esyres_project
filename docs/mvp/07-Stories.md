@@ -33,6 +33,7 @@
 - As a customer, I want a second request for a service I already have that day to be refused, so that I cannot spam the same service.
 - As a customer, I want to create an account with email and password without a homepage login wall, so that I can browse first and sign in when I request or open My Bookings.
 - As a customer or someone opening a panel, I want to type my Ime i prezime when I register and see Rezervacije or Panel on the auth shell, so that my name is real and I know which door I opened.
+- As a customer or someone opening a panel, I want one centered login box with sliding Prijava / Registracija tabs and forgot password on every surface, so that signing in works the same everywhere and I can reset a lost password by email.
 - As a customer, I want to verify my email before my request is sent, so that the salon can reach me with reminders.
 - As a customer, I want to verify my phone with OTP before my request is sent (optional earlier, required at submit), so that the salon can SMS me if push fails.
 - As a customer, I want confirmation that my request was sent and is awaiting salon response (accept or counter-propose), so that I know what to expect next.
