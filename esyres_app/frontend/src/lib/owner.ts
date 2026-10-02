@@ -516,26 +516,6 @@ export function ownerZapisiPath(
   return query === '' ? '/owner/zapisi' : `/owner/zapisi?${query}`
 }
 
-export function requestFromZapisiPath(
-  bookingId: string,
-  date: string,
-  today = sarajevoToday(),
-  salonId: string | null = null,
-  firstOwnedId: string | null = null,
-  origin: ZapisiOrigin | null = null,
-): string {
-  const list = ownerZapisiPath(date, today, salonId, firstOwnedId, origin)
-  const query = list.includes('?') ? list.slice(list.indexOf('?')) : ''
-
-  return `/owner/requests/${bookingId}${query}`
-}
-
-export function boardSearchParams(board: string): URLSearchParams {
-  const query = board.includes('?') ? board.slice(board.indexOf('?') + 1) : ''
-
-  return new URLSearchParams(query)
-}
-
 export function ownerPhonePath(
   date: string,
   today = sarajevoToday(),

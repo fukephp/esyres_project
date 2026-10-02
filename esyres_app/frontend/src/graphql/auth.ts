@@ -1,5 +1,21 @@
 import { gql } from '@apollo/client'
 
+const WORKER_PROFILE_FIELDS = gql`
+  fragment WorkerProfileFields on WorkerProfile {
+    photoUrl
+    about
+    experienceYears
+    portfolioUrl
+    maintenance
+    talents
+    specializations
+    certificates
+    education
+    brands
+    strongestServiceIds
+  }
+`
+
 export const ME_QUERY = gql`
   query Me {
     me {
@@ -48,7 +64,45 @@ export const ME_QUERY = gql`
         workers {
           id
           name
+          profile {
+            ...WorkerProfileFields
+          }
         }
+      }
+    }
+  }
+  ${WORKER_PROFILE_FIELDS}
+`
+
+export type WorkerProfile = {
+  photoUrl: string | null
+  about: string | null
+  experienceYears: number | null
+  portfolioUrl: string | null
+  maintenance: string | null
+  talents: string[]
+  specializations: string[]
+  certificates: string[]
+  education: string[]
+  brands: string[]
+  strongestServiceIds: string[]
+}
+
+export const UPLOAD_WORKER_PHOTO_MUTATION = `mutation UploadWorkerPhoto($workerId: ID!, $file: Upload!) {
+  uploadWorkerPhoto(workerId: $workerId, file: $file) {
+    id
+    profile {
+      photoUrl
+    }
+  }
+}`
+
+export const REMOVE_WORKER_PHOTO_MUTATION = gql`
+  mutation RemoveWorkerPhoto($workerId: ID!) {
+    removeWorkerPhoto(workerId: $workerId) {
+      id
+      profile {
+        photoUrl
       }
     }
   }
@@ -262,8 +316,12 @@ export const UPDATE_SALON_WORKER_MUTATION = gql`
     updateSalonWorker(id: $id, input: $input) {
       id
       name
+      profile {
+        ...WorkerProfileFields
+      }
     }
   }
+  ${WORKER_PROFILE_FIELDS}
 `
 
 export const ADD_SALON_MUTATION = gql`
@@ -341,6 +399,7 @@ export type MeData = {
       workers: {
         id: string
         name: string
+        profile: WorkerProfile
       }[]
     }[]
   } | null

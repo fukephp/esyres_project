@@ -23,7 +23,6 @@ import {
   ownerQueuePath,
   ownerPhonePath,
   ownerZapisiPath,
-  requestFromZapisiPath,
   zapisiOriginFromSearch,
   phoneFreeWorkerIds,
   phoneErrorKey,
@@ -270,10 +269,6 @@ test('owner zapisi path omits today, first salon, and Svi', () => {
   expect(ownerZapisiPath('2026-08-29', '2026-08-29', '2', '1', 'phone')).toBe('/owner/zapisi?salon=2&origin=phone')
   expect(zapisiOriginFromSearch('nope')).toBeNull()
   expect(zapisiOriginFromSearch('assistant')).toBe('assistant')
-  expect(requestFromZapisiPath('9', '2026-08-30', '2026-08-29', '2', '1', 'picker')).toBe(
-    '/owner/requests/9?date=2026-08-30&salon=2&origin=picker',
-  )
-  expect(requestFromZapisiPath('9', '2026-08-29', '2026-08-29')).toBe('/owner/requests/9')
 })
 
 test('owner phone path keeps the return day and omits the first salon', () => {

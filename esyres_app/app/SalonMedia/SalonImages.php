@@ -4,6 +4,7 @@ namespace App\SalonMedia;
 
 use App\Exceptions\ClientError;
 use App\Models\Salon;
+use App\Models\Worker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -70,6 +71,32 @@ final class SalonImages
         Storage::disk('public')->delete($old);
         $salon->main_image_path = null;
         $salon->save();
+    }
+
+    public static function storeWorkerPhoto(Worker $worker, UploadedFile $file): void
+    {
+        $ext = self::extension($file);
+        $old = $worker->photo_path;
+        $path = $file->storeAs('salons/'.$worker->salon_id.'/workers', $worker->id.'-'.Str::lower((string) Str::ulid()).'.'.$ext, 'public');
+        if (! is_string($path) || $path === '') {
+            throw new ClientError('INVALID_IMAGE_TYPE');
+        }
+        if (is_string($old) && $old !== '' && $old !== $path) {
+            Storage::disk('public')->delete($old);
+        }
+        $worker->photo_path = $path;
+        $worker->save();
+    }
+
+    public static function removeWorkerPhoto(Worker $worker): void
+    {
+        $old = $worker->photo_path;
+        if (! is_string($old) || $old === '') {
+            return;
+        }
+        Storage::disk('public')->delete($old);
+        $worker->photo_path = null;
+        $worker->save();
     }
 
     public static function storeGallery(Salon $salon, UploadedFile $file): void

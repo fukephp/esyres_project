@@ -4,6 +4,7 @@ use App\Models\AssistantIntake;
 use App\Models\Booking;
 use App\Models\Salon;
 use App\Models\SalonServiceCategory;
+use App\Models\Service;
 use App\Models\User;
 use App\Models\Worker;
 use App\SalonHours\WeeklyHours;
@@ -1662,6 +1663,176 @@ GQL, ['id' => (string) $this->salon->id]);
             'id' => (string) $this->worker->id,
             'input' => json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR),
         ]);
+    }
+
+    /**
+     * @When I update the salon worker strongest services to the first :count salon services
+     */
+    public function iUpdateTheSalonWorkerStrongestServicesToTheFirstSalonServices(string $count): void
+    {
+        $ids = array_map(fn ($service) => (string) $service->id, array_slice($this->services, 0, (int) $count));
+        $this->updateWorkerStrongest($ids);
+    }
+
+    /**
+     * @When I update the salon worker strongest services to a service of another salon
+     */
+    public function iUpdateTheSalonWorkerStrongestServicesToAServiceOfAnotherSalon(): void
+    {
+        $foreign = Service::factory()->create(['salon_id' => Salon::factory()->create()->id]);
+        $this->updateWorkerStrongest([(string) $foreign->id]);
+    }
+
+    /**
+     * @When I query my salon worker profiles
+     */
+    public function iQueryMySalonWorkerProfiles(): void
+    {
+        $this->graphql($this->salonWorkerProfilesQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query public salon worker profiles as a guest
+     */
+    public function iQueryPublicSalonWorkerProfilesAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql($this->salonWorkerProfilesQuery(), ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @Then the salon worker profile matches:
+     */
+    public function theSalonWorkerProfileMatches(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $profile = $this->graphql['data']['salon']['workers'][0]['profile'] ?? null;
+        if (! is_array($profile)) {
+            throw new RuntimeException('Expected worker profile, got '.json_encode($this->graphql));
+        }
+        foreach ($expected as $key => $value) {
+            $this->assertSame($value, $profile[$key] ?? null, 'profile.'.$key);
+        }
+    }
+
+    /**
+     * @Then the salon worker has :count strongest services
+     */
+    public function theSalonWorkerHasStrongestServices(string $count): void
+    {
+        $this->assertSame((int) $count, $this->worker->strongestServices()->count());
+    }
+
+    /**
+     * @When I upload a :kind worker photo
+     */
+    public function iUploadAWorkerPhoto(string $kind): void
+    {
+        $this->graphqlMultipart($this->uploadWorkerPhotoMutation(), [
+            'workerId' => (string) $this->worker->id,
+        ], $this->fakeImage($kind));
+        $this->worker = $this->worker->fresh();
+    }
+
+    /**
+     * @When I remove the worker photo
+     */
+    public function iRemoveTheWorkerPhoto(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation RemoveWorkerPhoto($workerId: ID!) {
+  removeWorkerPhoto(workerId: $workerId) {
+    id
+    profile { photoUrl }
+  }
+}
+GQL, ['workerId' => (string) $this->worker->id]);
+        $this->worker = $this->worker->fresh();
+    }
+
+    /**
+     * @When I remember the worker photo path
+     */
+    public function iRememberTheWorkerPhotoPath(): void
+    {
+        $this->rememberedMainPath = $this->worker->fresh()?->photo_path;
+        if (! is_string($this->rememberedMainPath) || $this->rememberedMainPath === '') {
+            throw new RuntimeException('Expected a stored worker photo path');
+        }
+    }
+
+    /**
+     * @Then the worker photo is on disk
+     */
+    public function theWorkerPhotoIsOnDisk(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $path = $this->worker->fresh()?->photo_path;
+        $this->assertIsString($path);
+        $this->assertTrue(Storage::disk('public')->exists($path));
+        $url = $this->graphql['data']['uploadWorkerPhoto']['profile']['photoUrl'] ?? null;
+        $this->assertIsString($url);
+        $this->assertStringStartsWith('/storage/', $url);
+    }
+
+    /**
+     * @Then the worker has no photo
+     */
+    public function theWorkerHasNoPhoto(): void
+    {
+        $this->assertNull($this->worker->fresh()?->photo_path);
+    }
+
+    /**
+     * @param  list<string>  $ids
+     */
+    private function updateWorkerStrongest(array $ids): void
+    {
+        $this->graphql($this->updateWorkerMutation(), [
+            'id' => (string) $this->worker->id,
+            'input' => ['name' => $this->worker->name, 'profile' => ['strongestServiceIds' => $ids]],
+        ]);
+    }
+
+    private function salonWorkerProfilesQuery(): string
+    {
+        return <<<'GQL'
+query Salon($id: ID!) {
+  salon(id: $id) {
+    id
+    workers {
+      id
+      name
+      profile {
+        photoUrl
+        about
+        experienceYears
+        portfolioUrl
+        maintenance
+        talents
+        specializations
+        certificates
+        education
+        brands
+        strongestServiceIds
+      }
+    }
+  }
+}
+GQL;
+    }
+
+    private function uploadWorkerPhotoMutation(): string
+    {
+        return <<<'GQL'
+mutation UploadWorkerPhoto($workerId: ID!, $file: Upload!) {
+  uploadWorkerPhoto(workerId: $workerId, file: $file) {
+    id
+    profile { photoUrl }
+  }
+}
+GQL;
     }
 
     /**

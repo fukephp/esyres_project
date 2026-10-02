@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
+import { openRequestFromState, RequestDetailAside, type RequestAsideState } from './OwnerRequestDetail'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
@@ -56,7 +57,6 @@ import {
   occupyingBlock,
   occupyingSarajevoYmd,
   nextPendingDay,
-  boardSearchParams,
   ownerDateFromSearch,
   ownerSalonFromSearch,
   ownerSearchParams,
@@ -70,29 +70,34 @@ import {
   visibleKanbanColumns,
 } from '../lib/owner'
 
-export function OwnerHome({
-  lockedSearch,
-  hideSwitcher = false,
-}: {
-  lockedSearch?: string
-  hideSwitcher?: boolean
-} = {}) {
+export function OwnerHome() {
   const { t } = useTranslation()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [aside, setAside] = useState<RequestAsideState>(null)
+  const asideOpen = aside?.open === true
+  useEffect(() => {
+    const id = openRequestFromState(location.state)
+    if (id === null) {
+      return
+    }
+    setAside({ id, open: true })
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null })
+  }, [location.state])
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(id)
   }, [])
   const [params, setParams] = useSearchParams()
-  const boardParams = lockedSearch === undefined ? params : boardSearchParams(lockedSearch)
-  const date = ownerDateFromSearch(boardParams.get('date'))
+  const date = ownerDateFromSearch(params.get('date'))
   const days = ownerWeekDays(date)
   const week = { from: days[0], to: days[6] }
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const kanban = data?.me?.ownerView === 'KANBAN'
   const navMe = loading ? null : (data?.me ?? null)
   const salons = data?.me?.salons ?? []
-  const salonId = ownerSalonFromSearch(boardParams.get('salon'), salons)
+  const salonId = ownerSalonFromSearch(params.get('salon'), salons)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const ownerReady = salon !== null && data?.me?.emailVerified === true
   useOwnerPush(ownerReady)
@@ -168,17 +173,15 @@ export function OwnerHome({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [phoneOpen, setPhoneOpen] = useState(false)
 
+  function openAside(id: string) {
+    setAside({ id, open: true })
+  }
+
   function onDate(value: string) {
-    if (lockedSearch !== undefined) {
-      return
-    }
     setParams(ownerSearchParams(ownerDateFromSearch(value), sarajevoToday(), salonId, salons[0]?.id ?? null))
   }
 
   function onSalon(id: string) {
-    if (lockedSearch !== undefined) {
-      return
-    }
     setPhoneOpen(false)
     setParams(ownerSearchParams(date, sarajevoToday(), id, salons[0]?.id ?? null))
   }
@@ -398,6 +401,7 @@ export function OwnerHome({
               : []
           }
           onAssign={(workerId) => void onAssign(row, workerId)}
+          onPropose={() => openAside(row.id)}
           onDeclineOpen={() => {
             setDeclineId(row.id)
             setReasonDraft('')
@@ -439,7 +443,7 @@ export function OwnerHome({
         date={date}
         badge={badge}
         active="queue"
-        hideSwitcher={hideSwitcher}
+        hideSwitcher={asideOpen}
         onSalon={onSalon}
         action={
           <>
@@ -500,7 +504,7 @@ export function OwnerHome({
                           <BookingCard
                             key={row.id}
                             row={row}
-                            to={`/owner/requests/${row.id}`}
+                            onOpen={openAside}
                             now={now}
                             progress={ymd !== null && row.preferredStartsAtLabel !== null ? occupiedElapsedShare(ymd, row.preferredStartsAtLabel, row.durationMinutes, now) : undefined}
                           />
@@ -521,7 +525,7 @@ export function OwnerHome({
               {occupyingRange === undefined ? (
                 <WeekGridSkeleton className="mt-4" />
               ) : (
-                <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} now={now} />
+                <WeekGrid days={days} date={date} rows={rangeRows} closedFor={closedFor} onDate={onDate} now={now} onOpen={openAside} />
               )}
             </section>
             <section className="mt-4 rounded-3xl bg-canvas p-4 md:p-6">
@@ -552,9 +556,7 @@ export function OwnerHome({
         onSaved={(saved) => {
           const savedWeek = ownerWeekDays(saved)
           setPhoneOpen(false)
-          if (lockedSearch === undefined) {
-            setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
-          }
+          setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
           void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
           if (kanban) {
             void refetchDay({ salonId: salon.id, date: saved, origin: null })
@@ -562,6 +564,11 @@ export function OwnerHome({
             void refetchRange({ salonId: salon.id, from: savedWeek[0], to: savedWeek[6] })
           }
         }}
+      />
+      <RequestDetailAside
+        aside={aside}
+        onClose={() => setAside((current) => (current === null ? null : { ...current, open: false }))}
+        onChanged={refetchAll}
       />
     </>
   )
@@ -577,6 +584,7 @@ function QueueRow({
   onAccept,
   taps,
   onAssign,
+  onPropose,
   onDeclineOpen,
   onDeclineCancel,
   onDeclineConfirm,
@@ -594,6 +602,7 @@ function QueueRow({
   onAccept: () => void
   taps: { id: string; name: string }[]
   onAssign: (workerId: string) => void
+  onPropose: () => void
   onDeclineOpen: () => void
   onDeclineCancel: () => void
   onDeclineConfirm: () => void
@@ -603,7 +612,6 @@ function QueueRow({
   onReasonChange: (value: string) => void
 }) {
   const { t } = useTranslation()
-  const location = useLocation()
   const chrome = overlayQueueChrome(row.reschedulePending)
   const clock = queueRowLabel(row)
 
@@ -666,13 +674,13 @@ function QueueRow({
           </button>
         ))}
         {chrome.propose ? (
-          <Link
-            to={`/owner/requests/${row.id}`}
-            state={{ board: `${location.pathname}${location.search}` }}
+          <button
+            type="button"
+            onClick={onPropose}
             className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink"
           >
             {t('owner.propose')}
-          </Link>
+          </button>
         ) : null}
         {chrome.decline && !declineOpen ? (
           <button

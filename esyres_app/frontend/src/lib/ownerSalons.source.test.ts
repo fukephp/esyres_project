@@ -190,9 +190,8 @@ test('salon edit loads from me.salons; exclusive chips; split Spremi', () => {
   expect(page).toMatch(/createSalonService/)
   expect(page).toMatch(/updateSalonService/)
   expect(page).toMatch(/createSalonWorker/)
-  expect(page).toMatch(/updateSalonWorker/)
   expect(page).toMatch(/await createSalonWorker[\s\S]*setName\(''\)[\s\S]*await onSaved/)
-  expect(page).toMatch(/await updateSalonWorker[\s\S]*await onSaved/)
+  expect(read('components/WorkerProfileRow.tsx')).toMatch(/await updateSalonWorker[\s\S]*await onSaved/)
   expect(page).toMatch(/durationMinutes\?: number/)
   expect(page).toMatch(/duration\.trim\(\) !== ''/)
   expect(page).toMatch(/CREATE_SALON_SERVICE_CATEGORY_MUTATION/)
@@ -319,11 +318,12 @@ test('add salon overlay form calls addSalon and lands on edit', () => {
   expect(page).not.toMatch(/updateSalonDnd/)
 })
 
-test('request detail hides the salon switcher while the modal is open', () => {
+test('boards hide the salon switcher while the Request Detail aside is open', () => {
   const page = read('pages/OwnerRequestDetail.tsx')
-  expect(page).toMatch(/hideSwitcher/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/onSalon/)
+  expect(read('pages/OwnerHome.tsx')).toMatch(/hideSwitcher=\{asideOpen\}/)
+  expect(read('pages/OwnerZapisi.tsx')).toMatch(/hideSwitcher=\{aside\?\.open === true\}/)
 })
 
 test('create-salon is unchanged and has no OwnerNav', () => {

@@ -7,6 +7,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { ImageUploadModal } from '../components/ImageUploadModal'
+import { WorkerProfileRow } from '../components/WorkerProfileRow'
 import { Alert, Spinner } from '../components/ui'
 import { OwnerPageSkeleton, OwnerSalonEditSkeleton } from '../components/Skeleton'
 import {
@@ -21,7 +22,6 @@ import {
   UPDATE_SALON_MUTATION,
   UPDATE_SALON_SERVICE_CATEGORY_MUTATION,
   UPDATE_SALON_SERVICE_MUTATION,
-  UPDATE_SALON_WORKER_MUTATION,
   UPLOAD_SALON_GALLERY_IMAGE_MUTATION,
   UPLOAD_SALON_MAIN_IMAGE_MUTATION,
   type MeData,
@@ -60,8 +60,6 @@ type SalonEditSection = 'info' | 'hours' | 'services' | 'workers'
 
 type OwnerSalonCategory = NonNullable<MeData['me']>['salons'][number]['serviceCategories'][number]
 type OwnerSalonService = OwnerSalonCategory['services'][number]
-type OwnerSalonWorker = NonNullable<MeData['me']>['salons'][number]['workers'][number]
-
 function emptyWeek(): SalonHoursDayForm[] {
   return SALON_WEEKDAYS.map((weekday) => ({
     weekday,
@@ -163,26 +161,15 @@ function workerFail(code: string, t: (key: string) => string): string {
 
 function SalonWorkerForm({
   salonId,
-  worker,
   onSaved,
 }: {
   salonId: string
-  worker?: OwnerSalonWorker
   onSaved: () => Promise<unknown>
 }) {
   const { t } = useTranslation()
-  const [createSalonWorker, { loading: creating }] = useMutation(CREATE_SALON_WORKER_MUTATION)
-  const [updateSalonWorker, { loading: updating }] = useMutation(UPDATE_SALON_WORKER_MUTATION)
-  const saving = creating || updating
-  const [name, setName] = useState(worker?.name ?? '')
+  const [createSalonWorker, { loading: saving }] = useMutation(CREATE_SALON_WORKER_MUTATION)
+  const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (worker === undefined) {
-      return
-    }
-    setName(worker.name)
-  }, [worker])
 
   async function onSaveWorker(e: FormEvent) {
     e.preventDefault()
@@ -191,14 +178,8 @@ function SalonWorkerForm({
     }
     setError(null)
     try {
-      if (worker === undefined) {
-        await createSalonWorker({ variables: { salonId, input: { name: name.trim() } } })
-        setName('')
-      } else {
-        await updateSalonWorker({
-          variables: { id: worker.id, input: { name: name.trim() } },
-        })
-      }
+      await createSalonWorker({ variables: { salonId, input: { name: name.trim() } } })
+      setName('')
       await onSaved()
     } catch (err) {
       setError(workerFail(graphqlErrorCode(err) ?? '', t))
@@ -219,7 +200,7 @@ function SalonWorkerForm({
       {error ? <Alert variant="error">{error}</Alert> : null}
       <button type="submit" disabled={saving} className={SAVE_BTN}>
         {saving ? <Spinner /> : null}
-        {worker === undefined ? t('owner.addWorker') : t('owner.save')}
+        {t('owner.addWorker')}
       </button>
     </form>
   )
@@ -372,6 +353,7 @@ export function OwnerSalonEdit() {
   const [deleteSalonServiceCategory] = useMutation(DELETE_SALON_SERVICE_CATEGORY_MUTATION)
   const [section, setSection] = useState<SalonEditSection>('info')
   const [openWeekday, setOpenWeekday] = useState<string | null>(null)
+  const [openWorkerId, setOpenWorkerId] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [description, setDescription] = useState('')
@@ -429,6 +411,9 @@ export function OwnerSalonEdit() {
   function selectSection(next: SalonEditSection): void {
     if (next !== 'hours') {
       setOpenWeekday(null)
+    }
+    if (next !== 'workers') {
+      setOpenWorkerId(null)
     }
     setSection(next)
   }
@@ -1002,11 +987,18 @@ export function OwnerSalonEdit() {
                 {salon.workers.length === 0 ? (
                   <p className="text-sm text-body">{t('owner.noWorkers')}</p>
                 ) : (
-                  <ul className="space-y-6">
+                  <ul className="space-y-3">
                     {salon.workers.map((row) => (
-                      <li key={row.id}>
-                        <SalonWorkerForm salonId={salon.id} worker={row} onSaved={refetch} />
-                      </li>
+                      <WorkerProfileRow
+                        key={row.id}
+                        worker={row}
+                        services={salon.services}
+                        open={openWorkerId === row.id}
+                        onToggle={() =>
+                          setOpenWorkerId((current) => (current === row.id ? null : row.id))
+                        }
+                        onSaved={refetch}
+                      />
                     ))}
                   </ul>
                 )}

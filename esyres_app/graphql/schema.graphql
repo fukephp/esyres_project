@@ -62,6 +62,34 @@ type Service {
 type Worker {
     id: ID!
     name: String!
+    profile: WorkerProfile! @field(resolver: "App\\GraphQL\\Queries\\WorkerProfile")
+}
+
+type WorkerProfile {
+    photoUrl: String
+    about: String
+    experienceYears: Int
+    portfolioUrl: String
+    maintenance: String
+    talents: [String!]!
+    specializations: [String!]!
+    certificates: [String!]!
+    education: [String!]!
+    brands: [String!]!
+    strongestServiceIds: [ID!]!
+}
+
+input WorkerProfileInput {
+    about: String
+    experienceYears: Int
+    portfolioUrl: String
+    maintenance: String
+    talents: [String!]
+    specializations: [String!]
+    certificates: [String!]
+    education: [String!]
+    brands: [String!]
+    strongestServiceIds: [ID!]
 }
 
 input CreateSalonServiceInput {
@@ -92,6 +120,7 @@ input CreateSalonWorkerInput {
 
 input UpdateSalonWorkerInput {
     name: String!
+    profile: WorkerProfileInput
 }
 
 enum BookingStatus {
@@ -323,6 +352,8 @@ type Mutation {
     deleteSalonServiceCategory(id: ID!): Boolean!
     createSalonWorker(salonId: ID!, input: CreateSalonWorkerInput!): Worker
     updateSalonWorker(id: ID!, input: UpdateSalonWorkerInput!): Worker
+    uploadWorkerPhoto(workerId: ID!, file: Upload!): Worker!
+    removeWorkerPhoto(workerId: ID!): Worker!
     createBooking(input: CreateBookingInput!): Booking!
     createPhoneBooking(input: CreatePhoneBookingInput!): Booking!
     cancelPhoneBooking(bookingId: ID!): Booking!

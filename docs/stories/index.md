@@ -118,5 +118,5 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-93 | U toku column | 3 | STORY-93 | STORY-80, STORY-85 |
 | STORY-94 | Hide Chat | 7 | STORY-94 | STORY-71, STORY-78, STORY-26 |
 | STORY-95 | Telefon past start | 3 | `STORY-95` | STORY-76 |
-| STORY-96 | Worker profile on Radnici | 7 | — | STORY-55, STORY-56, STORY-60, STORY-69 |
-| STORY-97 | Request Detail aside | 3 | — | STORY-90, STORY-91 |
+| STORY-96 | Worker profile on Radnici | 7 | `STORY-96` | STORY-55, STORY-56, STORY-60, STORY-69 |
+| STORY-97 | Request Detail aside | 3 | `STORY-97` | STORY-90, STORY-91 |
