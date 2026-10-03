@@ -117,6 +117,7 @@ void i18n.use(initReactI18next).init({
           invalidName: 'Unesi ime i prezime.',
           favorites: 'Omiljeni saloni',
           favoritesEmpty: 'Nema omiljenih salona.',
+          suggestions: 'Predloženi saloni',
         },
         home: {
           panel: 'Panel',

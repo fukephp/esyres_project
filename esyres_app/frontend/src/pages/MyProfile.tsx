@@ -7,9 +7,32 @@ import { CardsSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { UNSAVE_FAVORITE } from '../graphql/favorites'
 import { MY_BOOKINGS_QUERY, type MyBooking, type MyBookingsData } from '../graphql/booking'
+import { SUGGESTED_SALONS_QUERY, type DiscoverySalon, type SuggestedSalonsData } from '../graphql/discovery'
 import { bookingClock, bookingStatusKey } from '../lib/booking'
-import { formatCivilDate } from '../lib/format'
+import { busyToken } from '../lib/busyToken'
+import { discoveryAddressLine, discoverySalonCategoryNames } from '../lib/discovery'
+import { formatCivilDate, sarajevoToday } from '../lib/format'
 import { BOOKINGS_HREF, GUEST_COLUMN_CLASS, PROFILE_HREF } from '../lib/homepage'
+
+function SuggestedRow({ salon }: { salon: DiscoverySalon }) {
+  const { t } = useTranslation()
+  const token = busyToken(salon.busyLevel)
+  const categories = discoverySalonCategoryNames(salon.serviceCategories)
+  const address = discoveryAddressLine(salon.address)
+  return (
+    <li className="border-t border-hairline py-3">
+      <div className="flex items-start justify-between gap-4">
+        <Link to={`/salon/${salon.id}`} className="text-sm font-medium text-ink">
+          {salon.name}
+        </Link>
+        <span className="text-sm text-body">{t(`salon.busy.${salon.busyLevel}`)}</span>
+      </div>
+      {categories.length > 0 ? <p className="mt-1 text-sm text-muted">{categories.join(', ')}</p> : null}
+      {address !== null ? <p className="mt-1 text-sm text-muted">{address}</p> : null}
+      <span className="sr-only">{token}</span>
+    </li>
+  )
+}
 
 function BookingSummary({ row }: { row: MyBooking }) {
   const { t } = useTranslation()
@@ -41,6 +64,10 @@ export function MyProfile() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [unsaveFavorite] = useMutation(UNSAVE_FAVORITE)
   const list = useQuery<MyBookingsData>(MY_BOOKINGS_QUERY, { skip: data?.me == null })
+  const suggested = useQuery<SuggestedSalonsData>(SUGGESTED_SALONS_QUERY, {
+    variables: { date: sarajevoToday() },
+    skip: data?.me == null,
+  })
   const navMe = loading ? null : (data?.me ?? null)
 
   if (loading) {
@@ -77,6 +104,16 @@ export function MyProfile() {
             {t('bookings.seeAll')}
           </Link>
         </div>
+        {(suggested.data?.suggestedSalons.length ?? 0) > 0 ? (
+          <section className="mt-8">
+            <h2 className="text-sm font-semibold text-ink">{t('profile.suggestions')}</h2>
+            <ul className="mt-3">
+              {suggested.data?.suggestedSalons.map((salon) => (
+                <SuggestedRow key={salon.id} salon={salon} />
+              ))}
+            </ul>
+          </section>
+        ) : null}
         <section className="mt-8">
           <h2 className="text-sm font-semibold text-ink">{t('profile.favorites')}</h2>
           {(data.me.favoriteSalons ?? []).length === 0 ? (

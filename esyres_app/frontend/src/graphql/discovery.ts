@@ -57,3 +57,24 @@ export type SalonsNearbyData = {
 export type PopularInSarajevoData = {
   popularInSarajevo: DiscoverySalon[]
 }
+
+export const SUGGESTED_SALONS_QUERY = gql`
+  query SuggestedSalons($date: String!) {
+    suggestedSalons {
+      id
+      name
+      address
+      busyLevel(date: $date)
+      serviceCategories {
+        name
+        services {
+          id
+        }
+      }
+    }
+  }
+`
+
+export type SuggestedSalonsData = {
+  suggestedSalons: DiscoverySalon[]
+}

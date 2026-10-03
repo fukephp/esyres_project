@@ -2728,6 +2728,90 @@ GQL);
         $this->assertSame(explode(',', $names), $got);
     }
 
+    /**
+     * @Given a listed hair salon named :name
+     */
+    public function aListedHairSalonNamed(string $name): void
+    {
+        $this->listExtraSalon($name, true);
+    }
+
+    /**
+     * @Given a listed unkeyed salon named :name
+     */
+    public function aListedUnkeyedSalonNamed(string $name): void
+    {
+        $this->listExtraSalon($name, false);
+    }
+
+    /**
+     * @When I save the listed salon :name as a favorite
+     */
+    public function iSaveTheListedSalonAsAFavorite(string $name): void
+    {
+        $salon = Salon::query()->where('name', $name)->firstOrFail();
+        $this->saveFavoriteFor($salon->id);
+    }
+
+    /**
+     * @When I read suggested salons
+     */
+    public function iReadSuggestedSalons(): void
+    {
+        $this->graphql(<<<'GQL'
+query Suggested {
+  suggestedSalons { name }
+}
+GQL);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then suggested salon names are :names
+     */
+    public function suggestedSalonNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['suggestedSalons'];
+        $got = array_map(static fn (array $row): string => $row['name'], $rows);
+        $expected = $names === '' ? [] : explode(',', $names);
+        $this->assertSame($expected, $got);
+    }
+
+    private function listExtraSalon(string $name, bool $hair): void
+    {
+        $owner = User::factory()->create([
+            'email' => strtolower($name).'-'.substr(sha1($name.microtime()), 0, 6).'@listed.test',
+            'email_verified_at' => now(),
+        ]);
+        $salon = Salon::factory()->create([
+            'owner_id' => $owner->id,
+            'name' => $name,
+        ]);
+        $previousSalon = $this->salon;
+        $previousServices = $this->services;
+        $previousService = $this->service;
+        $previousCategory = $this->serviceCategory;
+        $this->salon = $salon;
+        $this->services = [];
+        $this->theSalonIsOpenFromTo('saturday', '09:00', '17:00');
+        if ($hair) {
+            $this->theSalonIsListed();
+        } else {
+            $this->theSalonHasAnUnkeyedServiceCategory('Posebno');
+            Service::factory()->create([
+                'salon_id' => $salon->id,
+                'service_category_id' => $this->serviceCategory->id,
+                'name' => 'Posebno',
+                'duration_minutes' => 30,
+                'price_feninga' => 1000,
+            ]);
+        }
+        $this->salon = $previousSalon;
+        $this->services = $previousServices;
+        $this->service = $previousService;
+        $this->serviceCategory = $previousCategory;
+    }
+
     private function saveFavoriteFor(int|string $salonId): void
     {
         $this->graphql(<<<'GQL'

@@ -321,6 +321,7 @@ type Query {
     occupyingBookingsRange(salonId: ID!, from: String!, to: String!): [Booking!]!
     ownerBooking(id: ID!): Booking!
     myBookings(limit: Int = 20, offset: Int = 0): [Booking!]!
+    suggestedSalons: [Salon!]!
     assistantIntake(token: String!): AssistantIntake
     inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
     inFlightIntakeCount(salonId: ID!): Int!
