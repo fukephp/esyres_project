@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-94`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-106`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -12,7 +12,10 @@
 - As a logged-in guest or owner, I want Dobrodošli and my Ime i prezime in the top-nav on every page, so that I can see I am signed in without opening Moje rezervacije.
 - As a guest, I want the top-nav and the page content to share one width on public pages, so that the logo and the main column line up.
 - As a customer, I want to see salons near my current location without logging in, so that I can start browsing immediately from a QR code or IG link.
+- As a customer, I want a saved municipality to be that nearby point, so that the browser is not asked while a place is set, and Popular in Sarajevo still covers an empty place.
 - As a customer, I want a fallback list ("Popular in Sarajevo") when location is denied or unavailable, so that I never hit a blank screen.
+- As a customer, I want the public pages to share one card system, so that the homepage, discovery, a salon, and my bookings feel like the same product.
+- As a customer, I want a few suggested salons that share a discovery chip with a booking I already made, so that my profile can point me at another shop of that kind.
 - As a customer, I want to filter by a discovery chip (Kosa / Šminka / Masaža) or search by name, so that I can find a relevant salon quickly.
 - As a customer, I want the salon profile and picker to group services under the owner’s category names, so that the menu matches the shop instead of three locked types.
 - As a customer, I want `/salons` to show a short card teaser and then a richer results list when I filter, search, or show all, so that I can pick a salon without opening every profile.
@@ -22,6 +25,7 @@
 - As a customer, I want a single send on the salon profile — under the title on a phone, in a sticky sidebar on a wide screen — so that I am not looking at two identical buttons.
 - As a customer, I want Pošalji zahtjev after the hours list, so that send is a button and the hours stay information.
 - As a logged-in customer, I want Moje rezervacije on the homepage, so that bookings are one tap from `/`.
+- As a logged-in customer, I want Profil in the top-nav before Moje rezervacije, so that my profile is one tap away.
 
 ## Epic 2 — Booking Request Flow (Customer)
 
@@ -66,6 +70,7 @@
 - As a customer, I want to approve, reject, or ask for a different day or time once a counter-proposed time is offered, so that I stay in control of the final appointment. Asking for a different day or time updates the same request (new preferred date/time, back to pending), not a duplicate.
 - As an owner, I want to be notified immediately when a customer responds to a proposed time, so that I can react (e.g. re-propose) quickly.
 - As a customer, I want to see all my requests (Pending / Time Proposed / Confirmed / Declined) in one place, so that I can track their status.
+- As a customer, I want a profile with my latest booking and a link to that list, so that Moji zahtjevi is not the only page I have.
 
 ## Epic 5 — Reschedule & Cancellation
 
@@ -101,6 +106,7 @@
 ## Epic 8 — Trust Signal Data Foundations
 
 - As an owner, I want to see when a returning customer physically scanned my QR code and verified, so that I know they're a real repeat visitor, not just a remote favorite.
+- As a customer, I want to save a salon from its page and see those salons on my profile, so that I can return without searching.
 - As the platform, I want to capture response-time and no-show data from day one, so that trust badges can be computed later without a backfill gap.
 - As an owner, I want this guest's other confirmed bookings and a no-show mark on Request Detail, so that I know who already came before I accept, without a customers screen.
 
@@ -123,6 +129,16 @@ Not on `/salon/:id` (STORY-89). The stories below are the assistant contract, no
 - As an owner, I want a chat tab with a badge for conversations that have not become a request yet, so that in-flight chats are visible without replacing the panel as home.
 - As an owner, I want optional Take over so I can handle one conversation myself, and I want the assistant to keep going (and still be able to send a request) unless I have tapped Take over. After hours or DND, take-over is off.
 - As an owner, I want the assistant to say it does not know when the answer is not in live salon data, and optionally ping me, without making the guest wait on me.
+
+## Epic 11 — Visit ratings
+
+Locked in `docs/mvp/06-Epics.md`. Stories: STORY-104, STORY-105, STORY-106.
+
+- As a customer, I want to give a salon one score from its page, so that the average reflects that salon and not one finished visit.
+- As a guest, I want to see only that average and how many ratings exist, so that I can judge the salon before I send a request.
+- As a logged-in customer, I want to read comments and leave one reply, so that I can respond to another customer’s visit.
+- As a customer, I want my own ratings listed on my profile, so that I can open the salon I scored.
+- As an owner, I want every rating of my salon on salon edit, so that I can read them without a reviews screen.
 
 ---
 

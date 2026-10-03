@@ -17,8 +17,12 @@ The one sign-in surface everywhere: Prijava / Registracija tabs plus a forgot-pa
 _Avoid_: login page, auth modal (as a separate behavior), owner login
 
 **Owner settings**:
-The owner’s person-account page (Postavke). Password for the same person as the customer. Not salon edit and not a customer settings screen.
+The owner’s person-account page (Postavke). Password for the same person as the customer. Not salon edit and not customer settings.
 _Avoid_: account settings, profile settings, admin, salon settings
+
+**Customer settings**:
+The customer’s page for their person name and saved place. Not owner Postavke and not the salon profile.
+_Avoid_: owner settings, account settings, profile settings
 
 **Person name**:
 The person's Ime i prezime. Not the salon name, not a worker name, and not an email local-part.
@@ -407,8 +411,8 @@ Silently favoriting that salon and recording a QR visit once the customer is ver
 _Avoid_: check-in, stamp, reconnect QR (as a second product)
 
 **Favorite**:
-A customer bookmark of one salon. QR reconnect creates one without a tap. Not a QR visit and not a booking.
-_Avoid_: like, save, follow, wishlist
+A customer bookmark of one salon. A tap on that salon or QR reconnect can create one. Not a QR visit, not a booking, and not a rating.
+_Avoid_: like, save, follow, wishlist, rating
 
 **QR visit**:
 The owner-side fact that this customer physically scanned that salon’s QR and then verified. Not a remote favorite and not a completed booking.
@@ -421,6 +425,30 @@ _Avoid_: profile view, page view, check-in, unique visitor
 **QR conversion**:
 The owner-visible share of QR scans that became QR visits. Not request→confirmed and not a trust badge.
 _Avoid_: booking conversion, sticker ROI, Regular (the badge)
+
+## Ratings
+
+**Rating**:
+One customer's score, from 1 to 5, of one salon. Not a finished visit, not a worker, and not a Favorite.
+_Avoid_: review, stars (as a trust badge), recommend, like
+
+**Comment**:
+Optional text that customer attaches to their rating. Not the score and not a reply.
+_Avoid_: review, feedback, message, note
+
+**Reply**:
+One other customer's response under a comment. Not a rating and not a thread.
+_Avoid_: thread, review, owner answer, chat
+
+## Customer profile
+
+**Saved place**:
+The customer’s chosen Sarajevo municipality, used as their point for Nearby. Not a salon address and not a browser reading.
+_Avoid_: location, current location, GPS, address
+
+**Suggested salon**:
+A listed salon offered on the customer profile because a discovery chip on one of their bookings still matches that salon. Not Nearby, not Popular in Sarajevo, and not a Favorite.
+_Avoid_: recommendation, nearby, popular
 
 ## Signals
 

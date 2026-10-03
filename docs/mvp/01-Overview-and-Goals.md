@@ -30,6 +30,7 @@ The picker shows which quarters are already taken. Sending still does not hold a
 - Replace phone tag and Instagram DM waiting with a structured request-and-propose flow.
 - Give owners one shared workspace (Zahtjevi: month navigator + selected-day list) to manage all incoming requests and worker schedules without needing per-worker logins. From that home they can write a phone booking when the caller is not in the app. Owner habit stays this home; the in-PWA assistant fills the pending queue 24/7 so opening the app is worth it.
 - Capture the data needed for trust signals (verification, response speed, reliability) from day one, even where the UI to display it is a later phase.
+- Let a customer rate a salon from its profile, and show that salon’s average there.
 - A guest who typed `/` sees the Bosnian homepage, then Pronađi salon to discovery at `/salons` (teaser, then results) — no separate marketing site.
 
 ## Explicit Non-Goals (for now)
@@ -37,7 +38,6 @@ The picker shows which quarters are already taken. Sending still does not hold a
 - Native mobile app (PWA only at MVP; native is a possible fast-follow).
 - In-app payments (in-salon payment only).
 - Worker self-service logins.
-- Reviews/ratings system.
 - Viber/WhatsApp / Instagram DM messaging, referral incentives, badge display UI — all Phase 2. In-PWA scripted salon-profile chat is MVP (after the picker/panel loop exists); it is not those channels.
 - A separate marketing Vite app, public owner waitlist / Formspree, public pricing page, and Awwwards/GSAP motion on product screens.
 

@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-95` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–98. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-95` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–106. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -121,3 +121,11 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-96 | Worker profile on Radnici | 7 | `STORY-96` | STORY-55, STORY-56, STORY-60, STORY-69 |
 | STORY-97 | Request Detail aside | 3 | `STORY-97` | STORY-90, STORY-91 |
 | STORY-98 | Auth box | 2 | — | STORY-11, STORY-71 |
+| STORY-99 | Customer card system | 1 | — | — |
+| STORY-100 | My profile | 4 | — | STORY-99 |
+| STORY-101 | Saved place and name | 1 | — | STORY-100 |
+| STORY-102 | Favorite salon | 8 | — | STORY-100 |
+| STORY-103 | Suggested salons | 1 | — | STORY-100 |
+| STORY-104 | Salon rating | 11 | — | STORY-100 |
+| STORY-105 | Rating replies | 11 | — | STORY-104 |
+| STORY-106 | Owner Ocjene | 11 | — | STORY-104 |
