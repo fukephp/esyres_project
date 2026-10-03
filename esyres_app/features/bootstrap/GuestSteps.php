@@ -2729,6 +2729,116 @@ GQL);
     }
 
     /**
+     * @Given my phone is verified
+     */
+    public function myPhoneIsVerified(): void
+    {
+        $this->user->phone = '+38761111001';
+        $this->user->phone_verified_at = now();
+        $this->user->save();
+    }
+
+    /**
+     * @When I rate the salon :score with comment :comment
+     */
+    public function iRateTheSalonWithComment(string $score, string $comment): void
+    {
+        $this->rateSalon((int) $score, $comment);
+    }
+
+    /**
+     * @When I rate the salon :score with no comment
+     */
+    public function iRateTheSalonWithNoComment(string $score): void
+    {
+        $this->rateSalon((int) $score, null);
+    }
+
+    /**
+     * @When I rate the salon with a comment of :count characters
+     */
+    public function iRateTheSalonWithALongComment(string $count): void
+    {
+        $this->rateSalon(5, str_repeat('a', (int) $count));
+    }
+
+    /**
+     * @When I read the salon rating summary
+     */
+    public function iReadTheSalonRatingSummary(): void
+    {
+        $this->graphql(<<<'GQL'
+query SalonRating($id: ID!) {
+  salon(id: $id) {
+    ratingAverage
+    ratingCount
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then the salon rating average is :average and the count is :count
+     */
+    public function theSalonRatingAverageIs(string $average, string $count): void
+    {
+        $row = $this->graphql['data']['salon'] ?? $this->graphql['data']['rateSalon'];
+        $this->assertSame($average === 'none' ? null : $average, $row['ratingAverage']);
+        $this->assertSame((int) $count, $row['ratingCount']);
+    }
+
+    /**
+     * @When I read the salon rating rows
+     */
+    public function iReadTheSalonRatingRows(): void
+    {
+        $this->graphql(<<<'GQL'
+query SalonRatingRows($id: ID!) {
+  salon(id: $id) {
+    ratings { authorName score comment day }
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then the rating author names are :names
+     */
+    public function theRatingAuthorNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['salon']['ratings'];
+        $got = array_map(static fn (array $row): string => $row['authorName'], $rows);
+        $this->assertSame(explode(',', $names), $got);
+        $this->assertSame(1, preg_match('/^\d{4}-\d{2}-\d{2}$/', $rows[0]['day']));
+    }
+
+    /**
+     * @Then the salon has :count rating rows
+     */
+    public function theSalonHasRatingRows(string $count): void
+    {
+        $this->assertSame((int) $count, \App\Models\SalonRating::query()->where('salon_id', $this->salon->id)->count());
+    }
+
+    private function rateSalon(int $score, ?string $comment): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Rate($salonId: ID!, $score: Int!, $comment: String) {
+  rateSalon(salonId: $salonId, score: $score, comment: $comment) {
+    ratingAverage
+    ratingCount
+  }
+}
+GQL, [
+            'salonId' => (string) $this->salon->id,
+            'score' => $score,
+            'comment' => $comment,
+        ]);
+    }
+
+    /**
      * @Given a listed hair salon named :name
      */
     public function aListedHairSalonNamed(string $name): void

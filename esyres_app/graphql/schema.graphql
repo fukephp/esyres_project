@@ -255,6 +255,15 @@ type SalonQrStats {
     conversionPercent: Int!
 }
 
+type SalonRating {
+    id: ID!
+    score: Int!
+    comment: String
+    authorName: String! @method(name: "authorName")
+    day: String! @method(name: "sarajevoDay")
+    salon: Salon! @belongsTo
+}
+
 type Salon {
     id: ID!
     name: String!
@@ -273,6 +282,9 @@ type Salon {
     services: [Service!]! @method(name: "serviceList")
     workers: [Worker!]! @method(name: "workerList")
     busyLevel(date: String!): BusyLevel! @field(resolver: "App\\GraphQL\\Queries\\SalonBusyLevel")
+    ratingAverage: String @method(name: "ratingAverage")
+    ratingCount: Int! @method(name: "ratingCount")
+    ratings: [SalonRating!]! @method(name: "ratingRows")
 }
 
 type SalonStatsDay {
@@ -321,6 +333,7 @@ type Query {
     occupyingBookingsRange(salonId: ID!, from: String!, to: String!): [Booking!]!
     ownerBooking(id: ID!): Booking!
     myBookings(limit: Int = 20, offset: Int = 0): [Booking!]!
+    myRatings: [SalonRating!]!
     suggestedSalons: [Salon!]!
     assistantIntake(token: String!): AssistantIntake
     inFlightIntakes(salonId: ID!, limit: Int = 20, offset: Int = 0): [AssistantIntake!]!
@@ -341,6 +354,7 @@ type Mutation {
     updateCustomerSettings(name: String!, savedPlace: String): User!
     saveFavorite(salonId: ID!): User!
     unsaveFavorite(salonId: ID!): User!
+    rateSalon(salonId: ID!, score: Int!, comment: String): Salon!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!

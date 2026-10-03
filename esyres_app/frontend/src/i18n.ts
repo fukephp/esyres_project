@@ -20,6 +20,7 @@ void i18n.use(initReactI18next).init({
           send: 'Pošalji zahtjev',
           save: 'Sačuvaj',
           saved: 'Sačuvano',
+          rate: 'Ocijeni',
           loginToRequest: 'Prijavi se ili se registruj da pošalješ zahtjev.',
           today: 'Danas',
           tomorrow: 'Sutra',
@@ -118,6 +119,8 @@ void i18n.use(initReactI18next).init({
           favorites: 'Omiljeni saloni',
           favoritesEmpty: 'Nema omiljenih salona.',
           suggestions: 'Predloženi saloni',
+          ratings: 'Moje ocjene',
+          ratingsEmpty: 'Nema ocjena.',
         },
         home: {
           panel: 'Panel',

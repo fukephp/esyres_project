@@ -17,6 +17,7 @@ import {
   type QuarterStartsData,
 } from '../graphql/booking'
 import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonService, type SalonServiceCategory } from '../graphql/salon'
+import { SalonRatingBlock } from './SalonRating'
 import { assistantAddressLine, assistantHoursFacts, assistantHoursForDate, formatAssistantHoursLine } from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
 import { quarterNoneTappable, quarterStartPast } from '../lib/guestQuarter'
@@ -185,7 +186,7 @@ export function SalonProfile() {
   const { id } = useParams()
   const { t } = useTranslation()
   const date = sarajevoToday()
-  const { data, loading } = useQuery<PublicSalonData>(PUBLIC_SALON_QUERY, {
+  const { data, loading, refetch } = useQuery<PublicSalonData>(PUBLIC_SALON_QUERY, {
     variables: { id, date, chosenDate: date },
     skip: !id,
   })
@@ -451,6 +452,15 @@ export function SalonProfile() {
           </div>
         )}
       </section>
+      <SalonRatingBlock
+        salonId={salon.id}
+        average={salon.ratingAverage}
+        count={salon.ratingCount}
+        me={meData?.me ?? null}
+        onRated={() => {
+          void refetch()
+        }}
+      />
     </>
   )
 

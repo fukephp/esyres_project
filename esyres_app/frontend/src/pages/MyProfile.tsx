@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
@@ -8,11 +8,26 @@ import { ME_QUERY, type MeData } from '../graphql/auth'
 import { UNSAVE_FAVORITE } from '../graphql/favorites'
 import { MY_BOOKINGS_QUERY, type MyBooking, type MyBookingsData } from '../graphql/booking'
 import { SUGGESTED_SALONS_QUERY, type DiscoverySalon, type SuggestedSalonsData } from '../graphql/discovery'
+import { MyRatingsList } from './SalonRating'
 import { bookingClock, bookingStatusKey } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import { discoveryAddressLine, discoverySalonCategoryNames } from '../lib/discovery'
 import { formatCivilDate, sarajevoToday } from '../lib/format'
 import { BOOKINGS_HREF, GUEST_COLUMN_CLASS, PROFILE_HREF } from '../lib/homepage'
+
+const MY_RATINGS_QUERY = gql`
+  query MyRatings {
+    myRatings {
+      id
+      score
+      comment
+      salon {
+        id
+        name
+      }
+    }
+  }
+`
 
 function SuggestedRow({ salon }: { salon: DiscoverySalon }) {
   const { t } = useTranslation()
@@ -68,6 +83,10 @@ export function MyProfile() {
     variables: { date: sarajevoToday() },
     skip: data?.me == null,
   })
+  const mine = useQuery<{ myRatings: { id: string; score: number; comment: string | null; salon: { id: string; name: string } }[] }>(
+    MY_RATINGS_QUERY,
+    { skip: data?.me == null },
+  )
   const navMe = loading ? null : (data?.me ?? null)
 
   if (loading) {
@@ -139,6 +158,7 @@ export function MyProfile() {
             </ul>
           )}
         </section>
+        <MyRatingsList rows={mine.data?.myRatings ?? []} />
         <Link to={`${PROFILE_HREF}/settings`} className="mt-8 inline-block text-sm font-semibold text-ink">
           {t('profile.settings')}
         </Link>

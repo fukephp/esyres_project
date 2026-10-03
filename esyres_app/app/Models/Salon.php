@@ -133,4 +133,34 @@ class Salon extends Model
     {
         return $this->dnd !== true && OpenNow::at($this);
     }
+
+    /**
+     * @return HasMany<SalonRating, $this>
+     */
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(SalonRating::class);
+    }
+
+    public function ratingCount(): int
+    {
+        return $this->ratings()->count();
+    }
+
+    public function ratingAverage(): ?string
+    {
+        if ($this->ratingCount() === 0) {
+            return null;
+        }
+
+        return number_format((float) $this->ratings()->avg('score'), 1, '.', '');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, SalonRating>
+     */
+    public function ratingRows()
+    {
+        return $this->ratings()->with('user')->orderByDesc('updated_at')->orderByDesc('id')->get();
+    }
 }

@@ -37,6 +37,8 @@ export const PUBLIC_SALON_QUERY = gql`
       }
       busyLevel(date: $date)
       chatBusyLevel: busyLevel(date: $chosenDate)
+      ratingAverage
+      ratingCount
     }
   }
 `
@@ -78,6 +80,8 @@ export type PublicSalon = {
   workers: SalonWorker[]
   busyLevel: BusyLevel
   chatBusyLevel: BusyLevel
+  ratingAverage: string | null
+  ratingCount: number
 }
 
 export type PublicSalonData = {
