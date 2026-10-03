@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { LOGOUT_MUTATION } from '../graphql/auth'
-import { BOOKINGS_HREF, GUEST_COLUMN_CLASS, isOwnerPath, topNavChrome, type TopNavMe } from '../lib/homepage'
+import { BOOKINGS_HREF, GUEST_COLUMN_CLASS, isOwnerPath, PROFILE_HREF, topNavChrome, type TopNavMe } from '../lib/homepage'
 
 const linkClass = 'text-sm text-body'
 const panelClass =
@@ -54,6 +54,9 @@ export function TopNav({
                 {chrome.personName ? (
                   <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
                 ) : null}
+                <Link to={PROFILE_HREF} className={linkClass}>
+                  {t('nav.profile')}
+                </Link>
                 <Link to={BOOKINGS_HREF} className={linkClass}>
                   {t('nav.bookings')}
                 </Link>
@@ -70,9 +73,30 @@ export function TopNav({
                 {chrome.personName ? (
                   <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
                 ) : null}
+                {chrome.profile ? (
+                  <Link to={PROFILE_HREF} className={linkClass}>
+                    {t('nav.profile')}
+                  </Link>
+                ) : null}
                 <Link to={BOOKINGS_HREF} className={linkClass}>
                   {t('nav.bookings')}
                 </Link>
+              </>
+            ) : null}
+            {chrome.slot === 'customer-session' ? (
+              <>
+                {chrome.personName ? (
+                  <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
+                ) : null}
+                <Link to={PROFILE_HREF} className={linkClass}>
+                  {t('nav.profile')}
+                </Link>
+                <Link to={BOOKINGS_HREF} className={linkClass}>
+                  {t('nav.bookings')}
+                </Link>
+                <button type="button" className={logoutClass} onClick={() => void logout()}>
+                  {t('home.logout')}
+                </button>
               </>
             ) : null}
             {chrome.slot === 'session' ? (

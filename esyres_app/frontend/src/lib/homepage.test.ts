@@ -167,6 +167,7 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'home-session',
     personName: 'Ana',
+    profile: true,
     bookings: true,
     logout: true,
     panel: { href: '/owner', kind: 'panel' },
@@ -175,6 +176,7 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'home-session',
     personName: null,
+    profile: true,
     bookings: true,
     logout: true,
     panel: { href: '/create-salon', kind: 'create' },
@@ -183,12 +185,14 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'discovery',
     personName: 'Ana',
+    profile: true,
     bookings: true,
   })
   expect(topNavChrome('/salons', nameless)).toEqual({
     brand,
     slot: 'discovery',
     personName: null,
+    profile: true,
     bookings: true,
   })
   expect(topNavChrome('/salon/1', null)).toEqual({
@@ -206,14 +210,18 @@ test('topNavChrome brand is always home; slots match path + me', () => {
   expect(topNavChrome('/bookings', null)).toEqual({ brand, slot: 'empty' })
   expect(topNavChrome('/bookings', ana)).toEqual({
     brand,
-    slot: 'session',
+    slot: 'customer-session',
     personName: 'Ana',
+    profile: true,
+    bookings: true,
     logout: true,
   })
   expect(topNavChrome('/bookings', nameless)).toEqual({
     brand,
-    slot: 'session',
+    slot: 'customer-session',
     personName: null,
+    profile: true,
+    bookings: true,
     logout: true,
   })
   expect(topNavChrome('/owner', owner)).toEqual({

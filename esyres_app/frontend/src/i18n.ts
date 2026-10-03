@@ -104,7 +104,11 @@ void i18n.use(initReactI18next).init({
         },
         nav: {
           bookings: 'Moje rezervacije',
+          profile: 'Profil',
           welcome: 'Dobrodošli, {{name}}',
+        },
+        profile: {
+          settings: 'Postavke',
         },
         home: {
           panel: 'Panel',
@@ -181,6 +185,7 @@ void i18n.use(initReactI18next).init({
           link: 'Moji zahtjevi',
           title: 'Moji zahtjevi',
           empty: 'Nema zahtjeva.',
+          seeAll: 'Vidi sve',
           logout: 'Odjavi se',
           status: {
             REQUESTED: 'Na čekanju',
