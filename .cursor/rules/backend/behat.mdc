@@ -1,0 +1,17 @@
+---
+description: Behat GraphQL conventions for the Esyres guest and owner suites
+globs: esyres_app/features/**
+alwaysApply: false
+---
+
+# Behat GraphQL
+
+Runtime, suites, and verify commands: `.cursor/CONTEXT.md`. HTTP lives in `esyres_app/features/bootstrap/BehatRuntime.php`.
+
+- `BehatRuntime::graphql()` POSTs JSON (`query` + `variables`) to `/graphql`. Login fetches `/sanctum/csrf-cookie`, then sends `X-CSRF-TOKEN`. Leave `VerifyCsrfToken` on. Do not call `Request::create` or `app()->handle`, and do not encrypt session cookies by hand.
+- Suites in `esyres_app/behat.yml`: `guest` → `GuestContext` + `features/guest`; `owner` → `OwnerContext` + `features/owner`. Shared login and fixtures: `SharedFixtures.php`. Domain steps: `GuestSteps.php` / `OwnerSteps.php`. Do not add `FeatureContext`.
+- Auth is a Sanctum session cookie. No Bearer tokens. Customer: `Given a verified customer "…" with password "…"` then `When I log in as "…" with password "…"`. Owner: `Given a verified owner "…" with password "…" owns salon "…"` then the same login step. Guest denial uses the existing "as a guest" steps and `Then the GraphQL error code is "…"`. Do not fill a login form, and do not add `Given I am authenticated as a standard user`.
+- JSON fixtures and expected bodies use `PyStringNode` (`"""`). Reuse a domain step when one exists. A new call is a named step that calls `$this->graphql()`.
+- Each scenario truncates tables. `APP_ENV=testing` and database `esyres_test` only. Do not use `RefreshDatabase`. Do not touch the `esyres` database.
+- While iterating, from `esyres_app/`: `docker compose exec -T php vendor/bin/behat features/<guest|owner>/<file>.feature --format=progress --stop-on-failure`. Flags stay on the CLI. Do not put them in `behat.yml`.
+- Finished work still runs the full suite from `esyres_app/`: `docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure`. Not `php artisan test`. Not host `vendor/bin/behat`.
