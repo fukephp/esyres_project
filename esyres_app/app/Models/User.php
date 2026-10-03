@@ -134,6 +134,14 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * @return \Illuminate\Database\Eloquent\Collection<int, Salon>
      */
+    public function favoriteSalonList()
+    {
+        return $this->favoriteSalons()->orderBy('salons.name')->orderBy('salons.id')->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Salon>
+     */
     public function salonList()
     {
         return $this->salons()->orderBy('id')->get();

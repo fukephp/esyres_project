@@ -30,6 +30,10 @@ export const ME_QUERY = gql`
       showFinished
       chatEnabled
       favoriteSalonIds
+      favoriteSalons {
+        id
+        name
+      }
       savedPlace
       savedLat
       savedLng
@@ -380,6 +384,8 @@ export type MeData = {
     showInProgress: boolean
     showFinished: boolean
     chatEnabled: boolean
+    favoriteSalonIds: string[]
+    favoriteSalons: { id: string; name: string }[]
     savedPlace: string | null
     savedLat: number | null
     savedLng: number | null

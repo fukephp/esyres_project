@@ -9,6 +9,7 @@ import { GuestPageSkeleton, SalonProfileSkeleton } from '../components/Skeleton'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
 import { Alert, CloseButton, Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
+import { SAVE_FAVORITE, UNSAVE_FAVORITE } from '../graphql/favorites'
 import {
   CREATE_BOOKING_MUTATION,
   QUARTER_STARTS_QUERY,
@@ -188,7 +189,9 @@ export function SalonProfile() {
     variables: { id, date, chosenDate: date },
     skip: !id,
   })
-  const { data: meData, loading: meLoading } = useQuery<MeData>(ME_QUERY)
+  const { data: meData, loading: meLoading, refetch: refetchMe } = useQuery<MeData>(ME_QUERY)
+  const [saveFavorite] = useMutation(SAVE_FAVORITE)
+  const [unsaveFavorite] = useMutation(UNSAVE_FAVORITE)
   const navMe = meLoading ? null : (meData?.me ?? null)
   const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
   const [mode, setMode] = useState<'idle' | 'picker'>('idle')
@@ -456,7 +459,22 @@ export function SalonProfile() {
       <TopNav me={navMe} />
       <main className={`${GUEST_COLUMN_CLASS} py-8`}>
         <header className="flex items-start justify-between gap-4">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h1>
+          <div>
+            <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h1>
+            {meData?.me != null ? (
+              <button
+                type="button"
+                className="mt-2 text-sm font-semibold text-ink"
+                onClick={() => {
+                  const saved = (meData.me?.favoriteSalonIds ?? []).includes(salon.id)
+                  const run = saved ? unsaveFavorite : saveFavorite
+                  void run({ variables: { salonId: salon.id } }).then(() => refetchMe())
+                }}
+              >
+                {(meData.me.favoriteSalonIds ?? []).includes(salon.id) ? t('salon.saved') : t('salon.save')}
+              </button>
+            ) : null}
+          </div>
           <p className="flex items-center gap-2 text-sm text-body">
             <span className={`size-2.5 shrink-0 rounded-full ${busyBg[token]}`} aria-hidden />
             {t(`salon.busy.${salon.busyLevel}`)}

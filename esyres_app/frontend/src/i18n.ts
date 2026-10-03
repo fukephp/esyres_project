@@ -18,6 +18,8 @@ void i18n.use(initReactI18next).init({
           duration: '{{n}} min',
           loading: 'Učitavanje…',
           send: 'Pošalji zahtjev',
+          save: 'Sačuvaj',
+          saved: 'Sačuvano',
           loginToRequest: 'Prijavi se ili se registruj da pošalješ zahtjev.',
           today: 'Danas',
           tomorrow: 'Sutra',
@@ -113,6 +115,8 @@ void i18n.use(initReactI18next).init({
           place: 'Mjesto',
           save: 'Sačuvaj',
           invalidName: 'Unesi ime i prezime.',
+          favorites: 'Omiljeni saloni',
+          favoritesEmpty: 'Nema omiljenih salona.',
         },
         home: {
           panel: 'Panel',

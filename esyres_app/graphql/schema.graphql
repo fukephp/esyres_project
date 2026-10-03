@@ -236,6 +236,7 @@ type User {
     chatEnabled: Boolean! @rename(attribute: "chat_enabled")
     salons: [Salon!]! @method(name: "salonList")
     favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
+    favoriteSalons: [Salon!]! @method(name: "favoriteSalonList")
     savedPlace: String @method(name: "savedPlaceName")
     savedLat: Float @method(name: "savedPlaceLat")
     savedLng: Float @method(name: "savedPlaceLng")
@@ -337,6 +338,8 @@ type Mutation {
     resetPassword(email: String!, token: String!, password: String!): Boolean!
     updateOwnerView(view: OwnerView!): User!
     updateCustomerSettings(name: String!, savedPlace: String): User!
+    saveFavorite(salonId: ID!): User!
+    unsaveFavorite(salonId: ID!): User!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!

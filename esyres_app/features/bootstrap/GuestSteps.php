@@ -2676,6 +2676,68 @@ GQL, [
         $this->assertTrue(strlen(trim((string) $fresh->name)) > 0);
     }
 
+    /**
+     * @When I save the salon as a favorite
+     */
+    public function iSaveTheSalonAsAFavorite(): void
+    {
+        $this->saveFavoriteFor($this->salon->id);
+    }
+
+    /**
+     * @When I save the other salon as a favorite
+     */
+    public function iSaveTheOtherSalonAsAFavorite(): void
+    {
+        $this->saveFavoriteFor($this->otherSalon->id);
+    }
+
+    /**
+     * @When I unsave the salon favorite
+     */
+    public function iUnsaveTheSalonFavorite(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UnsaveFavorite($salonId: ID!) {
+  unsaveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @When I read my favorite salon names
+     */
+    public function iReadMyFavoriteSalonNames(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeFavorites {
+  me { favoriteSalons { name } }
+}
+GQL);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then my favorite salon names are :names
+     */
+    public function myFavoriteSalonNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['me']['favoriteSalons'];
+        $got = array_map(static fn (array $row): string => $row['name'], $rows);
+        $this->assertSame(explode(',', $names), $got);
+    }
+
+    private function saveFavoriteFor(int|string $salonId): void
+    {
+        $this->graphql(<<<'GQL'
+mutation SaveFavorite($salonId: ID!) {
+  saveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $salonId]);
+        $this->assertNoGraphqlErrors();
+    }
+
     private function busyLevelQuery(): string
     {
         return <<<'GQL'

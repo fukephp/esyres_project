@@ -1,10 +1,11 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { TopNav } from '../components/TopNav'
 import { CardsSkeleton, GuestPageSkeleton } from '../components/Skeleton'
 import { ME_QUERY, type MeData } from '../graphql/auth'
+import { UNSAVE_FAVORITE } from '../graphql/favorites'
 import { MY_BOOKINGS_QUERY, type MyBooking, type MyBookingsData } from '../graphql/booking'
 import { bookingClock, bookingStatusKey } from '../lib/booking'
 import { formatCivilDate } from '../lib/format'
@@ -38,6 +39,7 @@ function BookingSummary({ row }: { row: MyBooking }) {
 export function MyProfile() {
   const { t } = useTranslation()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
+  const [unsaveFavorite] = useMutation(UNSAVE_FAVORITE)
   const list = useQuery<MyBookingsData>(MY_BOOKINGS_QUERY, { skip: data?.me == null })
   const navMe = loading ? null : (data?.me ?? null)
 
@@ -75,6 +77,31 @@ export function MyProfile() {
             {t('bookings.seeAll')}
           </Link>
         </div>
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold text-ink">{t('profile.favorites')}</h2>
+          {(data.me.favoriteSalons ?? []).length === 0 ? (
+            <p className="mt-3 text-sm text-body">{t('profile.favoritesEmpty')}</p>
+          ) : (
+            <ul className="mt-3">
+              {data.me.favoriteSalons.map((salon) => (
+                <li key={salon.id} className="flex items-center justify-between gap-4 border-t border-hairline py-3">
+                  <Link to={`/salon/${salon.id}`} className="text-sm font-semibold text-ink">
+                    {salon.name}
+                  </Link>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-ink"
+                    onClick={() => {
+                      void unsaveFavorite({ variables: { salonId: salon.id } }).then(() => refetch())
+                    }}
+                  >
+                    {t('salon.saved')}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
         <Link to={`${PROFILE_HREF}/settings`} className="mt-8 inline-block text-sm font-semibold text-ink">
           {t('profile.settings')}
         </Link>
