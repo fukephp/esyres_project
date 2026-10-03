@@ -57,6 +57,26 @@ html {
   }
 }
 
+.customer-surface {
+  --color-page: #e8eef3;
+  --color-canvas: #ffffff;
+  --color-ink: #14181f;
+  --color-body: #5c6770;
+  --color-muted: #5c6770;
+  --color-hairline: #e3e7eb;
+  --color-star: #2f6fed;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  background: #e8eef3;
+  color: #14181f;
+  font-family: var(--font-sans);
+}
+
+.customer-surface .rounded-3xl.bg-canvas,
+.customer-surface .rounded-2xl.bg-canvas {
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(20, 24, 31, 0.06);
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.03em;

@@ -43,15 +43,19 @@ function owner(page: ReactNode, preset: ReactNode) {
   return <Suspense fallback={<OwnerPageSkeleton>{preset}</OwnerPageSkeleton>}>{page}</Suspense>
 }
 
+function customer(page: ReactNode) {
+  return <div className="customer-surface min-h-svh">{page}</div>
+}
+
 export default function App() {
   return (
     <div className="min-h-svh bg-canvas">
       <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/salons" element={<DiscoveryHome />} />
+        <Route path="/" element={customer(<Homepage />)} />
+        <Route path="/salons" element={customer(<DiscoveryHome />)} />
         <Route path={CREATE_SALON_PATH} element={<CreateSalon />} />
-        <Route path="/salon/:id" element={<SalonProfile />} />
-        <Route path="/bookings" element={<MyBookings />} />
+        <Route path="/salon/:id" element={customer(<SalonProfile />)} />
+        <Route path="/bookings" element={customer(<MyBookings />)} />
         <Route path={RESET_PASSWORD_PATH} element={<ResetPassword />} />
         <Route path="/owner" element={owner(<OwnerHome />, <OwnerWeekSkeleton />)} />
         <Route path="/owner/chats" element={owner(<OwnerChats />, <RowsSkeleton count={4} />)} />
