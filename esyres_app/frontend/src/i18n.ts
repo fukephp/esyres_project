@@ -293,6 +293,8 @@ void i18n.use(initReactI18next).init({
           description: 'Opis',
           mainImage: 'Glavna slika',
           gallery: 'Galerija',
+          ratings: 'Ocjene',
+          ratingsEmpty: 'Nema ocjena.',
           removeImage: 'Ukloni',
           addImage: 'Dodaj sliku',
           uploadMainTitle: 'Dodaj glavnu sliku',

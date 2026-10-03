@@ -44,6 +44,18 @@ export const ME_QUERY = gql`
         description
         mainImageUrl
         galleryUrls
+        ownerRatings {
+          id
+          authorName
+          score
+          comment
+          day
+          replies {
+            id
+            authorName
+            body
+          }
+        }
         cancellationNoticeHours
         hours {
           weekday
@@ -396,6 +408,14 @@ export type MeData = {
       description: string | null
       mainImageUrl: string | null
       galleryUrls: string[]
+      ownerRatings: {
+        id: string
+        authorName: string
+        score: number
+        comment: string | null
+        day: string
+        replies: { id: string; authorName: string; body: string }[]
+      }[]
       cancellationNoticeHours: number
       hours: {
         weekday: string

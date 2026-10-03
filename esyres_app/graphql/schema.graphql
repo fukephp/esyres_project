@@ -285,6 +285,7 @@ type Salon {
     description: String @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@description")
     mainImageUrl: String @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@mainImageUrl")
     galleryUrls: [String!]! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@galleryUrls")
+    ownerRatings: [SalonRating!]! @field(resolver: "App\\GraphQL\\Queries\\SalonOwnerField@ownerRatings")
     hours: [DayHours!]! @method(name: "dayHours")
     serviceCategories: [SalonServiceCategory!]! @method(name: "serviceCategoryList")
     services: [Service!]! @method(name: "serviceList")

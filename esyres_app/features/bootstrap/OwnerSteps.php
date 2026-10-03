@@ -2,7 +2,9 @@
 
 use App\Models\AssistantIntake;
 use App\Models\Booking;
+use App\Models\RatingReply;
 use App\Models\Salon;
+use App\Models\SalonRating;
 use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
@@ -19,6 +21,8 @@ use Illuminate\Support\Facades\Storage;
 trait OwnerSteps
 {
     private ?\Throwable $seederException = null;
+
+    private ?SalonRating $rating = null;
 
     private ?string $rememberedRespondedAt = null;
 
@@ -3411,6 +3415,86 @@ mutation CreatePhoneBooking($input: CreatePhoneBookingInput!) {
   }
 }
 GQL;
+    }
+
+    /**
+     * @Given the salon has a rating :score from :name saying :comment
+     */
+    public function theSalonHasARatingFrom(string $score, string $name, string $comment): void
+    {
+        $customer = User::factory()->create([
+            'name' => $name,
+            'email' => strtolower($name).'-'.substr(sha1($name.microtime()), 0, 6).'@rate.test',
+        ]);
+        $this->rating = SalonRating::query()->create([
+            'user_id' => $customer->id,
+            'salon_id' => $this->salon->id,
+            'score' => (int) $score,
+            'comment' => $comment,
+        ]);
+    }
+
+    /**
+     * @Given that rating has a reply :body from :name
+     */
+    public function thatRatingHasAReply(string $body, string $name): void
+    {
+        $customer = User::factory()->create([
+            'name' => $name,
+            'email' => strtolower($name).'-'.substr(sha1($body.microtime()), 0, 6).'@reply.test',
+        ]);
+        RatingReply::query()->create([
+            'salon_rating_id' => $this->rating->id,
+            'user_id' => $customer->id,
+            'body' => $body,
+        ]);
+    }
+
+    /**
+     * @When I read owner ratings
+     */
+    public function iReadOwnerRatings(): void
+    {
+        $this->graphql(<<<'GQL'
+query OwnerRatings($id: ID!) {
+  salon(id: $id) {
+    ownerRatings {
+      authorName
+      score
+      comment
+      day
+      replies { authorName body }
+    }
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I read owner ratings for the other salon
+     */
+    public function iReadOwnerRatingsForTheOtherSalon(): void
+    {
+        $this->graphql(<<<'GQL'
+query OwnerRatings($id: ID!) {
+  salon(id: $id) {
+    ownerRatings { authorName }
+  }
+}
+GQL, ['id' => (string) $this->otherSalon->id]);
+    }
+
+    /**
+     * @Then the owner rating names are :names
+     */
+    public function theOwnerRatingNamesAre(string $names): void
+    {
+        $this->assertNoGraphqlErrors();
+        $rows = $this->graphql['data']['salon']['ownerRatings'];
+        $got = array_map(static fn (array $row): string => $row['authorName'], $rows);
+        $this->assertSame(explode(',', $names), $got);
+        $this->assertSame('Slažem se', $rows[0]['replies'][0]['body']);
+        $this->assertSame('Mia', $rows[0]['replies'][0]['authorName']);
     }
 
     private function cancelPhoneBookingMutation(): string
