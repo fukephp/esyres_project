@@ -109,6 +109,10 @@ void i18n.use(initReactI18next).init({
         },
         profile: {
           settings: 'Postavke',
+          name: 'Ime i prezime',
+          place: 'Mjesto',
+          save: 'Sačuvaj',
+          invalidName: 'Unesi ime i prezime.',
         },
         home: {
           panel: 'Panel',

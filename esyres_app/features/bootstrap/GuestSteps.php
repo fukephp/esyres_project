@@ -2627,6 +2627,55 @@ query SalonOwnerFields($id: ID!) {
 GQL;
     }
 
+    /**
+     * @When I save customer settings name :name and place :place
+     */
+    public function iSaveCustomerSettings(string $name, string $place): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateCustomerSettings($name: String!, $savedPlace: String) {
+  updateCustomerSettings(name: $name, savedPlace: $savedPlace) {
+    name
+    savedPlace
+    savedLat
+    savedLng
+  }
+}
+GQL, [
+            'name' => $name,
+            'savedPlace' => $place === 'none' ? null : $place,
+        ]);
+    }
+
+    /**
+     * @Then customer settings are name :name and place :place
+     */
+    public function customerSettingsAre(string $name, string $place): void
+    {
+        $row = $this->graphql['data']['updateCustomerSettings'];
+        $this->assertSame($name, $row['name']);
+        if ($place === 'none') {
+            $this->assertNull($row['savedPlace']);
+            $this->assertNull($row['savedLat']);
+            $this->assertNull($row['savedLng']);
+
+            return;
+        }
+        $this->assertSame($place, $row['savedPlace']);
+        $this->assertNotNull($row['savedLat']);
+        $this->assertNotNull($row['savedLng']);
+    }
+
+    /**
+     * @Then the saved place was not written
+     */
+    public function theSavedPlaceWasNotWritten(): void
+    {
+        $fresh = $this->user->fresh();
+        $this->assertNull($fresh->saved_place);
+        $this->assertTrue(strlen(trim((string) $fresh->name)) > 0);
+    }
+
     private function busyLevelQuery(): string
     {
         return <<<'GQL'

@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'phone', 'password'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'saved_place'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -62,6 +62,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function graphqlOwnerView(): string
     {
         return strtoupper((string) ($this->owner_view ?? 'calendar'));
+    }
+
+    public function savedPlaceName(): ?string
+    {
+        $name = $this->saved_place;
+
+        return is_string($name) && $name !== '' ? $name : null;
+    }
+
+    public function savedPlaceLat(): ?float
+    {
+        $point = \App\SavedPlace::point($this->savedPlaceName());
+
+        return $point[0] ?? null;
+    }
+
+    public function savedPlaceLng(): ?float
+    {
+        $point = \App\SavedPlace::point($this->savedPlaceName());
+
+        return $point[1] ?? null;
     }
 
     /**

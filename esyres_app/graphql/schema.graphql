@@ -236,6 +236,9 @@ type User {
     chatEnabled: Boolean! @rename(attribute: "chat_enabled")
     salons: [Salon!]! @method(name: "salonList")
     favoriteSalonIds: [ID!]! @method(name: "favoriteSalonIdList")
+    savedPlace: String @method(name: "savedPlaceName")
+    savedLat: Float @method(name: "savedPlaceLat")
+    savedLng: Float @method(name: "savedPlaceLng")
 }
 
 type QrScan {
@@ -333,6 +336,7 @@ type Mutation {
     requestPasswordReset(email: String!): Boolean!
     resetPassword(email: String!, token: String!, password: String!): Boolean!
     updateOwnerView(view: OwnerView!): User!
+    updateCustomerSettings(name: String!, savedPlace: String): User!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!
