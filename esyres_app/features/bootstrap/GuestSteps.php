@@ -2728,6 +2728,64 @@ GQL);
         $this->assertSame(explode(',', $names), $got);
     }
 
+    private ?string $rememberedRatingId = null;
+
+    /**
+     * @When I remember the first rating
+     */
+    public function iRememberTheFirstRating(): void
+    {
+        $this->rememberedRatingId = (string) $this->graphql['data']['salon']['ratings'][0]['id'];
+    }
+
+    /**
+     * @When I reply :body
+     */
+    public function iReply(string $body): void
+    {
+        $this->replyToRating($body);
+    }
+
+    /**
+     * @When I reply with :count characters
+     */
+    public function iReplyWithCharacters(string $count): void
+    {
+        $this->replyToRating(str_repeat('b', (int) $count));
+    }
+
+    /**
+     * @Then the rating has :count replies
+     */
+    public function theRatingHasReplies(string $count): void
+    {
+        $this->assertSame(
+            (int) $count,
+            \App\Models\RatingReply::query()->where('salon_rating_id', $this->rememberedRatingId)->count(),
+        );
+    }
+
+    /**
+     * @Then the reply body is :body
+     */
+    public function theReplyBodyIs(string $body): void
+    {
+        $row = \App\Models\RatingReply::query()->where('salon_rating_id', $this->rememberedRatingId)->first();
+        $this->assertSame($body, $row?->body);
+    }
+
+    private function replyToRating(string $body): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Reply($ratingId: ID!, $body: String!) {
+  replyToRating(ratingId: $ratingId, body: $body) { id }
+}
+GQL, [
+            'ratingId' => $this->rememberedRatingId,
+            'body' => $body,
+        ]);
+    }
+
     /**
      * @Given my phone is verified
      */
@@ -2796,7 +2854,7 @@ GQL, ['id' => (string) $this->salon->id]);
         $this->graphql(<<<'GQL'
 query SalonRatingRows($id: ID!) {
   salon(id: $id) {
-    ratings { authorName score comment day }
+    ratings { id authorName score comment day }
   }
 }
 GQL, ['id' => (string) $this->salon->id]);

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['user_id', 'salon_id', 'score', 'comment'])]
 class SalonRating extends Model
@@ -43,5 +44,18 @@ class SalonRating extends Model
     public function sarajevoDay(): string
     {
         return $this->updated_at->timezone('Europe/Sarajevo')->format('Y-m-d');
+    }
+
+    public function authorId(): string
+    {
+        return (string) $this->user_id;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, RatingReply>
+     */
+    public function replyList()
+    {
+        return $this->hasMany(RatingReply::class)->with('user')->orderBy('id')->get();
     }
 }

@@ -255,12 +255,20 @@ type SalonQrStats {
     conversionPercent: Int!
 }
 
+type RatingReply {
+    id: ID!
+    body: String!
+    authorName: String! @method(name: "authorName")
+}
+
 type SalonRating {
     id: ID!
     score: Int!
     comment: String
     authorName: String! @method(name: "authorName")
+    authorId: ID! @method(name: "authorId")
     day: String! @method(name: "sarajevoDay")
+    replies: [RatingReply!]! @method(name: "replyList")
     salon: Salon! @belongsTo
 }
 
@@ -355,6 +363,7 @@ type Mutation {
     saveFavorite(salonId: ID!): User!
     unsaveFavorite(salonId: ID!): User!
     rateSalon(salonId: ID!, score: Int!, comment: String): Salon!
+    replyToRating(ratingId: ID!, body: String!): SalonRating!
     updateKanbanColumns(showInProgress: Boolean!, showFinished: Boolean!): User!
     updateChatEnabled(enabled: Boolean!): User!
     logout: Boolean!

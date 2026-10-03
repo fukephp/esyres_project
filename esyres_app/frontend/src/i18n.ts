@@ -21,6 +21,7 @@ void i18n.use(initReactI18next).init({
           save: 'Sačuvaj',
           saved: 'Sačuvano',
           rate: 'Ocijeni',
+          reply: 'Odgovori',
           loginToRequest: 'Prijavi se ili se registruj da pošalješ zahtjev.',
           today: 'Danas',
           tomorrow: 'Sutra',
