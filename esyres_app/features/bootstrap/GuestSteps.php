@@ -2627,6 +2627,369 @@ query SalonOwnerFields($id: ID!) {
 GQL;
     }
 
+    /**
+     * @When I save customer settings name :name and place :place
+     */
+    public function iSaveCustomerSettings(string $name, string $place): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UpdateCustomerSettings($name: String!, $savedPlace: String) {
+  updateCustomerSettings(name: $name, savedPlace: $savedPlace) {
+    name
+    savedPlace
+    savedLat
+    savedLng
+  }
+}
+GQL, [
+            'name' => $name,
+            'savedPlace' => $place === 'none' ? null : $place,
+        ]);
+    }
+
+    /**
+     * @Then customer settings are name :name and place :place
+     */
+    public function customerSettingsAre(string $name, string $place): void
+    {
+        $row = $this->graphql['data']['updateCustomerSettings'];
+        $this->assertSame($name, $row['name']);
+        if ($place === 'none') {
+            $this->assertNull($row['savedPlace']);
+            $this->assertNull($row['savedLat']);
+            $this->assertNull($row['savedLng']);
+
+            return;
+        }
+        $this->assertSame($place, $row['savedPlace']);
+        $this->assertNotNull($row['savedLat']);
+        $this->assertNotNull($row['savedLng']);
+    }
+
+    /**
+     * @Then the saved place was not written
+     */
+    public function theSavedPlaceWasNotWritten(): void
+    {
+        $fresh = $this->user->fresh();
+        $this->assertNull($fresh->saved_place);
+        $this->assertTrue(strlen(trim((string) $fresh->name)) > 0);
+    }
+
+    /**
+     * @When I save the salon as a favorite
+     */
+    public function iSaveTheSalonAsAFavorite(): void
+    {
+        $this->saveFavoriteFor($this->salon->id);
+    }
+
+    /**
+     * @When I save the other salon as a favorite
+     */
+    public function iSaveTheOtherSalonAsAFavorite(): void
+    {
+        $this->saveFavoriteFor($this->otherSalon->id);
+    }
+
+    /**
+     * @When I unsave the salon favorite
+     */
+    public function iUnsaveTheSalonFavorite(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation UnsaveFavorite($salonId: ID!) {
+  unsaveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @When I read my favorite salon names
+     */
+    public function iReadMyFavoriteSalonNames(): void
+    {
+        $this->graphql(<<<'GQL'
+query MeFavorites {
+  me { favoriteSalons { name } }
+}
+GQL);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then my favorite salon names are :names
+     */
+    public function myFavoriteSalonNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['me']['favoriteSalons'];
+        $got = array_map(static fn (array $row): string => $row['name'], $rows);
+        $this->assertSame(explode(',', $names), $got);
+    }
+
+    private ?string $rememberedRatingId = null;
+
+    /**
+     * @When I remember the first rating
+     */
+    public function iRememberTheFirstRating(): void
+    {
+        $this->rememberedRatingId = (string) $this->graphql['data']['salon']['ratings'][0]['id'];
+    }
+
+    /**
+     * @When I reply :body
+     */
+    public function iReply(string $body): void
+    {
+        $this->replyToRating($body);
+    }
+
+    /**
+     * @When I reply with :count characters
+     */
+    public function iReplyWithCharacters(string $count): void
+    {
+        $this->replyToRating(str_repeat('b', (int) $count));
+    }
+
+    /**
+     * @Then the rating has :count replies
+     */
+    public function theRatingHasReplies(string $count): void
+    {
+        $this->assertSame(
+            (int) $count,
+            \App\Models\RatingReply::query()->where('salon_rating_id', $this->rememberedRatingId)->count(),
+        );
+    }
+
+    /**
+     * @Then the reply body is :body
+     */
+    public function theReplyBodyIs(string $body): void
+    {
+        $row = \App\Models\RatingReply::query()->where('salon_rating_id', $this->rememberedRatingId)->first();
+        $this->assertSame($body, $row?->body);
+    }
+
+    private function replyToRating(string $body): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Reply($ratingId: ID!, $body: String!) {
+  replyToRating(ratingId: $ratingId, body: $body) { id }
+}
+GQL, [
+            'ratingId' => $this->rememberedRatingId,
+            'body' => $body,
+        ]);
+    }
+
+    /**
+     * @Given my phone is verified
+     */
+    public function myPhoneIsVerified(): void
+    {
+        $this->user->phone = '+38761111001';
+        $this->user->phone_verified_at = now();
+        $this->user->save();
+    }
+
+    /**
+     * @When I rate the salon :score with comment :comment
+     */
+    public function iRateTheSalonWithComment(string $score, string $comment): void
+    {
+        $this->rateSalon((int) $score, $comment);
+    }
+
+    /**
+     * @When I rate the salon :score with no comment
+     */
+    public function iRateTheSalonWithNoComment(string $score): void
+    {
+        $this->rateSalon((int) $score, null);
+    }
+
+    /**
+     * @When I rate the salon with a comment of :count characters
+     */
+    public function iRateTheSalonWithALongComment(string $count): void
+    {
+        $this->rateSalon(5, str_repeat('a', (int) $count));
+    }
+
+    /**
+     * @When I read the salon rating summary
+     */
+    public function iReadTheSalonRatingSummary(): void
+    {
+        $this->graphql(<<<'GQL'
+query SalonRating($id: ID!) {
+  salon(id: $id) {
+    ratingAverage
+    ratingCount
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then the salon rating average is :average and the count is :count
+     */
+    public function theSalonRatingAverageIs(string $average, string $count): void
+    {
+        $row = $this->graphql['data']['salon'] ?? $this->graphql['data']['rateSalon'];
+        $this->assertSame($average === 'none' ? null : $average, $row['ratingAverage']);
+        $this->assertSame((int) $count, $row['ratingCount']);
+    }
+
+    /**
+     * @When I read the salon rating rows
+     */
+    public function iReadTheSalonRatingRows(): void
+    {
+        $this->graphql(<<<'GQL'
+query SalonRatingRows($id: ID!) {
+  salon(id: $id) {
+    ratings { id authorName score comment day }
+  }
+}
+GQL, ['id' => (string) $this->salon->id]);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then the rating author names are :names
+     */
+    public function theRatingAuthorNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['salon']['ratings'];
+        $got = array_map(static fn (array $row): string => $row['authorName'], $rows);
+        $this->assertSame(explode(',', $names), $got);
+        $this->assertSame(1, preg_match('/^\d{4}-\d{2}-\d{2}$/', $rows[0]['day']));
+    }
+
+    /**
+     * @Then the salon has :count rating rows
+     */
+    public function theSalonHasRatingRows(string $count): void
+    {
+        $this->assertSame((int) $count, \App\Models\SalonRating::query()->where('salon_id', $this->salon->id)->count());
+    }
+
+    private function rateSalon(int $score, ?string $comment): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Rate($salonId: ID!, $score: Int!, $comment: String) {
+  rateSalon(salonId: $salonId, score: $score, comment: $comment) {
+    ratingAverage
+    ratingCount
+  }
+}
+GQL, [
+            'salonId' => (string) $this->salon->id,
+            'score' => $score,
+            'comment' => $comment,
+        ]);
+    }
+
+    /**
+     * @Given a listed hair salon named :name
+     */
+    public function aListedHairSalonNamed(string $name): void
+    {
+        $this->listExtraSalon($name, true);
+    }
+
+    /**
+     * @Given a listed unkeyed salon named :name
+     */
+    public function aListedUnkeyedSalonNamed(string $name): void
+    {
+        $this->listExtraSalon($name, false);
+    }
+
+    /**
+     * @When I save the listed salon :name as a favorite
+     */
+    public function iSaveTheListedSalonAsAFavorite(string $name): void
+    {
+        $salon = Salon::query()->where('name', $name)->firstOrFail();
+        $this->saveFavoriteFor($salon->id);
+    }
+
+    /**
+     * @When I read suggested salons
+     */
+    public function iReadSuggestedSalons(): void
+    {
+        $this->graphql(<<<'GQL'
+query Suggested {
+  suggestedSalons { name }
+}
+GQL);
+        $this->assertNoGraphqlErrors();
+    }
+
+    /**
+     * @Then suggested salon names are :names
+     */
+    public function suggestedSalonNamesAre(string $names): void
+    {
+        $rows = $this->graphql['data']['suggestedSalons'];
+        $got = array_map(static fn (array $row): string => $row['name'], $rows);
+        $expected = $names === '' ? [] : explode(',', $names);
+        $this->assertSame($expected, $got);
+    }
+
+    private function listExtraSalon(string $name, bool $hair): void
+    {
+        $owner = User::factory()->create([
+            'email' => strtolower($name).'-'.substr(sha1($name.microtime()), 0, 6).'@listed.test',
+            'email_verified_at' => now(),
+        ]);
+        $salon = Salon::factory()->create([
+            'owner_id' => $owner->id,
+            'name' => $name,
+        ]);
+        $previousSalon = $this->salon;
+        $previousServices = $this->services;
+        $previousService = $this->service;
+        $previousCategory = $this->serviceCategory;
+        $this->salon = $salon;
+        $this->services = [];
+        $this->theSalonIsOpenFromTo('saturday', '09:00', '17:00');
+        if ($hair) {
+            $this->theSalonIsListed();
+        } else {
+            $this->theSalonHasAnUnkeyedServiceCategory('Posebno');
+            Service::factory()->create([
+                'salon_id' => $salon->id,
+                'service_category_id' => $this->serviceCategory->id,
+                'name' => 'Posebno',
+                'duration_minutes' => 30,
+                'price_feninga' => 1000,
+            ]);
+        }
+        $this->salon = $previousSalon;
+        $this->services = $previousServices;
+        $this->service = $previousService;
+        $this->serviceCategory = $previousCategory;
+    }
+
+    private function saveFavoriteFor(int|string $salonId): void
+    {
+        $this->graphql(<<<'GQL'
+mutation SaveFavorite($salonId: ID!) {
+  saveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $salonId]);
+        $this->assertNoGraphqlErrors();
+    }
+
     private function busyLevelQuery(): string
     {
         return <<<'GQL'

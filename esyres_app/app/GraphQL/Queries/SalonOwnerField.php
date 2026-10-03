@@ -76,4 +76,14 @@ final class SalonOwnerField
 
         return SalonImages::galleryUrls($salon);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\SalonRating>
+     */
+    public function ownerRatings(Salon $salon, array $args, GraphQLContext $context)
+    {
+        OwnerAccess::salon(OwnerAccess::user($context), (string) $salon->id);
+
+        return $salon->ratingRows();
+    }
 }

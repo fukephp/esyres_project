@@ -42,10 +42,17 @@ const busyBg = {
   'busy-busy': 'bg-busy-busy',
 } as const
 
-function useGeo(): Geo {
+function useGeo(place: { lat: number; lng: number } | null, ready: boolean): Geo {
   const [geo, setGeo] = useState<Geo>({ status: 'pending' })
 
   useEffect(() => {
+    if (!ready) {
+      return
+    }
+    if (place) {
+      setGeo({ status: 'granted', lat: place.lat, lng: place.lng })
+      return
+    }
     if (!navigator.geolocation) {
       setGeo({ status: 'unavailable' })
       return
@@ -55,7 +62,7 @@ function useGeo(): Geo {
       () => setGeo({ status: 'denied' }),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300_000 },
     )
-  }, [])
+  }, [place, ready])
 
   return geo
 }
@@ -124,7 +131,9 @@ export function DiscoveryHome() {
   const { t } = useTranslation()
   const { data: meData, loading: meLoading } = useQuery<MeData>(ME_QUERY)
   const navMe = meLoading ? null : (meData?.me ?? null)
-  const geo = useGeo()
+  const saved =
+    navMe?.savedLat != null && navMe.savedLng != null ? { lat: navMe.savedLat, lng: navMe.savedLng } : null
+  const geo = useGeo(saved, !meLoading)
   const [category, setCategory] = useState<ServiceCategory | null>(null)
   const [nameDraft, setNameDraft] = useState('')
   const [showAll, setShowAll] = useState(false)

@@ -29,6 +29,14 @@ export const ME_QUERY = gql`
       showInProgress
       showFinished
       chatEnabled
+      favoriteSalonIds
+      favoriteSalons {
+        id
+        name
+      }
+      savedPlace
+      savedLat
+      savedLng
       salons {
         id
         name
@@ -36,6 +44,18 @@ export const ME_QUERY = gql`
         description
         mainImageUrl
         galleryUrls
+        ownerRatings {
+          id
+          authorName
+          score
+          comment
+          day
+          replies {
+            id
+            authorName
+            body
+          }
+        }
         cancellationNoticeHours
         hours {
           weekday
@@ -376,6 +396,11 @@ export type MeData = {
     showInProgress: boolean
     showFinished: boolean
     chatEnabled: boolean
+    favoriteSalonIds: string[]
+    favoriteSalons: { id: string; name: string }[]
+    savedPlace: string | null
+    savedLat: number | null
+    savedLng: number | null
     salons: {
       id: string
       name: string
@@ -383,6 +408,14 @@ export type MeData = {
       description: string | null
       mainImageUrl: string | null
       galleryUrls: string[]
+      ownerRatings: {
+        id: string
+        authorName: string
+        score: number
+        comment: string | null
+        day: string
+        replies: { id: string; authorName: string; body: string }[]
+      }[]
       cancellationNoticeHours: number
       hours: {
         weekday: string

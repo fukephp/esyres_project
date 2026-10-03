@@ -30,11 +30,14 @@ test('Design 2 tokens: cream page, pastels, status, busy unchanged; Bricolage + 
   expect(css).toMatch(/--font-display:\s*"Bricolage Grotesque Variable"/)
   expect(css).toMatch(/--font-sans:\s*"Manrope Variable"/)
   expect(css).not.toMatch(/Cal Sans/)
-  expect(css).not.toMatch(/Inter/)
+  const theme = css.slice(0, css.indexOf('.customer-surface'))
+  expect(theme).not.toMatch(/Inter/)
+  expect(css).toMatch(/\.customer-surface[\s\S]*Inter Variable/)
 
   const main = read('main.tsx')
   expect(main).toMatch(/@fontsource-variable\/bricolage-grotesque/)
   expect(main).toMatch(/@fontsource-variable\/manrope/)
+  expect(main).toMatch(/@fontsource-variable\/inter/)
 })
 
 test('owner chrome is the Design 2 shell: dark sidebar and dark bottom tabs', () => {

@@ -4,6 +4,7 @@ export const DISCOVERY_HREF = '/salons'
 export const CREATE_SALON_HREF = CREATE_SALON_PATH
 export const HOME_HREF = '/'
 export const BOOKINGS_HREF = '/bookings'
+export const PROFILE_HREF = '/my-profile'
 export const RESET_PASSWORD_PATH = '/reset-password'
 export const DISCOVERY_BRAND_KEY = 'pitch.brand' as const
 export const GUEST_COLUMN_CLASS = 'mx-auto w-full max-w-[1200px] px-5 md:px-16'
@@ -30,11 +31,12 @@ export type TopNavBrand = { to: typeof HOME_HREF; brandKey: typeof DISCOVERY_BRA
 
 export type TopNavChrome =
   | { brand: TopNavBrand; slot: 'home-guest'; login: true; register: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'home-session'; personName: string | null; bookings: true; logout: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'discovery'; personName: string | null; bookings: true }
+  | { brand: TopNavBrand; slot: 'home-session'; personName: string | null; profile: true; bookings: true; logout: true; panel: PanelCta }
+  | { brand: TopNavBrand; slot: 'discovery'; personName: string | null; profile?: true; bookings: true }
   | { brand: TopNavBrand; slot: 'greeting'; personName: string }
   | { brand: TopNavBrand; slot: 'empty' }
   | { brand: TopNavBrand; slot: 'session'; personName: string | null; logout: true }
+  | { brand: TopNavBrand; slot: 'customer-session'; personName: string | null; profile: true; bookings: true; logout: true }
 
 const brand: TopNavBrand = { to: HOME_HREF, brandKey: DISCOVERY_BRAND_KEY }
 
@@ -58,6 +60,10 @@ export function isBookingsPath(path: string): boolean {
   return path === '/bookings'
 }
 
+export function isProfilePath(path: string): boolean {
+  return path === PROFILE_HREF || path === `${PROFILE_HREF}/settings`
+}
+
 export function isOwnerPath(path: string): boolean {
   return path === '/owner' || path.startsWith('/owner/')
 }
@@ -69,7 +75,10 @@ export function topNavSlot(path: string): TopNavSlot {
   if (isDiscoveryHomePath(path) || isSalonProfilePath(path)) {
     return 'discovery'
   }
-  if (isBookingsPath(path) || isOwnerPath(path)) {
+  if (isBookingsPath(path) || isProfilePath(path)) {
+    return 'session'
+  }
+  if (isOwnerPath(path)) {
     return 'session'
   }
   return 'empty'
@@ -94,16 +103,22 @@ export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
       brand,
       slot: 'home-session',
       personName,
+      profile: true,
       bookings: true,
       logout: true,
       panel,
     }
   }
   if (slot === 'discovery') {
-    return { brand, slot: 'discovery', personName, bookings: true }
+    return me == null
+      ? { brand, slot: 'discovery', personName, bookings: true }
+      : { brand, slot: 'discovery', personName, profile: true, bookings: true }
   }
   if (slot === 'session' && me != null) {
-    return { brand, slot: 'session', personName, logout: true }
+    if (isOwnerPath(path)) {
+      return { brand, slot: 'session', personName, logout: true }
+    }
+    return { brand, slot: 'customer-session', personName, profile: true, bookings: true, logout: true }
   }
   if ((isCreateSalonPath(path) || path === RESET_PASSWORD_PATH) && personName != null) {
     return { brand, slot: 'greeting', personName }

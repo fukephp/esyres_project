@@ -9,6 +9,7 @@ import { TopNav } from '../components/TopNav'
 import { ImageUploadModal } from '../components/ImageUploadModal'
 import { WorkerProfileRow } from '../components/WorkerProfileRow'
 import { Alert, Spinner } from '../components/ui'
+import { formatCivilDate } from '../lib/format'
 import { OwnerPageSkeleton, OwnerSalonEditSkeleton } from '../components/Skeleton'
 import {
   CREATE_SALON_SERVICE_CATEGORY_MUTATION,
@@ -734,6 +735,29 @@ export function OwnerSalonEdit() {
                       </button>
                     ) : null}
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-sm font-semibold text-ink">{t('owner.ratings')}</h2>
+                  {salon.ownerRatings.length === 0 ? (
+                    <p className="text-sm text-body">{t('owner.ratingsEmpty')}</p>
+                  ) : (
+                    <ul>
+                      {salon.ownerRatings.map((row) => (
+                        <li key={row.id} className="border-t border-hairline py-3 text-sm text-ink">
+                          <p className="font-semibold">{row.authorName}</p>
+                          <p>
+                            {row.score} · {formatCivilDate(row.day)}
+                          </p>
+                          {row.comment ? <p className="text-body">{row.comment}</p> : null}
+                          {row.replies.map((reply) => (
+                            <p key={reply.id} className="mt-1 text-body">
+                              {reply.authorName} {reply.body}
+                            </p>
+                          ))}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 {mediaError ? <Alert variant="error">{mediaError}</Alert> : null}
                 <ImageUploadModal

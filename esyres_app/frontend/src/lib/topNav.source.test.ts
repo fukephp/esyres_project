@@ -66,20 +66,20 @@ test('Odjava is the Design 2 destructive pill on both logged-in slots', () => {
   const logoutButtons = [
     ...nav.matchAll(/<button type="button" className=\{(\w+)\} onClick=\{\(\) => void logout\(\)\}>/g),
   ]
-  expect(logoutButtons).toHaveLength(2)
+  expect(logoutButtons).toHaveLength(3)
   for (const match of logoutButtons) {
     expect(match[1]).toBe('logoutClass')
   }
 
   const homeSession = nav.match(/chrome\.slot === 'home-session'[\s\S]*?(?=chrome\.slot === 'discovery')/)?.[0]
-  expect(homeSession).toMatch(/nav\.welcome[\s\S]*nav\.bookings[\s\S]*home\.logout[\s\S]*panelClass/)
+  expect(homeSession).toMatch(/nav\.welcome[\s\S]*nav\.profile[\s\S]*nav\.bookings[\s\S]*home\.logout[\s\S]*panelClass/)
   expect(homeSession).toMatch(/className=\{linkClass\}>\{t\('nav\.welcome', \{ name: chrome\.personName \}\)/)
   expect(homeSession).not.toMatch(/chrome\.displayName/)
   expect(homeSession).toMatch(/to=\{BOOKINGS_HREF\}[\s\S]*nav\.bookings/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onLogin\}>/)
   expect(nav).toMatch(/<button type="button" className=\{linkClass\} onClick=\{onRegister\}>/)
 
-  const discoverySlot = nav.match(/chrome\.slot === 'discovery'[\s\S]*?(?=chrome\.slot === 'session')/)?.[0]
+  const discoverySlot = nav.match(/chrome\.slot === 'discovery'[\s\S]*?(?=chrome\.slot === 'customer-session')/)?.[0]
   expect(discoverySlot).toMatch(/nav\.welcome[\s\S]*nav\.bookings/)
   expect(discoverySlot).not.toMatch(/logoutClass/)
   expect(discoverySlot).not.toMatch(/panelClass/)

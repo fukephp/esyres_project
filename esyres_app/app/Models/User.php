@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'phone', 'password'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'saved_place'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -64,6 +64,27 @@ class User extends Authenticatable implements MustVerifyEmail
         return strtoupper((string) ($this->owner_view ?? 'calendar'));
     }
 
+    public function savedPlaceName(): ?string
+    {
+        $name = $this->saved_place;
+
+        return is_string($name) && $name !== '' ? $name : null;
+    }
+
+    public function savedPlaceLat(): ?float
+    {
+        $point = \App\SavedPlace::point($this->savedPlaceName());
+
+        return $point[0] ?? null;
+    }
+
+    public function savedPlaceLng(): ?float
+    {
+        $point = \App\SavedPlace::point($this->savedPlaceName());
+
+        return $point[1] ?? null;
+    }
+
     /**
      * @return HasMany<Salon, $this>
      */
@@ -108,6 +129,14 @@ class User extends Authenticatable implements MustVerifyEmail
             ->map(fn (mixed $id): string => (string) $id)
             ->values()
             ->all();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Salon>
+     */
+    public function favoriteSalonList()
+    {
+        return $this->favoriteSalons()->orderBy('salons.name')->orderBy('salons.id')->get();
     }
 
     /**
