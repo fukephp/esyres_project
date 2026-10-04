@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { OwnerGate } from './components/OwnerGate'
 import {
   CardsSkeleton,
   FormSkeleton,
@@ -41,7 +42,11 @@ const OwnerPhoneBooking = lazy(() =>
 const OwnerZapisi = lazy(() => import('./pages/OwnerZapisi').then((m) => ({ default: m.OwnerZapisi })))
 
 function owner(page: ReactNode, preset: ReactNode) {
-  return <Suspense fallback={<OwnerPageSkeleton>{preset}</OwnerPageSkeleton>}>{page}</Suspense>
+  return (
+    <OwnerGate>
+      <Suspense fallback={<OwnerPageSkeleton>{preset}</OwnerPageSkeleton>}>{page}</Suspense>
+    </OwnerGate>
+  )
 }
 
 function customer(page: ReactNode) {

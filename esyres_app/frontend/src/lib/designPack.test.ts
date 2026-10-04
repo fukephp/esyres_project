@@ -85,7 +85,6 @@ test('owner chrome is the Design 2 shell: dark sidebar and dark bottom tabs', ()
   ]) {
     const text = read(file)
     expect(text, file).toMatch(/bg-canvas/)
-    expect(text, file).toMatch(/text-ink/)
     expect(text, file).toMatch(/<OwnerShell/)
   }
 

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekHeader } from '../components/OwnerBoards'
@@ -11,7 +11,6 @@ import { KanbanSkeleton, OwnerPageSkeleton, RowsSkeleton } from '../components/S
 import { ME_QUERY, UPDATE_KANBAN_COLUMNS_MUTATION, type MeData } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { SALON_DAY_BOOKINGS_QUERY, type SalonDayBookingsData } from '../graphql/pending'
-import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
@@ -111,18 +110,7 @@ export function OwnerZapisi() {
   }
 
   if (salon === null) {
-    return (
-      <>
-        <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.zapisi')}</h1>
-          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-          <Link to={CREATE_SALON_PATH} className="mt-4 inline-block text-sm font-semibold text-ink">
-            {t('owner.createSalon')}
-          </Link>
-        </main>
-      </>
-    )
+    return null
   }
 
   const chips: { id: ZapisiOrigin | null; label: string }[] = [

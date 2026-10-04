@@ -111,15 +111,7 @@ export function OwnerChats() {
   }
 
   if (salon === null) {
-    return (
-      <>
-        <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.chat')}</h1>
-          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-        </main>
-      </>
-    )
+    return null
   }
 
   const rows = listData?.inFlightIntakes ?? []

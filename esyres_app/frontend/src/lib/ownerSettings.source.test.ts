@@ -32,10 +32,9 @@ test('settings sits in OwnerShell like the catalog', () => {
   expect(page).not.toMatch(/allowRegister/)
   expect(page).toMatch(/data\?\.me == null[\s\S]*<AuthShell place="panel"/)
   expect(page).toMatch(/emailVerified[\s\S]*auth\.placePanel[\s\S]*EmailVerifyPanel/)
-  expect(page).toMatch(/owner\.notOwner/)
-  expect(page).toMatch(/CREATE_SALON_PATH/)
-  expect(page).toMatch(/owner\.createSalon/)
-  expect(page).toMatch(/owner\.title/)
+  expect(page).not.toMatch(/owner\.notOwner/)
+  expect(page).not.toMatch(/CREATE_SALON_PATH/)
+  expect(page).not.toMatch(/owner\.createSalon/)
 })
 
 test('Prikaz toggle saves CALENDAR or KANBAN on the account above the password card', () => {
