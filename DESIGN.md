@@ -31,6 +31,10 @@ Cool gray page, white cards, Inter, black primary pills. One blue, used for star
 - Card radius 20px
 - Shadow `0 8px 30px rgba(20,24,31,0.06)`
 
+Affordance: every link and enabled button shows a pointer cursor. Non-primary buttons are pills with a `line` border; primary is the black pill; icon buttons are 36px bordered circles. Status reads as small neutral chips (no owner pastels).
+
+Profile layout (`/my-profile`): one full-width header card (initials circle, name, saved place, counts, gear icon top-right), then `md+` two columns (left ~2/3 feed, right ~1/3 side cards). Postavke opens as a right Aside. `/bookings`: Na čekanju, then two highlight cards (Zadnje potvrđeno / Zadnje odbijeno), then a compact Historija list.
+
 ## Which file to read
 
 - Customer route UI → this file’s customer card section, then `docs/mvp/04-UI-Design-Goals.md` and `.cursor/rules/frontend/` (sparse customer).

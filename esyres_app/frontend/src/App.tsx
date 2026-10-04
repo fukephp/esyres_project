@@ -18,7 +18,6 @@ import { DiscoveryHome } from './pages/DiscoveryHome'
 import { Homepage } from './pages/Homepage'
 import { MyBookings } from './pages/MyBookings'
 import { MyProfile } from './pages/MyProfile'
-import { CustomerSettings } from './pages/CustomerSettings'
 import { ResetPassword } from './pages/ResetPassword'
 import { SalonProfile } from './pages/SalonProfile'
 
@@ -59,7 +58,7 @@ export default function App() {
         <Route path="/salon/:id" element={customer(<SalonProfile />)} />
         <Route path="/bookings" element={customer(<MyBookings />)} />
         <Route path="/my-profile" element={customer(<MyProfile />)} />
-        <Route path="/my-profile/settings" element={customer(<CustomerSettings />)} />
+        <Route path="/my-profile/settings" element={customer(<MyProfile />)} />
         <Route path={RESET_PASSWORD_PATH} element={<ResetPassword />} />
         <Route path="/owner" element={owner(<OwnerHome />, <OwnerWeekSkeleton />)} />
         <Route path="/owner/chats" element={owner(<OwnerChats />, <RowsSkeleton count={4} />)} />

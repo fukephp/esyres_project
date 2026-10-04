@@ -31,12 +31,12 @@ export type TopNavBrand = { to: typeof HOME_HREF; brandKey: typeof DISCOVERY_BRA
 
 export type TopNavChrome =
   | { brand: TopNavBrand; slot: 'home-guest'; login: true; register: true; panel: PanelCta }
-  | { brand: TopNavBrand; slot: 'home-session'; personName: string | null; profile: true; bookings: true; logout: true; panel: PanelCta }
+  | { brand: TopNavBrand; slot: 'home-session'; personName: string | null; profile?: true; bookings: true; logout: true; panel: PanelCta }
   | { brand: TopNavBrand; slot: 'discovery'; personName: string | null; profile?: true; bookings: true }
   | { brand: TopNavBrand; slot: 'greeting'; personName: string }
   | { brand: TopNavBrand; slot: 'empty' }
   | { brand: TopNavBrand; slot: 'session'; personName: string | null; logout: true }
-  | { brand: TopNavBrand; slot: 'customer-session'; personName: string | null; profile: true; bookings: true; logout: true }
+  | { brand: TopNavBrand; slot: 'customer-session'; personName: string | null; profile?: true; bookings: true; logout: true }
 
 const brand: TopNavBrand = { to: HOME_HREF, brandKey: DISCOVERY_BRAND_KEY }
 
@@ -91,11 +91,20 @@ export function homepagePersonName(
   return name !== '' ? name : null
 }
 
+export function isOwnerMe(me: { salons?: unknown[] } | null | undefined): boolean {
+  return (me?.salons?.length ?? 0) > 0
+}
+
+export function afterHomepageAuthHref(me: { salons?: unknown[] } | null | undefined): string {
+  return isOwnerMe(me) ? '/owner' : PROFILE_HREF
+}
+
 export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
   const slot = topNavSlot(path)
   const personName = homepagePersonName(me)
+  const profile = me != null && !isOwnerMe(me) ? { profile: true as const } : {}
   if (slot === 'home') {
-    const panel = ownerPanelCta((me?.salons?.length ?? 0) > 0)
+    const panel = ownerPanelCta(isOwnerMe(me))
     if (me == null) {
       return { brand, slot: 'home-guest', login: true, register: true, panel }
     }
@@ -103,22 +112,20 @@ export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
       brand,
       slot: 'home-session',
       personName,
-      profile: true,
+      ...profile,
       bookings: true,
       logout: true,
       panel,
     }
   }
   if (slot === 'discovery') {
-    return me == null
-      ? { brand, slot: 'discovery', personName, bookings: true }
-      : { brand, slot: 'discovery', personName, profile: true, bookings: true }
+    return { brand, slot: 'discovery', personName, ...profile, bookings: true }
   }
   if (slot === 'session' && me != null) {
     if (isOwnerPath(path)) {
       return { brand, slot: 'session', personName, logout: true }
     }
-    return { brand, slot: 'customer-session', personName, profile: true, bookings: true, logout: true }
+    return { brand, slot: 'customer-session', personName, ...profile, bookings: true, logout: true }
   }
   if ((isCreateSalonPath(path) || path === RESET_PASSWORD_PATH) && personName != null) {
     return { brand, slot: 'greeting', personName }

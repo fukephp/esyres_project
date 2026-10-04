@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
@@ -25,12 +25,23 @@ import {
   cancelChrome,
   cancelErrorKey,
   graphqlErrorCode,
+  groupMyBookings,
   rescheduleChrome,
   rescheduleErrorKey,
   respondErrorKey,
 } from '../lib/booking'
+import {
+  CUSTOMER_CARD,
+  CUSTOMER_CHIP,
+  CUSTOMER_ICON_BUTTON,
+  CUSTOMER_LINK,
+  CUSTOMER_SMALL_BUTTON,
+  CUSTOMER_SMALL_PRIMARY,
+} from '../lib/customerUi'
 import { formatCivilDate } from '../lib/format'
 import { GUEST_COLUMN_CLASS } from '../lib/homepage'
+
+const SECTION_TITLE_CLASS = 'text-base font-semibold text-ink'
 import { useCustomerPush } from '../lib/push'
 
 type Expand = { id: string; mode: 'reject' | 'ask' | 'reschedule' | 'cancel' } | null
@@ -52,6 +63,9 @@ function VerifyBanner() {
 
 function BookingRow({
   row,
+  className,
+  label,
+  headless = false,
   expand,
   askDate,
   askTime,
@@ -70,6 +84,9 @@ function BookingRow({
   onAskTime,
 }: {
   row: MyBooking
+  className?: string
+  label?: string
+  headless?: boolean
   expand: Expand
   askDate: string
   askTime: string
@@ -107,10 +124,17 @@ function BookingRow({
   const cancelOpen = open && expand.mode === 'cancel'
 
   return (
-    <li className="rounded-lg border border-hairline px-4 py-3">
-      <p className="text-sm font-semibold text-muted">{t(`bookings.status.${bookingStatusKey(row.status)}`)}</p>
-      <p className="mt-1 font-semibold text-ink">{row.salon.name}</p>
-      <p className="mt-1 text-sm text-ink">
+    <div className={className}>
+      {label ? <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">{label}</p> : null}
+      {headless ? null : (
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <Link to={`/salon/${row.salon.id}`} className={`text-base ${CUSTOMER_LINK}`}>
+            {row.salon.name}
+          </Link>
+          <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+        </div>
+      )}
+      <p className="text-sm text-ink">
         {formatCivilDate(row.status === 'TIME_PROPOSED' && row.proposedDate !== null ? row.proposedDate : row.preferredDate)}
         {' '}
         {row.status === 'TIME_PROPOSED' && row.proposedStartsAtLabel !== null
@@ -135,7 +159,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onRescheduleOpen}
-              className="text-sm font-medium text-ink underline disabled:opacity-40"
+              className={CUSTOMER_SMALL_BUTTON}
             >
               {row.rescheduleDate !== null && row.rescheduleStartsAtLabel !== null
                 ? `${formatCivilDate(row.rescheduleDate)} ${row.rescheduleStartsAtLabel}`
@@ -150,7 +174,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onRescheduleOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className={CUSTOMER_SMALL_BUTTON}
           >
             {t('bookings.reschedule')}
           </button>
@@ -159,7 +183,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onCancelOpen}
-              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+              className={CUSTOMER_SMALL_BUTTON}
             >
               {t('bookings.cancelBooking')}
             </button>
@@ -172,7 +196,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onCancelOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className={CUSTOMER_SMALL_BUTTON}
           >
             {t('bookings.cancelBooking')}
           </button>
@@ -184,7 +208,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onConfirm}
-            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className={CUSTOMER_SMALL_PRIMARY}
           >
             {busy ? <Spinner /> : null}
             {t('bookings.confirm')}
@@ -193,7 +217,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onRejectOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className={CUSTOMER_SMALL_BUTTON}
           >
             {t('bookings.reject')}
           </button>
@@ -201,7 +225,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onAskOpen}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className={CUSTOMER_SMALL_BUTTON}
           >
             {t('bookings.ask')}
           </button>
@@ -213,7 +237,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onRejectConfirm}
-            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+            className={CUSTOMER_SMALL_PRIMARY}
           >
             {busy ? <Spinner /> : null}
             {t('bookings.rejectConfirm')}
@@ -222,7 +246,7 @@ function BookingRow({
             type="button"
             disabled={busy}
             onClick={onCancel}
-            className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className={CUSTOMER_SMALL_BUTTON}
           >
             {t('bookings.cancel')}
           </button>
@@ -237,7 +261,7 @@ function BookingRow({
               value={askDate}
               disabled={busy}
               onChange={(e) => onAskDate(e.target.value)}
-              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="mt-1 w-full rounded-full border border-[#c9d1d8] bg-canvas px-4 py-2 text-ink"
             />
           </label>
           <label className="block text-sm text-body">
@@ -249,7 +273,7 @@ function BookingRow({
               value={askTime}
               disabled={busy}
               onChange={(e) => onAskTime(e.target.value)}
-              className="mt-1 w-full border border-hairline bg-canvas px-3 py-2 text-ink"
+              className="mt-1 w-full rounded-full border border-[#c9d1d8] bg-canvas px-4 py-2 text-ink"
             />
           </label>
           <div className="flex flex-wrap gap-2">
@@ -257,7 +281,7 @@ function BookingRow({
               type="button"
               disabled={busy || askDate === '' || askTime === ''}
               onClick={onAskSend}
-              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+              className={CUSTOMER_SMALL_PRIMARY}
             >
               {busy ? <Spinner /> : null}
               {t('bookings.askSend')}
@@ -266,7 +290,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onCancel}
-              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+              className={CUSTOMER_SMALL_BUTTON}
             >
               {t('bookings.cancel')}
             </button>
@@ -281,7 +305,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onCancelConfirm}
-              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-sm font-medium text-canvas disabled:opacity-40"
+              className={CUSTOMER_SMALL_PRIMARY}
             >
               {busy ? <Spinner /> : null}
               {t('bookings.cancelConfirm')}
@@ -290,7 +314,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onCancel}
-              className="rounded-full border border-hairline px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+              className={CUSTOMER_SMALL_BUTTON}
             >
               {t('bookings.cancel')}
             </button>
@@ -298,7 +322,7 @@ function BookingRow({
         </div>
       ) : null}
       {error ? <Alert variant="error" className="mt-2">{error}</Alert> : null}
-    </li>
+    </div>
   )
 }
 
@@ -320,6 +344,7 @@ export function MyBookings() {
   const [askTime, setAskTime] = useState('')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [historyOpen, setHistoryOpen] = useState<string | null>(null)
 
   function onExpand(next: Expand) {
     setExpand(next)
@@ -387,6 +412,7 @@ export function MyBookings() {
   }
 
   const rows = list?.myBookings ?? []
+  const groups = groupMyBookings(rows)
 
   return (
     <>
@@ -410,45 +436,140 @@ export function MyBookings() {
       {listLoading ? (
         <CardsSkeleton className="mt-8" />
       ) : rows.length === 0 ? (
-        <p className="mt-8 text-sm text-body">{t('bookings.empty')}</p>
+        <p className={`mt-8 ${CUSTOMER_CARD} text-sm text-body`}>{t('bookings.empty')}</p>
       ) : (
-        <ul className="mt-8 space-y-3">
-          {rows.map((row) => (
-            <BookingRow
-              key={row.id}
-              row={row}
-              expand={expand}
-              askDate={askDate}
-              askTime={askTime}
-              busy={busyId === row.id}
-              error={errors[row.id]}
-              onConfirm={() => void run(row.id, () => confirmProposed({ variables: { bookingId: row.id } }))}
-              onRejectOpen={() => onExpand({ id: row.id, mode: 'reject' })}
-              onAskOpen={() => onExpand({ id: row.id, mode: 'ask' })}
-              onRescheduleOpen={() => onExpand({ id: row.id, mode: 'reschedule' })}
-              onCancelOpen={() => onExpand({ id: row.id, mode: 'cancel' })}
-              onRejectConfirm={() => void run(row.id, () => rejectProposed({ variables: { bookingId: row.id } }))}
-              onAskSend={() =>
-                void run(row.id, () => {
-                  const variables = {
-                    bookingId: row.id,
-                    preferredDate: askDate,
-                    preferredTime: askTime.slice(0, 5),
-                  }
-                  return expand?.mode === 'reschedule'
-                    ? requestReschedule({ variables })
-                    : askOther({ variables })
-                })
-              }
-              onCancelConfirm={() => void run(row.id, () => cancelBooking({ variables: { bookingId: row.id } }))}
-              onCancel={() => onExpand(null)}
-              onAskDate={setAskDate}
-              onAskTime={setAskTime}
-            />
-          ))}
-        </ul>
+        <div className="mt-8 grid items-start gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:grid-rows-[auto_1fr]">
+          <section className="md:col-start-1 md:row-start-1">
+            <h2 className={SECTION_TITLE_CLASS}>{t('bookings.onHold')}</h2>
+            {groups.onHold.length === 0 ? (
+              <p className={`mt-3 ${CUSTOMER_CARD} text-sm text-body`}>{t('bookings.onHoldEmpty')}</p>
+            ) : (
+              <ul className="mt-3 grid gap-3">
+                {groups.onHold.map((row) => (
+                  <li key={row.id}>{renderRow(row, { className: CUSTOMER_CARD })}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+          {groups.lastConfirmed !== null || groups.lastDeclined !== null ? (
+            <div className="grid gap-3 md:col-start-2 md:row-span-2 md:row-start-1 md:pt-9">
+              {groups.lastConfirmed !== null
+                ? renderRow(groups.lastConfirmed, { className: CUSTOMER_CARD, label: t('bookings.lastConfirmed') })
+                : null}
+              {groups.lastDeclined !== null
+                ? renderRow(groups.lastDeclined, { className: CUSTOMER_CARD, label: t('bookings.lastDeclined') })
+                : null}
+            </div>
+          ) : null}
+          {groups.history.length > 0 ? (
+            <section className="md:col-start-1 md:row-start-2">
+              <h2 className={SECTION_TITLE_CLASS}>{t('bookings.history')}</h2>
+              <ul className={`mt-3 ${CUSTOMER_CARD} py-1 md:py-1`}>
+                {groups.history.map((row) => (
+                  <HistoryRow
+                    key={row.id}
+                    row={row}
+                    open={historyOpen === row.id}
+                    onToggle={() => {
+                      setHistoryOpen((current) => (current === row.id ? null : row.id))
+                      onExpand(null)
+                    }}
+                  >
+                    {renderRow(row, { className: 'pb-4', headless: true })}
+                  </HistoryRow>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+        </div>
       )}
       </main>
     </>
+  )
+
+  function renderRow(row: MyBooking, extra: { className?: string; label?: string; headless?: boolean }) {
+    return (
+      <BookingRow
+        key={row.id}
+        row={row}
+        {...extra}
+        expand={expand}
+        askDate={askDate}
+        askTime={askTime}
+        busy={busyId === row.id}
+        error={errors[row.id]}
+        onConfirm={() => void run(row.id, () => confirmProposed({ variables: { bookingId: row.id } }))}
+        onRejectOpen={() => onExpand({ id: row.id, mode: 'reject' })}
+        onAskOpen={() => onExpand({ id: row.id, mode: 'ask' })}
+        onRescheduleOpen={() => onExpand({ id: row.id, mode: 'reschedule' })}
+        onCancelOpen={() => onExpand({ id: row.id, mode: 'cancel' })}
+        onRejectConfirm={() => void run(row.id, () => rejectProposed({ variables: { bookingId: row.id } }))}
+        onAskSend={() =>
+          void run(row.id, () => {
+            const variables = {
+              bookingId: row.id,
+              preferredDate: askDate,
+              preferredTime: askTime.slice(0, 5),
+            }
+            return expand?.mode === 'reschedule'
+              ? requestReschedule({ variables })
+              : askOther({ variables })
+          })
+        }
+        onCancelConfirm={() => void run(row.id, () => cancelBooking({ variables: { bookingId: row.id } }))}
+        onCancel={() => onExpand(null)}
+        onAskDate={setAskDate}
+        onAskTime={setAskTime}
+      />
+    )
+  }
+}
+
+function HistoryRow({
+  row,
+  open,
+  onToggle,
+  children,
+}: {
+  row: MyBooking
+  open: boolean
+  onToggle: () => void
+  children: ReactNode
+}) {
+  const { t } = useTranslation()
+  return (
+    <li className="border-t border-hairline first:border-t-0">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className="flex w-full items-center gap-3 py-3 text-left"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-semibold text-ink">{row.salon.name}</span>
+          <span className="mt-0.5 block truncate text-sm text-muted">
+            {formatCivilDate(row.preferredDate)} {row.preferredStartsAtLabel ?? t('owner.noTime')}
+            {' · '}
+            {row.services.map((s) => s.name).join(', ')}
+          </span>
+        </span>
+        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+        <span className={`${CUSTOMER_ICON_BUTTON} size-8`} aria-hidden>
+          <svg
+            viewBox="0 0 24 24"
+            className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </span>
+        <span className="sr-only">{t('bookings.details')}</span>
+      </button>
+      {open ? children : null}
+    </li>
   )
 }

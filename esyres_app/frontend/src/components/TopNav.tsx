@@ -54,9 +54,11 @@ export function TopNav({
                 {chrome.personName ? (
                   <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
                 ) : null}
-                <Link to={PROFILE_HREF} className={linkClass}>
-                  {t('nav.profile')}
-                </Link>
+                {chrome.profile ? (
+                  <Link to={PROFILE_HREF} className={linkClass}>
+                    {t('nav.profile')}
+                  </Link>
+                ) : null}
                 <Link to={BOOKINGS_HREF} className={linkClass}>
                   {t('nav.bookings')}
                 </Link>
@@ -88,9 +90,11 @@ export function TopNav({
                 {chrome.personName ? (
                   <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
                 ) : null}
-                <Link to={PROFILE_HREF} className={linkClass}>
-                  {t('nav.profile')}
-                </Link>
+                {chrome.profile ? (
+                  <Link to={PROFILE_HREF} className={linkClass}>
+                    {t('nav.profile')}
+                  </Link>
+                ) : null}
                 <Link to={BOOKINGS_HREF} className={linkClass}>
                   {t('nav.bookings')}
                 </Link>

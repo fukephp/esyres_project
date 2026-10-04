@@ -3,6 +3,13 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import type { MeData } from '../graphql/auth'
+import {
+  CUSTOMER_CARD,
+  CUSTOMER_CARD_TITLE,
+  CUSTOMER_LINK,
+  CUSTOMER_SMALL_BUTTON,
+  CUSTOMER_SMALL_PRIMARY,
+} from '../lib/customerUi'
 import { formatCivilDate } from '../lib/format'
 
 const RATINGS_QUERY = gql`
@@ -135,7 +142,7 @@ export function SalonRatingBlock({
             onChange={(event) => setComment(event.target.value)}
             className="mt-3 w-full rounded-2xl border border-hairline bg-canvas px-3 py-2 text-sm text-ink"
           />
-          <button type="submit" disabled={loading} className="mt-3 text-sm font-semibold text-ink">
+          <button type="submit" disabled={loading} className={`mt-3 ${CUSTOMER_SMALL_PRIMARY}`}>
             {t('salon.rate')}
           </button>
         </form>
@@ -177,7 +184,7 @@ export function SalonRatingBlock({
                     onChange={(event) => setReplyBody(event.target.value)}
                     className="w-full rounded-full border border-hairline bg-canvas px-3 py-2 text-sm"
                   />
-                  <button type="submit" className="mt-2 text-sm font-semibold">
+                  <button type="submit" className={`mt-2 ${CUSTOMER_SMALL_BUTTON}`}>
                     {t('salon.reply')}
                   </button>
                 </form>
@@ -197,19 +204,24 @@ export function MyRatingsList({
 }) {
   const { t } = useTranslation()
   return (
-    <section className="mt-8">
-      <h2 className="text-sm font-semibold text-ink">{t('profile.ratings')}</h2>
+    <section className={CUSTOMER_CARD}>
+      <h2 className={`${CUSTOMER_CARD_TITLE} border-b border-hairline pb-3`}>{t('profile.ratings')}</h2>
       {rows.length === 0 ? (
-        <p className="mt-3 text-sm text-body">{t('profile.ratingsEmpty')}</p>
+        <p className="pt-3 text-sm text-body">{t('profile.ratingsEmpty')}</p>
       ) : (
-        <ul className="mt-3">
+        <ul className="pt-3">
           {rows.map((row) => (
-            <li key={row.id} className="border-t border-hairline py-3 text-sm text-ink">
-              <Link to={`/salon/${row.salon.id}`} className="font-semibold">
-                {row.salon.name}
-              </Link>
-              <p>{row.score}</p>
-              {row.comment ? <p className="text-body">{row.comment}</p> : null}
+            <li key={row.id} className="border-t border-hairline py-3 text-sm text-ink first:border-t-0 first:pt-0">
+              <div className="flex items-center justify-between gap-4">
+                <Link to={`/salon/${row.salon.id}`} className={CUSTOMER_LINK}>
+                  {row.salon.name}
+                </Link>
+                <span className="shrink-0">
+                  <span className="sr-only">{row.score}</span>
+                  <Stars filled={row.score} />
+                </span>
+              </div>
+              {row.comment ? <p className="mt-1 text-body">{row.comment}</p> : null}
             </li>
           ))}
         </ul>

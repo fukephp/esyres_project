@@ -7,6 +7,7 @@ import {
   GUEST_COLUMN_CLASS,
   HOME_HREF,
   PLACE_HEADING_CLASS,
+  afterHomepageAuthHref,
   discoveryBrandLink,
   homepageChrome,
   homepagePersonName,
@@ -14,6 +15,7 @@ import {
   isCreateSalonPath,
   isDiscoveryHomePath,
   isHomepagePath,
+  isOwnerMe,
   isOwnerPath,
   isSalonProfilePath,
   nextHomepageAuth,
@@ -27,6 +29,15 @@ test('GUEST_COLUMN_CLASS is the Design 1 1200px inner', () => {
 
 test('PLACE_HEADING_CLASS is the 28px display h1', () => {
   expect(PLACE_HEADING_CLASS).toBe('font-display text-[28px] font-semibold tracking-tight text-ink')
+})
+
+test('an owner owns a salon and lands on /owner after homepage auth; a customer lands on /my-profile', () => {
+  expect(isOwnerMe(null)).toBe(false)
+  expect(isOwnerMe({ salons: [] })).toBe(false)
+  expect(isOwnerMe({ salons: [{ id: '1' }] })).toBe(true)
+  expect(afterHomepageAuthHref({ salons: [{ id: '1' }] })).toBe('/owner')
+  expect(afterHomepageAuthHref({ salons: [] })).toBe('/my-profile')
+  expect(afterHomepageAuthHref(null)).toBe('/my-profile')
 })
 
 test('nextHomepageAuth toggles the already-open mode closed', () => {
@@ -167,7 +178,6 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'home-session',
     personName: 'Ana',
-    profile: true,
     bookings: true,
     logout: true,
     panel: { href: '/owner', kind: 'panel' },
@@ -185,9 +195,9 @@ test('topNavChrome brand is always home; slots match path + me', () => {
     brand,
     slot: 'discovery',
     personName: 'Ana',
-    profile: true,
     bookings: true,
   })
+  expect(topNavChrome('/my-profile', owner)).not.toHaveProperty('profile')
   expect(topNavChrome('/salons', nameless)).toEqual({
     brand,
     slot: 'discovery',

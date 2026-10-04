@@ -52,7 +52,11 @@ html {
 @layer base {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
-  a[href] {
+  a[href],
+  summary,
+  select:not(:disabled),
+  label:has(> input[type="radio"]:not(:disabled)),
+  label:has(> input[type="checkbox"]:not(:disabled)) {
     cursor: pointer;
   }
 }
