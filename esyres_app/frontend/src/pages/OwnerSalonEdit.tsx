@@ -49,7 +49,7 @@ const SAVE_BTN =
 const PLUS_BTN =
   'inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]'
 const REMOVE_BTN =
-  'inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink'
+  'inline-flex h-10 shrink-0 items-center gap-2 rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink disabled:opacity-40'
 const THUMB = 'h-24 w-24 border border-hairline object-cover'
 const FILE_ACCEPT = 'image/jpeg,image/png,image/webp'
 const CHIP_IDLE = 'rounded-full bg-surface-card px-4 py-2 text-body'
@@ -344,13 +344,13 @@ export function OwnerSalonEdit() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [updateSalon, { loading: savingSalon }] = useMutation(UPDATE_SALON_MUTATION)
   const [updateSalonHours, { loading: savingHours }] = useMutation(UPDATE_SALON_HOURS_MUTATION)
-  const [removeSalonMainImage] = useMutation(REMOVE_SALON_MAIN_IMAGE_MUTATION)
-  const [removeSalonGalleryImage] = useMutation(REMOVE_SALON_GALLERY_IMAGE_MUTATION)
-  const [createSalonServiceCategory] = useMutation<{
+  const [removeSalonMainImage, { loading: removingMain }] = useMutation(REMOVE_SALON_MAIN_IMAGE_MUTATION)
+  const [removeSalonGalleryImage, { loading: removingGallery }] = useMutation(REMOVE_SALON_GALLERY_IMAGE_MUTATION)
+  const [createSalonServiceCategory, { loading: addingCategory }] = useMutation<{
     createSalonServiceCategory: { id: string; name: string }
   }>(CREATE_SALON_SERVICE_CATEGORY_MUTATION)
-  const [updateSalonServiceCategory] = useMutation(UPDATE_SALON_SERVICE_CATEGORY_MUTATION)
-  const [deleteSalonServiceCategory] = useMutation(DELETE_SALON_SERVICE_CATEGORY_MUTATION)
+  const [updateSalonServiceCategory, { loading: renamingCategory }] = useMutation(UPDATE_SALON_SERVICE_CATEGORY_MUTATION)
+  const [deleteSalonServiceCategory, { loading: deletingCategory }] = useMutation(DELETE_SALON_SERVICE_CATEGORY_MUTATION)
   const [section, setSection] = useState<SalonEditSection>('info')
   const [openWeekday, setOpenWeekday] = useState<string | null>(null)
   const [openWorkerId, setOpenWorkerId] = useState<string | null>(null)
@@ -682,7 +682,8 @@ export function OwnerSalonEdit() {
                   {salon.mainImageUrl ? (
                     <div className="flex items-center gap-3">
                       <img src={salon.mainImageUrl} alt="" className={THUMB} />
-                      <button type="button" className={REMOVE_BTN} onClick={() => void onRemoveMain()}>
+                      <button type="button" disabled={removingMain} className={REMOVE_BTN} onClick={() => void onRemoveMain()}>
+                        {removingMain ? <Spinner /> : null}
                         {t('owner.removeImage')}
                       </button>
                     </div>
@@ -705,9 +706,11 @@ export function OwnerSalonEdit() {
                         <img src={url} alt="" className={THUMB} />
                         <button
                           type="button"
+                          disabled={removingGallery}
                           className={REMOVE_BTN}
                           onClick={() => void onRemoveGallery(index)}
                         >
+                          {removingGallery ? <Spinner /> : null}
                           {t('owner.removeImage')}
                         </button>
                       </div>
@@ -935,16 +938,19 @@ export function OwnerSalonEdit() {
                           className={FIELD}
                         />
                       </label>
-                      <button type="submit" className={SAVE_BTN}>
+                      <button type="submit" disabled={renamingCategory} className={SAVE_BTN}>
+                        {renamingCategory ? <Spinner /> : null}
                         {t('owner.save')}
                       </button>
                     </form>
                     {selectedCategory.services.length === 0 ? (
                       <button
                         type="button"
+                        disabled={deletingCategory}
                         className={SAVE_BTN}
                         onClick={() => void onDeleteCategory()}
                       >
+                        {deletingCategory ? <Spinner /> : null}
                         {t('owner.deleteCategory')}
                       </button>
                     ) : null}
@@ -983,7 +989,8 @@ export function OwnerSalonEdit() {
                       className={FIELD}
                     />
                   </label>
-                  <button type="submit" className={SAVE_BTN}>
+                  <button type="submit" disabled={addingCategory} className={SAVE_BTN}>
+                    {addingCategory ? <Spinner /> : null}
                     {t('owner.addCategory')}
                   </button>
                 </form>

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
 import { formatPickerDayNumeric } from '../lib/salonHours'
-import { Alert } from './ui'
+import { Alert, Spinner } from './ui'
 import {
   STATUS_CARD_CLASS,
   currentJobLabel,
@@ -207,11 +207,13 @@ export function KanbanColumnToggles({
   showInProgress,
   showFinished,
   error,
+  busy = false,
   onChange,
 }: {
   showInProgress: boolean
   showFinished: boolean
   error: string | null
+  busy?: boolean
   onChange: (showInProgress: boolean, showFinished: boolean) => void
 }) {
   const { t } = useTranslation()
@@ -221,6 +223,7 @@ export function KanbanColumnToggles({
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
+          disabled={busy}
           checked={showInProgress}
           onChange={() => onChange(!showInProgress, showFinished)}
         />
@@ -229,11 +232,13 @@ export function KanbanColumnToggles({
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
+          disabled={busy}
           checked={showFinished}
           onChange={() => onChange(showInProgress, !showFinished)}
         />
         {t('owner.kanban.done')}
       </label>
+      {busy ? <Spinner /> : null}
       {error !== null ? <Alert variant="error">{error}</Alert> : null}
     </div>
   )

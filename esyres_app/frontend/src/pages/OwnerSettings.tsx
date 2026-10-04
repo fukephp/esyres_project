@@ -26,7 +26,7 @@ export function OwnerSettings() {
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [changePassword, { loading: saving }] = useMutation(CHANGE_PASSWORD_MUTATION)
   const [updateOwnerView, { loading: savingView }] = useMutation(UPDATE_OWNER_VIEW_MUTATION)
-  const [updateChatEnabled] = useMutation(UPDATE_CHAT_ENABLED_MUTATION)
+  const [updateChatEnabled, { loading: savingChat }] = useMutation(UPDATE_CHAT_ENABLED_MUTATION)
   const [viewError, setViewError] = useState(false)
   const [chatError, setChatError] = useState(false)
   const [current, setCurrent] = useState('')
@@ -162,10 +162,11 @@ export function OwnerSettings() {
                     onClick={() => void chooseView(view)}
                     className={
                       on
-                        ? 'h-10 rounded-full bg-ink px-5 text-sm font-semibold text-canvas'
-                        : 'h-10 rounded-full px-5 text-sm text-body disabled:opacity-40'
+                        ? 'inline-flex h-10 items-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-canvas'
+                        : 'inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm text-body disabled:opacity-40'
                     }
                   >
+                    {savingView && !on ? <Spinner /> : null}
                     {t(view === 'CALENDAR' ? 'owner.viewCalendar' : 'owner.viewKanban')}
                   </button>
                 )
@@ -177,9 +178,11 @@ export function OwnerSettings() {
               <input
                 type="checkbox"
                 role="switch"
+                disabled={savingChat}
                 checked={data.me?.chatEnabled === true}
                 onChange={() => void chooseChat(data.me?.chatEnabled !== true)}
               />
+              {savingChat ? <Spinner /> : null}
               {t('owner.chat')}
             </label>
             {chatError ? <Alert variant="error">{t('owner.chatError')}</Alert> : null}

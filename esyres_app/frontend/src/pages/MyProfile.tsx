@@ -1,11 +1,12 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Aside } from '../components/Aside'
 import { AuthShell } from '../components/AuthShell'
 import { TopNav } from '../components/TopNav'
 import { CardsSkeleton, GuestPageSkeleton } from '../components/Skeleton'
+import { Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import { UNSAVE_FAVORITE } from '../graphql/favorites'
 import { MY_BOOKINGS_QUERY, type MyBooking, type MyBookingsData } from '../graphql/booking'
@@ -135,6 +136,7 @@ export function MyProfile() {
   const settingsOpen = useLocation().pathname === SETTINGS_HREF
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const [unsaveFavorite] = useMutation(UNSAVE_FAVORITE)
+  const [unsavingId, setUnsavingId] = useState<string | null>(null)
   const customer = data?.me != null && !isOwnerMe(data.me)
   const list = useQuery<MyBookingsData>(MY_BOOKINGS_QUERY, { skip: !customer })
   const suggested = useQuery<SuggestedSalonsData>(SUGGESTED_SALONS_QUERY, {
@@ -255,11 +257,19 @@ export function MyProfile() {
                       <button
                         type="button"
                         title={t('profile.remove')}
+                        disabled={unsavingId !== null}
                         className={CUSTOMER_SMALL_BUTTON}
                         onClick={() => {
-                          void unsaveFavorite({ variables: { salonId: salon.id } }).then(() => refetch())
+                          if (unsavingId !== null) {
+                            return
+                          }
+                          setUnsavingId(salon.id)
+                          void unsaveFavorite({ variables: { salonId: salon.id } })
+                            .then(() => refetch())
+                            .finally(() => setUnsavingId(null))
                         }}
                       >
+                        {unsavingId === salon.id ? <Spinner /> : null}
                         {t('salon.saved')}
                       </button>
                     </li>

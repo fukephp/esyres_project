@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Spinner } from './ui'
 import { ME_QUERY, REQUEST_PHONE_OTP, VERIFY_PHONE_OTP, type MeData } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
 
@@ -38,7 +39,7 @@ export function PhoneOtpPanel({
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<null | 'send' | 'verify'>(null)
 
   useEffect(() => {
     const stored = data?.me?.phone
@@ -49,10 +50,10 @@ export function PhoneOtpPanel({
 
   async function onSend(e: FormEvent) {
     e.preventDefault()
-    if (busy || phone.trim() === '') {
+    if (busy !== null || phone.trim() === '') {
       return
     }
-    setBusy(true)
+    setBusy('send')
     setMsg(null)
     try {
       await requestOtp({ variables: { phone: phone.trim() } })
@@ -60,16 +61,16 @@ export function PhoneOtpPanel({
     } catch (err) {
       setMsg(otpMessage(graphqlErrorCode(err), t))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
   async function onVerify(e: FormEvent) {
     e.preventDefault()
-    if (busy || code.trim() === '') {
+    if (busy !== null || code.trim() === '') {
       return
     }
-    setBusy(true)
+    setBusy('verify')
     setMsg(null)
     try {
       await verifyOtp({ variables: { code: code.trim() } })
@@ -79,7 +80,7 @@ export function PhoneOtpPanel({
     } catch (err) {
       setMsg(otpMessage(graphqlErrorCode(err), t))
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -100,9 +101,10 @@ export function PhoneOtpPanel({
         </label>
         <button
           type="submit"
-          disabled={busy}
-          className="text-sm font-medium text-ink disabled:opacity-40"
+          disabled={busy !== null}
+          className="inline-flex items-center gap-2 text-sm font-medium text-ink disabled:opacity-40"
         >
+          {busy === 'send' ? <Spinner /> : null}
           {t('otp.send')}
         </button>
       </form>
@@ -122,17 +124,19 @@ export function PhoneOtpPanel({
         {onRetry ? (
           <button
             type="submit"
-            disabled={busy}
-            className="block w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+            disabled={busy !== null}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
           >
+            {busy === 'verify' ? <Spinner /> : null}
             {t('otp.verify')}
           </button>
         ) : (
           <button
             type="submit"
-            disabled={busy}
-            className="text-sm font-medium text-ink disabled:opacity-40"
+            disabled={busy !== null}
+            className="inline-flex items-center gap-2 text-sm font-medium text-ink disabled:opacity-40"
           >
+            {busy === 'verify' ? <Spinner /> : null}
             {t('otp.verify')}
           </button>
         )}

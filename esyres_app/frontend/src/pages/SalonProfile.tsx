@@ -194,6 +194,7 @@ export function SalonProfile() {
   const { data: meData, loading: meLoading, refetch: refetchMe } = useQuery<MeData>(ME_QUERY)
   const [saveFavorite] = useMutation(SAVE_FAVORITE)
   const [unsaveFavorite] = useMutation(UNSAVE_FAVORITE)
+  const [favoriteBusy, setFavoriteBusy] = useState(false)
   const navMe = meLoading ? null : (meData?.me ?? null)
   const [createBooking] = useMutation(CREATE_BOOKING_MUTATION)
   const [mode, setMode] = useState<'idle' | 'picker'>('idle')
@@ -475,13 +476,21 @@ export function SalonProfile() {
             {meData?.me != null ? (
               <button
                 type="button"
+                disabled={favoriteBusy}
                 className={`mt-2 ${CUSTOMER_SMALL_BUTTON}`}
                 onClick={() => {
+                  if (favoriteBusy) {
+                    return
+                  }
                   const saved = (meData.me?.favoriteSalonIds ?? []).includes(salon.id)
                   const run = saved ? unsaveFavorite : saveFavorite
-                  void run({ variables: { salonId: salon.id } }).then(() => refetchMe())
+                  setFavoriteBusy(true)
+                  void run({ variables: { salonId: salon.id } })
+                    .then(() => refetchMe())
+                    .finally(() => setFavoriteBusy(false))
                 }}
               >
+                {favoriteBusy ? <Spinner /> : null}
                 {(meData.me.favoriteSalonIds ?? []).includes(salon.id) ? t('salon.saved') : t('salon.save')}
               </button>
             ) : null}
@@ -662,7 +671,7 @@ export function SalonProfile() {
           )}
           {!sent && !showLogin && needEmail ? (
             <div className="mt-8">
-              <EmailVerifyPanel onRetry={() => void onVerified()} />
+              <EmailVerifyPanel onRetry={() => onVerified()} />
             </div>
           ) : null}
           {!sent && !showLogin && needPhone ? (

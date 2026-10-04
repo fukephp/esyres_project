@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
@@ -6,6 +7,7 @@ import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
 import { TopNav } from '../components/TopNav'
 import { OwnerPageSkeleton, RowsSkeleton } from '../components/Skeleton'
+import { Spinner } from '../components/ui'
 import { ME_QUERY, type MeData } from '../graphql/auth'
 import {
   IN_FLIGHT_INTAKE_COUNT_QUERY,
@@ -58,7 +60,7 @@ export function OwnerChats() {
   })
   const [takeOver] = useMutation(TAKE_OVER_INTAKE_MUTATION)
   const [release] = useMutation(RELEASE_INTAKE_MUTATION)
-  const [setDnd] = useMutation(UPDATE_SALON_DND_MUTATION)
+  const [setDnd, { loading: savingDnd }] = useMutation(UPDATE_SALON_DND_MUTATION)
   const badge = chatBadgeCount(countData?.inFlightIntakeCount ?? 0)
   const firstOwnedId = salons[0]?.id ?? ''
   const takeoverAllowed = board?.salon?.takeoverAllowed === true
@@ -133,11 +135,13 @@ export function OwnerChats() {
         <label className="flex items-center gap-2 text-sm text-body">
           <input
             type="checkbox"
+            disabled={savingDnd}
             checked={dnd}
             onChange={(e) => {
               void setDnd({ variables: { salonId: salon.id, dnd: e.target.checked } }).then(refreshChats)
             }}
           />
+          {savingDnd ? <Spinner /> : null}
           {t('owner.dnd')}
         </label>
         {listLoading ? (
@@ -153,8 +157,8 @@ export function OwnerChats() {
                 services={services}
                 workerCount={workerCount}
                 takeoverAllowed={takeoverAllowed}
-                onTakeOver={() => void takeOver({ variables: { id: row.id } }).then(refreshChats)}
-                onRelease={() => void release({ variables: { id: row.id } }).then(refreshChats)}
+                onTakeOver={() => takeOver({ variables: { id: row.id } }).then(refreshChats)}
+                onRelease={() => release({ variables: { id: row.id } }).then(refreshChats)}
               />
             ))}
           </ul>
@@ -176,10 +180,19 @@ function IntakeRow({
   services: { id: string; name: string }[]
   workerCount: number
   takeoverAllowed: boolean
-  onTakeOver: () => void
-  onRelease: () => void
+  onTakeOver: () => Promise<unknown>
+  onRelease: () => Promise<unknown>
 }) {
   const { t } = useTranslation()
+  const [busy, setBusy] = useState(false)
+
+  function run(action: () => Promise<unknown>) {
+    if (busy) {
+      return
+    }
+    setBusy(true)
+    void action().finally(() => setBusy(false))
+  }
   const snapshot = intakeSnapshotFromRow(row)
   const names = services.filter((service) => row.serviceIds.includes(service.id)).map((service) => service.name)
   const progress = intakeProgressLine(names, intakeStepFromSnapshot(snapshot, workerCount))
@@ -195,12 +208,24 @@ function IntakeRow({
       <p className="mt-1 text-sm text-body">{line}</p>
       {intakePingMark(row.pinged) && <p className="mt-1 text-sm font-medium text-ink">{t('owner.ping')}</p>}
       {chrome === 'takeover' && (
-        <button type="button" className="mt-2 text-sm font-medium text-ink underline underline-offset-4" onClick={onTakeOver}>
+        <button
+          type="button"
+          disabled={busy}
+          className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-ink underline underline-offset-4 disabled:opacity-40"
+          onClick={() => run(onTakeOver)}
+        >
+          {busy ? <Spinner /> : null}
           {t('owner.takeOver')}
         </button>
       )}
       {chrome === 'release' && (
-        <button type="button" className="mt-2 text-sm font-medium text-ink underline underline-offset-4" onClick={onRelease}>
+        <button
+          type="button"
+          disabled={busy}
+          className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-ink underline underline-offset-4 disabled:opacity-40"
+          onClick={() => run(onRelease)}
+        >
+          {busy ? <Spinner /> : null}
           {t('owner.releaseTakeOver')}
         </button>
       )}

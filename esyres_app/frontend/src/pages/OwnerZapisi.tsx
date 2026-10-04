@@ -34,7 +34,7 @@ export function OwnerZapisi() {
   const { t } = useTranslation()
   const [columnError, setColumnError] = useState<string | null>(null)
   const [aside, setAside] = useState<RequestAsideState>(null)
-  const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
+  const [updateKanbanColumns, { loading: savingColumns }] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
   const [params, setParams] = useSearchParams()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
@@ -168,6 +168,7 @@ export function OwnerZapisi() {
                 showInProgress={showInProgress}
                 showFinished={showFinished}
                 error={columnError}
+                busy={savingColumns}
                 onChange={(nextInProgress, nextFinished) => {
                   void updateKanbanColumns({ variables: { showInProgress: nextInProgress, showFinished: nextFinished } })
                     .then(() => setColumnError(null))

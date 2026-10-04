@@ -54,7 +54,7 @@ test('Odjava is the Design 2 destructive pill on both logged-in slots', () => {
   const nav = read('components/TopNav.tsx')
   const logoutClass = nav.match(/const logoutClass =\s*'([^']+)'/)?.[1]
   expect(logoutClass).toBe(
-    'inline-flex h-10 items-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active',
+    'inline-flex h-10 items-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active disabled:opacity-40',
   )
   expect(logoutClass).not.toMatch(/hover:/)
   expect(logoutClass).not.toMatch(/rounded-md/)
@@ -64,7 +64,7 @@ test('Odjava is the Design 2 destructive pill on both logged-in slots', () => {
   expect(nav).not.toMatch(/window\.confirm|confirm\(/)
 
   const logoutButtons = [
-    ...nav.matchAll(/<button type="button" className=\{(\w+)\} onClick=\{\(\) => void logout\(\)\}>/g),
+    ...nav.matchAll(/<button type="button" disabled=\{loggingOut\} className=\{(\w+)\} onClick=\{\(\) => void logout\(\)\}>/g),
   ]
   expect(logoutButtons).toHaveLength(3)
   for (const match of logoutButtons) {

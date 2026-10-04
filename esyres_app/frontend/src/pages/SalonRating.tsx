@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { Spinner } from '../components/ui'
 import type { MeData } from '../graphql/auth'
 import {
   CUSTOMER_CARD,
@@ -93,7 +94,7 @@ export function SalonRatingBlock({
   const [comment, setComment] = useState('')
   const [rate, { loading }] = useMutation(RATE_SALON)
   const [replyBody, setReplyBody] = useState('')
-  const [sendReply] = useMutation(REPLY_TO_RATING)
+  const [sendReply, { loading: replying }] = useMutation(REPLY_TO_RATING)
   const rows = ratings.data?.salon?.ratings ?? []
 
   if (count === 0 && !mayRate) {
@@ -143,6 +144,7 @@ export function SalonRatingBlock({
             className="mt-3 w-full rounded-2xl border border-hairline bg-canvas px-3 py-2 text-sm text-ink"
           />
           <button type="submit" disabled={loading} className={`mt-3 ${CUSTOMER_SMALL_PRIMARY}`}>
+            {loading ? <Spinner /> : null}
             {t('salon.rate')}
           </button>
         </form>
@@ -184,7 +186,8 @@ export function SalonRatingBlock({
                     onChange={(event) => setReplyBody(event.target.value)}
                     className="w-full rounded-full border border-hairline bg-canvas px-3 py-2 text-sm"
                   />
-                  <button type="submit" className={`mt-2 ${CUSTOMER_SMALL_BUTTON}`}>
+                  <button type="submit" disabled={replying} className={`mt-2 ${CUSTOMER_SMALL_BUTTON}`}>
+                    {replying ? <Spinner /> : null}
                     {t('salon.reply')}
                   </button>
                 </form>

@@ -28,7 +28,7 @@ const SAVE_BTN =
 const PLUS_BTN =
   'inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md bg-ink text-sm font-semibold text-canvas active:bg-[#242424]'
 const REMOVE_BTN =
-  'inline-flex h-10 shrink-0 items-center rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink'
+  'inline-flex h-10 shrink-0 items-center gap-2 rounded-md border border-hairline bg-canvas px-5 text-sm font-semibold text-ink disabled:opacity-40'
 const FILE_ACCEPT = 'image/jpeg,image/png,image/webp'
 
 type Worker = { id: string; name: string; profile: WorkerProfile }
@@ -124,7 +124,7 @@ function WorkerProfileForm({
   const [updateSalonWorker, { loading: saving }] = useMutation<{
     updateSalonWorker: Worker
   }>(UPDATE_SALON_WORKER_MUTATION)
-  const [removeWorkerPhoto] = useMutation(REMOVE_WORKER_PHOTO_MUTATION)
+  const [removeWorkerPhoto, { loading: removingPhoto }] = useMutation(REMOVE_WORKER_PHOTO_MUTATION)
   const [draft, setDraft] = useState<WorkerDraft>(() => workerDraft(worker.name, worker.profile))
   const [error, setError] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
@@ -231,7 +231,8 @@ function WorkerProfileForm({
         <div className="flex items-center gap-3">
           <WorkerAvatar name={draft.name} photoUrl={worker.profile.photoUrl} />
           {worker.profile.photoUrl !== null ? (
-            <button type="button" className={REMOVE_BTN} onClick={() => void onRemovePhoto()}>
+            <button type="button" disabled={removingPhoto} className={REMOVE_BTN} onClick={() => void onRemovePhoto()}>
+              {removingPhoto ? <Spinner /> : null}
               {t('owner.removeImage')}
             </button>
           ) : (

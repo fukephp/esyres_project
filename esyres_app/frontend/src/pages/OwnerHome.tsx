@@ -163,7 +163,7 @@ export function OwnerHome() {
   const [acceptReschedule] = useMutation(ACCEPT_RESCHEDULE_MUTATION)
   const [dismissReschedule] = useMutation(DISMISS_RESCHEDULE_MUTATION)
   const [decline] = useMutation(DECLINE_BOOKING_MUTATION)
-  const [updateKanbanColumns] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
+  const [updateKanbanColumns, { loading: savingColumns }] = useMutation(UPDATE_KANBAN_COLUMNS_MUTATION)
   const [columnError, setColumnError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [declineId, setDeclineId] = useState<string | null>(null)
@@ -461,6 +461,7 @@ export function OwnerHome() {
               showInProgress={showInProgress}
               showFinished={showFinished}
               error={columnError}
+              busy={savingColumns}
               onChange={(nextInProgress, nextFinished) => {
                 void updateKanbanColumns({ variables: { showInProgress: nextInProgress, showFinished: nextFinished } })
                   .then(() => setColumnError(null))
@@ -648,8 +649,9 @@ function QueueRow({
             type="button"
             disabled={busy}
             onClick={() => onAssign(worker.id)}
-            className="rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full bg-canvas px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
           >
+            {busy && !declineOpen && !dismissOpen ? <Spinner /> : null}
             {worker.name}
           </button>
         ))}

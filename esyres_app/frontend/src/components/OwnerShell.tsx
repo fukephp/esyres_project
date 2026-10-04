@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { LOGOUT_MUTATION, ME_QUERY, type MeData } from '../graphql/auth'
 import { DISCOVERY_BRAND_KEY } from '../lib/homepage'
 import { OWNER_RAIL_STORAGE_KEY, ownerRailExpanded, ownerStatsPath } from '../lib/owner'
+import { Spinner } from './ui'
 import { OwnerNav, type OwnerNavActive } from './OwnerNav'
 
 function readRailExpanded(): boolean {
@@ -16,7 +17,7 @@ function readRailExpanded(): boolean {
 }
 
 const logoutClass =
-  'inline-flex h-10 items-center justify-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active'
+  'inline-flex h-10 items-center justify-center rounded-full bg-error-strong px-5 text-sm font-semibold text-canvas active:bg-error-strong-active disabled:opacity-40'
 
 type Props = {
   personName: string | null
@@ -50,7 +51,7 @@ export function OwnerShell({
   const { t } = useTranslation()
   const { data: meData } = useQuery<MeData>(ME_QUERY)
   const chatEnabled = meData?.me?.chatEnabled === true
-  const [logout] = useMutation(LOGOUT_MUTATION, { refetchQueries: ['Me'] })
+  const [logout, { loading: loggingOut }] = useMutation(LOGOUT_MUTATION, { refetchQueries: ['Me'] })
   const [expanded, setExpanded] = useState(readRailExpanded)
   const salon = salons.find((row) => row.id === salonId) ?? null
   const name = personName?.trim() ? personName.trim() : null
@@ -106,16 +107,21 @@ export function OwnerShell({
           <button
             type="button"
             aria-label={t('home.logout')}
+            disabled={loggingOut}
             className={
               expanded
                 ? `${logoutClass} w-full gap-2`
-                : 'flex h-10 w-10 items-center justify-center rounded-full bg-error-strong text-canvas active:bg-error-strong-active'
+                : 'flex h-10 w-10 items-center justify-center rounded-full bg-error-strong text-canvas active:bg-error-strong-active disabled:opacity-40'
             }
             onClick={() => void logout()}
           >
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 7V5H5v14h5v-2M10 12h9M16 9l3 3-3 3" />
-            </svg>
+            {loggingOut ? (
+              <Spinner className="size-5" />
+            ) : (
+              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 7V5H5v14h5v-2M10 12h9M16 9l3 3-3 3" />
+              </svg>
+            )}
             {expanded ? t('home.logout') : null}
           </button>
         </div>
@@ -133,7 +139,8 @@ export function OwnerShell({
               {t('owner.stats')}
             </Link>
           )}
-          <button type="button" className={logoutClass} onClick={() => void logout()}>
+          <button type="button" disabled={loggingOut} className={logoutClass} onClick={() => void logout()}>
+            {loggingOut ? <Spinner className="mr-2 size-4" /> : null}
             {t('home.logout')}
           </button>
         </header>

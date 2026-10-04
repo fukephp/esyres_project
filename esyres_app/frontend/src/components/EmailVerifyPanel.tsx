@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Spinner } from './ui'
 import { RESEND_VERIFICATION_EMAIL } from '../graphql/auth'
 import { graphqlErrorCode } from '../lib/booking'
 
@@ -25,13 +26,13 @@ export function EmailVerifyPanel({
   const { t } = useTranslation()
   const [resend] = useMutation(RESEND_VERIFICATION_EMAIL)
   const [msg, setMsg] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<null | 'resend' | 'retry'>(null)
 
   async function onResend() {
-    if (busy) {
+    if (busy !== null) {
       return
     }
-    setBusy(true)
+    setBusy('resend')
     setMsg(null)
     try {
       await resend()
@@ -39,7 +40,19 @@ export function EmailVerifyPanel({
     } catch (err) {
       setMsg(resendMessage(graphqlErrorCode(err), t))
     } finally {
-      setBusy(false)
+      setBusy(null)
+    }
+  }
+
+  async function onRetryClick() {
+    if (busy !== null || onRetry === undefined) {
+      return
+    }
+    setBusy('retry')
+    try {
+      await onRetry()
+    } finally {
+      setBusy(null)
     }
   }
 
@@ -49,19 +62,21 @@ export function EmailVerifyPanel({
       {msg && <p className="text-sm text-body">{msg}</p>}
       <button
         type="button"
-        disabled={busy}
-        className="text-sm font-medium text-ink disabled:opacity-40"
+        disabled={busy !== null}
+        className="inline-flex items-center gap-2 text-sm font-medium text-ink disabled:opacity-40"
         onClick={() => void onResend()}
       >
+        {busy === 'resend' ? <Spinner /> : null}
         {t('verify.resend')}
       </button>
       {onRetry ? (
         <button
           type="button"
-          disabled={busy}
-          className="block w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
-          onClick={() => void onRetry()}
+          disabled={busy !== null}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-canvas disabled:opacity-40"
+          onClick={() => void onRetryClick()}
         >
+          {busy === 'retry' ? <Spinner /> : null}
           {t('verify.retry')}
         </button>
       ) : null}
