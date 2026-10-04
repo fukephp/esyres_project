@@ -1,0 +1,3 @@
+# First salon waits for an admin
+
+A signed-in person still submits the first salon by name on the same account (`/create-salon`). That salon stays pending until the one seeded admin approves it, because instant ownership let any customer open the owner panel. A second account, a public waitlist, and a public profile while pending were rejected: the same person can book and own, discovery stays the hours-plus-service rule, and a shop with no owner must not take requests. Add salon by an approved owner stays immediate. Existing salons stay owned. The admin signs in on the existing Prijava and lands on `/admin/dashboard`; there is no `/admin` page. STORY-110. Supersedes the instant-ownership landing in `docs/adr/0025-self-serve-create-salon.md`.

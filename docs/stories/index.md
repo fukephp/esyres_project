@@ -2,7 +2,7 @@
 
 Inventory for what-next and story-loop. **Not** `docs/mvp/07-Stories.md` (narrative only).
 
-One file = one PR. IDs are `STORY-01` … `STORY-95` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–108. Acceptance criteria live **only** on the story file.
+One file = one PR. IDs are `STORY-01` … `STORY-95` in demo order: Epic **7 → 1 → 2 → 3 → 4 → 10 → 5 → 6 → 8 → 9**, then STORY-40–108 and STORY-110. Acceptance criteria live **only** on the story file.
 
 Existing loop maps/keys keep `E*` / `MKT-*` / `SCAFFOLD-*` names until a later rename. Historical `MKT-*` keys (separate marketing site) are obsolete; they are not in this inventory. Scaffold keys are not in this inventory.
 
@@ -131,3 +131,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-106 | Owner Ocjene | 11 | — | STORY-104 |
 | STORY-107 | Customer pages redesign | 4 | — | STORY-100, STORY-101 |
 | STORY-108 | Customer bounce from owner routes | 7 | — | STORY-78, STORY-82, STORY-107 |
+| STORY-110 | Admin gate for the first salon | 12 | — | STORY-41, STORY-78, STORY-108 |

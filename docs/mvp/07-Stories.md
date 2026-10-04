@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-108`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-108`, `STORY-110`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -86,7 +86,7 @@
 
 ## Epic 7 — Salon & Service Management (Owner Onboarding)
 
-- As a customer who has a salon, I want to create it on the same account from Get your panel, so that I can open the panel without a founder invite.
+- As a person with no booking on this account, I want to submit my first salon by name from Get your panel, so that an admin can approve it before I open the panel.
 - As an owner, I want a salon catalog of shops I own with whether each is open now, so that I can see all my shops without treating the switcher as a directory.
 - As an owner, I want my salon catalog as boxed shops with an Edit button and a plus under the title to add another shop, so that I can pick a shop or create one without a table list.
 - As an owner, I want to edit a salon’s name and address on `/owner/salons/:id`, so that the catalog has a place for the rest of the profile to land.
@@ -140,6 +140,14 @@ Locked in `docs/mvp/06-Epics.md`. Stories: STORY-104, STORY-105, STORY-106.
 - As a logged-in customer, I want to read comments and leave one reply, so that I can respond to another customer’s visit.
 - As a customer, I want my own ratings listed on my profile, so that I can open the salon I scored.
 - As an owner, I want every rating of my salon on salon edit, so that I can read them without a reviews screen.
+
+## Epic 12 — Admin
+
+Locked in `docs/mvp/06-Epics.md`. Story: STORY-110.
+
+- As a person with no booking on this account, I want my first salon to stay pending, so that naming a shop does not open the owner panel.
+- As an admin, I want to sign in on Prijava and land on Pregled, so that I see how many salons are waiting, how many salons have an owner, and how many reservations exist.
+- As an admin, I want to approve or reject a pending salon, so that a real shop can open the panel and a refused name can be submitted again.
 
 ---
 

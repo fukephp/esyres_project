@@ -55,7 +55,8 @@
 
 - **QR Reconnect Loop** — the existing front-counter acquisition QR code gets a second job: a ~7 day guest cookie holds the last scanned salon; once a customer verifies, the scan silently bookmarks the salon as a Favorite and records a QR visit. That visit stays data (Statistika), not Request Detail chrome. No second sticker, no popups.
 - **Trust signal data capture** — response-time timestamps, no-show/cancellation counters, QR scan events, and verification status (`email_verified_at`, `phone_verified_at`) are captured from MVP launch, even though badge display is Phase 2.
-- **Owner onboarding** — self-serve **create salon** on the same account (`/create-salon`, name only). An owner **adds** another shop from the salon catalog (`/owner/salons/create`, name and address). Not invite-only. Not a waitlist. Not a second user type.
+- **Owner onboarding** — **create salon** on the same account (`/create-salon`, name only). The salon stays pending until the seeded admin approves it; the submitter has no owner panel until then. A person who already sent a booking cannot submit. An approved owner **adds** another shop from the salon catalog (`/owner/salons/create`, name and address) with no second approval. Not invite-only. Not a public waitlist. Not a second user type. See `docs/adr/0051-first-salon-waits-for-admin.md`.
+- **Admin** — one seeded person, signed in on the existing Prijava, no `/admin` page. Login lands on `/admin/dashboard` (Pregled: three counts). **Na odobrenju** is `/admin/na-odobrenju`. No screen to add another admin. No email, push, or SMS when a salon is approved or rejected.
 - **Multi-service, multi-category salons** — a salon may have several owner-named service categories from day one. A service belongs to exactly one. Not a locked HAIR / MAKE_UP / MASSAGE enum. Discovery chips stay Kosa / Šminka / Masaža until a later story. See `docs/adr/0033-salon-service-categories.md`.
 
 ## Explicitly Phase 2 (not MVP)

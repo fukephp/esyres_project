@@ -33,7 +33,7 @@ flowchart LR
 
 - **Guest** — discovery, salon profile, busy-level. No cookie required except the optional QR hold cookie.
 - **Customer** — registered user (email+password). May also be an owner.
-- **Owner** — same `users` table; access via owning at least one salon (self-serve create salon).
+- **Owner** — same `users` table; access via owning at least one salon (name-only create on the same account, pending until the seeded admin approves it).
 - **Worker** — salon row only. No login at MVP.
 
 ## Trust boundary

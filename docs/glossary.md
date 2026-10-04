@@ -9,12 +9,16 @@ A person with email+password who can browse as a guest and send requests once ve
 _Avoid_: account (as a type), member, client user, shopper
 
 **Owner**:
-A user who owns at least one salon. The same person can also be a customer. They become an owner by creating a salon on the same account, not by a second user type.
+A user who owns at least one salon. The same person can also be a customer. They become an owner when an admin approves their first salon, on the same account, not by a second user type.
 _Avoid_: merchant, vendor, admin, staff login
 
+**Admin**:
+A seeded person who may approve a pending salon. The same person-account as a customer. Not an owner by that role, and not a choice on the public register.
+_Avoid_: moderator, staff, receptionist, founder login
+
 **Auth box**:
-The one sign-in surface everywhere: Prijava / Registracija tabs plus a forgot-password pane, the same on customer and owner routes. A centered card on pages; in a modal the modal is the box. Password reset is by email link only. Not a social login and not a phone login.
-_Avoid_: login page, auth modal (as a separate behavior), owner login
+The one sign-in surface everywhere: Prijava / Registracija tabs plus a forgot-password pane, the same for a customer, an owner, and an admin. A centered card on pages; in a modal the modal is the box. Password reset is by email link only. Not a social login and not a phone login.
+_Avoid_: login page, auth modal (as a separate behavior), owner login, admin login
 
 **Owner settings**:
 The owner’s person-account page (Postavke). Password for the same person as the customer. Not salon edit and not customer settings.
@@ -28,9 +32,17 @@ _Avoid_: owner settings, account settings, profile settings
 The person's Ime i prezime. Not the salon name, not a worker name, and not an email local-part.
 _Avoid_: display name, username, handle, full name (as a second field)
 
+**Owner door**:
+The public path where a signed-in person who has no customer booking submits their first salon name. Same account as the customer.
+_Avoid_: owner signup, register salon, waitlist
+
 **Create salon**:
-The act of adding the first salon the signed-in user owns, on the public path. Same account as the customer. Name only. Not a waitlist, not founder provision, not add salon, and not a separate owner signup.
+The act of submitting the first salon name on the owner door. It is a pending salon until an admin approves it. Same account. Name only. Not a public waitlist, not founder provision, not add salon, and not a separate owner signup.
 _Avoid_: register salon (as a second account), owner signup, waitlist, Get your panel (the button copy)
+
+**Pending salon**:
+A salon name submitted on the owner door that nobody owns yet. It has no public profile and does not appear on discovery.
+_Avoid_: draft, application, waitlist entry, unpublished, unlisted
 
 **Add salon**:
 The owner’s act of creating another salon they own. Name and address are both required. Not the public first create, not the salon switcher, and not chain multi-location.
