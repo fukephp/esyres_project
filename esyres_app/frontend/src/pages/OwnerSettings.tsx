@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { OwnerShell } from '../components/OwnerShell'
@@ -18,7 +17,6 @@ import {
 } from '../graphql/auth'
 import { IN_FLIGHT_INTAKE_COUNT_QUERY, type InFlightIntakeCountData } from '../graphql/intake'
 import { graphqlErrorCode } from '../lib/booking'
-import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
 import { useOwnerPush } from '../lib/push'
@@ -133,18 +131,7 @@ export function OwnerSettings() {
   }
 
   if (firstOwnedId === '') {
-    return (
-      <>
-        <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
-          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-          <Link to={CREATE_SALON_PATH} className="mt-4 inline-block text-sm font-semibold text-ink">
-            {t('owner.createSalon')}
-          </Link>
-        </main>
-      </>
-    )
+    return null
   }
 
   return (

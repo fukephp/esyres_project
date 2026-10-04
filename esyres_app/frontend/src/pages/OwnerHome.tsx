@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { PhoneBookingDialog } from './OwnerPhoneBooking'
 import { openRequestFromState, RequestDetailAside, type RequestAsideState } from './OwnerRequestDetail'
 import { AuthShell } from '../components/AuthShell'
@@ -38,7 +38,6 @@ import {
 } from '../graphql/pending'
 import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekGrid, WeekHeader } from '../components/OwnerBoards'
 import { graphqlErrorCode } from '../lib/booking'
-import { CREATE_SALON_PATH } from '../lib/createSalon'
 import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
@@ -336,21 +335,7 @@ export function OwnerHome() {
   }
 
   if (salon === null) {
-    return (
-      <>
-        <TopNav me={navMe} />
-        <main className="mx-auto max-w-md px-5 py-8">
-          <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{t('owner.title')}</h1>
-          <p className="mt-8 text-sm text-body">{t('owner.notOwner')}</p>
-          <Link
-            to={CREATE_SALON_PATH}
-            className="mt-4 inline-block text-sm font-semibold text-ink"
-          >
-            {t('owner.createSalon')}
-          </Link>
-        </main>
-      </>
-    )
+    return null
   }
 
   const rows = queue?.pendingBookings ?? []

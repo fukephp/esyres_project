@@ -11,6 +11,10 @@ export function ownerRailExpanded(stored: string | null): boolean {
   return stored === 'expanded'
 }
 
+export function ownerBounce(historyIdx: unknown): 'back' | 'home' {
+  return typeof historyIdx === 'number' && historyIdx > 0 ? 'back' : 'home'
+}
+
 export function isYmd(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (match === null) {

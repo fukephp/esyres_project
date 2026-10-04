@@ -78,11 +78,11 @@ test('OwnerNav Saloni has no salon query and is on every owner overlay', () => {
   expect(nav).toMatch(/OWNER_SETTINGS_PATH/)
 })
 
-test('catalog overlay has boxed shops, header plus, Uredi; not-owner keeps create-salon', () => {
+test('catalog overlay has boxed shops, header plus, Uredi; no not-owner page', () => {
   const page = read('pages/OwnerSalons.tsx')
-  expect(page).toMatch(/owner\.notOwner/)
-  expect(page).toMatch(/CREATE_SALON_PATH/)
-  expect(page).toMatch(/owner\.createSalon/)
+  expect(page).not.toMatch(/owner\.notOwner/)
+  expect(page).not.toMatch(/CREATE_SALON_PATH/)
+  expect(page).not.toMatch(/owner\.createSalon/)
   expect(page).toMatch(/owner\.openNow/)
   expect(page).toMatch(/owner\.closedNow/)
   expect(page).toMatch(/salonIsOpenNow/)
@@ -304,8 +304,8 @@ test('add salon overlay form calls addSalon and lands on edit', () => {
   expect(page).toMatch(/active="salons"/)
   expect(page).toMatch(/rounded-md bg-ink/)
   expect(page).toMatch(/ownerSalonEditPath\(id\)/)
-  expect(page).toMatch(/CREATE_SALON_PATH/)
-  expect(page).toMatch(/owner\.createSalon/)
+  expect(page).not.toMatch(/CREATE_SALON_PATH/)
+  expect(page).not.toMatch(/owner\.createSalon/)
   expect(page).not.toMatch(/GUEST_COLUMN_CLASS/)
   expect(page).not.toMatch(/t\('owner\.salon'\)/)
   expect(page).not.toMatch(/<select/)

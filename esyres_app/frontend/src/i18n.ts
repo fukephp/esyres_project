@@ -421,7 +421,6 @@ void i18n.use(initReactI18next).init({
           },
           columnsError: 'Kolone nisu sačuvane. Pokušaj ponovo.',
           empty: 'Nema zahtjeva za ovaj dan.',
-          notOwner: 'Nisi vlasnik salona.',
           createSalon: 'Napravi salon',
           noWorkers: 'Nema radnika.',
           closedDay: 'Zatvoreno ovaj dan.',
