@@ -2,7 +2,7 @@
 
 *Representative stories per epic — enough to scope and start building, not an exhaustive backlog. Format: As a [user], I want [goal], so that [benefit].*
 
-**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-106`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
+**Inventory for what-next / story-loop is `docs/stories/` (`STORY-01` … `STORY-108`), not this file.** Acceptance criteria live only on those story files. This page stays the narrative source those files were split from.
 
 ## Epic 1 — Salon Discovery & Profile Browsing
 
@@ -102,6 +102,7 @@
 - As an owner, I want to switch between salons I own, so that each shop has its own profile, queue, and QR without mixing them.
 - As an owner, I want to change my password on `/owner/settings`, so that I can rotate the shared credential without a founder reset.
 - As an owner, I want a Chat switch on Postavke, default off, so that the menu hides a tab I am not using.
+- As a customer who opens an owner route, I want to be sent straight back to where I was, so that I never see an owner panel skeleton or a "not an owner" page.
 
 ## Epic 8 — Trust Signal Data Foundations
 
