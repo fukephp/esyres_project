@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { TopNav } from '../components/TopNav'
 import { PopularSkeleton } from '../components/Skeleton'
@@ -9,6 +9,7 @@ import { ME_QUERY, type MeData } from '../graphql/auth'
 import { POPULAR_IN_SARAJEVO_QUERY, type PopularInSarajevoData } from '../graphql/discovery'
 import { sarajevoToday } from '../lib/format'
 import {
+  afterHomepageAuthHref,
   DISCOVERY_HREF,
   GUEST_COLUMN_CLASS,
   homepageChrome,
@@ -21,7 +22,8 @@ const PILL_CLASS =
 
 export function Homepage() {
   const { t } = useTranslation()
-  const { data } = useQuery<MeData>(ME_QUERY)
+  const navigate = useNavigate()
+  const { data, refetch } = useQuery<MeData>(ME_QUERY)
   const [authOpen, setAuthOpen] = useState<'login' | 'register' | null>(null)
   const { data: popular, loading: popularLoading } = useQuery<PopularInSarajevoData>(POPULAR_IN_SARAJEVO_QUERY, {
     variables: { date: sarajevoToday(), category: null, name: null },
@@ -38,7 +40,15 @@ export function Homepage() {
         onRegister={() => setAuthOpen((current) => nextHomepageAuth(current, 'register'))}
       />
       {authOpen ? (
-        <AuthShell key={authOpen} place="customer" initialMode={authOpen} onAuthenticated={() => setAuthOpen(null)} />
+        <AuthShell
+          key={authOpen}
+          place="customer"
+          initialMode={authOpen}
+          onAuthenticated={async () => {
+            const result = await refetch()
+            navigate(afterHomepageAuthHref(result.data.me))
+          }}
+        />
       ) : (
         <>
           <main className={`${GUEST_COLUMN_CLASS} flex-1 pb-16`}>

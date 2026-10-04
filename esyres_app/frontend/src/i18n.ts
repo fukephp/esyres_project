@@ -122,6 +122,9 @@ void i18n.use(initReactI18next).init({
           suggestions: 'Predloženi saloni',
           ratings: 'Moje ocjene',
           ratingsEmpty: 'Nema ocjena.',
+          remove: 'Ukloni',
+          saved: 'Sačuvano',
+          noPlace: 'Mjesto nije postavljeno',
         },
         home: {
           panel: 'Panel',
@@ -199,6 +202,13 @@ void i18n.use(initReactI18next).init({
           title: 'Moji zahtjevi',
           empty: 'Nema zahtjeva.',
           seeAll: 'Vidi sve',
+          latest: 'Zadnja rezervacija',
+          onHold: 'Na čekanju',
+          onHoldEmpty: 'Nema zahtjeva na čekanju.',
+          lastConfirmed: 'Zadnje potvrđeno',
+          lastDeclined: 'Zadnje odbijeno',
+          history: 'Historija',
+          details: 'Detalji',
           logout: 'Odjavi se',
           status: {
             REQUESTED: 'Na čekanju',

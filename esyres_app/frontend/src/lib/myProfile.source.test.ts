@@ -43,3 +43,25 @@ test('Profil sits before Moje rezervacije on customer routes and not on owner or
   expect(nav).toMatch(/nav\.profile[\s\S]*nav\.bookings/)
   expect(app).toMatch(/path="\/my-profile" element=\{customer\(<MyProfile/)
 })
+
+test('an owner never sees Profil and is sent from the profile routes to /owner', () => {
+  const owner = { name: 'Ana', email: 'a@b.c', salons: [{ id: '1' }] }
+  for (const path of ['/', '/salons', '/salon/1', '/bookings', '/my-profile']) {
+    expect(topNavChrome(path, owner), path).not.toHaveProperty('profile')
+  }
+  expect(nav.match(/chrome\.profile \?/g)).toHaveLength(3)
+  expect(page).toMatch(/isOwnerMe\(data\.me\)[\s\S]*<Navigate to="\/owner" replace \/>/)
+})
+
+test('profile is a header card then two columns; bookings group on hold, last confirmed, last declined, history', () => {
+  expect(page).toMatch(/initials\(name\)/)
+  expect(page).toMatch(/md:grid-cols-\[minmax\(0,2fr\)_minmax\(0,1fr\)\]/)
+  expect(bookings).toMatch(/groupMyBookings\(rows\)/)
+  const order = ['bookings.onHold', 'bookings.lastConfirmed', 'bookings.lastDeclined', 'bookings.history'].map((key) =>
+    bookings.indexOf(key),
+  )
+  expect(order.every((at) => at > -1)).toBe(true)
+  expect([...order].sort((a, b) => a - b)).toEqual(order)
+  expect(bookings).toMatch(/<HistoryRow/)
+  expect(bookings).toMatch(/aria-expanded=\{open\}/)
+})

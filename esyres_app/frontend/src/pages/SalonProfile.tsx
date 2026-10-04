@@ -20,6 +20,7 @@ import { PUBLIC_SALON_QUERY, type DayHours, type PublicSalonData, type SalonServ
 import { SalonRatingBlock } from './SalonRating'
 import { assistantAddressLine, assistantHoursFacts, assistantHoursForDate, formatAssistantHoursLine } from '../lib/assistant'
 import { bookingWorkerId, graphqlErrorCode, stackSelection } from '../lib/booking'
+import { CUSTOMER_SMALL_BUTTON } from '../lib/customerUi'
 import { quarterNoneTappable, quarterStartPast } from '../lib/guestQuarter'
 import { busyToken } from '../lib/busyToken'
 import { formatFeninga, sarajevoToday } from '../lib/format'
@@ -474,7 +475,7 @@ export function SalonProfile() {
             {meData?.me != null ? (
               <button
                 type="button"
-                className="mt-2 text-sm font-semibold text-ink"
+                className={`mt-2 ${CUSTOMER_SMALL_BUTTON}`}
                 onClick={() => {
                   const saved = (meData.me?.favoriteSalonIds ?? []).includes(salon.id)
                   const run = saved ? unsaveFavorite : saveFavorite

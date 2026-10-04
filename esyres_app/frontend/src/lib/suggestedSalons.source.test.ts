@@ -9,7 +9,7 @@ const discovery = readFileSync(new URL('../pages/DiscoveryHome.tsx', import.meta
 describe('suggested salons', () => {
   it('renders the discovery row only when the list is non-empty', () => {
     expect(profile).toMatch(/profile\.suggestions/)
-    expect(profile).toMatch(/suggestedSalons\.length/)
+    expect(profile).toMatch(/suggestions\.length > 0/)
     expect(profile).toMatch(/salon\.name/)
     expect(profile).toMatch(/salon\.busy/)
     expect(profile).toMatch(/discoverySalonCategoryNames/)

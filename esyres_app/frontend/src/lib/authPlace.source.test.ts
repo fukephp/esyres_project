@@ -31,7 +31,8 @@ test('REGISTER_MUTATION sends name; LOGIN_MUTATION does not', () => {
 
 test('customer place heading is Rezervacije on homepage, bookings, and assistant', () => {
   const home = read('pages/Homepage.tsx')
-  expect(home).toMatch(/<AuthShell key=\{authOpen\} place="customer"/)
+  expect(home).toMatch(/<AuthShell\s+key=\{authOpen\}\s+place="customer"/)
+  expect(home).toMatch(/navigate\(afterHomepageAuthHref\(result\.data\.me\)\)/)
   expect(home).not.toMatch(/auth\.placeCustomer/)
 
   const bookings = read('pages/MyBookings.tsx')

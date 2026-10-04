@@ -129,3 +129,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-104 | Salon rating | 11 | — | STORY-100 |
 | STORY-105 | Rating replies | 11 | — | STORY-104 |
 | STORY-106 | Owner Ocjene | 11 | — | STORY-104 |
+| STORY-107 | Customer pages redesign | 4 | — | STORY-100, STORY-101 |

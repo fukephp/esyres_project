@@ -108,7 +108,7 @@ test('Homepage uses TopNav; AuthShell under bar; hero and footer stay constraine
   expect(page).toMatch(/<TopNav/)
   expect(page).toMatch(/AuthShell/)
   expect(page).toMatch(/nextHomepageAuth/)
-  expect(page).toMatch(/<AuthShell key=\{authOpen\} place="customer"/)
+  expect(page).toMatch(/<AuthShell\s+key=\{authOpen\}\s+place="customer"/)
   expect(page).toMatch(/authOpen \?/)
   expect(page).toMatch(/pitch\.h1/)
   expect(page).toMatch(/pitch\.cta/)

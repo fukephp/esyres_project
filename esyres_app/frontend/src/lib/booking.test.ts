@@ -6,11 +6,30 @@ import {
   cancelChrome,
   cancelErrorKey,
   graphqlErrorCode,
+  groupMyBookings,
   rescheduleChrome,
   rescheduleErrorKey,
   respondErrorKey,
   stackSelection,
 } from './booking'
+
+test('groups my bookings: on hold first, newest confirmed and declined pulled out, the rest is history', () => {
+  const rows = [
+    { id: '1', status: 'CANCELLED' },
+    { id: '2', status: 'CONFIRMED' },
+    { id: '3', status: 'REQUESTED' },
+    { id: '4', status: 'DECLINED' },
+    { id: '5', status: 'CONFIRMED' },
+    { id: '6', status: 'TIME_PROPOSED' },
+    { id: '7', status: 'DECLINED' },
+  ]
+  const groups = groupMyBookings(rows)
+  expect(groups.onHold.map((row) => row.id)).toEqual(['3', '6'])
+  expect(groups.lastConfirmed?.id).toBe('2')
+  expect(groups.lastDeclined?.id).toBe('4')
+  expect(groups.history.map((row) => row.id)).toEqual(['1', '5', '7'])
+  expect(groupMyBookings([])).toEqual({ onHold: [], lastConfirmed: null, lastDeclined: null, history: [] })
+})
 
 test('stacks duration and feninga', () => {
   expect(

@@ -141,3 +141,13 @@ export function cancelErrorKey(code: string | null): CancelErrorKey {
 
   return 'fallback'
 }
+
+export function groupMyBookings<T extends { status: string }>(
+  rows: T[],
+): { onHold: T[]; lastConfirmed: T | null; lastDeclined: T | null; history: T[] } {
+  const onHold = rows.filter((row) => row.status === 'REQUESTED' || row.status === 'TIME_PROPOSED')
+  const lastConfirmed = rows.find((row) => row.status === 'CONFIRMED') ?? null
+  const lastDeclined = rows.find((row) => row.status === 'DECLINED') ?? null
+  const history = rows.filter((row) => !onHold.includes(row) && row !== lastConfirmed && row !== lastDeclined)
+  return { onHold, lastConfirmed, lastDeclined, history }
+}
