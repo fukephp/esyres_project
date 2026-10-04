@@ -131,4 +131,4 @@ Then: **User story** (from `docs/mvp/07-Stories.md`), **Acceptance criteria**, *
 | STORY-106 | Owner Ocjene | 11 | — | STORY-104 |
 | STORY-107 | Customer pages redesign | 4 | — | STORY-100, STORY-101 |
 | STORY-108 | Customer bounce from owner routes | 7 | — | STORY-78, STORY-82, STORY-107 |
-| STORY-110 | Admin gate for the first salon | 12 | — | STORY-41, STORY-78, STORY-108 |
+| STORY-110 | Admin gate for the first salon | 12 | — | STORY-38, STORY-41, STORY-78, STORY-108 |
