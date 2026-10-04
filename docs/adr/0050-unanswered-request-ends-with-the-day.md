@@ -1,0 +1,3 @@
+# Unanswered request ends with the preferred day
+
+A request stays approvable through its preferred day, including after the guest’s quarter, because the owner can still counter-propose a later quarter that same day. At midnight Europe/Sarajevo it becomes a declined booking with reason `expired` and is shown as **Nije odgovoreno**. Expiring at the preferred start would freeze that later quarter. A separate status was rejected; expire already shares `declined`. The row stays on the selected day so a missed request is visible, and the guest is not warned beforehand. A time-proposed booking the guest has not answered is a different window and is still open. STORY-109.
