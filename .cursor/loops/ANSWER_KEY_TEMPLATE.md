@@ -48,12 +48,12 @@ npm run test
 npm run build
 ```
 
-**If Behat runs** (classifier fails, or the human asked for Behat / `--suite`) — from `esyres_app/`:
+**If Behat runs** (classifier fails, or the human asked for Behat / a named `@tag` or `.feature`) — from `esyres_app/`. Name the area tags or feature paths this story changes and can affect. One process. Do not pass `--suite`. Do not run an unfiltered suite. Comma in `--tags` is OR. Replace `@<area>` (or the paths) before approval.
 
 ```text
 docker compose up -d
 docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
+docker compose exec -T php vendor/bin/behat --tags=@<area> --format=progress --stop-on-failure
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build

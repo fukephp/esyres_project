@@ -1,3 +1,4 @@
+@chat
 Feature: Guest assistant intake persistence
   As a guest
   I want my salon chat snapshot saved

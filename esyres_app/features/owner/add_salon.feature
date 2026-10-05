@@ -1,3 +1,4 @@
+@salon
 Feature: Owner adds another salon
   As an owner
   I want to add another shop with name and address

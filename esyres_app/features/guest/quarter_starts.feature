@@ -1,3 +1,4 @@
+@booking
 Feature: Guest quarter starts
   As a customer
   I want to see which quarter starts are Zauzet

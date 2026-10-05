@@ -1,3 +1,4 @@
+@booking
 Feature: Owner sees customer respond
   As an owner
   I want to subscribe to customer responses for my salon

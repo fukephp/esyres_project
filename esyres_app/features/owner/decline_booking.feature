@@ -1,3 +1,4 @@
+@booking
 Feature: Owner decline a request
   As an owner
   I want to decline a request with an optional reason

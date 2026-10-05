@@ -1,3 +1,4 @@
+@noshow
 Feature: Owner marks a no-show after start
   As the platform
   I want the owner to stamp a missed confirmed booking

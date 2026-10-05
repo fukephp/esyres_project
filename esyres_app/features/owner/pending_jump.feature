@@ -1,3 +1,4 @@
+@booking
 Feature: Owner pending jump
   As an owner
   I want the count and days of every pending row

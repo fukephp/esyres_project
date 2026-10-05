@@ -1,3 +1,4 @@
+@salon
 Feature: Admin gate for the first salon
   As the seeded admin
   I want a first salon to stay pending until I approve it

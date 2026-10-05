@@ -1,3 +1,4 @@
+@salon
 Feature: Self-serve create salon
   As a customer who has a salon
   I want to name it on the same account

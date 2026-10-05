@@ -1,3 +1,4 @@
+@salon
 Feature: Owner updates salon name and address
   As an owner
   I want to save a salon’s name and address

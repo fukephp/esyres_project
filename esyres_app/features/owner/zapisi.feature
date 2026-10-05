@@ -1,3 +1,4 @@
+@booking
 Feature: Zapisi
   As an owner
   I want one day's bookings for this salon, filtered by origin

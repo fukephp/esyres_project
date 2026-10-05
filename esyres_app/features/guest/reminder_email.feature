@@ -1,3 +1,4 @@
+@notify
 Feature: Customer reminder email
   As a customer
   I want a reminder email before my appointment

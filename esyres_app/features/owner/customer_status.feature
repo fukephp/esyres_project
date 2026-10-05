@@ -1,3 +1,4 @@
+@notify
 Feature: Customer status push and SMS fallback
   As a customer
   I want a web push for time-critical status, and SMS if push misses

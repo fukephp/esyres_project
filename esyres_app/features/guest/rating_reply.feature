@@ -1,3 +1,4 @@
+@rating
 Feature: Rating replies
   As another customer
   I want to answer a rating comment

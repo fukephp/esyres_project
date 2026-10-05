@@ -1,3 +1,4 @@
+@cancel
 Feature: Owner subscribe to cancelled bookings
   As an owner
   I want a live handshake when a customer cancels

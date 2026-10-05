@@ -1,3 +1,4 @@
+@qr
 Feature: QR reconnect hold cookie
   As an owner
   I want a returning customer who scanned my QR and verified to be marked visited

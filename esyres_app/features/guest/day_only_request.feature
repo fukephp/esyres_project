@@ -1,3 +1,4 @@
+@booking
 Feature: Day-only request
   As a customer
   I want to send a request for an open day with no quarter

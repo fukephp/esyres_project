@@ -1,3 +1,4 @@
+@rating
 Feature: Salon rating
   As a customer
   I want to leave one score for a salon

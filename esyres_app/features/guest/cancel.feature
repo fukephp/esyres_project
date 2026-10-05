@@ -1,3 +1,4 @@
+@cancel
 Feature: Customer cancel of a confirmed booking
   As a customer
   I want to cancel a confirmed booking with a late warning, not a block

@@ -1,3 +1,4 @@
+@phone
 Feature: Phone booking
   As an owner
   I want to write a confirmed booking for a caller

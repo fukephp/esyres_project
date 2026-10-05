@@ -1,3 +1,4 @@
+@booking
 Feature: Owner one-tap accept preferred time
   As an owner
   I want to accept a guest's preferred time in one tap

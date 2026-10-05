@@ -1,3 +1,4 @@
+@booking
 Feature: Occupying bookings range
   As an owner
   I want occupying bookings for a month span

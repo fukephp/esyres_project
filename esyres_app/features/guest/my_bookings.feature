@@ -1,3 +1,4 @@
+@booking
 Feature: Customer My Bookings status list
   As a customer
   I want to see all my requests in one place

@@ -16,16 +16,14 @@ npm run test
 npm run build
 ```
 
-(`docker compose exec -T vite npm run …` only if that container is already up.) Humans can still ask for full Behat; `--suite owner|guest` always runs Behat.
+(`docker compose exec -T vite npm run …` only if that container is already up.)
 
-When Behat runs, from this directory. `up -d` is idempotent (starts php artisan on :8000 and Vite on :5173). Do not `down` as part of verify. Never `docker compose run` for verify or servers.
+When Behat runs, from this directory. `up -d` is idempotent (starts php artisan on :8000 and Vite on :5173). Do not `down` as part of verify. Never `docker compose run` for verify or servers. One process for the area tags or feature paths the change affects. Do not pass `--suite`. Do not run an unfiltered suite. Comma in `--tags` is OR. A shell loop over features is not the verify path. Only if a pipeline forces a loop: before the loop, inside the php container, `php artisan config:clear`, `cache:clear`, and `route:clear`.
 
 ```text
 docker compose up -d
 docker compose exec -T php php artisan --version
-docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure
-docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure --suite owner
-docker compose exec -T php vendor/bin/behat --format=progress --stop-on-failure --suite guest
+docker compose exec -T php vendor/bin/behat --tags=@booking,@cancel --format=progress --stop-on-failure
 docker compose exec -T vite npm run typecheck
 docker compose exec -T vite npm run test
 docker compose exec -T vite npm run build

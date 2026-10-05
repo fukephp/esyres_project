@@ -1,3 +1,4 @@
+@chat
 Feature: Owner assistant-originated pending requests
   As an owner
   I want chat-sent requests in the same pending queue, with intake on the row

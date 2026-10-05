@@ -1,3 +1,4 @@
+@salon
 Feature: Suggested salons
   As a customer
   I want a few salons that match services I already booked

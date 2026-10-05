@@ -1,3 +1,4 @@
+@rating
 Feature: Owner salon ratings
   As a salon owner
   I want to read ratings on salon edit

@@ -1,3 +1,4 @@
+@booking
 Feature: Owner assigns a free worker
   As an owner
   I want to confirm a no-preference request by tapping a free worker

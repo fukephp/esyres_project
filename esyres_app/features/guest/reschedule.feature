@@ -1,3 +1,4 @@
+@reschedule
 Feature: Customer reschedule of a confirmed booking
   As a customer
   I want to ask for a new day and time on a confirmed booking

@@ -1,3 +1,4 @@
+@auth
 Feature: Password reset
   As a person who lost a password
   I want a reset link by email

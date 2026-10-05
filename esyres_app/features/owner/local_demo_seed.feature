@@ -1,3 +1,4 @@
+@seed
 Feature: Local demo seed
   As a founder running the PWA locally
   I want provisioned owners, salons, and bookings

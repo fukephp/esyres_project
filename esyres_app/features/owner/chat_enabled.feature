@@ -1,3 +1,4 @@
+@chat
 Feature: Chat switch
   As an owner
   I want Chat off until I turn it on

@@ -1,3 +1,4 @@
+@auth
 Feature: Customer email verification
   As a customer
   I want to verify my email before my request is sent

@@ -1,3 +1,4 @@
+@salon
 Feature: Guest salon profile
   As a customer
   I want to see a salon's services, prices, hours, and busy-level

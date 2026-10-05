@@ -1,3 +1,4 @@
+@booking
 Feature: Customer multi-service booking request
   As a customer
   I want to select multiple services in one request

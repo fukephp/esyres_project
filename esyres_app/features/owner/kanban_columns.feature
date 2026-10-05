@@ -1,3 +1,4 @@
+@booking
 Feature: Kanban column flags
   As an owner
   I want U toku and Završeno i otkazano to follow my account

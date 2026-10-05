@@ -1,3 +1,4 @@
+@cancel
 Feature: Trust cancel counters and capture gates
   As the platform
   I want cancel events to increment salon and customer counters

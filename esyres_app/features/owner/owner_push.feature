@@ -1,3 +1,4 @@
+@notify
 Feature: Owner mutations do not web-push
   As an owner
   I want push only for guest events

@@ -1,3 +1,4 @@
+@notify
 Feature: Customer status notify is not for guest events
   As a customer
   I want SMS and status push only when the owner proposes, accepts, or declines

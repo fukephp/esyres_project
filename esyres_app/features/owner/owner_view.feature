@@ -1,3 +1,4 @@
+@booking
 Feature: Owner Prikaz
   As an owner
   I want to choose Kalendar or Kanban for Zahtjevi and Zapisi

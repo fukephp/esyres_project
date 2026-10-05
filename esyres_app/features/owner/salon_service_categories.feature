@@ -1,3 +1,4 @@
+@salon
 Feature: Owner salon service categories
   As an owner
   I want named service groups on my salon

@@ -1,3 +1,4 @@
+@stats
 Feature: Owner salon stats
   As an owner
   I want bookings per week, busy percent, and cancellation rate

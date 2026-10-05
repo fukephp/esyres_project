@@ -1,3 +1,4 @@
+@chat
 Feature: Owner take over of in-flight assistant intakes
   As an owner
   I want optional Take over on one conversation

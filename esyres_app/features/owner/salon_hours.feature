@@ -1,3 +1,4 @@
+@salon
 Feature: Owner salon working hours
   As an owner
   I want to set working hours, breaks, and a cancellation notice window

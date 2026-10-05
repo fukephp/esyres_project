@@ -1,3 +1,4 @@
+@reschedule
 Feature: Owner accept and dismiss reschedule
   As an owner
   I want to accept or dismiss a reschedule overlay

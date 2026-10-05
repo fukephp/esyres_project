@@ -1,3 +1,4 @@
+@booking
 Feature: Unanswered request ends with the preferred day
   As an owner
   I want a request I never answered to leave the live boards at midnight

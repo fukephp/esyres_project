@@ -1,3 +1,4 @@
+@notify
 Feature: Reminder email after reschedule
   As a customer
   I want reminders to follow the occupied clock

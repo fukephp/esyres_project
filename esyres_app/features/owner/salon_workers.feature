@@ -1,3 +1,4 @@
+@salon
 Feature: Owner salon workers
   As an owner
   I want to add workers to my salon

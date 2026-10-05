@@ -1,3 +1,4 @@
+@chat
 Feature: Owner in-flight assistant intakes
   As an owner
   I want in-flight chats listed with a count

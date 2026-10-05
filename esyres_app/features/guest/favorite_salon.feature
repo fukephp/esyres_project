@@ -1,3 +1,4 @@
+@salon
 Feature: Favorite salon
   As a customer
   I want to bookmark one salon

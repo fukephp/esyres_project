@@ -1,3 +1,4 @@
+@booking
 Feature: Owner pending queue for a day
   As an owner
   I want to see all pending requests for a day in one queue

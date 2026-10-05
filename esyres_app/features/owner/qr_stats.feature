@@ -1,3 +1,4 @@
+@qr
 Feature: Owner QR conversion stats
   As an owner
   I want scan and visit counts for my salon

@@ -1,3 +1,4 @@
+@booking
 Feature: Same-day service block
   As a customer
   I want a second live booking of a service I already have that day to be refused

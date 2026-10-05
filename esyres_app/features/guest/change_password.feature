@@ -1,3 +1,4 @@
+@auth
 Feature: Change password
   As a logged-in person
   I want to change my password

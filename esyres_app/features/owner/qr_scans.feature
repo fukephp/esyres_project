@@ -1,3 +1,4 @@
+@qr
 Feature: Owner QR scans query
   As an owner
   I want to read verified QR visits for my salon

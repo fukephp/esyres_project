@@ -1,3 +1,4 @@
+@notify
 Feature: Owner web push
   As an owner
   I want a web push for new requests and customer responses

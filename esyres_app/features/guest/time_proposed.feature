@@ -1,3 +1,4 @@
+@booking
 Feature: Customer respond to a counter-proposal
   As a customer
   I want to approve, reject, or ask for a different day or time

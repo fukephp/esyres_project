@@ -1,3 +1,4 @@
+@qr
 Feature: QR sticker hits
   As the platform
   I want each successful sticker GET to record a QR scan

@@ -1,3 +1,4 @@
+@auth
 Feature: Customer email and password account
   As a customer
   I want to create an account with email and password without a homepage login wall

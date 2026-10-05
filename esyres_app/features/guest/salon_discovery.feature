@@ -1,3 +1,4 @@
+@salon
 Feature: Guest salon discovery
   As a customer
   I want to see salons near me without logging in

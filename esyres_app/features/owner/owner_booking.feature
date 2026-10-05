@@ -1,3 +1,4 @@
+@booking
 Feature: Owner Request Detail booking
   As an owner
   I want to load one booking by id

@@ -1,3 +1,4 @@
+@booking
 Feature: Owner drag-to-counter-propose
   As an owner
   I want to propose a different time on a worker

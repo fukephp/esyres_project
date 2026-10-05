@@ -1,3 +1,4 @@
+@auth
 Feature: Customer phone OTP before send
   As a customer
   I want to verify my phone with OTP before my request is sent

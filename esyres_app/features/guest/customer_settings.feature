@@ -1,3 +1,4 @@
+@auth
 Feature: Customer settings
   As a customer
   I want to save my name and a Sarajevo municipality

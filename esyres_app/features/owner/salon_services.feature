@@ -1,3 +1,4 @@
+@salon
 Feature: Owner salon services
   As an owner
   I want to add and edit services with durations and prices

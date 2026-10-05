@@ -1,3 +1,4 @@
+@salon
 Feature: Owner salon media on Informacije
   As an owner
   I want a description, main image, and gallery on salon edit
