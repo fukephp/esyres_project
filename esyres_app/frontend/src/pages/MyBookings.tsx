@@ -21,7 +21,7 @@ import {
 } from '../graphql/booking'
 import {
   bookingClock,
-  bookingStatusKey,
+  guestStatusKey,
   cancelChrome,
   cancelErrorKey,
   graphqlErrorCode,
@@ -131,7 +131,7 @@ function BookingRow({
           <Link to={`/salon/${row.salon.id}`} className={`text-base ${CUSTOMER_LINK}`}>
             {row.salon.name}
           </Link>
-          <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+          <span className={CUSTOMER_CHIP}>{t(`bookings.status.${guestStatusKey(row)}`)}</span>
         </div>
       )}
       <p className="text-sm text-ink">
@@ -148,7 +148,7 @@ function BookingRow({
         {' · '}
         {clock.worker ? clock.worker.name : t('salon.noPreference')}
       </p>
-      {row.status === 'DECLINED' && row.declineReason !== null ? (
+      {row.status === 'DECLINED' && row.declineReason !== null && row.declineReason !== 'expired' ? (
         <p className="mt-1 text-sm text-body">{row.declineReason}</p>
       ) : null}
       {chrome === 'pending' ? (
@@ -553,7 +553,7 @@ function HistoryRow({
             {row.services.map((s) => s.name).join(', ')}
           </span>
         </span>
-        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${guestStatusKey(row)}`)}</span>
         <span className={`${CUSTOMER_ICON_BUTTON} size-8`} aria-hidden>
           <svg
             viewBox="0 0 24 24"

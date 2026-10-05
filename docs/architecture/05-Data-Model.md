@@ -42,4 +42,4 @@ Server computes per salon-day: enum + percent. Customer UI only renders the enum
 
 ## Auto-expire
 
-Scheduled command. TTL numbers are config placeholders. Result: `declined` + reason `expired`.
+Scheduled command `bookings:expire-unanswered`. A `requested` booking becomes `declined` with reason `expired` at the end of its preferred day, Europe/Sarajevo. See `docs/adr/0050-unanswered-request-ends-with-the-day.md`.

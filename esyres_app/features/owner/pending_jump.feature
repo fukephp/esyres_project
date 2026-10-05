@@ -16,12 +16,12 @@ Feature: Owner pending jump
     Given a verified owner "owner@example.com" with password "secret-pass" owns salon "Test Salon"
     And the salon has a requested booking on "2026-08-29" at "10:00" for "Ena"
     And the salon has a requested booking on "2026-08-29" at "09:00" for "Ana"
-    And the salon has a requested booking on "2026-08-01" at "11:00" for "Mia"
+    And the salon has a requested booking on "2026-08-30" at "11:00" for "Mia"
     When I log in as "owner@example.com" with password "secret-pass"
     And I query pending jump
     Then pending jump matches:
       """
-      {"count": 3, "dates": ["2026-08-01", "2026-08-29"]}
+      {"count": 3, "dates": ["2026-08-29", "2026-08-30"]}
       """
 
   Scenario: Reschedule overlay counts on the overlay day

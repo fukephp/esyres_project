@@ -29,15 +29,17 @@ import {
   PENDING_BOOKINGS_QUERY,
   PENDING_JUMP_QUERY,
   SALON_DAY_BOOKINGS_QUERY,
+  UNANSWERED_BOOKINGS_QUERY,
   type OccupyingBookingsRangeData,
   type OwnerSalonData,
   type PendingBooking,
   type PendingBookingsData,
   type PendingJumpData,
   type SalonDayBookingsData,
+  type UnansweredBookingsData,
 } from '../graphql/pending'
 import { BoardColumn, BookingCard, DayChips, KanbanBoard, KanbanColumnToggles, WeekGrid, WeekHeader } from '../components/OwnerBoards'
-import { graphqlErrorCode } from '../lib/booking'
+import { expiresToday, graphqlErrorCode, isUnansweredBooking } from '../lib/booking'
 import { sarajevoToday } from '../lib/format'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { chatBadgeCount } from '../lib/intake'
@@ -104,6 +106,10 @@ export function OwnerHome() {
     variables: { salonId: salon?.id ?? '', date, limit: 50 },
     skip: !ownerReady,
   })
+  const { data: unansweredData, refetch: refetchUnanswered } = useQuery<UnansweredBookingsData>(UNANSWERED_BOOKINGS_QUERY, {
+    variables: { salonId: salon?.id ?? '', date },
+    skip: !ownerReady,
+  })
   const { data: jumpData, loading: jumpLoading, refetch: refetchJump } = useQuery<PendingJumpData>(PENDING_JUMP_QUERY, {
     variables: { salonId: salon?.id ?? '' },
     skip: !ownerReady,
@@ -125,6 +131,7 @@ export function OwnerHome() {
   })
   function refetchAll() {
     void refetchQueue()
+    void refetchUnanswered()
     void refetchJump()
     if (kanban) {
       void refetchDay()
@@ -338,7 +345,8 @@ export function OwnerHome() {
     return null
   }
 
-  const rows = queue?.pendingBookings ?? []
+  const rows = (queue?.pendingBookings ?? []).filter((row) => !isUnansweredBooking(row, now))
+  const unanswered = unansweredData?.unansweredBookings ?? []
   const workers = board?.salon?.workers ?? []
   const hours = board?.salon?.hours ?? null
   function closedFor(ymd: string): boolean {
@@ -357,7 +365,10 @@ export function OwnerHome() {
     const block = occupyingBlock(row)
     return block === null ? [] : [block]
   })
-  const groups = kanbanGroups((dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED'), now)
+  const groups = kanbanGroups(
+    (dayBookings?.salonDayBookings ?? []).filter((row) => row.status !== 'REQUESTED' || isUnansweredBooking(row, now)),
+    now,
+  )
   const showInProgress = data?.me?.showInProgress !== false
   const showFinished = data?.me?.showFinished !== false
   const columns = visibleKanbanColumns(showInProgress, showFinished)
@@ -522,6 +533,15 @@ export function OwnerHome() {
                 ) : (
                   pendingList
                 )}
+                {unanswered.length > 0 ? (
+                  <ul className="mt-3 space-y-2">
+                    {unanswered.map((row) => (
+                      <li key={row.id}>
+                        <BookingCard row={row} onOpen={openAside} now={now} />
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             </section>
           </>
@@ -539,6 +559,7 @@ export function OwnerHome() {
           setPhoneOpen(false)
           setParams(ownerSearchParams(saved, sarajevoToday(), salon.id, firstOwnedId))
           void refetchQueue({ salonId: salon.id, date: saved, limit: 50 })
+          void refetchUnanswered({ salonId: salon.id, date: saved })
           if (kanban) {
             void refetchDay({ salonId: salon.id, date: saved, origin: null })
           } else {
@@ -628,6 +649,11 @@ function QueueRow({
         {isPreferredSoon(clock) ? (
           <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-semibold text-canvas">
             {t('owner.soon')}
+          </span>
+        ) : null}
+        {expiresToday(row, new Date()) ? (
+          <span className="rounded-full bg-ink px-2 py-0.5 text-xs font-semibold text-canvas">
+            {t('owner.expiresToday')}
           </span>
         ) : null}
       </div>

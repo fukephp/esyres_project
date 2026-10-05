@@ -14,6 +14,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LocalDemoSeeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -882,6 +883,77 @@ GQL);
         $this->assertNoGraphqlErrors();
         $expected = json_decode(trim($payload->getRaw()), true);
         $this->assertSame($expected, $this->graphql['data']['pendingJump']);
+    }
+
+    /**
+     * @When I expire unanswered bookings
+     */
+    public function iExpireUnansweredBookings(): void
+    {
+        Artisan::call('bookings:expire-unanswered');
+    }
+
+    /**
+     * @Then the stored booking status is :status
+     */
+    public function theStoredBookingStatusIs(string $status): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($status, $this->booking->status);
+    }
+
+    /**
+     * @Then the booking for :name is still :status
+     */
+    public function theBookingForIsStill(string $name, string $status): void
+    {
+        $booking = Booking::query()->whereHas('customer', fn ($query) => $query->where('name', $name))->first();
+        $this->assertNotNull($booking);
+        $this->assertSame($status, $booking->status);
+    }
+
+    /**
+     * @Then the phone booking is still confirmed
+     */
+    public function thePhoneBookingIsStillConfirmed(): void
+    {
+        $booking = Booking::query()->where('origin', Booking::ORIGIN_PHONE)->first();
+        $this->assertNotNull($booking);
+        $this->assertSame(Booking::CONFIRMED, $booking->status);
+    }
+
+    /**
+     * @Then that booking decline reason is :reason
+     */
+    public function thatBookingDeclineReasonIs(string $reason): void
+    {
+        $this->booking->refresh();
+        $this->assertSame($reason, $this->booking->decline_reason);
+    }
+
+    /**
+     * @When I query unanswered bookings for date :date
+     */
+    public function iQueryUnansweredBookingsForDate(string $date): void
+    {
+        $this->graphql($this->unansweredBookingsQuery(), [
+            'salonId' => (string) $this->salon->id,
+            'date' => $date,
+        ]);
+    }
+
+    /**
+     * @Then unanswered booking names are:
+     */
+    public function unansweredBookingNamesAre(PyStringNode $payload): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($payload->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = [];
+        foreach ($this->graphql['data']['unansweredBookings'] as $row) {
+            $actual[] = $row['customerName'];
+        }
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -2335,6 +2407,20 @@ query SalonDayBookings($salonId: ID!, $date: String!, $origin: BookingOrigin) {
     preferredStartsAt
     proposedStartsAt
     services { name }
+  }
+}
+GQL;
+    }
+
+    private function unansweredBookingsQuery(): string
+    {
+        return <<<'GQL'
+query Unanswered($salonId: ID!, $date: String!) {
+  unansweredBookings(salonId: $salonId, date: $date) {
+    customerName
+    status
+    declineReason
+    preferredStartsAt
   }
 }
 GQL;

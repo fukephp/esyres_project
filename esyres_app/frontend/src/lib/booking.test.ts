@@ -2,6 +2,10 @@ import { expect, test } from 'vitest'
 import {
   bookingClock,
   bookingStatusKey,
+  compareUnanswered,
+  expiresToday,
+  guestStatusKey,
+  isUnansweredBooking,
   bookingWorkerId,
   cancelChrome,
   cancelErrorKey,
@@ -29,6 +33,31 @@ test('groups my bookings: on hold first, newest confirmed and declined pulled ou
   expect(groups.lastDeclined?.id).toBe('4')
   expect(groups.history.map((row) => row.id)).toEqual(['1', '5', '7'])
   expect(groupMyBookings([])).toEqual({ onHold: [], lastConfirmed: null, lastDeclined: null, history: [] })
+  const morning = new Date('2026-08-29T07:00:00Z')
+  const aged = groupMyBookings(
+    [
+      { id: '8', status: 'REQUESTED', preferredDate: '2026-08-01' },
+      { id: '9', status: 'DECLINED', declineReason: 'busy', preferredDate: '2026-08-02' },
+      { id: '10', status: 'REQUESTED', preferredDate: '2026-08-29' },
+    ],
+    morning,
+  )
+  expect(aged.onHold.map((row) => row.id)).toEqual(['10'])
+  expect(aged.lastDeclined?.id).toBe('8')
+  expect(aged.history.map((row) => row.id)).toEqual(['9'])
+  expect(isUnansweredBooking({ status: 'REQUESTED', preferredDate: '2026-08-30' }, morning)).toBe(false)
+  expect(expiresToday({ status: 'REQUESTED', preferredDate: '2026-08-29' }, morning)).toBe(true)
+  expect(expiresToday({ status: 'REQUESTED', preferredDate: '2026-08-30' }, morning)).toBe(false)
+  expect(guestStatusKey({ status: 'DECLINED', declineReason: 'expired', preferredDate: '2026-08-01' }, morning)).toBe('UNANSWERED')
+  expect(guestStatusKey({ status: 'DECLINED', declineReason: 'nema mjesta', preferredDate: '2026-08-01' }, morning)).toBe('DECLINED')
+  expect(compareUnanswered(
+    { id: '2', preferredStartsAt: null },
+    { id: '1', preferredStartsAt: '2026-08-01T08:00:00Z' },
+  )).toBeGreaterThan(0)
+  expect(compareUnanswered(
+    { id: '3', preferredStartsAt: '2026-08-01T07:00:00Z' },
+    { id: '4', preferredStartsAt: '2026-08-01T08:00:00Z' },
+  )).toBeLessThan(0)
 })
 
 test('stacks duration and feninga', () => {

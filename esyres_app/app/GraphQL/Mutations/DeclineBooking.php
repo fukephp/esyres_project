@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Mutations;
 
+use App\Booking\Unanswered;
 use App\Exceptions\ClientError;
 use App\GraphQL\OwnerAccess;
 use App\Models\Booking;
@@ -26,6 +27,7 @@ final class DeclineBooking
             if ($booking === null || $booking->salon->owner_id !== $user->id) {
                 throw new ClientError('FORBIDDEN');
             }
+            Unanswered::refuse($booking);
             if ($booking->status !== Booking::REQUESTED) {
                 throw new ClientError('NOT_REQUESTED');
             }

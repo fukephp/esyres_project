@@ -46,6 +46,53 @@ export function bookingClock(row: BookingClockRow): {
   return { startsAt: row.preferredStartsAt ?? '', worker: row.worker }
 }
 
+export function sarajevoDay(now = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sarajevo' }).format(now)
+}
+
+export function isUnansweredBooking(
+  row: { status: string; preferredDate?: string; declineReason?: string | null },
+  now = new Date(),
+): boolean {
+  if (row.status === 'DECLINED' && row.declineReason === 'expired') {
+    return true
+  }
+
+  return row.status === 'REQUESTED' && (row.preferredDate ?? '') !== '' && row.preferredDate! < sarajevoDay(now)
+}
+
+export function expiresToday(
+  row: { status: string; preferredDate?: string },
+  now = new Date(),
+): boolean {
+  return row.status === 'REQUESTED' && row.preferredDate === sarajevoDay(now)
+}
+
+export function compareUnanswered<T extends { preferredStartsAt: string | null; id: string }>(a: T, b: T): number {
+  if (a.preferredStartsAt === null && b.preferredStartsAt !== null) {
+    return 1
+  }
+  if (a.preferredStartsAt !== null && b.preferredStartsAt === null) {
+    return -1
+  }
+  if (a.preferredStartsAt !== null && b.preferredStartsAt !== null && a.preferredStartsAt !== b.preferredStartsAt) {
+    return a.preferredStartsAt < b.preferredStartsAt ? -1 : 1
+  }
+
+  return Number(a.id) - Number(b.id)
+}
+
+export function guestStatusKey(
+  row: { status: string; preferredDate?: string; declineReason?: string | null },
+  now = new Date(),
+): string {
+  if (isUnansweredBooking(row, now)) {
+    return 'UNANSWERED'
+  }
+
+  return bookingStatusKey(row.status)
+}
+
 export function bookingStatusKey(status: string): BookingStatus {
   if (
     status === 'TIME_PROPOSED' ||
@@ -142,12 +189,14 @@ export function cancelErrorKey(code: string | null): CancelErrorKey {
   return 'fallback'
 }
 
-export function groupMyBookings<T extends { status: string }>(
+export function groupMyBookings<T extends { status: string; preferredDate?: string; declineReason?: string | null }>(
   rows: T[],
+  now = new Date(),
 ): { onHold: T[]; lastConfirmed: T | null; lastDeclined: T | null; history: T[] } {
-  const onHold = rows.filter((row) => row.status === 'REQUESTED' || row.status === 'TIME_PROPOSED')
+  const unanswered = (row: T) => isUnansweredBooking(row, now)
+  const onHold = rows.filter((row) => !unanswered(row) && (row.status === 'REQUESTED' || row.status === 'TIME_PROPOSED'))
   const lastConfirmed = rows.find((row) => row.status === 'CONFIRMED') ?? null
-  const lastDeclined = rows.find((row) => row.status === 'DECLINED') ?? null
+  const lastDeclined = rows.find((row) => row.status === 'DECLINED' || unanswered(row)) ?? null
   const history = rows.filter((row) => !onHold.includes(row) && row !== lastConfirmed && row !== lastDeclined)
   return { onHold, lastConfirmed, lastDeclined, history }
 }
