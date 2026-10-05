@@ -29,6 +29,9 @@ final class CreateBooking
         if (! $user instanceof User) {
             throw new ClientError('UNAUTHENTICATED');
         }
+        if ($user->is_admin) {
+            throw new ClientError('FORBIDDEN');
+        }
         if (! $user->hasVerifiedEmail()) {
             throw new ClientError('EMAIL_UNVERIFIED');
         }

@@ -240,6 +240,22 @@ type User {
     savedPlace: String @method(name: "savedPlaceName")
     savedLat: Float @method(name: "savedPlaceLat")
     savedLng: Float @method(name: "savedPlaceLng")
+    isAdmin: Boolean! @rename(attribute: "is_admin")
+    hasPendingSalon: Boolean! @method(name: "hasPendingSalon")
+    hasSentBooking: Boolean! @method(name: "hasSentBooking")
+    salonRejected: Boolean! @rename(attribute: "salon_rejected")
+}
+
+type PendingSalon {
+    id: ID!
+    name: String!
+    personName: String!
+}
+
+type AdminOverview {
+    pendingSalons: Int!
+    ownedSalons: Int!
+    bookings: Int!
 }
 
 type QrScan {
@@ -351,6 +367,8 @@ type Query {
     salonStats(salonId: ID!): SalonStats! @field(resolver: "App\\GraphQL\\Queries\\SalonStats")
     qrScans(salonId: ID!, limit: Int = 20, offset: Int = 0): [QrScan!]!
     salonQrStats(salonId: ID!): SalonQrStats!
+    adminOverview: AdminOverview!
+    pendingSalons: [PendingSalon!]!
 }
 
 type Mutation {
@@ -409,6 +427,8 @@ type Mutation {
     dismissReschedule(bookingId: ID!): Booking!
     cancelBooking(bookingId: ID!): Booking!
     markNoShow(bookingId: ID!): Booking!
+    approveSalon(id: ID!): Salon!
+    rejectSalon(id: ID!): Boolean!
 }
 
 type Subscription {

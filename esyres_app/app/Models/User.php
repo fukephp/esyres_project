@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'saved_place'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'saved_place', 'is_admin', 'salon_rejected'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -36,6 +36,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'show_in_progress' => 'boolean',
             'show_finished' => 'boolean',
             'chat_enabled' => 'boolean',
+            'is_admin' => 'boolean',
+            'salon_rejected' => 'boolean',
         ];
     }
 
@@ -91,6 +93,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function salons(): HasMany
     {
         return $this->hasMany(Salon::class, 'owner_id');
+    }
+
+    public function hasSentBooking(): bool
+    {
+        return Booking::query()->where('customer_id', $this->id)->exists();
+    }
+
+    public function hasPendingSalon(): bool
+    {
+        return Salon::query()->where('submitted_by', $this->id)->whereNull('owner_id')->exists();
     }
 
     /**

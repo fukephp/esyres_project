@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   LOGIN_MUTATION,
   REGISTER_MUTATION,
@@ -58,6 +59,7 @@ export function AuthShell({
   reset?: { token: string; email: string }
 }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [login] = useMutation(LOGIN_MUTATION, { refetchQueries: ['Me'] })
   const [register] = useMutation(REGISTER_MUTATION, { refetchQueries: ['Me'] })
   const [requestReset] = useMutation(REQUEST_PASSWORD_RESET_MUTATION)
@@ -135,7 +137,12 @@ export function AuthShell({
           },
         })
       } else {
-        await login({ variables: { email, password } })
+        const result = await login({ variables: { email, password } })
+        const loggedIn = result.data?.login as { isAdmin?: boolean } | undefined
+        if (loggedIn?.isAdmin) {
+          navigate('/admin/dashboard', { replace: true })
+          return
+        }
       }
       await onAuthenticated()
     } catch (err) {

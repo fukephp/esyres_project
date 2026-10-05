@@ -66,7 +66,7 @@ test('Odjava is the Design 2 destructive pill on both logged-in slots', () => {
   const logoutButtons = [
     ...nav.matchAll(/<button type="button" disabled=\{loggingOut\} className=\{(\w+)\} onClick=\{\(\) => void logout\(\)\}>/g),
   ]
-  expect(logoutButtons).toHaveLength(3)
+  expect(logoutButtons).toHaveLength(4)
   for (const match of logoutButtons) {
     expect(match[1]).toBe('logoutClass')
   }
@@ -188,7 +188,7 @@ test('create-salon empty slot; no Brand duplicate or owner chrome', () => {
   expect(page).not.toMatch(/home\.footer/)
   expect(page).not.toMatch(/nav\.bookings/)
   const createNavs = topNavTags(page)
-  expect(createNavs.length).toBe(4)
+  expect(createNavs.length).toBe(5)
   for (const tag of createNavs) {
     expect(tag).toMatch(/me=/)
   }

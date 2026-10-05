@@ -2,7 +2,9 @@
 
 use App\Models\AssistantIntake;
 use App\Models\Booking;
+use App\Models\Favorite;
 use App\Models\Salon;
+use App\Models\SalonRating;
 use App\Models\SalonServiceCategory;
 use App\Models\Service;
 use App\Models\User;
@@ -1475,16 +1477,154 @@ GQL, ['email' => $email, 'token' => $token, 'password' => $password]);
     }
 
     /**
-     * @Then the created salon is owned by :email
+     * @Then the created salon is pending for :email
      */
-    public function theCreatedSalonIsOwnedBy(string $email): void
+    public function theCreatedSalonIsPendingFor(string $email): void
     {
         if ($this->salon === null || $this->user === null) {
             throw new RuntimeException('Expected a created salon and session user');
         }
         $salon = $this->salon->fresh() ?? $this->salon;
-        $this->assertSame($this->user->id, $salon->owner_id);
+        $this->assertNull($salon->owner_id);
+        $this->assertSame($this->user->id, $salon->submitted_by);
         $this->assertSame($email, $this->user->email);
+    }
+
+    /**
+     * @Then the created salon owner is :email
+     */
+    public function theCreatedSalonOwnerIs(string $email): void
+    {
+        $salon = $this->salon?->fresh();
+        $owner = User::query()->where('email', $email)->first();
+        $this->assertNotNull($salon);
+        $this->assertNotNull($owner);
+        $this->assertSame($owner->id, $salon->owner_id);
+    }
+
+    /**
+     * @Then the customer has :count pending salons
+     */
+    public function theCustomerHasPendingSalons(string $count): void
+    {
+        $n = Salon::query()->where('submitted_by', $this->customer()->id)->whereNull('owner_id')->count();
+        $this->assertSame((int) $count, $n);
+    }
+
+    /**
+     * @Then the public salon is absent
+     */
+    public function thePublicSalonIsAbsent(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNull($this->graphql['data']['salon'] ?? null);
+    }
+
+    /**
+     * @Given the customer :email is named :name
+     */
+    public function theCustomerIsNamed(string $email, string $name): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        if ($user === null) {
+            throw new RuntimeException('Missing '.$email);
+        }
+        $user->name = $name;
+        $user->save();
+    }
+
+    /**
+     * @Given the signed-in customer has sent a booking
+     */
+    public function theSignedInCustomerHasSentABooking(): void
+    {
+        $owner = User::factory()->create(['email_verified_at' => now()]);
+        $salon = Salon::factory()->create(['owner_id' => $owner->id, 'name' => 'Tuđi']);
+        $this->insertCustomerBooking($this->user, $salon, '2026-08-29', '10:00');
+    }
+
+    /**
+     * @Given the customer has a favorite and a rating
+     */
+    public function theCustomerHasAFavoriteAndARating(): void
+    {
+        $owner = User::factory()->create(['email_verified_at' => now()]);
+        $salon = Salon::factory()->create(['owner_id' => $owner->id, 'name' => 'Ocjenjen']);
+        Favorite::query()->create(['user_id' => $this->user->id, 'salon_id' => $salon->id]);
+        SalonRating::query()->create([
+            'user_id' => $this->user->id,
+            'salon_id' => $salon->id,
+            'score' => 5,
+        ]);
+    }
+
+    /**
+     * @Given a verified admin :email with password :password
+     */
+    public function aVerifiedAdmin(string $email, string $password): void
+    {
+        $this->user = User::factory()->create([
+            'name' => 'Emina Softić',
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'is_admin' => true,
+        ]);
+    }
+
+    /**
+     * @Then the user :email has the salon rejected flag
+     */
+    public function theUserHasTheSalonRejectedFlag(string $email): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        $this->assertNotNull($user);
+        $this->assertTrue((bool) $user->salon_rejected);
+    }
+
+    /**
+     * @Then the user :email does not have the salon rejected flag
+     */
+    public function theUserDoesNotHaveTheSalonRejectedFlag(string $email): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        $this->assertNotNull($user);
+        $this->assertFalse((bool) $user->salon_rejected);
+    }
+
+    /**
+     * @Then the pending salon was deleted
+     */
+    public function thePendingSalonWasDeleted(): void
+    {
+        if ($this->salon === null) {
+            throw new RuntimeException('Expected a created salon');
+        }
+        $this->assertNull(Salon::query()->find($this->salon->id));
+    }
+
+    /**
+     * @When I attempt to save the salon as a favorite
+     */
+    public function iAttemptToSaveTheSalonAsAFavorite(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation SaveFavorite($salonId: ID!) {
+  saveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I attempt to rate the salon
+     */
+    public function iAttemptToRateTheSalon(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Rate($salonId: ID!) {
+  rateSalon(salonId: $salonId, score: 5) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
     }
 
     /**

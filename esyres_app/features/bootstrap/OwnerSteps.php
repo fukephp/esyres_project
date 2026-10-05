@@ -2799,6 +2799,282 @@ GQL;
     }
 
     /**
+     * @Given a verified admin :email with password :password
+     */
+    public function aVerifiedAdmin(string $email, string $password): void
+    {
+        $this->user = User::factory()->create([
+            'name' => 'Emina Softić',
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'is_admin' => true,
+        ]);
+    }
+
+    /**
+     * @When I create a salon named :name
+     */
+    public function iCreateASalonNamed(string $name): void
+    {
+        $this->graphql(<<<'GQL'
+mutation CreateSalon($name: String!) {
+  createSalon(name: $name) { id name }
+}
+GQL, ['name' => $name]);
+    }
+
+    /**
+     * @Then createSalon name is :name
+     */
+    public function createSalonNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['createSalon']['name']);
+        $id = $this->graphql['data']['createSalon']['id'] ?? null;
+        if (! is_string($id) && ! is_int($id)) {
+            throw new \RuntimeException('Expected createSalon id');
+        }
+        $this->salon = Salon::query()->find($id);
+    }
+
+    /**
+     * @Then the created salon is pending for :email
+     */
+    public function theCreatedSalonIsPendingFor(string $email): void
+    {
+        $salon = $this->salon?->fresh();
+        $this->assertNotNull($salon);
+        $this->assertNotNull($this->user);
+        $this->assertNull($salon->owner_id);
+        $this->assertSame($this->user->id, $salon->submitted_by);
+        $this->assertSame($email, $this->user->email);
+    }
+
+    /**
+     * @Then the created salon owner is :email
+     */
+    public function theCreatedSalonOwnerIs(string $email): void
+    {
+        $salon = $this->salon?->fresh();
+        $owner = User::query()->where('email', $email)->first();
+        $this->assertNotNull($salon);
+        $this->assertNotNull($owner);
+        $this->assertSame($owner->id, $salon->owner_id);
+    }
+
+    /**
+     * @Then the customer owns :count salons
+     */
+    public function theCustomerOwnsSalons(string $count): void
+    {
+        $user = $this->user?->fresh();
+        $this->assertNotNull($user);
+        $this->assertSame((int) $count, $user->salons()->count());
+    }
+
+    /**
+     * @When I query the public salon as a guest
+     */
+    public function iQueryThePublicSalonAsAGuest(): void
+    {
+        $this->iFetchTheCsrfCookie();
+        $this->graphql(<<<'GQL'
+query PublicSalon($id: ID!) {
+  salon(id: $id) { id name }
+}
+GQL, ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @Then the public salon is absent
+     */
+    public function thePublicSalonIsAbsent(): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertNull($this->graphql['data']['salon'] ?? null);
+    }
+
+    /**
+     * @Then the public salon name is :name
+     */
+    public function thePublicSalonNameIs(string $name): void
+    {
+        $this->assertNoGraphqlErrors();
+        $this->assertSame($name, $this->graphql['data']['salon']['name']);
+    }
+
+    /**
+     * @Then the pending salon was deleted
+     */
+    public function thePendingSalonWasDeleted(): void
+    {
+        $this->assertNotNull($this->salon);
+        $this->assertNull(Salon::query()->find($this->salon->id));
+    }
+
+    /**
+     * @Then the user :email has the salon rejected flag
+     */
+    public function theUserHasTheSalonRejectedFlag(string $email): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        $this->assertNotNull($user);
+        $this->assertTrue((bool) $user->salon_rejected);
+    }
+
+    /**
+     * @Then the user :email does not have the salon rejected flag
+     */
+    public function theUserDoesNotHaveTheSalonRejectedFlag(string $email): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        $this->assertNotNull($user);
+        $this->assertFalse((bool) $user->salon_rejected);
+    }
+
+    /**
+     * @Given the customer :email is named :name
+     */
+    public function theCustomerIsNamed(string $email, string $name): void
+    {
+        $user = User::query()->where('email', $email)->first();
+        if ($user === null) {
+            throw new \RuntimeException('Missing '.$email);
+        }
+        $user->name = $name;
+        $user->save();
+    }
+
+    /**
+     * @Given another verified customer :email with password :password
+     */
+    public function anotherVerifiedCustomer(string $email, string $password): void
+    {
+        $this->otherUser = User::factory()->create([
+            'email' => $email,
+            'password' => $password,
+            'email_verified_at' => now(),
+            'phone' => '+38762'.substr(sha1($email), 0, 6),
+            'phone_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * @When I create a booking on :date at :time with no services
+     */
+    public function iCreateABookingOnAtWithNoServices(string $date, string $time): void
+    {
+        $this->graphql(<<<'GQL'
+mutation CreateBooking($input: CreateBookingInput!) {
+  createBooking(input: $input) { id }
+}
+GQL, ['input' => [
+            'salonId' => (string) $this->salon->id,
+            'serviceIds' => [],
+            'preferredDate' => $date,
+            'preferredTime' => $time,
+        ]]);
+    }
+
+    /**
+     * @When I attempt to save the salon as a favorite
+     */
+    public function iAttemptToSaveTheSalonAsAFavorite(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation SaveFavorite($salonId: ID!) {
+  saveFavorite(salonId: $salonId) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I attempt to rate the salon
+     */
+    public function iAttemptToRateTheSalon(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Rate($salonId: ID!) {
+  rateSalon(salonId: $salonId, score: 5) { id }
+}
+GQL, ['salonId' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I approve the created salon
+     */
+    public function iApproveTheCreatedSalon(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Approve($id: ID!) {
+  approveSalon(id: $id) { id }
+}
+GQL, ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I reject the created salon
+     */
+    public function iRejectTheCreatedSalon(): void
+    {
+        $this->graphql(<<<'GQL'
+mutation Reject($id: ID!) {
+  rejectSalon(id: $id)
+}
+GQL, ['id' => (string) $this->salon->id]);
+    }
+
+    /**
+     * @When I query admin overview
+     */
+    public function iQueryAdminOverview(): void
+    {
+        $this->graphql(<<<'GQL'
+query {
+  adminOverview { pendingSalons ownedSalons bookings }
+}
+GQL);
+    }
+
+    /**
+     * @Then admin overview is pending :pending owned :owned bookings :bookings
+     */
+    public function adminOverviewIs(string $pending, string $owned, string $bookings): void
+    {
+        $this->assertNoGraphqlErrors();
+        $row = $this->graphql['data']['adminOverview'] ?? null;
+        if (! is_array($row)) {
+            throw new \RuntimeException('Expected adminOverview, got '.json_encode($this->graphql));
+        }
+        $this->assertSame((int) $pending, $row['pendingSalons']);
+        $this->assertSame((int) $owned, $row['ownedSalons']);
+        $this->assertSame((int) $bookings, $row['bookings']);
+    }
+
+    /**
+     * @When I query pending salons
+     */
+    public function iQueryPendingSalons(): void
+    {
+        $this->graphql(<<<'GQL'
+query {
+  pendingSalons { personName name }
+}
+GQL);
+    }
+
+    /**
+     * @Then pending salon rows are:
+     */
+    public function pendingSalonRowsAre(PyStringNode $body): void
+    {
+        $this->assertNoGraphqlErrors();
+        $expected = json_decode($body->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($expected, $this->graphql['data']['pendingSalons'] ?? null);
+    }
+
+    /**
      * @Then the local demo catalog matches the story
      */
     public function theLocalDemoCatalogMatchesTheStory(): void
@@ -2815,6 +3091,15 @@ GQL;
         $this->assertSame(2, $owner->salons()->count());
         $this->assertSame(1, $owner2->salons()->count());
         $this->assertSame(0, $guest->salons()->count());
+
+        $admin = User::query()->where('email', 'admin@esyres.test')->first();
+        $this->assertNotNull($admin);
+        $this->assertSame('Emina Softić', $admin->name);
+        $this->assertTrue($admin->is_admin);
+        $this->assertFalse($admin->salon_rejected);
+        $this->assertTrue(Hash::check('password', $admin->password));
+        $this->assertSame(0, $admin->salons()->count());
+        $this->assertSame(0, Salon::query()->where('submitted_by', $admin->id)->count());
 
         $salons = Salon::query()->orderBy('id')->get();
         $this->assertSame(3, $salons->count());

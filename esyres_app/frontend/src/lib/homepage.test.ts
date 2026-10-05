@@ -38,6 +38,7 @@ test('an owner owns a salon and lands on /owner after homepage auth; a customer 
   expect(afterHomepageAuthHref({ salons: [{ id: '1' }] })).toBe('/owner')
   expect(afterHomepageAuthHref({ salons: [] })).toBe('/my-profile')
   expect(afterHomepageAuthHref(null)).toBe('/my-profile')
+  expect(afterHomepageAuthHref({ salons: [], isAdmin: true })).toBe('/admin/dashboard')
 })
 
 test('nextHomepageAuth toggles the already-open mode closed', () => {
@@ -243,6 +244,21 @@ test('topNavChrome brand is always home; slots match path + me', () => {
   expect(topNavChrome('/owner/chats', null)).toEqual({ brand, slot: 'empty' })
   expect(topNavChrome('/welcome', owner)).toEqual({ brand, slot: 'empty' })
   expect(topNavChrome('/nope', ana)).toEqual({ brand, slot: 'empty' })
+})
+
+test('an admin nav is greeting, logout, and Pregled on open routes', () => {
+  const admin = { name: 'Emina', email: 'admin@esyres.test', salons: [], isAdmin: true as const }
+  for (const path of ['/', '/salons', '/salon/1', '/bookings', '/my-profile', '/create-salon']) {
+    expect(topNavChrome(path, admin)).toEqual({
+      brand,
+      slot: 'admin',
+      personName: 'Emina',
+      logout: true,
+    })
+  }
+  expect(topNavChrome('/', admin)).not.toHaveProperty('profile')
+  expect(topNavChrome('/', admin)).not.toHaveProperty('bookings')
+  expect(topNavChrome('/', admin)).not.toHaveProperty('panel')
 })
 
 test('discovery brand links home with Esyres wordmark key', () => {

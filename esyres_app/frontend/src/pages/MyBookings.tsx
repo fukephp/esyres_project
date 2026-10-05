@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
@@ -409,6 +409,10 @@ export function MyBookings() {
         <AuthShell place="customer" onAuthenticated={() => refetch()} />
       </div>
     )
+  }
+
+  if (data.me.isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />
   }
 
   const rows = list?.myBookings ?? []

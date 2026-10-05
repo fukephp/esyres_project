@@ -436,11 +436,13 @@ export function SalonProfile() {
           })}
         </ul>
         {hasServices ? (
-          <div className="mt-4">
-            <button type="button" className={SALON_SEND_CLASS} onClick={openPicker}>
-              {t('salon.send')}
-            </button>
-          </div>
+          meData?.me?.isAdmin === true ? null : (
+            <div className="mt-4">
+              <button type="button" className={SALON_SEND_CLASS} onClick={openPicker}>
+                {t('salon.send')}
+              </button>
+            </div>
+          )
         ) : null}
       </section>
 
@@ -454,6 +456,7 @@ export function SalonProfile() {
           </div>
         )}
       </section>
+      {meData?.me?.isAdmin === true ? null : (
       <SalonRatingBlock
         salonId={salon.id}
         average={salon.ratingAverage}
@@ -463,6 +466,7 @@ export function SalonProfile() {
           void refetch()
         }}
       />
+      )}
     </>
   )
 
@@ -473,7 +477,7 @@ export function SalonProfile() {
         <header className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-display text-[28px] font-semibold tracking-tight text-ink">{salon.name}</h1>
-            {meData?.me != null ? (
+            {meData?.me != null && meData.me.isAdmin !== true ? (
               <button
                 type="button"
                 disabled={favoriteBusy}

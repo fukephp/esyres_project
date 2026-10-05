@@ -169,6 +169,10 @@ export function MyProfile() {
     )
   }
 
+  if (data.me.isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />
+  }
+
   if (isOwnerMe(data.me)) {
     return <Navigate to="/owner" replace />
   }

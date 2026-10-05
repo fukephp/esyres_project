@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'name', 'address', 'description', 'main_image_path', 'gallery_paths', 'cancellation_notice_hours', 'reschedule_cap', 'hours', 'lat', 'lng', 'dnd'])]
+#[Fillable(['owner_id', 'submitted_by', 'name', 'address', 'description', 'main_image_path', 'gallery_paths', 'cancellation_notice_hours', 'reschedule_cap', 'hours', 'lat', 'lng', 'dnd'])]
 class Salon extends Model
 {
     /** @use HasFactory<SalonFactory> */
@@ -60,6 +60,11 @@ class Salon extends Model
     /**
      * @return BelongsTo<User, $this>
      */
+    public function submitter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

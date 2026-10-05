@@ -50,6 +50,20 @@ export function TopNav({
                 </Link>
               </>
             ) : null}
+            {chrome.slot === 'admin' ? (
+              <>
+                {chrome.personName ? (
+                  <span className={linkClass}>{t('nav.welcome', { name: chrome.personName })}</span>
+                ) : null}
+                <button type="button" disabled={loggingOut} className={logoutClass} onClick={() => void logout()}>
+                  {loggingOut ? <Spinner className="mr-2 size-4" /> : null}
+                  {t('home.logout')}
+                </button>
+                <Link to="/admin/dashboard" className={linkClass}>
+                  {t('admin.overview')}
+                </Link>
+              </>
+            ) : null}
             {chrome.slot === 'home-session' ? (
               <>
                 {chrome.personName ? (
