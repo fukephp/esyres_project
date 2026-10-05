@@ -20,6 +20,9 @@ class LocalDemoSeeder extends Seeder
         $owner = $this->user('Amira Hodžić', 'owner@esyres.test');
         $guest = $this->user('Ana Kovač', 'guest@esyres.test');
         $owner2 = $this->user('Emir Begić', 'owner2@esyres.test');
+        $admin = $this->user('Emina Softić', 'admin@esyres.test');
+        $admin->is_admin = true;
+        $admin->save();
 
         $primary = $this->salon($owner, 'Salon Mira', 43.8590, 18.4310);
         $second = $this->salon($owner, 'Studio Luna', 43.8566, 18.3970);

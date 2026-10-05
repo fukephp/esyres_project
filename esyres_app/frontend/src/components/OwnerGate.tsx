@@ -10,8 +10,16 @@ export function OwnerGate({ children }: { children: ReactNode }) {
   const { data, loading } = useQuery<MeData>(ME_QUERY)
   const me = data?.me
   const unknown = loading && data === undefined
-  const bounce = !unknown && me != null && !isOwnerMe(me)
+  const admin = !unknown && me?.isAdmin === true
+  const bounce = !unknown && me != null && !isOwnerMe(me) && me.isAdmin !== true
   const bounced = useRef(false)
+
+  useEffect(() => {
+    if (!admin) {
+      return
+    }
+    navigate('/admin/dashboard', { replace: true })
+  }, [admin, navigate])
 
   useEffect(() => {
     if (!bounce || bounced.current) {
@@ -27,7 +35,7 @@ export function OwnerGate({ children }: { children: ReactNode }) {
     }
   }, [bounce, navigate])
 
-  if (unknown || bounce) {
+  if (unknown || admin || bounce) {
     return <div className="min-h-svh bg-page" />
   }
 

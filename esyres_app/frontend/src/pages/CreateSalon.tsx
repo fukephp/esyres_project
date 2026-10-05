@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { TopNav } from '../components/TopNav'
@@ -14,7 +14,6 @@ import { GUEST_COLUMN_CLASS, PLACE_HEADING_CLASS } from '../lib/homepage'
 
 export function CreateSalon() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const { data, loading, refetch } = useQuery<MeData>(ME_QUERY)
   const navMe = loading ? null : (data?.me ?? null)
   const [createSalon, { loading: saving }] = useMutation(CREATE_SALON_MUTATION, {
@@ -35,6 +34,9 @@ export function CreateSalon() {
   }
 
   const surface = createSalonSurface(data?.me ?? null)
+  if (surface === 'redirect-admin') {
+    return <Navigate to="/admin/dashboard" replace />
+  }
   if (surface === 'redirect-owner') {
     return <Navigate to="/owner" replace />
   }
@@ -68,17 +70,38 @@ export function CreateSalon() {
     setError(null)
     try {
       await createSalon({ variables: { name } })
-      navigate('/owner')
+      setName('')
+      await refetch()
     } catch (err) {
       const code = graphqlErrorCode(err)
-      setError(code === 'INVALID_NAME' ? t('createSalon.INVALID_NAME') : t('salon.gate.fallback'))
+      if (code === 'INVALID_NAME') {
+        setError(t('createSalon.INVALID_NAME'))
+      } else if (code === 'HAS_BOOKINGS') {
+        setError(t('createSalon.booked'))
+      } else if (code === 'PENDING_SALON') {
+        setError(t('createSalon.waiting'))
+      } else {
+        setError(t('salon.gate.fallback'))
+      }
     }
+  }
+
+  if (surface === 'pending' || surface === 'booked') {
+    return (
+      <>
+        <TopNav me={navMe} />
+        <main className={`${GUEST_COLUMN_CLASS} py-8`}>
+          <p className="text-sm text-body">{t(surface === 'pending' ? 'createSalon.waiting' : 'createSalon.booked')}</p>
+        </main>
+      </>
+    )
   }
 
   return (
     <>
       <TopNav me={navMe} />
       <main className={`${GUEST_COLUMN_CLASS} flex min-h-svh flex-col py-8`}>
+        {surface === 'rejected' ? <p className="text-sm text-body">{t('createSalon.rejected')}</p> : null}
         <form className="mt-10 max-w-md space-y-4" onSubmit={(e) => void onSubmit(e)}>
           <label className="block text-sm text-body">
             {t('createSalon.name')}

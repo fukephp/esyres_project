@@ -12,6 +12,7 @@ final class ListedSalon
      */
     public static function constrain(Builder $query): void
     {
+        $query->whereNotNull('owner_id');
         $query->whereHas('services');
         $query->where(function (Builder $open): void {
             foreach (WeeklyHours::WEEKDAYS as $day) {

@@ -5,6 +5,7 @@ export const OWNER_BOOKING_QUERY = gql`
     ownerBooking(id: $id) {
       id
       status
+      declineReason
       customerName
       preferredDate
       preferredStartsAt
@@ -51,6 +52,39 @@ export const OWNER_BOOKING_QUERY = gql`
   }
 `
 
+export const UNANSWERED_BOOKINGS_QUERY = gql`
+  query UnansweredBookings($salonId: ID!, $date: String!) {
+    unansweredBookings(salonId: $salonId, date: $date) {
+      id
+      status
+      origin
+      declineReason
+      customerName
+      preferredDate
+      preferredStartsAt
+      preferredStartsAtLabel
+      proposedStartsAt
+      proposedStartsAtLabel
+      durationMinutes
+      worker {
+        id
+        name
+      }
+      proposedWorker {
+        id
+        name
+      }
+      services {
+        name
+      }
+    }
+  }
+`
+
+export type UnansweredBookingsData = {
+  unansweredBookings: ZapisiBooking[]
+}
+
 export const PENDING_JUMP_QUERY = gql`
   query PendingJump($salonId: ID!) {
     pendingJump(salonId: $salonId) {
@@ -64,6 +98,8 @@ export const PENDING_BOOKINGS_QUERY = gql`
   query PendingBookings($salonId: ID!, $date: String!, $limit: Int) {
     pendingBookings(salonId: $salonId, date: $date, limit: $limit) {
       id
+      status
+      declineReason
       customerName
       preferredDate
       preferredStartsAt
@@ -198,7 +234,9 @@ export const SALON_DAY_BOOKINGS_QUERY = gql`
       id
       status
       origin
+      declineReason
       customerName
+      preferredDate
       preferredStartsAt
       preferredStartsAtLabel
       proposedStartsAt
@@ -223,7 +261,9 @@ export type ZapisiBooking = {
   id: string
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED' | 'CANCELLED'
   origin: 'PICKER' | 'ASSISTANT' | 'PHONE'
+  declineReason: string | null
   customerName: string
+  preferredDate: string
   preferredStartsAt: string | null
   preferredStartsAtLabel: string | null
   proposedStartsAt: string | null
@@ -355,6 +395,7 @@ export type PriorConfirmedBooking = {
 export type OwnerBooking = {
   id: string
   status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED'
+  declineReason: string | null
   customerName: string
   preferredDate: string
   preferredStartsAt: string | null
@@ -380,6 +421,8 @@ export type OwnerBookingData = {
 
 export type PendingBooking = {
   id: string
+  status: 'REQUESTED' | 'CONFIRMED' | 'TIME_PROPOSED' | 'DECLINED' | 'CANCELLED'
+  declineReason: string | null
   customerName: string
   preferredDate: string
   preferredStartsAt: string | null

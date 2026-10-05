@@ -19,6 +19,9 @@ final class SaveFavorite
         if (! $user instanceof User) {
             throw new ClientError('UNAUTHENTICATED');
         }
+        if ($user->is_admin) {
+            throw new ClientError('FORBIDDEN');
+        }
 
         $salon = Salon::query()->find($args['salonId']);
         if (! $salon instanceof Salon) {

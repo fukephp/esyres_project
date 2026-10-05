@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Mutations;
 
+use App\Booking\Unanswered;
 use App\Booking\WorkerOverlap;
 use App\Exceptions\ClientError;
 use App\GraphQL\OwnerAccess;
@@ -41,6 +42,7 @@ final class AcceptPreferredTime
             if ($booking === null) {
                 throw new ClientError('FORBIDDEN');
             }
+            Unanswered::refuse($booking);
             if ($booking->status !== Booking::REQUESTED) {
                 throw new ClientError('NOT_REQUESTED');
             }

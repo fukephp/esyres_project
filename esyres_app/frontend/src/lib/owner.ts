@@ -1,3 +1,4 @@
+import { isUnansweredBooking } from './booking'
 import { formatSarajevoTime, sarajevoNowMinutes, sarajevoToday } from './format'
 import { quarterStartPast } from './guestQuarter'
 
@@ -937,7 +938,14 @@ export function occupyingDiaryMeta(start: string, durationMinutes: number, worke
   return end
 }
 
-export function ownerDetailMode(status: string): 'form' | 'read' | 'bounce' {
+export function ownerDetailMode(
+  status: string,
+  row?: { declineReason?: string | null; preferredDate?: string },
+  now = new Date(),
+): 'form' | 'read' | 'bounce' | 'expired' {
+  if (isUnansweredBooking({ status, preferredDate: row?.preferredDate, declineReason: row?.declineReason }, now)) {
+    return 'expired'
+  }
   if (status === 'REQUESTED') {
     return 'form'
   }
@@ -1120,9 +1128,19 @@ export function bookingStartLabel(row: {
 }
 
 export function kanbanColumn(
-  row: { status: string; preferredStartsAt: string | null; proposedStartsAt: string | null; durationMinutes?: number },
+  row: {
+    status: string
+    preferredStartsAt: string | null
+    proposedStartsAt: string | null
+    durationMinutes?: number
+    preferredDate?: string
+    declineReason?: string | null
+  },
   now = new Date(),
 ): KanbanColumn {
+  if (isUnansweredBooking(row, now)) {
+    return 'done'
+  }
   if (row.status === 'REQUESTED') {
     return 'pending'
   }

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { AuthShell } from '../components/AuthShell'
 import { EmailVerifyPanel } from '../components/EmailVerifyPanel'
 import { PhoneOtpPanel } from '../components/PhoneOtpPanel'
@@ -21,7 +21,7 @@ import {
 } from '../graphql/booking'
 import {
   bookingClock,
-  bookingStatusKey,
+  guestStatusKey,
   cancelChrome,
   cancelErrorKey,
   graphqlErrorCode,
@@ -131,7 +131,7 @@ function BookingRow({
           <Link to={`/salon/${row.salon.id}`} className={`text-base ${CUSTOMER_LINK}`}>
             {row.salon.name}
           </Link>
-          <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+          <span className={CUSTOMER_CHIP}>{t(`bookings.status.${guestStatusKey(row)}`)}</span>
         </div>
       )}
       <p className="text-sm text-ink">
@@ -148,7 +148,7 @@ function BookingRow({
         {' · '}
         {clock.worker ? clock.worker.name : t('salon.noPreference')}
       </p>
-      {row.status === 'DECLINED' && row.declineReason !== null ? (
+      {row.status === 'DECLINED' && row.declineReason !== null && row.declineReason !== 'expired' ? (
         <p className="mt-1 text-sm text-body">{row.declineReason}</p>
       ) : null}
       {chrome === 'pending' ? (
@@ -411,6 +411,10 @@ export function MyBookings() {
     )
   }
 
+  if (data.me.isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />
+  }
+
   const rows = list?.myBookings ?? []
   const groups = groupMyBookings(rows)
 
@@ -553,7 +557,7 @@ function HistoryRow({
             {row.services.map((s) => s.name).join(', ')}
           </span>
         </span>
-        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${guestStatusKey(row)}`)}</span>
         <span className={`${CUSTOMER_ICON_BUTTON} size-8`} aria-hidden>
           <svg
             viewBox="0 0 24 24"

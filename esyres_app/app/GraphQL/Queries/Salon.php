@@ -12,6 +12,6 @@ final class Salon
      */
     public function __invoke(mixed $root, array $args, GraphQLContext $context): ?SalonModel
     {
-        return SalonModel::query()->find($args['id']);
+        return SalonModel::query()->whereKey($args['id'])->whereNotNull('owner_id')->first();
     }
 }

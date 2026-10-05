@@ -25,7 +25,7 @@ import {
   type OwnerBookingData,
   type OwnerSalonData,
 } from '../graphql/pending'
-import { graphqlErrorCode } from '../lib/booking'
+import { expiresToday, graphqlErrorCode } from '../lib/booking'
 import { PLACE_HEADING_CLASS } from '../lib/homepage'
 import { formatCivilDate, sarajevoToday } from '../lib/format'
 import {
@@ -329,7 +329,7 @@ function RequestDetailPanel({
     }
   }
 
-  const mode = booking === undefined ? null : ownerDetailMode(booking.status)
+  const mode = booking === undefined ? null : ownerDetailMode(booking.status, booking)
   const block = booking === undefined ? null : occupyingBlock(booking)
   const clock =
     booking === undefined || missing
@@ -353,7 +353,47 @@ function RequestDetailPanel({
         <div className="text-ink">
         {forbidden || booking === undefined ? (
           <p className="text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
-        ) : ownerDetailMode(booking.status) === 'bounce' ? (
+        ) : mode === 'expired' ? (
+          <>
+            <p className="text-sm text-body">
+              {formatCivilDate(booking.preferredDate)}
+              {' · '}
+              {booking.preferredStartsAtLabel ?? t('owner.noTime')}
+              {' · '}
+              {booking.services.map((s) => s.name).join(', ')}
+              {' · '}
+              {t('salon.duration', { n: booking.durationMinutes })}
+              {' · '}
+              {booking.worker ? booking.worker.name : t('salon.noPreference')}
+            </p>
+            <p className="mt-4 text-sm font-semibold text-ink">{t('bookings.status.UNANSWERED')}</p>
+            {assistantOriginVisible(booking.intake) ? (
+              <>
+                <span className="mt-4 inline-block rounded-sm border border-hairline px-2 py-0.5 text-xs font-semibold text-ink">
+                  {t('owner.assistant')}
+                </span>
+                <details className="mt-2 text-sm text-body">
+                  <summary className="cursor-pointer font-medium text-ink">{t('owner.transcript')}</summary>
+                  <ul className="mt-2 space-y-1">
+                    {assistantTranscriptLines({
+                      services: booking.services,
+                      workerName: booking.worker?.name ?? null,
+                      preferredDate: booking.intake?.preferredDate ?? booking.preferredDate,
+                      preferredTime: booking.intake?.preferredTime ?? booking.preferredStartsAtLabel ?? '',
+                      noPreference: t('salon.noPreference'),
+                    }).map((line) => (
+                      <li key={line.step}>
+                        {t(`owner.chatStep.${line.step}`)}
+                        {': '}
+                        {line.value}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </>
+            ) : null}
+          </>
+        ) : mode === 'bounce' ? (
           <>
             <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
@@ -366,7 +406,7 @@ function RequestDetailPanel({
             </p>
             <p className="mt-4 text-sm text-body">{t('owner.acceptError.NOT_REQUESTED')}</p>
           </>
-        ) : ownerDetailMode(booking.status) === 'read' ? (
+        ) : mode === 'read' ? (
           <>
             <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
@@ -400,7 +440,7 @@ function RequestDetailPanel({
               </span>
             ) : null}
           </>
-        ) : ownerDetailMode(booking.status) === 'form' ? (
+        ) : mode === 'form' ? (
           <>
             <p className="text-sm text-body">
               {formatCivilDate(booking.preferredDate)}
@@ -411,6 +451,11 @@ function RequestDetailPanel({
               {' · '}
               {booking.worker ? booking.worker.name : t('salon.noPreference')}
             </p>
+            {expiresToday(booking) ? (
+              <span className="mt-3 inline-block rounded-full bg-ink px-2 py-0.5 text-xs font-semibold text-canvas">
+                {t('owner.expiresToday')}
+              </span>
+            ) : null}
             <PriorMemory booking={booking} busy={busy} error={noShowError} onMark={() => void onNoShow()} />
             {assistantOriginVisible(booking.intake) ? (
               <>

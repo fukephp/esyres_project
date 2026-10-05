@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Queries;
 
+use App\Booking\Unanswered;
 use App\GraphQL\OwnerAccess;
 use App\Models\Booking;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -27,13 +28,18 @@ final class PendingJump
             })
             ->get(['status', 'preferred_date', 'reschedule_date']);
 
+        $today = Unanswered::today();
         $days = [];
         foreach ($rows as $row) {
             $day = $row->status === Booking::REQUESTED ? $row->preferred_date : $row->reschedule_date;
             if ($day === null) {
                 continue;
             }
-            $days[] = $day->format('Y-m-d');
+            $ymd = $day->format('Y-m-d');
+            if ($row->status === Booking::REQUESTED && $ymd < $today) {
+                continue;
+            }
+            $days[] = $ymd;
         }
 
         $dates = array_values(array_unique($days));

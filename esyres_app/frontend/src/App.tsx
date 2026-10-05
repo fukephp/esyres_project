@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { AdminGate } from './components/AdminGate'
 import { OwnerGate } from './components/OwnerGate'
 import {
   CardsSkeleton,
@@ -14,6 +15,8 @@ import {
 } from './components/Skeleton'
 import { CREATE_SALON_PATH } from './lib/createSalon'
 import { RESET_PASSWORD_PATH } from './lib/homepage'
+import { AdminDashboard } from './pages/AdminDashboard'
+import { AdminPending } from './pages/AdminPending'
 import { CreateSalon } from './pages/CreateSalon'
 import { DiscoveryHome } from './pages/DiscoveryHome'
 import { Homepage } from './pages/Homepage'
@@ -64,6 +67,9 @@ export default function App() {
         <Route path="/bookings" element={customer(<MyBookings />)} />
         <Route path="/my-profile" element={customer(<MyProfile />)} />
         <Route path="/my-profile/settings" element={customer(<MyProfile />)} />
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="/admin/dashboard" element={<AdminGate><AdminDashboard /></AdminGate>} />
+        <Route path="/admin/na-odobrenju" element={<AdminGate><AdminPending /></AdminGate>} />
         <Route path={RESET_PASSWORD_PATH} element={<ResetPassword />} />
         <Route path="/owner" element={owner(<OwnerHome />, <OwnerWeekSkeleton />)} />
         <Route path="/owner/chats" element={owner(<OwnerChats />, <RowsSkeleton count={4} />)} />

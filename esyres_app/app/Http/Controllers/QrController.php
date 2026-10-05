@@ -16,7 +16,7 @@ final class QrController
     public function __invoke(Request $request, string $salon, ReconcileQrHold $reconcile): RedirectResponse
     {
         $row = Salon::query()->find($salon);
-        if ($row === null) {
+        if ($row === null || $row->owner_id === null) {
             QrHold::forget();
 
             return redirect()->away(SpaUrl::home());

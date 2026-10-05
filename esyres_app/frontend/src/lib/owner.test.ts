@@ -615,6 +615,9 @@ test('owner catalog copy is Bosnian', async () => {
   expect(i18n.t('owner.prevMonth')).toBe('Prethodni mjesec')
   expect(i18n.t('owner.nextMonth')).toBe('Sljedeći mjesec')
   expect(i18n.t('owner.soon')).toBe('Uskoro')
+  expect(i18n.t('owner.expiresToday')).toBe('Ističe danas')
+  expect(i18n.t('bookings.status.UNANSWERED')).toBe('Nije odgovoreno')
+  expect(i18n.t('bookings.status.DECLINED')).toBe('Odbijeno')
   expect(i18n.t('owner.break')).toBe('Pauza')
   expect(i18n.exists('owner.today')).toBe(false)
   expect(i18n.t('owner.FORBIDDEN')).toBe('Salon nije tvoj.')
@@ -770,6 +773,10 @@ test('occupying clock range and request detail mode', () => {
   expect(ownerDetailMode('TIME_PROPOSED')).toBe('read')
   expect(ownerDetailMode('DECLINED')).toBe('bounce')
   expect(ownerDetailMode('CANCELLED')).toBe('bounce')
+  const sarajevoMorning = new Date('2026-08-29T07:00:00Z')
+  expect(ownerDetailMode('DECLINED', { declineReason: 'expired', preferredDate: '2026-08-01' }, sarajevoMorning)).toBe('expired')
+  expect(ownerDetailMode('REQUESTED', { preferredDate: '2026-08-01' }, sarajevoMorning)).toBe('expired')
+  expect(ownerDetailMode('REQUESTED', { preferredDate: '2026-08-29' }, sarajevoMorning)).toBe('form')
 })
 
 test('occupying dots and selected-day split', () => {
@@ -876,6 +883,9 @@ test('kanbanColumn maps status and past confirmed starts', () => {
   expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z', durationMinutes: 180 }, now)).toBe('inProgress')
   expect(kanbanColumn({ ...base, status: 'CONFIRMED', preferredStartsAt: '2026-09-29T08:00:00Z' }, now)).toBe('done')
   expect(kanbanColumn({ ...base, status: 'DECLINED' }, now)).toBe('done')
+  expect(kanbanColumn({ ...base, status: 'DECLINED', declineReason: 'expired', preferredDate: '2026-09-28' }, now)).toBe('done')
+  expect(kanbanColumn({ ...base, status: 'REQUESTED', preferredDate: '2026-09-28' }, now)).toBe('done')
+  expect(kanbanColumn({ ...base, status: 'REQUESTED', preferredDate: '2026-09-29' }, now)).toBe('pending')
   expect(kanbanColumn({ ...base, status: 'CANCELLED' }, now)).toBe('done')
 })
 

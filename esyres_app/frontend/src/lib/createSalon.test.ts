@@ -32,6 +32,14 @@ test('createSalonSurface is form when signed in, verified, with no salons', () =
   expect(createSalonSurface({ emailVerified: true, salons: [] })).toBe('form')
 })
 
+test('createSalonSurface sends an admin to the dashboard and holds a pending or booked account', () => {
+  const base = { emailVerified: true, salons: [] }
+  expect(createSalonSurface({ ...base, isAdmin: true })).toBe('redirect-admin')
+  expect(createSalonSurface({ ...base, hasPendingSalon: true, hasSentBooking: true })).toBe('pending')
+  expect(createSalonSurface({ ...base, hasSentBooking: true })).toBe('booked')
+  expect(createSalonSurface({ ...base, salonRejected: true })).toBe('rejected')
+})
+
 test('ownerPanelCta is create vs panel', () => {
   expect(ownerPanelCta(false)).toEqual({ href: '/create-salon', kind: 'create' })
   expect(ownerPanelCta(true)).toEqual({ href: '/owner', kind: 'panel' })
@@ -42,6 +50,9 @@ test('create salon copy is Bosnian', async () => {
   expect(i18n.t('createSalon.name')).toBe('Ime salona')
   expect(i18n.t('createSalon.submit')).toBe('Otvori panel')
   expect(i18n.t('createSalon.INVALID_NAME')).toBe('Unesi ime salona.')
+  expect(i18n.t('createSalon.waiting')).toBe('Salon čeka odobrenje.')
+  expect(i18n.t('createSalon.booked')).toBe('Ovaj račun već ima zahtjeve.')
+  expect(i18n.t('createSalon.rejected')).toBe('Salon nije odobren.')
   expect(i18n.t('home.panel')).toBe('Panel')
   expect(i18n.t('owner.createSalon')).toBe('Napravi salon')
   expect(i18n.t('pitch.brand')).toBe('Esyres')

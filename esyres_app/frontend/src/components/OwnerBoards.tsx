@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { OccupyingBooking, ZapisiBooking } from '../graphql/pending'
+import { expiresToday, guestStatusKey } from '../lib/booking'
 import { formatPickerDayNumeric } from '../lib/salonHours'
 import { Alert, Spinner } from './ui'
 import {
@@ -298,7 +299,10 @@ export function BookingCard({ row, onOpen, now, progress }: { row: ZapisiBooking
       ) : (
         <span className="mt-1.5 block text-xs">{t('salon.noPreference')}</span>
       )}
-      {column === 'done' ? <span className="mt-1 block text-[11px] font-semibold">{t(`bookings.status.${row.status}`)}</span> : null}
+      {column === 'pending' && expiresToday(row) ? (
+        <span className="mt-1 inline-block rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-canvas">{t('owner.expiresToday')}</span>
+      ) : null}
+      {column === 'done' ? <span className="mt-1 block text-[11px] font-semibold">{t(`bookings.status.${guestStatusKey(row)}`)}</span> : null}
       {progress !== undefined ? <ElapsedTrack share={progress} /> : null}
     </button>
   )

@@ -37,6 +37,10 @@ export const ME_QUERY = gql`
       savedPlace
       savedLat
       savedLng
+      isAdmin
+      hasPendingSalon
+      hasSentBooking
+      salonRejected
       salons {
         id
         name
@@ -137,6 +141,7 @@ export const LOGIN_MUTATION = gql`
       emailVerified
       phone
       phoneVerified
+      isAdmin
     }
   }
 `
@@ -401,6 +406,10 @@ export type MeData = {
     savedPlace: string | null
     savedLat: number | null
     savedLng: number | null
+    isAdmin: boolean
+    hasPendingSalon: boolean
+    hasSentBooking: boolean
+    salonRejected: boolean
     salons: {
       id: string
       name: string

@@ -13,7 +13,7 @@ import { MY_BOOKINGS_QUERY, type MyBooking, type MyBookingsData } from '../graph
 import { SUGGESTED_SALONS_QUERY, type DiscoverySalon, type SuggestedSalonsData } from '../graphql/discovery'
 import { CustomerSettingsForm } from './CustomerSettings'
 import { MyRatingsList } from './SalonRating'
-import { bookingClock, bookingStatusKey } from '../lib/booking'
+import { bookingClock, guestStatusKey } from '../lib/booking'
 import { busyToken } from '../lib/busyToken'
 import {
   CUSTOMER_CARD,
@@ -110,7 +110,7 @@ function BookingSummary({ row }: { row: MyBooking }) {
         <Link to={`/salon/${row.salon.id}`} className={`text-base ${CUSTOMER_LINK}`}>
           {row.salon.name}
         </Link>
-        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${bookingStatusKey(row.status)}`)}</span>
+        <span className={CUSTOMER_CHIP}>{t(`bookings.status.${guestStatusKey(row)}`)}</span>
       </div>
       <p className="mt-2 text-sm text-ink">
         {formatCivilDate(row.status === 'TIME_PROPOSED' && row.proposedDate !== null ? row.proposedDate : row.preferredDate)}
@@ -167,6 +167,10 @@ export function MyProfile() {
         <AuthShell place="customer" onAuthenticated={() => refetch()} />
       </div>
     )
+  }
+
+  if (data.me.isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />
   }
 
   if (isOwnerMe(data.me)) {

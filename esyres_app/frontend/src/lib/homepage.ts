@@ -25,6 +25,7 @@ export type TopNavMe = {
   name: string | null | undefined
   email: string
   salons?: unknown[]
+  isAdmin?: boolean
 } | null
 
 export type TopNavBrand = { to: typeof HOME_HREF; brandKey: typeof DISCOVERY_BRAND_KEY }
@@ -37,6 +38,7 @@ export type TopNavChrome =
   | { brand: TopNavBrand; slot: 'empty' }
   | { brand: TopNavBrand; slot: 'session'; personName: string | null; logout: true }
   | { brand: TopNavBrand; slot: 'customer-session'; personName: string | null; profile?: true; bookings: true; logout: true }
+  | { brand: TopNavBrand; slot: 'admin'; personName: string | null; logout: true }
 
 const brand: TopNavBrand = { to: HOME_HREF, brandKey: DISCOVERY_BRAND_KEY }
 
@@ -95,13 +97,19 @@ export function isOwnerMe(me: { salons?: unknown[] } | null | undefined): boolea
   return (me?.salons?.length ?? 0) > 0
 }
 
-export function afterHomepageAuthHref(me: { salons?: unknown[] } | null | undefined): string {
+export function afterHomepageAuthHref(me: { salons?: unknown[]; isAdmin?: boolean } | null | undefined): string {
+  if (me?.isAdmin) {
+    return '/admin/dashboard'
+  }
   return isOwnerMe(me) ? '/owner' : PROFILE_HREF
 }
 
 export function topNavChrome(path: string, me: TopNavMe): TopNavChrome {
   const slot = topNavSlot(path)
   const personName = homepagePersonName(me)
+  if (me?.isAdmin) {
+    return { brand, slot: 'admin', personName, logout: true }
+  }
   const profile = me != null && !isOwnerMe(me) ? { profile: true as const } : {}
   if (slot === 'home') {
     const panel = ownerPanelCta(isOwnerMe(me))
